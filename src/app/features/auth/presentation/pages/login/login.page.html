@@ -1,0 +1,37 @@
+<div class="login-container">
+  <!-- Mitad izquierda/formulario -->
+  <div class="login-left">
+    <div class="login-form-wrapper">
+      <img [src]="logoPath" alt="Logo refaccionaria" class="logo" />
+
+      <h2 class="login-title">Acceso al Sistema</h2>
+      <p class="login-description">
+        Ingresa con tus credenciales asignadas por el administrador o empleador.
+      </p>
+
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <app-input id="username" formControlName="username" label="Usuario" placeholder="Ingresa tu usuario"
+          [hasError]="usernameCtrl.invalid && usernameCtrl.touched" errorMessage="El usuario es requerido"></app-input>
+
+        <app-input id="password" type="password" formControlName="password" label="Contraseña"
+          placeholder="Ingresa tu contraseña" [hasError]="passwordCtrl.invalid && passwordCtrl.touched"
+          errorMessage="La contraseña es requerida"></app-input>
+
+        <div class="form-actions">
+          <app-button type="submit" [disabled]="isDisabled()" [loading]="loading()" loadingText="Ingresando...">
+            Ingresar
+          </app-button>
+        </div>
+      </form>
+
+      <div *ngIf="errorMessage()" class="error-message">
+        {{ errorMessage() }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Mitad derecha/imágen -->
+  <div class="login-right">
+    <img [src]="backgroundImagePath" alt="Fondo login" class="login-img" />
+  </div>
+</div>

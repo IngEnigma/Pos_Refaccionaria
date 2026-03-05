@@ -1,1 +1,21 @@
-/* You can add global styles to this file, and also import other style files */
+:root {
+  --font-title: "Montserrat", sans-serif, 600;
+  --font-text: "Roboto", sans-serif, 400;
+
+  --color-primary-600: #233387;
+  --color-primary-700: #1a2764;
+  --color-primary-100: #e0e7ff;
+
+  --color-bg: #f9fafb;
+  --color-border: #e5e7eb;
+  --color-text: #374151;
+  --color-text-strong: #111827;
+
+  --color-success: #059669;
+
+  --color-danger: #dc2626;
+}
+
+body {
+  margin: 0;
+}
