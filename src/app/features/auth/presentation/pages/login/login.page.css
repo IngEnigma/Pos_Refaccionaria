@@ -1,116 +1,86 @@
-/* Contenedor principal para PC/Laptop */
-.login-container {
-  display: flex;
-  height: 100vh;
-  width: 100%;
-  background-color: #f3f4f6;
+:host {
+  display: block;
+  height: 100dvh;
   overflow: hidden;
-  /* Evita scrolls innecesarios */
 }
 
-/* Mitad izquierda (formulario) */
+.login-container {
+  display: grid;
+  grid-template-columns: minmax(440px, 520px) minmax(0, 1fr);
+  height: 100%;
+  width: 100%;
+  background-color: var(--color-bg);
+  overflow: hidden;
+}
+
 .login-left {
-  flex: 0 0 500px;
-  /* Ancho fijo para el panel lateral de login en PC */
   display: flex;
-  flex-direction: column;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   padding: 3rem;
-  background-color: #ffffff;
-  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-  z-index: 10;
+  background-color: #fff;
+  box-shadow: 2px 0 12px rgba(0, 0, 0, 0.1);
+  z-index: 1;
 }
 
 .login-form-wrapper {
   width: 100%;
-  max-width: 360px;
-  /* Ancho cómodo para formularios en desktop */
+  max-width: 380px;
 }
 
 .logo {
-  width: 180px;
-  margin-bottom: 2rem;
+  width: 250px;
+  height: auto;
+  margin: 0 auto 2rem;
   display: block;
 }
 
-/* Título principal */
 .login-title {
-  font-size: 28px;
-  font-weight: 700;
-  color: #111827;
+  font-size: 2rem;
+  font-weight: var(--font-title-weight);
+  font-family: var(--font-title-family);
+  color: var(--color-text-strong);
   margin-top: 0;
   margin-bottom: 0.5rem;
+  text-align: center;
 }
 
-/* Texto descriptivo */
 .login-description {
-  font-size: 14px;
-  color: #6b7280;
+  font-size: 0.9rem;
+  font-weight: var(--font-text-weight);
+  font-family: var(--font-text-family);
+  color: var(--color-text);
   margin-bottom: 2rem;
   line-height: 1.5;
+  text-align: center;
 }
 
-/* Contenedor de acciones */
 .form-actions {
   margin-top: 2rem;
 }
 
-/* Manejo de errores globales */
 .error-message {
   margin-top: 1.5rem;
   padding: 0.75rem;
-  background-color: #fee2e2;
-  color: #b91c1c;
+  background-color: color-mix(in srgb, var(--color-danger) 12%, white);
+  color: var(--color-danger);
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 0.875rem;
   text-align: center;
-  border: 1px solid #fecaca;
+  border: 1px solid color-mix(in srgb, var(--color-danger) 35%, white);
 }
 
-/* Mitad derecha (imagen de fondo) */
 .login-right {
-  flex: 1;
-  /* Ocupa el resto del espacio en monitores anchos */
+  min-width: 0;
   display: flex;
   position: relative;
-  background-color: #e5e7eb;
+  background-color: var(--color-border);
+  overflow: hidden;
 }
 
-/* Imagen de la derecha */
 .login-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   object-position: center;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .login-container {
-    flex-direction: column;
-  }
-  
-  .login-left {
-    flex: 1;
-    width: 100%;
-    padding: 2rem;
-  }
-
-  .login-right {
-    display: none;
-  }
-
-  .login-form-wrapper {
-    max-width: 100%;
-  }
-  
-  .logo {
-    margin-bottom: 1.5rem;
-    width: 140px;
-  }
-  
-  .login-title {
-    font-size: 24px;
-  }
 }

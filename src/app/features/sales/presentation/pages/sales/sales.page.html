@@ -1,0 +1,61 @@
+<section class="sales-page">
+  <header class="sales-header">
+    <div>
+      <h1 class="sales-title">Ventas</h1>
+      <p class="sales-description">
+        Panel principal del POS. Gestiona ventas y consulta movimientos recientes.
+      </p>
+    </div>
+
+    <app-button
+      variant="secondary"
+      [loading]="facade.loading()"
+      loadingText="Actualizando..."
+      (onClick)="reloadSales()"
+    >
+      Actualizar
+    </app-button>
+  </header>
+
+  @if (facade.loading()) {
+    <div class="sales-skeleton">
+      @for (row of skeletonRows; track row) {
+        <div class="skeleton-row"></div>
+      }
+    </div>
+  } @else if (facade.errorMessage()) {
+    <div class="sales-feedback sales-feedback-error" role="alert" aria-live="polite">
+      <p>{{ facade.errorMessage() }}</p>
+      <app-button variant="secondary" (onClick)="reloadSales()">Reintentar</app-button>
+    </div>
+  } @else if (facade.sales().length === 0) {
+    <div class="sales-feedback sales-feedback-empty">
+      <p>No hay ventas registradas todavía.</p>
+    </div>
+  } @else {
+    <div class="sales-table-wrapper">
+      <table class="sales-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Usuario</th>
+            <th>Método de pago</th>
+            <th>Total</th>
+            <th>Fecha</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (sale of facade.sales(); track sale.id) {
+            <tr>
+              <td>#{{ sale.id }}</td>
+              <td>{{ sale.idUsuario ?? 'N/A' }}</td>
+              <td>{{ sale.idMetodoPago ?? 'N/A' }}</td>
+              <td>{{ sale.total | currency: 'MXN':'symbol':'1.2-2' }}</td>
+              <td>{{ sale.fecha | date: 'medium' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>

@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 
 import { APP_ENV } from '@core/tokens/app-env.token';
 import { Environment } from '@env/environment.model';
@@ -8,9 +8,10 @@ import { LoggerPort } from './logger.port';
 
 @Injectable({ providedIn: 'root' })
 export class LoggerService implements LoggerPort {
+  private readonly env = inject<Environment>(APP_ENV);
   private currentLevel: LogLevel;
 
-  constructor(@Inject(APP_ENV) private env: Environment) {
+  constructor() {
     this.currentLevel = this.env.loggingLevel;
   }
 

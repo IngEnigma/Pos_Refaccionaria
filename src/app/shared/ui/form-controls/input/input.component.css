@@ -1,0 +1,88 @@
+.input-container {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1.5rem;
+}
+
+.input-label {
+  font-weight: var(--font-title-weight);
+  font-family: var(--font-title-family);
+  margin-bottom: 0.5rem;
+  color: var(--color-text);
+}
+
+.input-field-wrapper {
+  position: relative;
+}
+
+.input-field {
+  width: 100%;
+  padding: 0.8rem;
+  border: 2px solid var(--color-border);
+  border-radius: 8px;
+  box-sizing: border-box;
+  font-size: 14px;
+  color: var(--color-text);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  background-color: color-mix(in srgb, var(--color-bg) 65%, white);;
+}
+
+.input-field::placeholder {
+  color: color-mix(in srgb, var(--color-text) 55%, white);
+}
+
+.input-field:focus {
+  outline: none;
+  border: 2px solid var(--color-primary-600);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary-600) 10%, white);
+}
+
+.input-field.has-error {
+  border-color: var(--color-danger);
+}
+
+.input-field-with-toggle {
+  padding-right: 2.8rem;
+}
+
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 0.7rem;
+  transform: translateY(-50%);
+  border: 0;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  width: 1.6rem;
+  height: 1.6rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.password-toggle:focus-visible {
+  outline: 2px solid var(--color-primary-600);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.password-toggle:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.password-toggle-icon {
+  width: 1.4rem;
+  height: 1.4rem;
+  object-fit: contain;
+}
+
+.error-message {
+  color: var(--color-danger);
+  font-size: 12px;
+  font-weight: var(--font-text-weight);
+  font-family: var(--font-text-family);
+  margin-top: 0.25rem;
+}

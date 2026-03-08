@@ -1,0 +1,69 @@
+.button-base {
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.button-base:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--color-primary-600) 35%, white);
+  outline-offset: 2px;
+}
+
+.button-base:disabled {
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.button-primary {
+  background-color: var(--color-primary-600);
+  color: #fff;
+}
+
+.button-primary:hover:not(:disabled) {
+  background-color: var(--color-primary-700);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px color-mix(in srgb, var(--color-primary-600) 25%, transparent);
+}
+
+.button-primary:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+.button-secondary {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+}
+
+.button-secondary:hover:not(:disabled) {
+  background-color: var(--color-primary-100);
+  transform: translateY(-1px);
+}
+
+.button-full {
+  width: 100%;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid color-mix(in srgb, var(--color-text-strong) 20%, transparent);
+  border-radius: 50%;
+  border-top-color: currentColor;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

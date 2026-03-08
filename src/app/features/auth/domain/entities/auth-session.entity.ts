@@ -38,12 +38,25 @@ export class Session {
   }
 
   isAccessTokenExpired(): boolean {
+    if (!this.accessToken) {
+      return true;
+    }
+
+    if (!this.accessExp) {
+      return false;
+    }
+
     const currentTime = Math.floor(Date.now() / 1000);
     return this.accessExp < currentTime;
   }
 
   isRefreshTokenExpired(): boolean {
     if (!this.refreshToken) return true;
+
+    if (!this.refreshExp) {
+      return false;
+    }
+
     const currentTime = Math.floor(Date.now() / 1000);
     return this.refreshExp < currentTime;
   }

@@ -1,13 +1,16 @@
 :root {
-  --font-title: "Montserrat", sans-serif, 600;
-  --font-text: "Roboto", sans-serif, 400;
+  --font-title-family: "Montserrat", sans-serif;
+  --font-text-family: "Roboto", sans-serif;
 
+  --font-title-weight: 600;
+  --font-text-weight: 400;
+  
   --color-primary-600: #233387;
   --color-primary-700: #1a2764;
   --color-primary-100: #e0e7ff;
 
   --color-bg: #f9fafb;
-  --color-border: #e5e7eb;
+  --color-border: #d1d4db;
   --color-text: #374151;
   --color-text-strong: #111827;
 

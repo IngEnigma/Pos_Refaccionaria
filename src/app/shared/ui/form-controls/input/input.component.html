@@ -1,0 +1,44 @@
+<div class="input-container">
+  <label [for]="inputId" class="input-label">{{ label() }}</label>
+  <div class="input-field-wrapper">
+    <input
+      [type]="resolvedInputType"
+      [id]="inputId"
+      [placeholder]="placeholder()"
+      [attr.autocomplete]="autocomplete()"
+      [value]="value"
+      (input)="onInputChange($event)"
+      (blur)="onTouchedFn()"
+      [disabled]="disabled"
+      [attr.aria-invalid]="hasError() ? 'true' : 'false'"
+      [attr.aria-describedby]="hasError() ? errorId : null"
+      class="input-field"
+      [class.has-error]="hasError()"
+      [class.input-field-with-toggle]="isPasswordType"
+    />
+
+    @if (isPasswordType) {
+      <button
+        type="button"
+        class="password-toggle"
+        [disabled]="disabled"
+        [attr.aria-label]="showPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+        [attr.aria-pressed]="showPassword() ? 'true' : 'false'"
+        (click)="togglePasswordVisibility()"
+      >
+        <img
+          class="password-toggle-icon"
+          [src]="showPassword() ? eyeOffIconPath : eyeIconPath"
+          alt=""
+          aria-hidden="true"
+        />
+      </button>
+    }
+  </div>
+
+  @if (hasError()) {
+    <div class="error-message" [id]="errorId" role="alert" aria-live="polite">
+      {{ errorMessage() }}
+    </div>
+  }
+</div>

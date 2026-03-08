@@ -5,5 +5,5 @@ export interface LogEntry {
   message: string;
   timestamp: string;
   context?: string;
-  data?: any;
+  data?: unknown;
 }

@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, catchError, map, tap, throwError } from 'rxjs';
 
@@ -20,15 +20,11 @@ import { SessionMapper } from '@features/auth/infrastructure/mappers/auth-sessio
 
 @Injectable({ providedIn: 'root' })
 export class AuthRepositoryImpl implements AuthRepository {
-  private readonly logger: LoggerPort;
-
-  constructor(
-    private http: HttpClient,
-    loggerService: LoggerService,
-    @Inject(APP_ENV) private env: Environment,
-  ) {
-    this.logger = loggerService.withContext('AuthRepository');
-  }
+  private readonly http = inject(HttpClient);
+  private readonly env = inject<Environment>(APP_ENV);
+  private readonly logger: LoggerPort = inject(LoggerService).withContext(
+    'AuthRepository',
+  );
 
   login(credentials: LoginCredentials): Observable<Session> {
     const url = `${this.env.apiUrl}${API_ENDPOINTS.AUTH.LOGIN}`;

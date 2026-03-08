@@ -1,0 +1,32 @@
+<header class="navbar" role="banner">
+  <div class="search-container">
+    <input
+      id="layout-search"
+      type="text"
+      [placeholder]="searchPlaceholder()"
+      class="search-input"
+      aria-label="Buscar en el sistema"
+      (input)="onSearchInput($event)"
+    />
+  </div>
+
+  <div class="user-section">
+    <div class="user-info">
+      <span class="username">{{ username() }}</span>
+      <span class="date">{{ currentDate() }}</span>
+    </div>
+
+    <button type="button" class="icon-button" aria-label="Perfil de usuario" (click)="onProfileClick()">
+      <img [ngSrc]="profileIconPath()" width="20" height="20" alt="" aria-hidden="true" />
+    </button>
+
+    <button
+      type="button"
+      class="icon-button"
+      aria-label="Notificaciones"
+      (click)="onNotificationsClick()"
+    >
+      <img [ngSrc]="notificationsIconPath()" width="20" height="20" alt="" aria-hidden="true" />
+    </button>
+  </div>
+</header>

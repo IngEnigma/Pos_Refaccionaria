@@ -1,0 +1,84 @@
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  background-color: #fff;
+  padding: 0.85rem 1.25rem;
+  border-bottom: 2px solid var(--color-border);
+}
+
+.search-container {
+  flex: 1;
+  max-width: 540px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.55rem 0.75rem;
+  border-radius: 8px;
+  border: 2px solid var(--color-border);
+  outline: none;
+  color: var(--color-text-strong);
+  background-color: color-mix(in srgb, var(--color-bg) 65%, white);
+}
+
+.search-input:focus-visible {
+  border-color: var(--color-primary-600);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary-600) 10%, white);
+}
+
+.user-section {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.user-info {
+  text-align: right;
+}
+
+.username {
+  display: block;
+  font-weight: 600;
+  color: var(--color-text-strong);
+}
+
+.date {
+  font-size: 0.85rem;
+  color: var(--color-text);
+}
+
+.icon-button {
+  background-color: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  width: 2.25rem;
+  height: 2.25rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.icon-button:hover {
+  background-color: var(--color-primary-100);
+  border-color: color-mix(in srgb, var(--color-primary-600) 20%, white);
+}
+
+.icon-button:focus-visible {
+  outline: 2px solid var(--color-primary-600);
+  outline-offset: 2px;
+}
+
+.icon-button img {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+@media (max-width: 900px) {
+  .search-container {
+    max-width: 360px;
+  }
+}

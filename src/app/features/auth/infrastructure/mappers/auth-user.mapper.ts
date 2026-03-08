@@ -7,7 +7,7 @@ export class UserMapper {
     const role = JwtUtils.mapRole(dto.user.isAdmin, dto.user.isStaff);
 
     return new User(
-      dto.user.id,
+      String(dto.user.id),
       role
     );
   }

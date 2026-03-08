@@ -1,0 +1,11 @@
+<div class="main-layout-shell">
+  <app-sidebar class="main-layout-sidebar" />
+
+  <section class="main-layout-content">
+    <app-navbar [username]="username()" [currentDate]="currentDate()" />
+
+    <main class="main-layout-router-view">
+      <router-outlet></router-outlet>
+    </main>
+  </section>
+</div>

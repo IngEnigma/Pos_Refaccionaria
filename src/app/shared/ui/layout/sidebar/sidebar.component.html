@@ -1,0 +1,30 @@
+<aside class="sidebar" aria-label="Navegación principal">
+  <div class="sidebar-logo">
+    <img [ngSrc]="logoPath()" width="242" height="74" alt="Logo Refaccionaria" class="logo-h" priority />
+  </div>
+
+  <nav class="sidebar-nav">
+    <ul class="sidebar-list">
+      @for (item of navItems(); track item.id) {
+        <li class="sidebar-item">
+          @if (!item.disabled) {
+            <a
+              [routerLink]="item.route"
+              routerLinkActive="sidebar-link-active"
+              [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
+              class="sidebar-link"
+            >
+              <img [ngSrc]="item.iconPath" width="20" height="20" alt="" aria-hidden="true" class="icon" />
+              <span class="link-text">{{ item.label }}</span>
+            </a>
+          } @else {
+            <span class="sidebar-link sidebar-link-disabled" aria-disabled="true" tabindex="-1">
+              <img [ngSrc]="item.iconPath" width="20" height="20" alt="" aria-hidden="true" class="icon" />
+              <span class="link-text">{{ item.label }}</span>
+            </span>
+          }
+        </li>
+      }
+    </ul>
+  </nav>
+</aside>

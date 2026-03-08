@@ -43,16 +43,18 @@ export class SessionMapper {
   }
 
   static fromLoginResponse(dto: LoginResponseDto): Session {
+    const accessToken = dto.accessToken ?? dto.access ?? '';
+    const refreshToken = dto.refreshToken ?? dto.refresh ?? null;
     const role = JwtUtils.mapRole(dto.user.isAdmin, dto.user.isStaff);
-    const accessExp = JwtUtils.decodeExpiration(dto.accessToken);
-    const refreshExp = JwtUtils.decodeExpiration(dto.refreshToken);
+    const accessExp = JwtUtils.decodeExpiration(accessToken);
+    const refreshExp = refreshToken ? JwtUtils.decodeExpiration(refreshToken) : 0;
 
     return new Session(
-      dto.accessToken,
-      dto.refreshToken,
+      accessToken,
+      refreshToken,
       accessExp,
       refreshExp,
-      dto.user.id,
+      String(dto.user.id),
       role,
     );
   }

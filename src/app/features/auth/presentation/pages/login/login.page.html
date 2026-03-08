@@ -1,37 +1,57 @@
 <div class="login-container">
-  <!-- Mitad izquierda/formulario -->
   <div class="login-left">
     <div class="login-form-wrapper">
-      <img [src]="logoPath" alt="Logo refaccionaria" class="logo" />
+      <img [ngSrc]="logoPath" width="610" height="469" alt="Logo refaccionaria" class="logo" priority />
 
-      <h2 class="login-title">Acceso al Sistema</h2>
+      <h1 class="login-title">Acceso al Sistema</h1>
       <p class="login-description">
         Ingresa con tus credenciales asignadas por el administrador o empleador.
       </p>
 
-      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-        <app-input id="username" formControlName="username" label="Usuario" placeholder="Ingresa tu usuario"
-          [hasError]="usernameCtrl.invalid && usernameCtrl.touched" errorMessage="El usuario es requerido"></app-input>
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
+        <app-input
+          id="username"
+          formControlName="username"
+          label="Usuario"
+          placeholder="Ingresa tu usuario"
+          autocomplete="username"
+          [hasError]="usernameCtrl.invalid && usernameCtrl.touched"
+          errorMessage="El usuario es requerido"
+        />
 
-        <app-input id="password" type="password" formControlName="password" label="Contraseña"
-          placeholder="Ingresa tu contraseña" [hasError]="passwordCtrl.invalid && passwordCtrl.touched"
-          errorMessage="La contraseña es requerida"></app-input>
+        <app-input
+          id="password"
+          type="password"
+          formControlName="password"
+          label="Contraseña"
+          placeholder="Ingresa tu contraseña"
+          autocomplete="current-password"
+          [hasError]="passwordCtrl.invalid && passwordCtrl.touched"
+          errorMessage="La contraseña es requerida"
+        />
 
         <div class="form-actions">
-          <app-button type="submit" [disabled]="isDisabled()" [loading]="loading()" loadingText="Ingresando...">
+          <app-button
+            type="submit"
+            [disabled]="submitDisabled"
+            [loading]="loading()"
+            loadingText="Ingresando..."
+            [fullWidth]="true"
+          >
             Ingresar
           </app-button>
         </div>
       </form>
 
-      <div *ngIf="errorMessage()" class="error-message">
-        {{ errorMessage() }}
-      </div>
+      @if (errorMessage()) {
+        <div class="error-message" role="alert" aria-live="polite">
+          {{ errorMessage() }}
+        </div>
+      }
     </div>
   </div>
 
-  <!-- Mitad derecha/imágen -->
-  <div class="login-right">
-    <img [src]="backgroundImagePath" alt="Fondo login" class="login-img" />
+  <div class="login-right" aria-hidden="true">
+    <img [ngSrc]="backgroundImagePath" fill alt="" class="login-img" priority />
   </div>
 </div>

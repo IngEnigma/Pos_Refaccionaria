@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 
 import { LoggerService } from '@core/logging/logger.service';
 import { LoggerPort } from '@core/logging/logger.port';
@@ -6,16 +6,9 @@ import { StoragePort } from '@core/ports/storage.port';
 
 @Injectable({ providedIn: 'root' })
 export class LocalStorageService implements StoragePort {
-  private readonly logger: LoggerPort;
-
-/**
- * Constructor for the LocalStorageService.
- * @param loggerService - The logger service to use for logging.
- * Sets up a logger with the context of 'LocalStorageService'.
- */
-  constructor(private loggerService: LoggerService) {
-    this.logger = this.loggerService.withContext('LocalStorageService');
-  }
+  private readonly logger: LoggerPort = inject(LoggerService).withContext(
+    'LocalStorageService',
+  );
 
 /**
  * Returns the storage object if it is available, otherwise returns null.

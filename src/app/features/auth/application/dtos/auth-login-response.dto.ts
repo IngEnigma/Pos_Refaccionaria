@@ -1,8 +1,10 @@
 export interface LoginResponseDto {
-  refreshToken: string;
-  accessToken: string;
+  refreshToken?: string;
+  accessToken?: string;
+  refresh?: string;
+  access?: string;
   user: {
-    id: string;
+    id: string | number;
     isAdmin: boolean;
     isStaff: boolean;
   };

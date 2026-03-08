@@ -1,4 +1,4 @@
-import { computed, Inject, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 
 import { SessionMapper } from '@features/auth/infrastructure/mappers/auth-session.mapper';
 import { Session } from '@features/auth/domain/entities/auth-session.entity';
@@ -13,7 +13,10 @@ type SessionPrimitives = ReturnType<typeof SessionMapper.toJSON>;
 export class SessionService {
   private readonly _session = signal<Session | null>(null);
   private readonly STORAGE_KEY = 'session';
-  private readonly logger: LoggerPort;
+  private readonly logger: LoggerPort = inject(LoggerService).withContext(
+    'SessionStateService',
+  );
+  private readonly storage = inject<StoragePort>(STORAGE_PORT);
   readonly session = this._session.asReadonly();
   readonly isAuthenticated = computed(() => {
     const session = this.session();
@@ -21,21 +24,10 @@ export class SessionService {
     return session?.isAuthenticated ?? false;
   });
 
-/**
- * Constructor for the SessionService.
- *
- * @param loggerService - The logger service to use for logging.
- * @param storage - The storage port to use for storing and retrieving the session.
- *
- * Loads the session from storage when the service is constructed.
- * If the stored session is expired, it is cleared from storage.
- */
-  constructor(
-    private loggerService: LoggerService,
-    @Inject(STORAGE_PORT) private storage: StoragePort,
-  ) {
-    this.logger = this.loggerService.withContext('SessionStateService');
-
+  /**
+   * Loads persisted session state when the service starts.
+   */
+  constructor() {
     const sessionJson = this.storage.getJSON<SessionPrimitives>(
       this.STORAGE_KEY,
     );
@@ -98,7 +90,7 @@ export class SessionService {
    * @param options - An optional object containing a single property: persist.
    * If persist is true, the session is persisted to storage.
    */
-  setSession(session: Session | null, options?: { persist?: boolean }) { //
+  setSession(session: Session | null, options?: { persist?: boolean }) {
     this._session.set(session);
 
     this.logger.debug('Setting session');
@@ -115,7 +107,7 @@ export class SessionService {
    *
    * @returns The current session, or null if there is no current session.
    */
-  getSession(): Session | null { 
+  getSession(): Session | null {
     const session = this.session();
     if (session) {
       this.logger.debug('Session retrieved');
@@ -130,7 +122,7 @@ export class SessionService {
    * Clears the current session by setting it to null and persisting the change to storage.
    * A debug message is logged when the session is cleared.
    */
-  clearSession() { 
+  clearSession() {
     this.setSession(null, { persist: true });
     this.logger.info('Session cleared');
   }
