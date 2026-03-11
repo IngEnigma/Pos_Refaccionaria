@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { LoggerService } from '@app/core/logging/logger.service';
-import { SessionService } from '@app/core/services/session-state.service';
+import { SessionStateService } from '@app/core/services/session-state.service';
 import {
   AuthRepository,
   LoginCredentials,
@@ -12,7 +12,7 @@ import { catchError, Observable, tap, throwError } from 'rxjs';
 export class LoginUseCase {
   private readonly authRepository = inject(AuthRepository);
   private readonly logger = inject(LoggerService).withContext('LoginUseCase');
-  private readonly sessionService = inject(SessionService);
+  private readonly sessionService = inject(SessionStateService);
 
   execute(credentials: LoginCredentials): Observable<Session> {
     return this.authRepository.login(credentials).pipe(

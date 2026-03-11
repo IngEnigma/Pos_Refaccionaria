@@ -3,10 +3,10 @@ import { CanActivateFn, Router } from '@angular/router';
 
 import { LoggerService } from '@core/logging/logger.service';
 import { AppRoutes } from '@core/routing/app-routes';
-import { SessionService } from '@core/services/session-state.service';
+import { SessionStateService } from '@core/services/session-state.service';
 
 export const authGuard: CanActivateFn = (_route, state) => {
-  const sessionService = inject(SessionService);
+  const sessionService = inject(SessionStateService);
   const router = inject(Router);
   const logger = inject(LoggerService).withContext('AuthGuard');
 

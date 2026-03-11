@@ -1,3 +1,5 @@
+@import '@angular/cdk/overlay-prebuilt.css';
+
 :root {
   --font-title-family: "Montserrat", sans-serif;
   --font-text-family: "Roboto", sans-serif;
@@ -5,9 +7,9 @@
   --font-title-weight: 600;
   --font-text-weight: 400;
   
-  --color-primary-600: #233387;
   --color-primary-700: #1a2764;
-  --color-primary-100: #e0e7ff;
+  --color-primary-600: #233387;
+  --color-primary-50: #ebf3ff;
 
   --color-bg: #f9fafb;
   --color-border: #d1d4db;
@@ -15,7 +17,7 @@
   --color-text-strong: #111827;
 
   --color-success: #059669;
-
+  --color-warning: #f59e0b;
   --color-danger: #dc2626;
 }
 

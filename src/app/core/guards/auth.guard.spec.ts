@@ -4,17 +4,17 @@ import { Router, UrlTree } from '@angular/router';
 import { LoggerPort } from '@core/logging/logger.port';
 import { LoggerService } from '@core/logging/logger.service';
 import { AppRoutes } from '@core/routing/app-routes';
-import { SessionService } from '@core/services/session-state.service';
+import { SessionStateService } from '@core/services/session-state.service';
 import { authGuard } from './auth.guard';
 
 describe('authGuard', () => {
   let routerSpy: jasmine.SpyObj<Router>;
-  let sessionServiceSpy: jasmine.SpyObj<SessionService>;
+  let sessionServiceSpy: jasmine.SpyObj<SessionStateService>;
   let loggerSpy: jasmine.SpyObj<LoggerPort>;
 
   beforeEach(() => {
     routerSpy = jasmine.createSpyObj<Router>('Router', ['createUrlTree']);
-    sessionServiceSpy = jasmine.createSpyObj<SessionService>('SessionService', [
+    sessionServiceSpy = jasmine.createSpyObj<SessionStateService>('SessionStateService', [
       'isAuthenticated',
     ]);
     loggerSpy = jasmine.createSpyObj<LoggerPort>('LoggerPort', [
@@ -28,7 +28,7 @@ describe('authGuard', () => {
     TestBed.configureTestingModule({
       providers: [
         { provide: Router, useValue: routerSpy },
-        { provide: SessionService, useValue: sessionServiceSpy },
+        { provide: SessionStateService, useValue: sessionServiceSpy },
         {
           provide: LoggerService,
           useValue: {

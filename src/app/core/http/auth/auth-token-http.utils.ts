@@ -1,5 +1,5 @@
 import { HttpErrorResponse, HttpRequest } from '@angular/common/http';
-import { API_ENDPOINTS } from '@core/config/api-endpints';
+import { API_ENDPOINTS } from '@core/config/api-endpoints';
 
 export function withBearerToken<T>(
   request: HttpRequest<T>,

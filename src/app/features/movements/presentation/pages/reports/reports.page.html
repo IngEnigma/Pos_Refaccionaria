@@ -1,0 +1,54 @@
+<div class="reports-container">
+  <div class="header">
+    <h1>Reportes de Ventas</h1>
+    <p class="subtitle">Resumen diario de operaciones</p>
+  </div>
+
+  <div class="filter-controls">
+    <span class="filter-label">Filtrar por:</span>
+    <div class="filter-buttons">
+      <button class="filter-btn" [class.active]="currentFilter === 'day'" (click)="setFilter('day')">Día</button>
+      <button class="filter-btn" [class.active]="currentFilter === 'biweekly'" (click)="setFilter('biweekly')">
+        Cada 2 Semanas
+      </button>
+      <button class="filter-btn" [class.active]="currentFilter === 'month'" (click)="setFilter('month')">Mes</button>
+    </div>
+  </div>
+
+  <div class="table-container">
+    <table class="reports-table">
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Transacciones</th>
+          <th class="text-right">Total Ventas</th>
+          <th class="text-center">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (report of displayedReports; track report.fecha + (report.fechaFin ?? '')) {
+          <tr>
+            <td class="capitalize">
+              @if (currentFilter === 'day') {
+                {{ report.fecha | date: 'fullDate' }}
+              } @else {
+                {{ report.fecha | date: 'd MMM' }} - {{ report.fechaFin | date: 'd MMM y' }}
+              }
+            </td>
+            <td>{{ report.transactions }} operaciones</td>
+            <td class="text-right font-bold">{{ report.totalSales | currency: 'MXN' }}</td>
+            <td class="text-center">
+              <button class="action-btn" (click)="generatePdf(report)">Ver Reporte</button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    @if (displayedReports.length === 0) {
+      <div class="empty-state">
+        <p>No hay reportes disponibles para este periodo.</p>
+      </div>
+    }
+  </div>
+</div>

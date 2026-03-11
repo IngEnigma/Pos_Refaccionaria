@@ -28,7 +28,6 @@
 }
 
 .button-primary:hover:not(:disabled) {
-  background-color: var(--color-primary-700);
   transform: translateY(-1px);
   box-shadow: 0 4px 6px color-mix(in srgb, var(--color-primary-600) 25%, transparent);
 }

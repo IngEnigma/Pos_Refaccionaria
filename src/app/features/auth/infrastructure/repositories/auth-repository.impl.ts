@@ -2,7 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, catchError, map, tap, throwError } from 'rxjs';
 
-import { API_ENDPOINTS } from '@app/core/config/api-endpints';
+import { API_ENDPOINTS } from '@app/core/config/api-endpoints';
 import { APP_ENV } from '@app/core/tokens/app-env.token';
 import { Environment } from '@env/environment.model';
 import { LoggerService } from '@app/core/logging/logger.service';

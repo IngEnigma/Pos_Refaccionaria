@@ -9,11 +9,7 @@ import { LoggerPort } from './logger.port';
 @Injectable({ providedIn: 'root' })
 export class LoggerService implements LoggerPort {
   private readonly env = inject<Environment>(APP_ENV);
-  private currentLevel: LogLevel;
-
-  constructor() {
-    this.currentLevel = this.env.loggingLevel;
-  }
+  private readonly currentLevel = this.env.loggingLevel;
 
   private shouldLog(level: LogLevel): boolean {
     return level >= this.currentLevel;
@@ -80,23 +76,23 @@ export class LoggerService implements LoggerPort {
   }
 
   debug(message: string, data?: unknown, context?: string) {
-    this.log(0, message, data, context);
+    this.log(LogLevel.DEBUG, message, data, context);
   }
 
   info(message: string, data?: unknown, context?: string) {
-    this.log(1, message, data, context);
+    this.log(LogLevel.INFO, message, data, context);
   }
 
   warn(message: string, data?: unknown, context?: string) {
-    this.log(2, message, data, context);
+    this.log(LogLevel.WARN, message, data, context);
   }
 
   error(message: string, data?: unknown, context?: string) {
-    this.log(3, message, data, context);
+    this.log(LogLevel.ERROR, message, data, context);
   }
 
   fatal(message: string, data?: unknown, context?: string) {
-    this.log(4, message, data, context);
+    this.log(LogLevel.FATAL, message, data, context);
   }
 
   withContext(context: string): LoggerPort {

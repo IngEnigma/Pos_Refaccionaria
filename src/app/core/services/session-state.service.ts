@@ -10,7 +10,7 @@ import { JwtUtils } from '@core/utils/jwt.utils';
 type SessionPrimitives = ReturnType<typeof SessionMapper.toJSON>;
 
 @Injectable({ providedIn: 'root' })
-export class SessionService {
+export class SessionStateService {
   private readonly _session = signal<Session | null>(null);
   private readonly STORAGE_KEY = 'session';
   private readonly logger: LoggerPort = inject(LoggerService).withContext(

@@ -9,13 +9,13 @@ import { Session } from '@features/auth/domain/entities/auth-session.entity';
 import { UserRole } from '@features/auth/domain/value-objects/auth-user-role.enum';
 import { LoggerPort } from '@core/logging/logger.port';
 import { LoggerService } from '@core/logging/logger.service';
-import { SessionService } from '@core/services/session-state.service';
+import { SessionStateService } from '@core/services/session-state.service';
 import { LoginUseCase } from './login.usecase';
 
 describe('LoginUseCase', () => {
   let useCase: LoginUseCase;
   let repositorySpy: jasmine.SpyObj<Pick<AuthRepository, 'login' | 'refresh'>>;
-  let sessionServiceSpy: jasmine.SpyObj<Pick<SessionService, 'setSession'>>;
+  let sessionServiceSpy: jasmine.SpyObj<Pick<SessionStateService, 'setSession'>>;
   let loggerSpy: jasmine.SpyObj<LoggerPort>;
 
   const credentials: LoginCredentials = {
@@ -28,7 +28,7 @@ describe('LoginUseCase', () => {
       'login',
       'refresh',
     ]);
-    sessionServiceSpy = jasmine.createSpyObj<Pick<SessionService, 'setSession'>>('SessionService', [
+    sessionServiceSpy = jasmine.createSpyObj<Pick<SessionStateService, 'setSession'>>('SessionStateService', [
       'setSession',
     ]);
     loggerSpy = jasmine.createSpyObj<LoggerPort>('LoggerPort', [
@@ -43,7 +43,7 @@ describe('LoginUseCase', () => {
       providers: [
         LoginUseCase,
         { provide: AuthRepository, useValue: repositorySpy },
-        { provide: SessionService, useValue: sessionServiceSpy },
+        { provide: SessionStateService, useValue: sessionServiceSpy },
         {
           provide: LoggerService,
           useValue: {

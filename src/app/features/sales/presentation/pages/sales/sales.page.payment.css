@@ -1,0 +1,111 @@
+.payment-section {
+  margin-top: 12px;
+}
+
+.payment-title {
+  font-size: 0.95rem;
+  margin-bottom: 8px;
+  color: #374151;
+}
+
+.payment-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.payment-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #e6e6e6;
+  background: #fafafa;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s;
+  text-align: center;
+}
+
+.payment-btn img {
+  width: 28px;
+  height: 28px;
+}
+
+.payment-btn:hover,
+.payment-btn.selected {
+  background: #eef6ff;
+  border-color: #cfe7ff;
+  color: #0366d6;
+}
+
+.payment-text {
+  font-size: 0.85rem;
+}
+
+.panel-footer {
+  margin-top: auto;
+  padding-top: 12px;
+}
+
+.process-btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  background: #233387;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.process-btn:hover {
+  background: #0056b3;
+}
+
+@media (max-width: 1100px) {
+  .sales-main {
+    margin-right: 300px;
+  }
+
+  .sales-panel {
+    width: 300px;
+  }
+}
+
+@media (max-width: 800px) {
+  .sales-main {
+    margin-right: 280px;
+  }
+
+  .sales-panel {
+    width: 280px;
+  }
+}
+
+@media (max-width: 640px) {
+  .sales-root {
+    flex-direction: column;
+    min-height: auto;
+  }
+
+  .sales-main {
+    margin-right: 0;
+    overflow: visible;
+  }
+
+  .sales-panel {
+    position: static;
+    width: 100%;
+    height: auto;
+    border-left: none;
+    box-shadow: none;
+    border-top: 1px solid #e6e6e6;
+  }
+
+  .cart-list {
+    height: auto;
+    max-height: 280px;
+  }
+}

@@ -1,0 +1,26 @@
+:host {
+  display: block;
+}
+
+.refounds-page {
+  padding: 2rem;
+}
+
+.refounds-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.5rem;
+  max-width: 760px;
+}
+
+h1 {
+  margin-top: 0;
+  color: #111827;
+}
+
+p {
+  margin-bottom: 0;
+  color: #4b5563;
+  line-height: 1.5;
+}

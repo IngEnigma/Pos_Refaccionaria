@@ -1,0 +1,94 @@
+<div class="inventory-root">
+  <main class="inventory-main">
+    <section class="category-section">
+      <h2 class="section-title">Categorías</h2>
+      <div class="category-scroll" role="list">
+        <button class="category-card">Llantas</button>
+        <button class="category-card">Filtros</button>
+        <button class="category-card">Aceites</button>
+        <button class="category-card">Frenos</button>
+        <button class="category-card">Baterías</button>
+        <button class="category-card">Suspensión</button>
+      </div>
+    </section>
+
+    <section class="inventory-section">
+      <h2 class="section-title">Inventario</h2>
+
+      <div class="button-group">
+        <button class="btn add-btn" type="button" (click)="abrirModal('add')">Añadir nuevo producto</button>
+        <button class="btn delete-btn" type="button" (click)="abrirModal('delete')">Eliminar producto</button>
+      </div>
+
+      <div class="inventory-grid">
+        @for (producto of productos; track producto.id) {
+          <article class="inventory-card">
+            <img class="product-img" [src]="producto.imagen" [alt]="producto.nombre" />
+            <h3 class="product-name">{{ producto.nombre }}</h3>
+            <p class="product-desc">{{ producto.descripcion }}</p>
+            <div class="product-row">
+              <span class="product-price">${{ producto.precio }}</span>
+              <span class="product-stock">Stock: {{ producto.stock }}</span>
+            </div>
+            <button class="edit-btn" type="button" (click)="abrirModal('edit', producto)">
+              Editar producto
+            </button>
+          </article>
+        }
+      </div>
+    </section>
+  </main>
+
+  @if (mostrarModal) {
+    <div class="modal-overlay">
+      <div class="modal">
+        <h3 class="modal-title">
+          {{ tipoModal === 'add' ? 'Añadir Producto' : tipoModal === 'edit' ? 'Editar Producto' : 'Eliminar Producto' }}
+        </h3>
+
+        @if (tipoModal !== 'delete') {
+          <form class="modal-form">
+            <label for="inventory-name">Nombre del producto</label>
+            <input id="inventory-name" type="text" placeholder="Ej. Aceite Castrol" [(ngModel)]="form.nombre" name="nombre" />
+
+            <label for="inventory-description">Descripción</label>
+            <input
+              id="inventory-description"
+              type="text"
+              placeholder="Descripción breve"
+              [(ngModel)]="form.descripcion"
+              name="descripcion"
+            />
+
+            <label for="inventory-price">Precio</label>
+            <input id="inventory-price" type="number" placeholder="0.00" [(ngModel)]="form.precio" name="precio" />
+
+            <label for="inventory-stock">Cantidad en stock</label>
+            <input id="inventory-stock" type="number" placeholder="0" [(ngModel)]="form.stock" name="stock" />
+
+            <div class="modal-actions">
+              <button type="button" class="btn save-btn" (click)="guardarCambios()">Guardar</button>
+              <button type="button" class="btn cancel-btn" (click)="cerrarModal()">Cancelar</button>
+            </div>
+          </form>
+        }
+
+        @if (tipoModal === 'delete') {
+          <form class="modal-form">
+            <p>Escribe el nombre del producto a eliminar:</p>
+            <input
+              type="text"
+              placeholder="Nombre del producto"
+              [(ngModel)]="form.nombre"
+              name="nombreEliminar"
+            />
+            <div class="modal-actions">
+              <button type="button" class="btn delete-confirm-btn" (click)="eliminarProducto()">Eliminar</button>
+              <button type="button" class="btn cancel-btn" (click)="cerrarModal()">Cancelar</button>
+            </div>
+          </form>
+        }
+      </div>
+    </div>
+  }
+</div>

@@ -56,9 +56,9 @@
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-.sidebar-link:hover {
-  background-color: var(--color-primary-100);
-  color: var(--color-primary-700);
+.sidebar-link:not(.sidebar-link-active):hover {
+  background-color: var(--color-primary-50);
+  color: var(--color-text-strong);
 }
 
 .sidebar-link-active {
@@ -85,6 +85,7 @@
 
 .link-text {
   font-size: 0.95rem;
-  font-weight: 500;
+  font-weight: var(--font-text-weight);
+  font-family: var(--font-title-family);
   color: inherit;
 }

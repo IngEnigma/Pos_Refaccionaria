@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, effect } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -7,6 +7,7 @@ import { AppRoutes } from '@core/routing/app-routes';
 import { AuthFacade } from '@features/auth/application/facades/auth.facade';
 import { InputComponent } from '@app/shared/ui/form-controls/input/input.component';
 import { ButtonComponent } from '@app/shared/ui/form-controls/button/button.component';
+import { ToastService } from '@app/shared/ui/components/toast/toast.service';
 
 @Component({
   selector: 'app-login-page',
@@ -24,9 +25,19 @@ export class LoginPageComponent {
   private readonly router = inject(Router);
   private readonly authFacade = inject(AuthFacade);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly toastService = inject(ToastService);
 
   readonly loading = this.authFacade.loading;
   readonly errorMessage = this.authFacade.errorMessage;
+
+  constructor() {
+    effect(() => {
+      const errorMsg = this.errorMessage();
+      if (errorMsg) {
+        this.toastService.error(errorMsg);
+      }
+    });
+  }
 
   readonly loginForm = this.fb.nonNullable.group({
     username: ['', Validators.required],

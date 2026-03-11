@@ -5,9 +5,9 @@ import { LoggerService } from '@core/logging/logger.service';
 import { STORAGE_PORT, StoragePort } from '@core/ports/storage.port';
 import { Session } from '@features/auth/domain/entities/auth-session.entity';
 import { UserRole } from '@features/auth/domain/value-objects/auth-user-role.enum';
-import { SessionService } from './session-state.service';
+import { SessionStateService } from './session-state.service';
 
-describe('SessionService', () => {
+describe('SessionStateService', () => {
   let storageSpy: jasmine.SpyObj<StoragePort>;
   let loggerSpy: jasmine.SpyObj<LoggerPort>;
 
@@ -32,7 +32,7 @@ describe('SessionService', () => {
   function configureTestingModule(): void {
     TestBed.configureTestingModule({
       providers: [
-        SessionService,
+        SessionStateService,
         { provide: STORAGE_PORT, useValue: storageSpy },
         {
           provide: LoggerService,
@@ -56,7 +56,7 @@ describe('SessionService', () => {
     });
 
     configureTestingModule();
-    const service = TestBed.inject(SessionService);
+    const service = TestBed.inject(SessionStateService);
 
     expect(service.getSession()?.userId).toBe('u-1');
     expect(storageSpy.removeItem).not.toHaveBeenCalled();
@@ -74,7 +74,7 @@ describe('SessionService', () => {
     });
 
     configureTestingModule();
-    const service = TestBed.inject(SessionService);
+    const service = TestBed.inject(SessionStateService);
 
     expect(service.getSession()).toBeNull();
     expect(storageSpy.removeItem).toHaveBeenCalledWith('session');
@@ -83,7 +83,7 @@ describe('SessionService', () => {
   it('persists session when setSession is called with persist=true', () => {
     storageSpy.getJSON.and.returnValue(null);
     configureTestingModule();
-    const service = TestBed.inject(SessionService);
+    const service = TestBed.inject(SessionStateService);
     const now = Math.floor(Date.now() / 1000);
 
     service.setSession(

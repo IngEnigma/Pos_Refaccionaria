@@ -1,10 +1,12 @@
-import { NgOptimizedImage } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { SearchInputComponent } from "../../form-controls/search-input/search-input.component";
+import { IconButtonComponent } from "../../form-controls/icon-button/icon-button.component";
+import { DropdownComponent } from '../../form-controls/dropdown/dropdown.component';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [NgOptimizedImage],
+  imports: [SearchInputComponent, IconButtonComponent, DropdownComponent],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -18,18 +20,11 @@ export class NavbarComponent {
 
   readonly username = input('Miguel Lara');
   readonly currentDate = input(NavbarComponent.DATE_FORMATTER.format(new Date()));
-  readonly searchPlaceholder = input('Buscar por código, producto o cliente');
   readonly profileIconPath = input('assets/icons/profile.svg');
   readonly notificationsIconPath = input('assets/icons/notifications.svg');
 
-  readonly searchChange = output<string>();
   readonly profileClick = output<void>();
   readonly notificationsClick = output<void>();
-
-  onSearchInput(event: Event): void {
-    const target = event.target as HTMLInputElement;
-    this.searchChange.emit(target.value);
-  }
 
   onProfileClick(): void {
     this.profileClick.emit();
@@ -38,4 +33,8 @@ export class NavbarComponent {
   onNotificationsClick(): void {
     this.notificationsClick.emit();
   }
-}
+
+  onLogout(): void {
+  
+  }  
+} 

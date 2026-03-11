@@ -8,26 +8,6 @@
   border-bottom: 2px solid var(--color-border);
 }
 
-.search-container {
-  flex: 1;
-  max-width: 540px;
-}
-
-.search-input {
-  width: 100%;
-  padding: 0.55rem 0.75rem;
-  border-radius: 8px;
-  border: 2px solid var(--color-border);
-  outline: none;
-  color: var(--color-text-strong);
-  background-color: color-mix(in srgb, var(--color-bg) 65%, white);
-}
-
-.search-input:focus-visible {
-  border-color: var(--color-primary-600);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary-600) 10%, white);
-}
-
 .user-section {
   display: flex;
   align-items: center;
@@ -40,12 +20,16 @@
 
 .username {
   display: block;
-  font-weight: 600;
+  font-size: 1rem;
+  font-weight: var(--font-title-weight);
+  font-family: var(--font-title-family);
   color: var(--color-text-strong);
 }
 
 .date {
   font-size: 0.85rem;
+  font-weight: var(--font-text-weight);
+  font-family: var(--font-text-family);
   color: var(--color-text);
 }
 

@@ -1,0 +1,144 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.sales-root {
+  display: flex;
+  width: 100%;
+  min-height: calc(100vh - 130px);
+  overflow: hidden;
+  background: var(--page-bg);
+}
+
+.sales-main {
+  flex: 1;
+  padding: 10px;
+  background: var(--page-bg);
+  margin-right: 360px;
+  overflow-y: auto;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.icon {
+  width: 22px;
+  height: 22px;
+  filter: brightness(0) saturate(100%);
+  transition: filter 0.3s ease;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  margin: 6px 0 12px;
+  color: #1f2937;
+}
+
+.category-scroll {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  margin-bottom: 18px;
+}
+
+.category-scroll::-webkit-scrollbar {
+  height: 8px;
+}
+
+.category-scroll::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 6px;
+}
+
+.category-btn {
+  flex-shrink: 0;
+  border: 1px solid #233387;
+  background: #ffffff;
+  color: #111827;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.18s ease;
+  font-size: 0.95rem;
+}
+
+.category-btn:hover {
+  background: #e6e6e6;
+}
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+  padding-right: 10px;
+}
+
+.product-card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.06);
+  transition: transform 0.12s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-4px);
+}
+
+.product-img {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.product-name {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 4px 0;
+  text-align: center;
+}
+
+.product-desc {
+  font-size: 0.85rem;
+  color: #6b7280;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.product-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.product-price {
+  color: #233387;
+  font-weight: 600;
+}
+
+.product-stock {
+  font-size: 0.85rem;
+  color: #374151;
+}
+
+.add-btn {
+  background: #233387;
+  color: #fff;
+  border: none;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 100%;
+  transition: background 0.15s ease;
+}
+
+.add-btn:hover {
+  background: #233387;
+}

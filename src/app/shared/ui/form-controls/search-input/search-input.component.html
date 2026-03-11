@@ -1,0 +1,27 @@
+<div class="search-container">
+
+  <svg
+    class="search-icon"
+    viewBox="0 0 24 24"
+    aria-hidden="true"
+  >
+    <path
+      d="M21 21l-4.3-4.3m1.8-5.2a7 7 0 11-14 0 7 7 0 0114 0z"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+  </svg>
+
+  <input
+    id="layout-search"
+    type="text"
+    [placeholder]="searchPlaceholder()"
+    class="search-input"
+    aria-label="Buscar en el sistema"
+    (input)="onSearchInput($event)"
+  />
+
+</div>

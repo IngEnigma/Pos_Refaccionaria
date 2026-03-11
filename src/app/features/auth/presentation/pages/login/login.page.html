@@ -14,7 +14,6 @@
           formControlName="username"
           label="Usuario"
           placeholder="Ingresa tu usuario"
-          autocomplete="username"
           [hasError]="usernameCtrl.invalid && usernameCtrl.touched"
           errorMessage="El usuario es requerido"
         />
@@ -42,12 +41,6 @@
           </app-button>
         </div>
       </form>
-
-      @if (errorMessage()) {
-        <div class="error-message" role="alert" aria-live="polite">
-          {{ errorMessage() }}
-        </div>
-      }
     </div>
   </div>
 

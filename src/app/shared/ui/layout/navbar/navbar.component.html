@@ -1,32 +1,54 @@
 <header class="navbar" role="banner">
-  <div class="search-container">
-    <input
-      id="layout-search"
-      type="text"
-      [placeholder]="searchPlaceholder()"
-      class="search-input"
-      aria-label="Buscar en el sistema"
-      (input)="onSearchInput($event)"
-    />
-  </div>
+  <app-search-input></app-search-input>
 
   <div class="user-section">
     <div class="user-info">
-      <span class="username">{{ username() }}</span>
-      <span class="date">{{ currentDate() }}</span>
+    <span class="username">{{ username() }}</span>
+    <span class="date">{{ currentDate() }}</span>
+  </div>
+
+  <app-dropdown #profileDropdown="appDropdown">
+
+    <div dropdownTrigger>
+      <app-icon-button
+        [icon]="profileIconPath()"
+        [isActive]="profileDropdown.open()"
+        ariaLabel="Perfil"
+      />
     </div>
 
-    <button type="button" class="icon-button" aria-label="Perfil de usuario" (click)="onProfileClick()">
-      <img [ngSrc]="profileIconPath()" width="20" height="20" alt="" aria-hidden="true" />
-    </button>
+    <div dropdownMenu>
+      <button>Ver perfil</button>
+      <button>Configuración</button>
+      <button (click)="onLogout()">Cerrar sesión</button>
+    </div>
 
-    <button
-      type="button"
-      class="icon-button"
-      aria-label="Notificaciones"
-      (click)="onNotificationsClick()"
-    >
-      <img [ngSrc]="notificationsIconPath()" width="20" height="20" alt="" aria-hidden="true" />
-    </button>
+    </app-dropdown>
+
+    <app-dropdown #notificationsDropdown="appDropdown">
+
+      <div dropdownTrigger>
+        <app-icon-button
+          [icon]="notificationsIconPath()"
+          [isActive]="notificationsDropdown.open()"
+          ariaLabel="Notificaciones"
+        />
+      </div>
+
+      <div dropdownMenu>
+
+        <div class="notification">
+          Stock bajo: Traje negro
+        </div>
+
+        <div class="notification">
+          Pedido pendiente
+        </div>
+
+        <button>Ver todas</button>
+
+      </div>
+
+    </app-dropdown>
   </div>
 </header>
