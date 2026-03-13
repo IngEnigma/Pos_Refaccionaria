@@ -1,8 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { catchError, map, Observable, tap, throwError } from 'rxjs';
 
-import { LoggerService } from '@app/core/logging/logger.service';
-import { SessionStateService } from '@app/core/services/session-state.service';
+import { LoggerService } from '@core/logging/logger.service';
+import { SessionStateService } from '@features/auth/application/services/session-state.service';
 import { JwtUtils } from '@core/utils/jwt.utils';
 import { Session } from '@features/auth/domain/entities/auth-session.entity';
 import { AuthRepository } from '@features/auth/domain/repository/auth-repository';

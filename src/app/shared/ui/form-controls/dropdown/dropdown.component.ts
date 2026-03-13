@@ -5,6 +5,7 @@ import {
   TemplateRef,
   ViewChild,
   ViewContainerRef,
+  ViewEncapsulation,
   signal
 } from '@angular/core';
 
@@ -24,6 +25,7 @@ import { TemplatePortal } from '@angular/cdk/portal';
   styleUrl: './dropdown.component.css',
   exportAs: 'appDropdown',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  encapsulation: ViewEncapsulation.None,
 })
 export class DropdownComponent {
 

@@ -2,12 +2,12 @@ import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { catchError, throwError } from 'rxjs';
 
-import { AuthTokenRefreshOrchestrator } from '@core/http/auth/auth-token-refresh-orchestrator.service';
 import { LoggerService } from '@core/logging/logger.service';
 import {
   isRefreshRequest,
   isUnauthorizedError,
-} from '@core/http/auth/auth-token-http.utils';
+} from './auth-token-http.utils';
+import { AuthTokenRefreshOrchestrator } from './auth-token-refresh-orchestrator.service';
 
 export const authTokenInterceptor: HttpInterceptorFn = (req, next) => {
   const logger = inject(LoggerService).withContext('AuthTokenInterceptor');

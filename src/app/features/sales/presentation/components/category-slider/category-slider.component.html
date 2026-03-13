@@ -1,0 +1,7 @@
+<div class="category-scroll" role="list">
+  @for (cat of categories(); track cat) {
+    <button class="category-btn" type="button" (click)="selectCategory(cat)">
+      {{ cat }}
+    </button>
+  }
+</div>

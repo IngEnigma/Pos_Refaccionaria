@@ -1,3 +1,4 @@
+
 .icon-button {
   background-color: transparent;
   border: none;
@@ -10,9 +11,6 @@
   justify-content: center;
 
   cursor: pointer;
-
-  transition: background-color 0.2s ease,
-              transform 0.15s ease;
 }
 
 .icon-button:hover {
@@ -24,11 +22,7 @@
 }
 
 .icon-button.active .icon {
-  filter: brightness(0) invert(1);
-}
-
-.icon-button:active {
-  transform: scale(0.95);
+  color: #fff;
 }
 
 .icon-button:focus-visible {
@@ -39,10 +33,6 @@
 .icon {
   width: 1.5rem;
   height: 1.5rem;
-  filter: brightness(0) saturate(100%);
-  transition: filter 0.2s ease;
-}
-
-.icon svg * {
-  vector-effect: non-scaling-stroke;
+  color: var(--color-text);
+  transition: color 0.2s ease;
 }

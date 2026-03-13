@@ -1,0 +1,76 @@
+
+.sales-panel {
+  position: fixed;
+  right: 0;
+  top: 68px;
+  height: calc(100vh - 100px);
+  width: 350px;
+  background: #ffffff;
+  border-left: 2px solid var(--color-bg);
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  box-shadow: -2px 0 6px rgba(2, 6, 23, 0.03);
+  z-index: 40;
+}
+
+.bottom-section {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.panel-header h3 {
+  margin: 0;
+  font-family: var(--font-title-family);
+  font-weight: var(--font-title-weight);
+  font-size: 1.125rem;
+  color: var(--color-text);
+}
+
+.divider {
+  height: 2px;
+  background: var(--color-border);
+  margin: 12px 0 5px 0;
+}
+
+.cart-list {
+  overflow: hidden;
+  height: auto;
+}
+
+.empty-cart {
+  color: var(--color-text);
+  font-family: var(--font-text-family);
+  font-weight: var(--font-text-weight);
+  font-size: 0.95rem;
+}
+
+.panel-footer {
+  margin-top: auto;
+  padding-top: 12px;
+}
+
+.process-btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  background: var(--color-primary-600);
+  font-family: var(--font-title-family);
+  font-weight: var(--font-title-weight);
+  color: #fff;
+  cursor: pointer;
+}
+
+@media (max-width: 1100px) {
+  .sales-panel {
+    width: 300px;
+  }
+}
+
+@media (max-width: 800px) {
+  .sales-panel {
+    width: 280px;
+  }
+}

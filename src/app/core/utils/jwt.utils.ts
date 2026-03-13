@@ -1,5 +1,3 @@
-import { UserRole } from '@app/features/auth/domain/value-objects/auth-user-role.enum';
-
 export class JwtUtils {
   static decodeExpiration(token: string): number {
     try {
@@ -29,15 +27,5 @@ export class JwtUtils {
     } catch {
       return 0;
     }
-  }
-
-  static mapRole(isAdmin: boolean, isStaff: boolean): UserRole {
-    if (isAdmin && isStaff) {
-      return UserRole.Admin;
-    }
-    if (!isAdmin && isStaff) {
-      return UserRole.Manager;
-    }
-    return UserRole.Seller;
   }
 }

@@ -18,9 +18,19 @@
     </div>
 
     <div dropdownMenu>
-      <button>Ver perfil</button>
-      <button>Configuración</button>
-      <button (click)="onLogout()">Cerrar sesión</button>
+      <button>
+        <lucide-icon name="user" [size]="16" class="menu-icon" />
+        <span>Ver perfil</span>
+      </button>
+      <button>
+        <lucide-icon name="settings" [size]="16" class="menu-icon" />
+        <span>Configuración</span>
+      </button>
+      <div class="dropdown-divider"></div>
+      <button class="dropdown-danger" (click)="onLogout()">
+        <lucide-icon name="log-out" [size]="16" class="menu-icon" />
+        <span>Cerrar sesión</span>
+      </button>
     </div>
 
     </app-dropdown>
@@ -36,17 +46,20 @@
       </div>
 
       <div dropdownMenu>
-
         <div class="notification">
-          Stock bajo: Traje negro
+          <lucide-icon name="alert-circle" [size]="15" class="notification-icon warning" />
+          <span>Stock bajo: Traje negro</span>
         </div>
 
         <div class="notification">
-          Pedido pendiente
+          <lucide-icon name="alert-circle" [size]="15" class="notification-icon" />
+          <span>Pedido pendiente</span>
         </div>
 
-        <button>Ver todas</button>
-
+        <div class="dropdown-divider"></div>
+        <button class="dropdown-link">
+          <span>Ver todas</span>
+        </button>
       </div>
 
     </app-dropdown>

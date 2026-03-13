@@ -1,60 +1,34 @@
-<section class="sales-page">
-  <header class="sales-header">
-    <div>
-      <h1 class="sales-title">Ventas</h1>
-      <p class="sales-description">
-        Panel principal del POS. Gestiona ventas y consulta movimientos
-        recientes.
-      </p>
-    </div>
+<div class="sales-root">
+  <main class="sales-main">
+    <section class="catalog-section">
+      <h2 class="section-title">Categorías</h2>
 
-    <app-button
-      variant="secondary"
-      [loading]="facade.loading()"
-      loadingText="Actualizando..."
-      (onClick)="reloadSales()"
-    >
-      Actualizar
-    </app-button>
-  </header>
+      <app-category-slider
+        [categories]="categorias"
+        (selected)="onSelectCategory($event)"
+      />
+      
+      <h2 class="section-title">Productos</h2>
 
-  @if (facade.loading()) {
-  <div
-    class="sales-skeleton"
-    style="display: flex; flex-direction: column; gap: 1rem"
-  >
-    @for (row of skeletonRows; track row) {
-    <app-skeleton height="40px" width="100%" />
-    }
-  </div>
-  } @else if (facade.sales().length === 0) {
-  <div class="sales-feedback sales-feedback-empty">
-    <p>No hay ventas registradas todavía.</p>
-  </div>
-  } @else {
-  <div class="sales-table-wrapper">
-    <table class="sales-table">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Usuario</th>
-          <th>Método de pago</th>
-          <th>Total</th>
-          <th>Fecha</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (sale of facade.sales(); track sale.id) {
-        <tr>
-          <td>#{{ sale.id }}</td>
-          <td>{{ sale.idUsuario ?? 'N/A' }}</td>
-          <td>{{ sale.idMetodoPago ?? 'N/A' }}</td>
-          <td>{{ sale.total | currency: 'MXN':'symbol':'1.2-2' }}</td>
-          <td>{{ sale.fecha | date: 'medium' }}</td>
-        </tr>
-        }
-      </tbody>
-    </table>
-  </div>
-  }
-</section>
+      <app-product-grid
+        [products]="productos"
+        (addToCart)="onAddToCart($event)"
+      />
+
+    </section>
+  </main>
+
+  <app-cart-panel
+    [cartItems]="cartItems()"
+    [subtotal]="subtotal()"
+    [descuento]="descuento()"
+    [iva]="iva()"
+    [total]="total()"
+    [selectedPayment]="selectedPayment()"
+    (removeItem)="onRemoveItem($event)"
+    (increaseQty)="onIncreaseQty($event)"
+    (decreaseQty)="onDecreaseQty($event)"
+    (selectPayment)="onSelectPayment($event)"
+    (processTransaction)="processTransaction()"
+  />
+</div>

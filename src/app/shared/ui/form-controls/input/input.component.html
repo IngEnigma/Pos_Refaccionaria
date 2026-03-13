@@ -26,12 +26,11 @@
         [attr.aria-pressed]="showPassword() ? 'true' : 'false'"
         (click)="togglePasswordVisibility()"
       >
-        <img
+        <lucide-icon
           class="password-toggle-icon"
-          [src]="showPassword() ? eyeOffIconPath : eyeIconPath"
-          alt=""
+          [name]="showPassword() ? 'eye-off' : 'eye'"
           aria-hidden="true"
-        />
+        ></lucide-icon>
       </button>
     }
   </div>

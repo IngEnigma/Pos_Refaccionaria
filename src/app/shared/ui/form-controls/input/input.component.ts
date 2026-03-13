@@ -1,12 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, forwardRef, input, signal } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
+import { LucideAngularModule } from 'lucide-angular';
 import { BaseControlValueAccessor } from '../base/base-control-value-accessor';
 
 @Component({
   selector: 'app-input',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, LucideAngularModule],
   templateUrl: './input.component.html',
   styleUrl: './input.component.css',
   providers: [
@@ -21,8 +22,7 @@ import { BaseControlValueAccessor } from '../base/base-control-value-accessor';
 export class InputComponent extends BaseControlValueAccessor<string> {
   private static nextId = 0;
 
-  readonly eyeIconPath = 'assets/icons/eye.svg';
-  readonly eyeOffIconPath = 'assets/icons/eye_off.svg';
+
 
   readonly id = input('');
   readonly label = input('');

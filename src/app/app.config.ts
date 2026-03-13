@@ -1,9 +1,13 @@
-import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import {
+  ApplicationConfig,
+  importProvidersFrom,
+  provideZoneChangeDetection,
+} from '@angular/core';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideRouter } from '@angular/router';
 
-import { authTokenInterceptor } from '@core/interceptors/auth-token.interceptor';
-import { httpErrorInterceptor } from '@app/core/interceptors/http-error.interceptor';
+import { authTokenInterceptor } from '@features/auth/infrastructure/http/auth-token.interceptor';
+import { httpErrorInterceptor } from '@core/interceptors/http-error.interceptor';
 import { STORAGE_PORT } from '@core/ports/storage.port';
 import { LocalStorageService } from '@core/services/local-storage.service';
 import { APP_ENV } from '@core/tokens/app-env.token';
@@ -27,12 +31,57 @@ import { UserRepositoryImpl } from '@features/users/infrastructure/repositories/
 import { ProductRepository } from '@features/inventory/domain/repository/product-repository';
 import { ProductRepositoryImpl } from '@features/inventory/infrastructure/repositories/product-repository.impl';
 import { routes } from '@app/app.routes';
+import {
+  Bell,
+  Eye,
+  EyeClosed,
+  EyeOff,
+  FileText,
+  History,
+  House,
+  LogOut,
+  LucideAngularModule,
+  Package,
+  RefreshCw,
+  Search,
+  Settings,
+  User,
+  Users,
+  CreditCard,
+  BanknoteIcon,
+  ArrowLeftRightIcon,
+  X,
+} from 'lucide-angular';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
-    provideHttpClient(withInterceptors([httpErrorInterceptor, authTokenInterceptor])),
+    provideHttpClient(
+      withInterceptors([httpErrorInterceptor, authTokenInterceptor]),
+    ),
+    importProvidersFrom(
+      LucideAngularModule.pick({
+        House,
+        History,
+        FileText,
+        Package,
+        Users,
+        User,
+        Eye,
+        EyeClosed,
+        EyeOff,
+        Bell,
+        RefreshCw,
+        Search,
+        Settings,
+        LogOut,
+        CreditCard,
+        BanknoteIcon,
+        ArrowLeftRightIcon,
+        X,
+      }),
+    ),
     {
       provide: APP_ENV,
       useValue: environment,

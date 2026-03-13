@@ -1,7 +1,8 @@
-import { JwtUtils } from '@app/core/utils/jwt.utils';
+import { JwtUtils } from '@core/utils/jwt.utils';
 import { LoginResponseDto } from '@features/auth/application/dtos/auth-login-response.dto';
 import { Session } from '@features/auth/domain/entities/auth-session.entity';
 import { UserRole } from '@features/auth/domain/value-objects/auth-user-role.enum';
+import { mapAuthUserRole } from './auth-role.mapper';
 
 export interface SessionPrimitives {
   accessToken: string;
@@ -45,7 +46,7 @@ export class SessionMapper {
   static fromLoginResponse(dto: LoginResponseDto): Session {
     const accessToken = dto.accessToken ?? dto.access ?? '';
     const refreshToken = dto.refreshToken ?? dto.refresh ?? null;
-    const role = JwtUtils.mapRole(dto.user.isAdmin, dto.user.isStaff);
+    const role = mapAuthUserRole(dto.user.isAdmin, dto.user.isStaff);
     const accessExp = JwtUtils.decodeExpiration(accessToken);
     const refreshExp = refreshToken ? JwtUtils.decodeExpiration(refreshToken) : 0;
 

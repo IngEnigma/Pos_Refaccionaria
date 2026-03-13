@@ -1,0 +1,25 @@
+<div class="cart-item">
+  <img class="cart-item-img" [src]="item().imagen" [alt]="item().nombre" />
+
+  <div class="cart-item-body">
+    <div class="cart-item-top">
+      <div class="cart-item-name">{{ item().nombre }}</div>
+
+      <button class="remove-btn" type="button" (click)="remove.emit(item())">
+        <lucide-icon name="X" class="icon" />
+      </button>
+    </div>
+
+    <div class="cart-item-desc">Modelo / info</div>
+
+    <div class="cart-item-bottom">
+      <div class="cart-price">${{ item().precio }}</div>
+
+      <app-quantity-control
+        [value]="item().qty"
+        (increase)="increaseQty.emit(item())"
+        (decrease)="decreaseQty.emit(item())"
+      />
+    </div>
+  </div>
+</div>

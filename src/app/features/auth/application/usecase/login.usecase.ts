@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
-import { LoggerService } from '@app/core/logging/logger.service';
-import { SessionStateService } from '@app/core/services/session-state.service';
+import { LoggerService } from '@core/logging/logger.service';
+import { SessionStateService } from '@features/auth/application/services/session-state.service';
 import {
   AuthRepository,
   LoginCredentials,

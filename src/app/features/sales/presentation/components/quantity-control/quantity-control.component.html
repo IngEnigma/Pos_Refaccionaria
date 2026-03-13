@@ -1,0 +1,5 @@
+<div class="qty-control" role="group" aria-label="Control de cantidad">
+  <button class="qty-circle" type="button" (click)="decrease.emit()">−</button>
+  <div class="qty-value" title="Cantidad">{{ value() }}</div>
+  <button class="qty-circle" type="button" (click)="increase.emit()">+</button>
+</div>

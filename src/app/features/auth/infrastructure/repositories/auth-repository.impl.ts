@@ -2,11 +2,11 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, catchError, map, tap, throwError } from 'rxjs';
 
-import { API_ENDPOINTS } from '@app/core/config/api-endpoints';
-import { APP_ENV } from '@app/core/tokens/app-env.token';
+import { API_ENDPOINTS } from '@core/config/api-endpoints';
+import { APP_ENV } from '@core/tokens/app-env.token';
 import { Environment } from '@env/environment.model';
-import { LoggerService } from '@app/core/logging/logger.service';
-import { LoggerPort } from '@app/core/logging/logger.port';
+import { LoggerService } from '@core/logging/logger.service';
+import { LoggerPort } from '@core/logging/logger.port';
 import { LoginRequestDto } from '@features/auth/application/dtos/auth-login-request.dto';
 import { LoginResponseDto } from '@features/auth/application/dtos/auth-login-response.dto';
 import { RefreshTokenRequestDto } from '@features/auth/application/dtos/auth-refresh-token-request.dto';

@@ -6,7 +6,7 @@ import {
   getExponentialBackoffDelay,
 } from '@core/http/retry/retry.utils';
 import { HTTP_RETRY_CONFIG } from '@core/config/http-retry.config';
-import { LoggerPort } from '@app/core/logging/logger.port';
+import { LoggerPort } from '@core/logging/logger.port';
 
 export function createRetryStrategy(
   req: HttpRequest<unknown>,

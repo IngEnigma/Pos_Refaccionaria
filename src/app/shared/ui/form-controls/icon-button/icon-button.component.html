@@ -5,12 +5,5 @@
   [attr.aria-label]="ariaLabel()"
   (click)="onClick()"
 >
-  <img
-    class="icon"
-    [ngSrc]="icon()"
-    width="22"
-    height="22"
-    alt=""
-    aria-hidden="true"
-  />
+  <lucide-icon [name]="icon()" [size]="22" aria-hidden="true" class="icon"></lucide-icon>
 </button>

@@ -1,0 +1,8 @@
+<div class="products-grid" aria-label="Lista de productos">
+  @for (producto of products(); track producto.id) {
+    <app-product-card
+      [product]="producto"
+      (addToCart)="addToCart.emit($event)"
+    />
+  }
+</div>

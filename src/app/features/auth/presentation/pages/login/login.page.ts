@@ -3,7 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AppRoutes } from '@core/routing/app-routes';
+import { AppRoutes } from '@app/app-routes';
 import { AuthFacade } from '@features/auth/application/facades/auth.facade';
 import { InputComponent } from '@app/shared/ui/form-controls/input/input.component';
 import { ButtonComponent } from '@app/shared/ui/form-controls/button/button.component';

@@ -1,0 +1,35 @@
+<div class="payment-section">
+  <div class="payment-title">Seleccionar método de pago</div>
+
+  <div class="payment-buttons">
+    <button
+      class="payment-btn"
+      [class.selected]="(selectedPayment() || 'efectivo') === 'efectivo'"
+      (click)="selectPayment.emit('efectivo')"
+      type="button"
+    >
+      <lucide-icon name="BanknoteIcon" class="icon" />
+      <div class="payment-text">Efectivo</div>
+    </button>
+
+    <button
+      class="payment-btn"
+      [class.selected]="(selectedPayment() || 'efectivo') === 'tarjeta'"
+      (click)="selectPayment.emit('tarjeta')"
+      type="button"
+    >
+      <lucide-icon name="CreditCard" class="icon" />
+      <div class="payment-text">Tarjeta</div>
+    </button>
+
+    <button
+      class="payment-btn"
+      [class.selected]="(selectedPayment() || 'efectivo') === 'transferencia'"
+      (click)="selectPayment.emit('transferencia')"
+      type="button"
+    >
+      <lucide-icon name="ArrowLeftRightIcon" class="icon" />
+      <div class="payment-text">Transferencia</div>
+    </button>
+  </div>
+</div>

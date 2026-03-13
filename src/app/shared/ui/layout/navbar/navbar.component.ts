@@ -2,11 +2,12 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
 import { SearchInputComponent } from "../../form-controls/search-input/search-input.component";
 import { IconButtonComponent } from "../../form-controls/icon-button/icon-button.component";
 import { DropdownComponent } from '../../form-controls/dropdown/dropdown.component';
+import { LucideAngularModule } from 'lucide-angular';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [SearchInputComponent, IconButtonComponent, DropdownComponent],
+  imports: [SearchInputComponent, IconButtonComponent, DropdownComponent, LucideAngularModule],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -20,8 +21,8 @@ export class NavbarComponent {
 
   readonly username = input('Miguel Lara');
   readonly currentDate = input(NavbarComponent.DATE_FORMATTER.format(new Date()));
-  readonly profileIconPath = input('assets/icons/profile.svg');
-  readonly notificationsIconPath = input('assets/icons/notifications.svg');
+  readonly profileIconPath = input('user');
+  readonly notificationsIconPath = input('bell');
 
   readonly profileClick = output<void>();
   readonly notificationsClick = output<void>();

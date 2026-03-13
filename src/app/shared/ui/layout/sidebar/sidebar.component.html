@@ -14,12 +14,12 @@
               [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
               class="sidebar-link"
             >
-              <img [ngSrc]="item.iconPath" width="20" height="20" alt="" aria-hidden="true" class="icon" />
+              <lucide-icon [name]="item.icon" [size]="20" aria-hidden="true" class="icon"></lucide-icon>
               <span class="link-text">{{ item.label }}</span>
             </a>
           } @else {
             <span class="sidebar-link sidebar-link-disabled" aria-disabled="true" tabindex="-1">
-              <img [ngSrc]="item.iconPath" width="20" height="20" alt="" aria-hidden="true" class="icon" />
+              <lucide-icon [name]="item.icon" [size]="20" aria-hidden="true" class="icon"></lucide-icon>
               <span class="link-text">{{ item.label }}</span>
             </span>
           }

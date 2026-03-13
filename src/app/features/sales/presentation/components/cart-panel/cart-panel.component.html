@@ -1,0 +1,46 @@
+<aside class="sales-panel" aria-label="Detalle de venta">
+  <div class="panel-header">
+    <h3>Detalle de Venta</h3>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="cart-list">
+    @if (cartItems().length === 0) {
+      <p class="empty-cart">No hay productos agregados.</p>
+    } @else {
+      @for (item of cartItems(); track item.productId) {
+        <app-cart-item
+          [item]="item"
+          (remove)="removeItem.emit($event)"
+          (increaseQty)="increaseQty.emit($event)"
+          (decreaseQty)="decreaseQty.emit($event)"
+        />
+      }
+    }
+  </div>
+
+  <div class="bottom-section">
+    <app-sales-summary
+      [subtotal]="subtotal()"
+      [descuento]="descuento()"
+      [iva]="iva()"
+      [total]="total()"
+    />
+
+    <app-payment-method-selector
+      [selectedPayment]="selectedPayment()"
+      (selectPayment)="selectPayment.emit($event)"
+    />
+
+    <div class="panel-footer">
+      <button
+        class="process-btn"
+        type="button"
+        (click)="processTransaction.emit()"
+      >
+        Procesar transacción
+      </button>
+    </div>
+  </div>
+</aside>

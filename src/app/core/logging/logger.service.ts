@@ -2,8 +2,8 @@ import { inject, Injectable } from '@angular/core';
 
 import { APP_ENV } from '@core/tokens/app-env.token';
 import { Environment } from '@env/environment.model';
-import { LogLevel } from '@app/core/logging/log-level.enum';
-import { LogEntry } from '@app/core/logging/log.model';
+import { LogLevel } from '@core/logging/log-level.enum';
+import { LogEntry } from '@core/logging/log.model';
 import { LoggerPort } from './logger.port';
 
 @Injectable({ providedIn: 'root' })

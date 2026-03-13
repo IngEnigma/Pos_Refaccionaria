@@ -9,7 +9,7 @@ import { Session } from '@features/auth/domain/entities/auth-session.entity';
 import { UserRole } from '@features/auth/domain/value-objects/auth-user-role.enum';
 import { LoggerPort } from '@core/logging/logger.port';
 import { LoggerService } from '@core/logging/logger.service';
-import { SessionStateService } from '@core/services/session-state.service';
+import { SessionStateService } from '@features/auth/application/services/session-state.service';
 import { LoginUseCase } from './login.usecase';
 
 describe('LoginUseCase', () => {

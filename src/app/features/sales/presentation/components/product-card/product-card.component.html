@@ -1,0 +1,16 @@
+<article class="product-card">
+  <img
+    class="product-img"
+    [src]="product().imagen"
+    [alt]="product().nombre"
+  />
+  <h3 class="product-name">{{ product().nombre }}</h3>
+  <p class="product-desc">{{ product().descripcion }}</p>
+
+  <div class="product-row">
+    <span class="product-price">${{ product().precio }}</span>
+    <span class="product-stock">{{ product().stock }}</span>
+  </div>
+
+  <button class="add-btn" type="button" (click)="onAdd()">Añadir</button>
+</article>

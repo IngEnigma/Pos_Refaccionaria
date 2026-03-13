@@ -11,7 +11,7 @@ import {
 } from 'rxjs';
 
 import { LoggerService } from '@core/logging/logger.service';
-import { SessionStateService } from '@core/services/session-state.service';
+import { SessionStateService } from '@features/auth/application/services/session-state.service';
 import { RefreshTokenUseCase } from '@features/auth/application/usecase/refresh.usecase';
 import { withBearerToken } from './auth-token-http.utils';
 

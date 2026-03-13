@@ -3,8 +3,8 @@ import { Router, UrlTree } from '@angular/router';
 
 import { LoggerPort } from '@core/logging/logger.port';
 import { LoggerService } from '@core/logging/logger.service';
-import { AppRoutes } from '@core/routing/app-routes';
-import { SessionStateService } from '@core/services/session-state.service';
+import { AppRoutes } from '@app/app-routes';
+import { SessionStateService } from '@features/auth/application/services/session-state.service';
 import { authGuard } from './auth.guard';
 
 describe('authGuard', () => {
