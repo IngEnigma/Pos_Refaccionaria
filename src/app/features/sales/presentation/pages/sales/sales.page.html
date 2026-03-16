@@ -4,14 +4,15 @@
       <h2 class="section-title">Categorías</h2>
 
       <app-category-slider
-        [categories]="categorias"
+        [categories]="categories()"
+        [selectedCategoryId]="selectedCategoryId()"
         (selected)="onSelectCategory($event)"
       />
       
       <h2 class="section-title">Productos</h2>
 
       <app-product-grid
-        [products]="productos"
+        [products]="productos()"
         (addToCart)="onAddToCart($event)"
       />
 
@@ -24,6 +25,7 @@
     [descuento]="descuento()"
     [iva]="iva()"
     [total]="total()"
+    [paymentMethods]="paymentMethods()"
     [selectedPayment]="selectedPayment()"
     (removeItem)="onRemoveItem($event)"
     (increaseQty)="onIncreaseQty($event)"

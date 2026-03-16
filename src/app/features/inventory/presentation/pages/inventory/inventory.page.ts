@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ToastService } from '../../../../../shared/ui/components/toast/toast.service';
 
 type InventoryModalType = 'add' | 'edit' | 'delete';
 
@@ -22,6 +23,8 @@ interface InventoryProduct {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InventoryPageComponent {
+  private readonly toast = inject(ToastService);
+
   mostrarModal = false;
   tipoModal: InventoryModalType | null = null;
   form: Partial<InventoryProduct> = {};
@@ -82,17 +85,17 @@ export class InventoryPageComponent {
     const stock = Number(this.form.stock);
 
     if (!nombre) {
-      window.alert('El nombre del producto es obligatorio.');
+      this.toast.warning('El nombre del producto es obligatorio.');
       return;
     }
 
     if (this.tipoModal === 'add') {
       if (Number.isNaN(precio) || precio < 0) {
-        window.alert('Ingresa un precio válido.');
+        this.toast.warning('Ingresa un precio válido.');
         return;
       }
       if (Number.isNaN(stock) || stock < 0) {
-        window.alert('Ingresa una cantidad en stock válida.');
+        this.toast.warning('Ingresa una cantidad en stock válida.');
         return;
       }
 
@@ -108,26 +111,27 @@ export class InventoryPageComponent {
 
       this.productos = [nuevo, ...this.productos];
       this.cerrarModal();
+      this.toast.success('Producto agregado correctamente.');
       return;
     }
 
     if (this.tipoModal === 'edit') {
       if (typeof this.form.id === 'undefined') {
-        window.alert('Producto no identificado para edición.');
+        this.toast.error('Producto no identificado para edición.');
         return;
       }
       if (Number.isNaN(precio) || precio < 0) {
-        window.alert('Ingresa un precio válido.');
+        this.toast.warning('Ingresa un precio válido.');
         return;
       }
       if (Number.isNaN(stock) || stock < 0) {
-        window.alert('Ingresa una cantidad en stock válida.');
+        this.toast.warning('Ingresa una cantidad en stock válida.');
         return;
       }
 
       const idx = this.productos.findIndex((product) => product.id === this.form.id);
       if (idx === -1) {
-        window.alert('No se encontró el producto a editar.');
+        this.toast.error('No se encontró el producto a editar.');
         return;
       }
 
@@ -147,6 +151,7 @@ export class InventoryPageComponent {
       ];
 
       this.cerrarModal();
+      this.toast.success('Producto actualizado correctamente.');
     }
   }
 
@@ -157,7 +162,7 @@ export class InventoryPageComponent {
 
     const nombreAEliminar = (this.form.nombre ?? '').toString().trim();
     if (!nombreAEliminar) {
-      window.alert('Escribe el nombre del producto a eliminar.');
+      this.toast.warning('Escribe el nombre del producto a eliminar.');
       return;
     }
 
@@ -171,29 +176,21 @@ export class InventoryPageComponent {
       );
 
       if (partialIndex === -1) {
-        window.alert(`No se encontró ningún producto con el nombre "${nombreAEliminar}".`);
+        this.toast.error(`No se encontró ningún producto con el nombre "${nombreAEliminar}".`);
         return;
       }
 
       const matched = this.productos[partialIndex];
-      const confirmPartial = window.confirm(`Se encontró "${matched.nombre}". ¿Eliminarlo?`);
-      if (!confirmPartial) {
-        return;
-      }
 
       this.productos = this.productos.filter((_, index) => index !== partialIndex);
       this.cerrarModal();
+      this.toast.success(`Producto "${matched.nombre}" eliminado correctamente.`);
       return;
     }
 
-    const confirmDelete = window.confirm(
-      `¿Seguro que quieres eliminar "${this.productos[exactIndex].nombre}"?`,
-    );
-    if (!confirmDelete) {
-      return;
-    }
-
+    const nombreExacto = this.productos[exactIndex].nombre;
     this.productos = this.productos.filter((_, index) => index !== exactIndex);
     this.cerrarModal();
+    this.toast.success(`Producto "${nombreExacto}" eliminado correctamente.`);
   }
 }

@@ -18,7 +18,7 @@
   align-items: center;
   justify-content: center;
   padding: 3rem;
-  background-color: #fff;
+  background-color: var(--color-surface);
   box-shadow: 2px 0 12px rgba(0, 0, 0, 0.1);
   z-index: 1;
 }
@@ -46,7 +46,7 @@
 }
 
 .login-description {
-  font-size: 0.9rem;
+  font-size: var(--font-size-sm);
   font-weight: var(--font-text-weight);
   font-family: var(--font-text-family);
   color: var(--color-text);
@@ -64,8 +64,8 @@
   padding: 0.75rem;
   background-color: color-mix(in srgb, var(--color-danger) 12%, white);
   color: var(--color-danger);
-  border-radius: 8px;
-  font-size: 0.875rem;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
   text-align: center;
   border: 1px solid color-mix(in srgb, var(--color-danger) 35%, white);
 }

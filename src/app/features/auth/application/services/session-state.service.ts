@@ -23,6 +23,10 @@ export class SessionStateService {
     if (!session) return false;
     return session?.isAuthenticated ?? false;
   });
+  readonly username = computed(() => {
+    const session = this.session();
+    return session?.username ?? '';
+  });
 
   /**
    * Loads persisted session state when the service starts.

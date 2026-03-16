@@ -1,5 +1,7 @@
+import { PaymentMethod } from '@features/sales/domain/entities/payment-method.entity';
+
 export interface SalesProduct {
-  id: string;
+  id: number;
   nombre: string;
   descripcion: string;
   precio: number;
@@ -8,11 +10,11 @@ export interface SalesProduct {
 }
 
 export interface SalesCartItem {
-  productId: string;
+  productId: number;
   nombre: string;
   precio: number;
   imagen: string;
   qty: number;
 }
 
-export type SalesPaymentMethod = 'efectivo' | 'tarjeta' | 'transferencia';
+export type SalesPaymentMethod = PaymentMethod;

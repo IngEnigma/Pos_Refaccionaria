@@ -1,4 +1,6 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, input, output } from '@angular/core';
+
+import { ProductType } from '@features/sales/product-types/domain/entities/product-type.entity';
 
 @Component({
   selector: 'app-category-slider',
@@ -8,10 +10,21 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CategorySliderComponent {
-  readonly categories = input<string[]>([]);
-  readonly selected = output<string>();
+  readonly categories = input<ProductType[]>([]);
+  readonly selectedCategoryId = input<number | null>(null);
+  readonly selected = output<ProductType>();
 
-  selectCategory(category: string): void {
+  constructor() {
+    effect(() => {
+      const cats = this.categories();
+
+      if (!cats.length || this.selectedCategoryId() !== null) return;
+
+      this.selected.emit(cats[0]);
+    });
+  }
+
+  selectCategory(category: ProductType): void {
     this.selected.emit(category);
   }
 }

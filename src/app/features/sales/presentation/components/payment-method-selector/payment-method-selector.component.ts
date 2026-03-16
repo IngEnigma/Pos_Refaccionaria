@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, input, output } from '@angular/core';
 
-import { SalesPaymentMethod } from '../../models/sales-ui.models';
-import { LucideAngularModule } from "lucide-angular";
+import { PaymentMethod } from '@features/sales/domain/entities/payment-method.entity';
+import { LucideAngularModule } from 'lucide-angular';
 
 @Component({
   selector: 'app-payment-method-selector',
@@ -12,6 +12,30 @@ import { LucideAngularModule } from "lucide-angular";
   imports: [LucideAngularModule],
 })
 export class PaymentMethodSelectorComponent {
-  readonly selectedPayment = input<SalesPaymentMethod>('efectivo');
-  readonly selectPayment = output<SalesPaymentMethod>();
+  paymentMethods = input<readonly PaymentMethod[]>([]);
+  selectedPayment = input<PaymentMethod | null>(null);
+  selectPayment = output<PaymentMethod>();
+
+  constructor() {
+    effect(() => {
+      const methods = this.paymentMethods();
+
+      if (!methods.length || this.selectedPayment()) return;
+
+      const efectivo = methods.find(m =>
+        m.tipo.toLowerCase().includes('efectivo')
+      );
+
+      if (efectivo) {
+        this.selectPayment.emit(efectivo);
+      }
+    });
+  }
+
+  resolveIcon(method: PaymentMethod): string {
+    const tipo = method.tipo.toLowerCase();
+    if (tipo.includes('tarjeta')) return 'CreditCard';
+    if (tipo.includes('transfer')) return 'ArrowLeftRightIcon';
+    return 'BanknoteIcon';
+  }
 }

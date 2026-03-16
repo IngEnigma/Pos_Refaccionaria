@@ -3,7 +3,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  background-color: #fff;
+  background-color: var(--color-surface);
   padding: 0.85rem 1.25rem;
   border-bottom: 2px solid var(--color-border);
 }
@@ -20,49 +20,15 @@
 
 .username {
   display: block;
-  font-size: 1rem;
+  font-size: var(--font-size-base);
   font-weight: var(--font-title-weight);
   font-family: var(--font-title-family);
   color: var(--color-text-strong);
 }
 
 .date {
-  font-size: 0.85rem;
+  font-size: var(--font-size-sm);
   font-weight: var(--font-text-weight);
   font-family: var(--font-text-family);
   color: var(--color-text);
-}
-
-.icon-button {
-  background-color: transparent;
-  border: 1px solid transparent;
-  border-radius: 8px;
-  width: 2.25rem;
-  height: 2.25rem;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
-}
-
-.icon-button:hover {
-  background-color: var(--color-primary-100);
-  border-color: color-mix(in srgb, var(--color-primary-600) 20%, white);
-}
-
-.icon-button:focus-visible {
-  outline: 2px solid var(--color-primary-600);
-  outline-offset: 2px;
-}
-
-.icon-button img {
-  width: 1.2rem;
-  height: 1.2rem;
-}
-
-@media (max-width: 900px) {
-  .search-container {
-    max-width: 360px;
-  }
 }

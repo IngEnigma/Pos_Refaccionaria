@@ -6,7 +6,7 @@
       <div class="cart-item-name">{{ item().nombre }}</div>
 
       <button class="remove-btn" type="button" (click)="remove.emit(item())">
-        <lucide-icon name="X" class="icon" />
+        <lucide-icon name="Trash2" class="icon" [size]="16"/>
       </button>
     </div>
 

@@ -5,10 +5,11 @@
 
 .sales-root {
   display: flex;
-  gap: 3rem; 
+  gap: 3rem;
   padding: 1rem 0 0 1rem;
   width: 100%;
   height: 100%;
+  --cart-panel-width: 360px;
   background: var(--page-bg, #f9fafc);
   overflow: hidden;
 }
@@ -17,15 +18,18 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 10px 10px 0 10px;
   background: var(--page-bg, #f9fafc);
   overflow: hidden;
   min-height: 0;
 }
 
 app-cart-panel {
-  width: 360px;
+  width: var(--cart-panel-width);
   flex-shrink: 0;
+}
+
+app-category-slider {
+  padding-right: var(--space-2);
 }
 
 .catalog-section {
@@ -50,17 +54,5 @@ app-product-grid {
   flex: 1;
   overflow-y: auto;
   min-height: 0;
-  padding-bottom: 20px;
-}
-
-@media (max-width: 1100px) {
-  .sales-main {
-    margin-right: 300px;
-  }
-}
-
-@media (max-width: 800px) {
-  .sales-main {
-    margin-right: 280px;
-  }
+  padding-bottom: var(--space-5);
 }

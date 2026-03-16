@@ -87,7 +87,7 @@ describe('SessionStateService', () => {
     const now = Math.floor(Date.now() / 1000);
 
     service.setSession(
-      new Session('access', 'refresh', now + 3600, now + 7200, 'u-1', UserRole.Manager),
+      new Session('access', 'refresh', now + 3600, now + 7200, 'u-1', UserRole.Manager, 'testuser'),
       { persist: true },
     );
 

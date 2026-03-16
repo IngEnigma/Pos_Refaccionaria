@@ -8,6 +8,7 @@ export class Session {
     public readonly refreshExp: number,
     public readonly userId: string,
     public readonly role: UserRole,
+    public readonly username: string,
   ) {}
 
   get isAdmin(): boolean {
@@ -34,6 +35,7 @@ export class Session {
       this.refreshExp,
       this.userId,
       this.role,
+      this.username,
     );
   }
 

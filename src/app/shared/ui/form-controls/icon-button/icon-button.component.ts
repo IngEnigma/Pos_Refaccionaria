@@ -1,4 +1,4 @@
-import { Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { LucideAngularModule } from 'lucide-angular';
 
 @Component({
@@ -6,7 +6,8 @@ import { LucideAngularModule } from 'lucide-angular';
   standalone: true,
   imports: [LucideAngularModule],
   templateUrl: './icon-button.component.html',
-  styleUrl: './icon-button.component.css'
+  styleUrl: './icon-button.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class IconButtonComponent {
 

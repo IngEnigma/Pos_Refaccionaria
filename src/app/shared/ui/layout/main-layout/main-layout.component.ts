@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { NavbarComponent } from '../navbar/navbar.component';
 import { SidebarComponent } from '../sidebar/sidebar.component';
+import { SessionStateService } from '@features/auth/application/services/session-state.service';
 
 @Component({
   selector: 'app-main-layout',
@@ -18,6 +19,8 @@ export class MainLayoutComponent {
     day: 'numeric',
   });
 
-  readonly username = input('Miguel Lara');
+  private readonly sessionState = inject(SessionStateService);
+
+  readonly username = this.sessionState.username;
   readonly currentDate = input(MainLayoutComponent.DATE_FORMATTER.format(new Date()));
 }

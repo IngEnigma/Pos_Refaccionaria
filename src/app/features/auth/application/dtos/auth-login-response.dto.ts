@@ -4,7 +4,8 @@ export interface LoginResponseDto {
   refresh?: string;
   access?: string;
   user: {
-    id: string | number;
+    id: number;
+    username: string;
     isAdmin: boolean;
     isStaff: boolean;
   };

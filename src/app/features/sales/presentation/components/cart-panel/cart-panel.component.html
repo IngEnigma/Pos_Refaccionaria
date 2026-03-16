@@ -29,6 +29,7 @@
     />
 
     <app-payment-method-selector
+      [paymentMethods]="paymentMethods()"
       [selectedPayment]="selectedPayment()"
       (selectPayment)="selectPayment.emit($event)"
     />

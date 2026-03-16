@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject, effect } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject, effect, signal, computed } from '@angular/core';
 
 import { ToastService } from '@app/shared/ui/components/toast/toast.service';
 import { SalesFacade } from '@features/sales/application/facades/sales.facade';
+import { ProductTypesFacade } from '@features/sales/application/facades/product-types.facade';
 import { CategorySliderComponent } from '@features/sales/presentation/components/category-slider/category-slider.component';
 import { CartPanelComponent } from '@features/sales/presentation/components/cart-panel/cart-panel.component';
 import { ProductGridComponent } from '@features/sales/presentation/components/product-grid/product-grid.component';
@@ -11,6 +12,8 @@ import {
   SalesProduct,
 } from '@features/sales/presentation/models/sales-ui.models';
 import { SalesCartService } from '@features/sales/presentation/state/sales-cart.service';
+import { InventoryFacade } from '@features/inventory';
+import { ProductType } from '@features/sales/product-types/domain/entities/product-type.entity';
 
 @Component({
   selector: 'app-sales-page',
@@ -22,13 +25,29 @@ import { SalesCartService } from '@features/sales/presentation/state/sales-cart.
   providers: [SalesCartService],
 })
 export class SalesPageComponent implements OnInit {
-  readonly facade = inject(SalesFacade);
+  readonly salesFacade = inject(SalesFacade);
+  readonly productTypesFacade = inject(ProductTypesFacade);
+  readonly inventoryFacade = inject(InventoryFacade);
   readonly toastService = inject(ToastService);
   readonly cartService = inject(SalesCartService);
 
   constructor() {
     effect(() => {
-      const errorMsg = this.facade.errorMessage();
+      const errorMsg = this.salesFacade.errorMessage();
+      if (errorMsg) {
+        this.toastService.error(errorMsg);
+      }
+    });
+
+    effect(() => {
+      const errorMsg = this.inventoryFacade.errorMessage();
+      if (errorMsg) {
+        this.toastService.error(errorMsg);
+      }
+    });
+
+    effect(() => {
+      const errorMsg = this.productTypesFacade.errorMessage();
       if (errorMsg) {
         this.toastService.error(errorMsg);
       }
@@ -36,60 +55,39 @@ export class SalesPageComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.facade.loadSales();
+    this.salesFacade.loadSales();
+    this.salesFacade.loadPaymentMethods();
+    this.inventoryFacade.loadProducts();
+    this.productTypesFacade.loadProductTypes();
   }
 
   reloadSales(): void {
-    this.facade.loadSales();
+    this.salesFacade.loadSales();
+    this.inventoryFacade.loadProducts();
   }
-
   
-  readonly categorias: string[] = [
-    'Frenos',
-    'Suspensión',
-    'Motor',
-    'Aceites',
-    'Filtros',
-    'Llantas',
-    'Herramientas',
-    'Accesorios'
-  ];
+  private readonly defaultCategory: ProductType = { id: 0, nombre: 'Todos' };
+  readonly categories = computed<ProductType[]>(() => [
+    this.defaultCategory,
+    ...this.productTypesFacade.productTypes(),
+  ]);
+  readonly selectedCategoryId = signal<number | null>(null);
 
-  // Productos hardcodeados acá
-  readonly productos: SalesProduct[] = [
-    {
-      id: 'p1',
-      nombre: 'Filtro de aceite',
-      descripcion: 'Filtro 1234 • 2.5L',
-      precio: 120,
-      stock: 15,
-      imagen: 'assets/images/filtro.jpg',
-    },
-    {
-      id: 'p2',
-      nombre: 'Bujía NGK',
-      descripcion: 'Modelo BPR6E • 4 piezas',
-      precio: 240,
-      stock: 32,
-      imagen: 'assets/images/bujia.jpg',
-    },
-    {
-      id: 'p3',
-      nombre: 'Líquido de frenos DOT4',
-      descripcion: '1 L • Uso universal',
-      precio: 95,
-      stock: 20,
-      imagen: 'assets/images/liquido.jpg',
-    },
-    {
-      id: 'p4',
-      nombre: 'Amortiguador delantero',
-      descripcion: 'Nissan Versa 2017',
-      precio: 860,
-      stock: 8,
-      imagen: 'assets/images/amortiguador.jpg',
-    },
-  ];
+  readonly productos = computed<SalesProduct[]>(() => {
+    const selectedId = this.selectedCategoryId();
+    const products = this.inventoryFacade.products();
+    const filtered =
+      selectedId && selectedId > 0 ? products.filter((product) => product.idTipo === selectedId) : products;
+
+    return filtered.map((product) => ({
+      id: product.id,
+      nombre: product.nombre,
+      descripcion: product.descripcion || '',
+      precio: product.precioVenta,
+      stock: product.existencia,
+      imagen: 'assets/images/Refaccionaria.webp',
+    }));
+  });
 
   readonly cartItems = this.cartService.cart;
   readonly descuento = this.cartService.descuento;
@@ -97,13 +95,14 @@ export class SalesPageComponent implements OnInit {
   readonly iva = this.cartService.iva;
   readonly total = this.cartService.total;
   readonly selectedPayment = this.cartService.selectedPayment;
+  readonly paymentMethods = this.salesFacade.paymentMethods;
 
   onAddToCart(product: SalesProduct): void {
     this.cartService.addToCart(product);
   }
 
-  onSelectCategory(_category: string): void {
-    // Placeholder for future category filtering.
+  onSelectCategory(category: ProductType): void {
+    this.selectedCategoryId.set(category.id);
   }
 
   onIncreaseQty(item: SalesCartItem): void {
@@ -122,9 +121,20 @@ export class SalesPageComponent implements OnInit {
     this.cartService.selectPayment(method);
   }
 
-  //Proceso de transacción:
-
   processTransaction() {
-
+    this.cartService
+      .confirmSale()
+      .subscribe({
+        next: () => {
+          this.toastService.success('Venta registrada correctamente.');
+        },
+        error: (error: unknown) => {
+          const message =
+            error instanceof Error && error.message
+              ? error.message
+              : 'No fue posible registrar la venta.';
+          this.toastService.error(message);
+        },
+      });
   }
 }

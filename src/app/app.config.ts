@@ -16,10 +16,10 @@ import { AuthRepository } from '@features/auth/domain/repository/auth-repository
 import { AuthRepositoryImpl } from '@features/auth/infrastructure/repositories/auth-repository.impl';
 import { MovementRepository } from '@features/movements/domain/repository/movement-repository';
 import { MovementRepositoryImpl } from '@features/movements/infrastructure/repositories/movement-repository.impl';
-import { PaymentMethodRepository } from '@features/payment-methods/domain/repository/payment-method-repository';
-import { PaymentMethodRepositoryImpl } from '@features/payment-methods/infrastructure/repositories/payment-method-repository.impl';
-import { ProductTypeRepository } from '@features/product-types/domain/repository/product-type-repository';
-import { ProductTypeRepositoryImpl } from '@features/product-types/infrastructure/repositories/product-type-repository.impl';
+import { PaymentMethodRepository as SalesPaymentMethodRepository } from '@features/sales/domain/repository/payment-method-repository';
+import { PaymentMethodRepositoryImpl as SalesPaymentMethodRepositoryImpl } from '@features/sales/infrastructure/repositories/payment-method-repository.impl';
+import { ProductTypeRepository } from '@features/sales/product-types/domain/repository/product-type-repository';
+import { ProductTypeRepositoryImpl } from '@features/sales/product-types/infrastructure/repositories/product-type-repository.impl';
 import { SaleDetailRepository } from '@features/sale-details/domain/repository/sale-detail-repository';
 import { SaleDetailRepositoryImpl } from '@features/sale-details/infrastructure/repositories/sale-detail-repository.impl';
 import { SaleRepository } from '@features/sales/domain/repository/sale-repository';
@@ -50,6 +50,8 @@ import {
   CreditCard,
   BanknoteIcon,
   ArrowLeftRightIcon,
+  CircleAlertIcon,
+  Trash2,
   X,
 } from 'lucide-angular';
 
@@ -79,6 +81,8 @@ export const appConfig: ApplicationConfig = {
         CreditCard,
         BanknoteIcon,
         ArrowLeftRightIcon,
+        CircleAlertIcon,
+        Trash2,
         X,
       }),
     ),
@@ -111,8 +115,8 @@ export const appConfig: ApplicationConfig = {
       useExisting: ProductTypeRepositoryImpl,
     },
     {
-      provide: PaymentMethodRepository,
-      useExisting: PaymentMethodRepositoryImpl,
+      provide: SalesPaymentMethodRepository,
+      useExisting: SalesPaymentMethodRepositoryImpl,
     },
     {
       provide: MovementRepository,

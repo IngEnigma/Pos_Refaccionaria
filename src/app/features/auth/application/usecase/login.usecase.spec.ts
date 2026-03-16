@@ -65,6 +65,7 @@ describe('LoginUseCase', () => {
       now + 7200,
       'u-1',
       UserRole.Admin,
+      'testuser'
     );
     repositorySpy.login.and.returnValue(of(session));
 

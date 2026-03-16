@@ -7,7 +7,7 @@ import { SaleRepository } from '@features/sales/domain/repository/sale-repositor
 export class DeleteSaleUseCase {
   private readonly repository = inject(SaleRepository);
 
-  execute(id: number): Observable<void> {
+  execute(id: number): Observable<boolean> {
     return this.repository.deleteSale(id);
   }
 }

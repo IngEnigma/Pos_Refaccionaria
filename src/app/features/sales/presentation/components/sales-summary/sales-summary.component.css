@@ -1,15 +1,15 @@
 .panel-summary {
   margin-top: 5px;
   border-top: 2px solid var(--color-border);
-  padding-top: 12px;
+  padding-top: var(--space-3);
 }
 .summary-row {
   display: flex;
   font-family: var(--font-text-family);
   font-weight: var(--font-text-weight);
   justify-content: space-between;
-  font-size: 0.95rem;
-  padding: 6px 0;
+  font-size: var(--font-size-sm);
+  padding: var(--space-2) 0;
   color: var(--color-text);
 }
 .summary-total {
@@ -19,9 +19,9 @@
   justify-content: space-between;
   border-top: 2px solid var(--color-border);
   border-bottom: 2px solid var(--color-border);
-  padding: 12px 0;
+  padding: var(--space-3) 0;
   align-items: center;
-  margin: 12px 0;
+  margin: var(--space-3) 0;
   font-size: 1.5rem;
 }
 .total-amount {

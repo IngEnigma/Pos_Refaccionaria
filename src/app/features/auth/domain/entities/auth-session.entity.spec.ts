@@ -10,6 +10,7 @@ describe('Session', () => {
       0,
       'u-1',
       UserRole.Seller,
+      'testuser'
     );
 
     expect(session.isAccessTokenExpired()).toBeFalse();
@@ -25,6 +26,7 @@ describe('Session', () => {
       0,
       'u-1',
       UserRole.Seller,
+      'testuser'
     );
 
     expect(session.isAccessTokenExpired()).toBeTrue();

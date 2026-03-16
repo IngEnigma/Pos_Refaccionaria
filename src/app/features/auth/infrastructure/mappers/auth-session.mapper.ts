@@ -11,6 +11,7 @@ export interface SessionPrimitives {
   refreshExp: number;
   userId: string;
   role: UserRole;
+  username: string;
 }
 
 type LegacySessionPrimitives = Omit<SessionPrimitives, 'accessExp'> & {
@@ -29,6 +30,7 @@ export class SessionMapper {
       json.refreshExp,
       json.userId,
       json.role,
+      json.username || '',
     );
   }
 
@@ -40,6 +42,7 @@ export class SessionMapper {
       refreshExp: session.refreshExp,
       userId: session.userId,
       role: session.role,
+      username: session.username,
     };
   }
 
@@ -57,6 +60,7 @@ export class SessionMapper {
       refreshExp,
       String(dto.user.id),
       role,
+      dto.user.username,
     );
   }
 }

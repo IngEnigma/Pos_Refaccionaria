@@ -2,8 +2,8 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
 
 import {
   SalesCartItem,
-  SalesPaymentMethod,
 } from '../../models/sales-ui.models';
+import { PaymentMethod } from '@features/sales/domain/entities/payment-method.entity';
 import { CartItemComponent } from '../cart-item/cart-item.component';
 import { PaymentMethodSelectorComponent } from '../payment-method-selector/payment-method-selector.component';
 import { SalesSummaryComponent } from '../sales-summary/sales-summary.component';
@@ -22,12 +22,12 @@ export class CartPanelComponent {
   readonly descuento = input(0);
   readonly iva = input(0);
   readonly total = input(0);
-  readonly selectedPayment = input<SalesPaymentMethod | null>(null);
+  paymentMethods = input<readonly PaymentMethod[]>([]);
+  selectedPayment = input<PaymentMethod | null>(null);
 
   readonly removeItem = output<SalesCartItem>();
   readonly increaseQty = output<SalesCartItem>();
   readonly decreaseQty = output<SalesCartItem>();
-  readonly selectPayment = output<SalesPaymentMethod>();
+  readonly selectPayment = output<PaymentMethod>();
   readonly processTransaction = output<void>();
 }
-

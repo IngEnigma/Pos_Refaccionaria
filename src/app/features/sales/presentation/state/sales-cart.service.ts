@@ -1,5 +1,8 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
+import { Observable, map, tap, throwError } from 'rxjs';
 
+import { SessionStateService } from '@features/auth/application/services/session-state.service';
+import { SalesFacade } from '@features/sales/application/facades/sales.facade';
 import {
   SalesCartItem,
   SalesPaymentMethod,
@@ -8,15 +11,9 @@ import {
 
 @Injectable()
 export class SalesCartService {
-  private readonly _cart = signal<SalesCartItem[]>([
-    {
-      productId: 'p1',
-      nombre: 'Filtro de aceite',
-      precio: 120,
-      imagen: 'assets/images/filtro.jpg',
-      qty: 1,
-    },
-  ]);
+  private readonly facade = inject(SalesFacade);
+  private readonly sessionState = inject(SessionStateService);
+  private readonly _cart = signal<SalesCartItem[]>([]);
   private readonly _selectedPayment = signal<SalesPaymentMethod | null>(null);
   private readonly _descuento = signal(0);
   private readonly _ivaRate = 0.16;
@@ -91,5 +88,48 @@ export class SalesCartService {
 
   selectPayment(method: SalesPaymentMethod): void {
     this._selectedPayment.set(method);
+  }
+
+  clearCart(): void {
+    this._cart.set([]);
+    this._selectedPayment.set(null);
+    this._descuento.set(0);
+  }
+
+  confirmSale(): Observable<void> {
+    const cartItems = this.cart();
+    if (cartItems.length === 0) {
+      return throwError(() => new Error('El carrito está vacío.'));
+    }
+
+    const paymentMethod = this.selectedPayment();
+    if (!paymentMethod) {
+      return throwError(() => new Error('Selecciona un método de pago.'));
+    }
+
+    const session = this.sessionState.getSession();
+    const userId = session ? Number(session.userId) : NaN;
+    if (!Number.isFinite(userId)) {
+      return throwError(() => new Error('No se pudo determinar el usuario actual.'));
+    }
+
+    const productos = cartItems.map((item) => ({
+      id: item.productId,
+      cantidad: item.qty,
+    }));
+
+    return this.facade
+      .createSale({
+        idUsuario: userId,
+        idMetodoPago: paymentMethod.id,
+        productos,
+      })
+      .pipe(
+        tap(() => {
+          this.clearCart();
+          this.facade.loadSales();
+        }),
+        map(() => undefined),
+      );
   }
 }

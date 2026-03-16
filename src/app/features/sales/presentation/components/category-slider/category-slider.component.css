@@ -1,31 +1,33 @@
 .category-scroll {
   display: flex;
-  gap: 10px;
+  gap: var(--space-2);
   overflow-x: auto;
-  padding-bottom: 8px;
-  margin-bottom: 18px;
+  padding-bottom: var(--space-2);
 }
 
 .category-scroll::-webkit-scrollbar {
   height: 8px;
 }
 .category-scroll::-webkit-scrollbar-thumb {
-  background: #d1d5db;
-  border-radius: 6px;
+  background: var(--color-border);
+  border-radius: var(--radius-sm);
 }
 
 .category-btn {
   flex-shrink: 0;
+  min-width: 120px;
+  text-align: center;
   border: none;
-  font-family: var(--font-text-family);
-  font-weight: var(--font-text-weight);
-  background: #ffffff;
+  font-family: var(--font-title-family);
+  font-weight: var(--font-text-strong);
+  border: 2px solid var(--color-border);
+  background: var(--color-surface);
   color: var(--font-text-strong);
-  padding: 6px 12px;
-  border-radius: 8px;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
   cursor: pointer;
   transition: background-color 0.18s ease;
-  font-size: 0.95rem;
+  font-size: var(--font-size-sm);
 }
 
 .category-btn:hover {
@@ -33,6 +35,7 @@
 }
 
 .category-btn.selected {
+  border: 2px solid var(--color-primary-600);
   background: var(--color-primary-600);
   color: #ffffff;
 }

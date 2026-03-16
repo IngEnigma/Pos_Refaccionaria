@@ -2,34 +2,20 @@
   <div class="payment-title">Seleccionar método de pago</div>
 
   <div class="payment-buttons">
-    <button
-      class="payment-btn"
-      [class.selected]="(selectedPayment() || 'efectivo') === 'efectivo'"
-      (click)="selectPayment.emit('efectivo')"
-      type="button"
-    >
-      <lucide-icon name="BanknoteIcon" class="icon" />
-      <div class="payment-text">Efectivo</div>
-    </button>
-
-    <button
-      class="payment-btn"
-      [class.selected]="(selectedPayment() || 'efectivo') === 'tarjeta'"
-      (click)="selectPayment.emit('tarjeta')"
-      type="button"
-    >
-      <lucide-icon name="CreditCard" class="icon" />
-      <div class="payment-text">Tarjeta</div>
-    </button>
-
-    <button
-      class="payment-btn"
-      [class.selected]="(selectedPayment() || 'efectivo') === 'transferencia'"
-      (click)="selectPayment.emit('transferencia')"
-      type="button"
-    >
-      <lucide-icon name="ArrowLeftRightIcon" class="icon" />
-      <div class="payment-text">Transferencia</div>
-    </button>
+    @if (paymentMethods().length === 0) {
+      <p class="empty-cart">No hay métodos de pago disponibles.</p>
+    } @else {
+      @for (method of paymentMethods(); track method.id) {
+        <button
+          class="payment-btn"
+          [class.selected]="selectedPayment()?.id === method.id"
+          (click)="selectPayment.emit(method)"
+          type="button"
+        >
+          <lucide-icon [name]="resolveIcon(method)" class="icon" />
+          <div class="payment-text">{{ method.tipo }}</div>
+        </button>
+      }
+    }
   </div>
 </div>

@@ -1,7 +1,12 @@
 <div class="category-scroll" role="list">
-  @for (cat of categories(); track cat) {
-    <button class="category-btn" type="button" (click)="selectCategory(cat)">
-      {{ cat }}
+  @for (cat of categories(); track cat.id) {
+    <button
+      class="category-btn"
+      type="button"
+      [class.selected]="selectedCategoryId() === cat.id"
+      (click)="selectCategory(cat)"
+    >
+      {{ cat.nombre }}
     </button>
   }
 </div>

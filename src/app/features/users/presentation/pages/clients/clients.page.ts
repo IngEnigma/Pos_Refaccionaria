@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ToastService } from '../../../../../shared/ui/components/toast/toast.service';
 
 interface Client {
   id: string;
@@ -21,6 +22,7 @@ interface Client {
 })
 export class ClientsPageComponent {
   private readonly fb = inject(FormBuilder);
+  private readonly toast = inject(ToastService);
 
   clients: Client[] = [
     {
@@ -143,10 +145,7 @@ export class ClientsPageComponent {
   }
 
   deleteClient(client: Client): void {
-    if (!window.confirm(`¿Estás seguro de eliminar a "${client.nombre}"?`)) {
-      return;
-    }
-
     this.clients = this.clients.filter((item) => item.id !== client.id);
+    this.toast.success(`Cliente "${client.nombre}" eliminado correctamente.`);
   }
 }
