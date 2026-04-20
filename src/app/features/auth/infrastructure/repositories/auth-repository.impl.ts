@@ -1,33 +1,35 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, catchError, map, tap, throwError } from 'rxjs';
 
-import { API_ENDPOINTS } from '@core/config/api-endpoints';
+import { AUTH_ENDPOINTS } from '@features/auth/config/auth-endpoints';
 import { APP_ENV } from '@core/tokens/app-env.token';
 import { Environment } from '@env/environment.model';
-import { LoggerService } from '@core/logging/logger.service';
-import { LoggerPort } from '@core/logging/logger.port';
-import { LoginRequestDto } from '@features/auth/application/dtos/auth-login-request.dto';
-import { LoginResponseDto } from '@features/auth/application/dtos/auth-login-response.dto';
-import { RefreshTokenRequestDto } from '@features/auth/application/dtos/auth-refresh-token-request.dto';
-import { RefreshTokenResponseDto } from '@features/auth/application/dtos/auth-refresh-token-response.dto';
+import { LOGGER_PORT } from '@core/logging/logger.port';
+import { LoginRequestDto } from '@features/auth/infrastructure/dtos/auth-login-request.dto';
+import { LoginResponseDto } from '@features/auth/infrastructure/dtos/auth-login-response.dto';
+import { RefreshTokenRequestDto } from '@features/auth/infrastructure/dtos/auth-refresh-token-request.dto';
+import { RefreshTokenResponseDto } from '@features/auth/infrastructure/dtos/auth-refresh-token-response.dto';
 import {
   AuthRepository,
   LoginCredentials,
 } from '@features/auth/domain/repository/auth-repository';
 import { Session } from '@features/auth/domain/entities/auth-session.entity';
 import { SessionMapper } from '@features/auth/infrastructure/mappers/auth-session.mapper';
+import {
+  InvalidCredentialsError,
+  NetworkAuthError,
+  UnknownAuthError,
+} from '@features/auth/domain/errors/auth.errors';
 
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class AuthRepositoryImpl implements AuthRepository {
   private readonly http = inject(HttpClient);
   private readonly env = inject<Environment>(APP_ENV);
-  private readonly logger: LoggerPort = inject(LoggerService).withContext(
-    'AuthRepository',
-  );
+  private readonly logger = inject(LOGGER_PORT).withContext('AuthRepository');
 
   login(credentials: LoginCredentials): Observable<Session> {
-    const url = `${this.env.apiUrl}${API_ENDPOINTS.AUTH.LOGIN}`;
+    const url = `${this.env.apiUrl}${AUTH_ENDPOINTS.LOGIN}`;
     const payload: LoginRequestDto = {
       username: credentials.username,
       password: credentials.password,
@@ -40,13 +42,13 @@ export class AuthRepositoryImpl implements AuthRepository {
       }),
       catchError((error: unknown) => {
         this.logger.error('Login request failed', { url, error });
-        return throwError(() => error);
+        return throwError(() => this.mapHttpError(error));
       }),
     );
   }
 
   refresh(refreshToken: string): Observable<string> {
-    const url = `${this.env.apiUrl}${API_ENDPOINTS.AUTH.REFRESH}`;
+    const url = `${this.env.apiUrl}${AUTH_ENDPOINTS.REFRESH}`;
     const payload: RefreshTokenRequestDto = { refresh: refreshToken };
 
     return this.http.post<RefreshTokenResponseDto>(url, payload).pipe(
@@ -56,8 +58,35 @@ export class AuthRepositoryImpl implements AuthRepository {
       }),
       catchError((error: unknown) => {
         this.logger.error('Refresh request failed', { url, error });
-        return throwError(() => error);
+        return throwError(() => this.mapHttpError(error));
       }),
     );
+  }
+
+  private mapHttpError(error: unknown): Error {
+    if (error instanceof HttpErrorResponse) {
+      if (error.status === 401) {
+        return new InvalidCredentialsError();
+      }
+      if (error.status === 0) {
+        return new NetworkAuthError();
+      }
+
+      const payload = error.error;
+      if (payload && typeof payload === 'object') {
+        if ('detail' in payload && typeof payload.detail === 'string') {
+          return new UnknownAuthError(payload.detail);
+        }
+        if ('message' in payload && typeof payload.message === 'string') {
+          return new UnknownAuthError(payload.message);
+        }
+      }
+    }
+
+    if (error instanceof Error) {
+      return error;
+    }
+
+    return new UnknownAuthError();
   }
 }

@@ -1,0 +1,78 @@
+<div class="reports-container">
+  <header class="reports-header animate-fade-in">
+    <div class="header-content">
+      <div class="header-text">
+        <h1>Centro de Reportes</h1>
+        <p>Genera reportes operativos detallados en formato PDF.</p>
+      </div>
+    </div>
+  </header>
+
+  <main class="reports-main animate-slide-up">
+    <section class="report-card">
+      <div class="card-header">
+        <lucide-icon name="file-text" size="20"></lucide-icon>
+        <h2>Generar Nuevo Reporte</h2>
+      </div>
+
+      <div class="card-body">
+        <div class="options-grid">
+          <!-- Period Selector -->
+          <div class="input-group">
+            <label for="periodType">Periodo del Reporte</label>
+            <div class="select-wrapper">
+              <select id="periodType" [ngModel]="selectedType()" (ngModelChange)="selectedType.set($event)">
+                <option value="day">Hoy</option>
+                <option value="week">Semana Actual</option>
+                <option value="biweek">Quincena Actual</option>
+                <option value="month">Mensual (Específico)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Conditional Selectors -->
+          @if (selectedType() === 'month') {
+            <div class="input-group animate-fade-in">
+              <label for="monthSelect">Mes</label>
+              <div class="select-wrapper">
+                <select id="monthSelect" [ngModel]="selectedMonth()" (ngModelChange)="selectedMonth.set($event)">
+                  @for (month of months; track month.value) {
+                    <option [value]="month.value">{{ month.label }}</option>
+                  }
+                </select>
+              </div>
+            </div>
+
+            <div class="input-group animate-fade-in">
+              <label for="yearSelect">Año</label>
+              <div class="select-wrapper">
+                <select id="yearSelect" [ngModel]="selectedYear()" (ngModelChange)="selectedYear.set($event)">
+                  @for (year of years(); track year) {
+                    <option [value]="year">{{ year }}</option>
+                  }
+                </select>
+              </div>
+            </div>
+          }
+        </div>
+
+        <div class="card-footer">
+          <button 
+            type="button" 
+            class="btn-generate" 
+            [disabled]="loading()"
+            (click)="generateReport()"
+          >
+            @if (loading()) {
+              <lucide-icon name="refresh-cw" class="spinner" size="18"></lucide-icon>
+              <span>Generando...</span>
+            } @else {
+              <lucide-icon name="file-text" size="18"></lucide-icon>
+              <span>Ver Reporte</span>
+            }
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>

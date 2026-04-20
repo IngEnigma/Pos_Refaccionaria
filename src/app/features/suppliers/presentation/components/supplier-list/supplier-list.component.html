@@ -1,0 +1,70 @@
+<div class="table-container">
+  <table class="supplier-table">
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Dirección</th>
+        <th>Teléfono</th>
+        <th>Correo</th>
+        <th class="actions-column">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Loading State -->
+      <ng-container *ngIf="loading()">
+        <tr *ngFor="let i of skeletonRows">
+          <td><app-skeleton width="150px" height="20px"></app-skeleton></td>
+          <td><app-skeleton width="200px" height="20px"></app-skeleton></td>
+          <td><app-skeleton width="100px" height="20px"></app-skeleton></td>
+          <td><app-skeleton width="150px" height="20px"></app-skeleton></td>
+          <td class="actions-cell">
+            <app-skeleton width="80px" height="32px"></app-skeleton>
+          </td>
+        </tr>
+      </ng-container>
+
+      <!-- Data State -->
+      <ng-container *ngIf="!loading()">
+        <tr *ngFor="let supplier of suppliers()" class="supplier-row">
+          <td>
+            <div class="supplier-name">
+              <div class="avatar">
+                {{ supplier.nombre.charAt(0).toUpperCase() }}
+              </div>
+              <span>{{ supplier.nombre }}</span>
+            </div>
+          </td>
+          <td>
+            <div class="text-truncate" [title]="supplier.direccion">
+              {{ supplier.direccion }}
+            </div>
+          </td>
+          <td>{{ supplier.telefono }}</td>
+          <td>
+            <a [href]="'mailto:' + supplier.correo" class="mail-link">{{ supplier.correo }}</a>
+          </td>
+          <td class="actions-cell">
+            <div class="action-buttons">
+              <button class="btn-action edit" (click)="edit.emit(supplier)" title="Editar">
+                <lucide-icon name="Pencil" [size]="16"></lucide-icon>
+              </button>
+              <button class="btn-action delete" (click)="delete.emit(supplier)" title="Eliminar">
+                <lucide-icon name="Trash2" [size]="16"></lucide-icon>
+              </button>
+            </div>
+          </td>
+        </tr>
+
+        <!-- Empty State -->
+        <tr *ngIf="suppliers().length === 0">
+          <td colspan="5" class="empty-state">
+            <div class="empty-content">
+              <lucide-icon name="Truck" [size]="48"></lucide-icon>
+              <p>No se encontraron proveedores registrados.</p>
+            </div>
+          </td>
+        </tr>
+      </ng-container>
+    </tbody>
+  </table>
+</div>

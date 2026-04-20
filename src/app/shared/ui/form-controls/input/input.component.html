@@ -1,23 +1,26 @@
 <div class="input-container">
-  <label [for]="inputId" class="input-label">{{ label() }}</label>
+  @if (hasVisibleLabel()) {
+    <label [for]="inputId()" class="input-label">{{ label() }}</label>
+  }
   <div class="input-field-wrapper">
     <input
-      [type]="resolvedInputType"
-      [id]="inputId"
+      [type]="resolvedInputType()"
+      [id]="inputId()"
       [placeholder]="placeholder()"
       [attr.autocomplete]="autocomplete()"
+      [attr.aria-label]="resolvedAriaLabel()"
       [value]="value"
       (input)="onInputChange($event)"
-      (blur)="onTouchedFn()"
+      (blur)="markAsTouched()"
       [disabled]="disabled"
       [attr.aria-invalid]="hasError() ? 'true' : 'false'"
-      [attr.aria-describedby]="hasError() ? errorId : null"
+      [attr.aria-describedby]="hasError() ? errorId() : null"
       class="input-field"
       [class.has-error]="hasError()"
-      [class.input-field-with-toggle]="isPasswordType"
+      [class.input-field-with-toggle]="isPasswordType()"
     />
 
-    @if (isPasswordType) {
+    @if (isPasswordType()) {
       <button
         type="button"
         class="password-toggle"
@@ -36,7 +39,7 @@
   </div>
 
   @if (hasError()) {
-    <div class="error-message" [id]="errorId" role="alert" aria-live="polite">
+    <div class="error-message" [id]="errorId()" role="alert" aria-live="polite">
       {{ errorMessage() }}
     </div>
   }

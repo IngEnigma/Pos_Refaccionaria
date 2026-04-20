@@ -3,6 +3,10 @@ export class SaleDate {
 
   static fromNullable(value: string | null, context: string): SaleDate | null {
     if (value === null) return null;
+    return this.fromPrimitive(value, context);
+  }
+
+  static fromPrimitive(value: string, context: string): SaleDate {
     const timestamp = Date.parse(value);
     if (Number.isNaN(timestamp)) {
       throw new Error(`${context}: sale date must be an ISO date string`);

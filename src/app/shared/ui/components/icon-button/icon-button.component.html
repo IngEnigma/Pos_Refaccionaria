@@ -1,0 +1,21 @@
+<button
+  type="button"
+  class="icon-button"
+  [class.active]="isActive()"
+  [class.loading]="loading()"
+  [class.icon-button--sm]="size() === 'sm'"
+  [class.icon-button--md]="size() === 'md'"
+  [class.icon-button--lg]="size() === 'lg'"
+  [class.button-primary]="variant() === 'primary'"
+  [class.button-secondary]="variant() === 'secondary'"
+  [class.button-danger]="variant() === 'danger'"
+  [class.button-outline]="variant() === 'outline'"
+  [class.button-ghost]="variant() === 'ghost'"
+  [attr.aria-label]="label()"
+  [attr.aria-pressed]="isActive()"
+  [attr.aria-busy]="loading() ? 'true' : null"
+  [attr.aria-disabled]="disabled() || loading() ? 'true' : null"
+  [disabled]="disabled() || loading()"
+>
+  <lucide-icon [name]="icon()" [size]="22" aria-hidden="true" class="icon"></lucide-icon>
+</button>

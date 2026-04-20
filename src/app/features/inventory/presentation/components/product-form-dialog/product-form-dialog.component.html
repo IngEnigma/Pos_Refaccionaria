@@ -1,0 +1,131 @@
+<div class="product-form-container">
+  <header class="dialog-header">
+    <div class="header-icon">
+      <lucide-icon [name]="isEditMode ? 'Edit' : 'PlusCircle'" [size]="24"></lucide-icon>
+    </div>
+    <div class="header-content">
+      <h2 class="dialog-title">{{ isEditMode ? 'Editar Producto' : 'Nuevo Producto' }}</h2>
+      <p class="dialog-subtitle">Completa la información detallada del artículo.</p>
+    </div>
+    <button class="btn-close" (click)="onCancel()" aria-label="Cerrar">
+      <lucide-icon name="X" [size]="20"></lucide-icon>
+    </button>
+  </header>
+
+  <form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="dialog-form">
+    <div class="form-grid">
+      <!-- General Information -->
+      <div class="form-group full-width">
+        <label for="nombre">Nombre del Producto</label>
+        <div class="input-wrapper" [class.error]="isFieldInvalid('nombre')">
+          <lucide-icon name="Package" [size]="18" class="input-icon"></lucide-icon>
+          <input id="nombre" type="text" formControlName="nombre" placeholder="Ej. Filtro de Aceite PH2">
+        </div>
+        <span class="error-text" *ngIf="isFieldInvalid('nombre')">El nombre es requerido (mín. 3 caracteres)</span>
+      </div>
+
+      <div class="form-group">
+        <label for="clave">Clave / SKU</label>
+        <div class="input-wrapper" [class.error]="isFieldInvalid('clave')">
+          <lucide-icon name="Tag" [size]="18" class="input-icon"></lucide-icon>
+          <input id="clave" type="text" formControlName="clave" placeholder="ABC-123">
+        </div>
+        <span class="error-text" *ngIf="isFieldInvalid('clave')">La clave es requerida</span>
+      </div>
+
+      <div class="form-group">
+        <label for="codigoBarras">Código de Barras</label>
+        <div class="input-wrapper" [class.error]="isFieldInvalid('codigoBarras')">
+          <lucide-icon name="Barcode" [size]="18" class="input-icon"></lucide-icon>
+          <input id="codigoBarras" type="text" formControlName="codigoBarras" placeholder="750123456789">
+        </div>
+        <span class="error-text" *ngIf="isFieldInvalid('codigoBarras')">El código de barras es requerido</span>
+      </div>
+
+      <div class="form-group">
+        <label for="idTipo">Categoría</label>
+        <div class="input-wrapper" [class.error]="isFieldInvalid('idTipo')">
+          <lucide-icon name="Layers" [size]="18" class="input-icon"></lucide-icon>
+          <select id="idTipo" formControlName="idTipo">
+            <option [ngValue]="null" disabled>Selecciona una categoría</option>
+            <option *ngFor="let type of productTypesFacade.productTypes()" [ngValue]="type.id">
+              {{ type.nombre }}
+            </option>
+          </select>
+        </div>
+        <span class="error-text" *ngIf="isFieldInvalid('idTipo')">La categoría es requerida</span>
+      </div>
+
+      <div class="form-group">
+        <label for="marca">Marca</label>
+        <div class="input-wrapper" [class.error]="isFieldInvalid('marca')">
+          <lucide-icon name="Settings" [size]="18" class="input-icon"></lucide-icon>
+          <input id="marca" type="text" formControlName="marca" placeholder="Ej. Fram, Bosch">
+        </div>
+        <span class="error-text" *ngIf="isFieldInvalid('marca')">La marca es requerida</span>
+      </div>
+
+      <div class="divider full-width"><span>Precios e Inventario</span></div>
+
+      <div class="form-group">
+        <label for="costo">Costo (Compra)</label>
+        <div class="input-wrapper" [class.error]="isFieldInvalid('costo')">
+          <lucide-icon name="DollarSign" [size]="18" class="input-icon"></lucide-icon>
+          <input id="costo" type="number" formControlName="costo" step="0.01">
+        </div>
+        <span class="error-text" *ngIf="isFieldInvalid('costo')">Costo inválido</span>
+      </div>
+
+      <div class="form-group">
+        <label for="precioVenta">Precio de Venta</label>
+        <div class="input-wrapper" [class.error]="isFieldInvalid('precioVenta')">
+          <lucide-icon name="TrendingUp" [size]="18" class="input-icon"></lucide-icon>
+          <input id="precioVenta" type="number" formControlName="precioVenta" step="0.01">
+        </div>
+        <span class="error-text" *ngIf="isFieldInvalid('precioVenta')">Precio inválido</span>
+      </div>
+
+      <div class="form-group">
+        <label for="existencia">Existencia Inicial</label>
+        <div class="input-wrapper" [class.error]="isFieldInvalid('existencia')">
+          <lucide-icon name="Archive" [size]="18" class="input-icon"></lucide-icon>
+          <input id="existencia" type="number" formControlName="existencia">
+        </div>
+        <span class="error-text" *ngIf="isFieldInvalid('existencia')">Stock inválido</span>
+      </div>
+
+       <div class="form-group">
+        <label for="codigoSat">Código SAT (Opcional)</label>
+        <div class="input-wrapper">
+          <lucide-icon name="ShieldCheck" [size]="18" class="input-icon"></lucide-icon>
+          <input id="codigoSat" type="text" formControlName="codigoSat" placeholder="Clave SAT">
+        </div>
+      </div>
+
+      <div class="form-group full-width">
+        <label for="descripcion">Descripción (Opcional)</label>
+        <div class="input-wrapper">
+          <textarea id="descripcion" formControlName="descripcion" rows="3" placeholder="Detalles adicionales del producto..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <footer class="dialog-footer">
+      <app-button 
+        type="button" 
+        variant="secondary" 
+        (click)="onCancel()"
+        class="footer-btn">
+        Cancelar
+      </app-button>
+      <app-button 
+        type="submit" 
+        variant="primary" 
+        [disabled]="productForm.invalid"
+        class="footer-btn">
+        <lucide-icon [name]="isEditMode ? 'Save' : 'Check'" [size]="18"></lucide-icon>
+        {{ isEditMode ? 'Guardar Cambios' : 'Crear Producto' }}
+      </app-button>
+    </footer>
+  </form>
+</div>

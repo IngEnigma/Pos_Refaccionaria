@@ -1,0 +1,62 @@
+<div class="page-container animate-fade-in">
+  <header class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">Historial de Ventas</h1>
+      <p class="page-subtitle">Consulta y gestiona los registros de ventas pasadas</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn-refresh" (click)="loadSalesHistory()" [disabled]="isLoading()">
+        <i class="lucide-rotate-cw" [class.spinning]="isLoading()"></i>
+        Actualizar
+      </button>
+    </div>
+  </header>
+
+
+  <!-- Filter Bar -->
+  <div class="filter-bar" *ngIf="!error()">
+    <div class="search-box">
+      <i class="lucide-search"></i>
+      <input 
+        type="text" 
+        placeholder="Buscar por ID o Usuario..." 
+        [ngModel]="searchQuery()"
+        (ngModelChange)="searchQuery.set($event)"
+      >
+    </div>
+
+    <div class="filter-actions">
+      <select 
+        [ngModel]="filterPaymentMethod()"
+        (ngModelChange)="filterPaymentMethod.set($event)"
+      >
+        <option [ngValue]="null">Todos los métodos</option>
+        <option [ngValue]="1">Efectivo</option>
+        <option [ngValue]="2">Tarjeta</option>
+      </select>
+    </div>
+  </div>
+
+  <main class="page-content animate-slide-up">
+    @if (error()) {
+      <div class="error-state">
+        <p>{{ error() }}</p>
+        <button (click)="loadSalesHistory()">Reintentar</button>
+      </div>
+    } @else {
+      <app-sales-history-table 
+        [sales]="filteredSales()" 
+        [loading]="isLoading()"
+        (viewDetail)="handleViewDetail($event)">
+      </app-sales-history-table>
+    }
+  </main>
+
+  @if (selectedSale()) {
+    <app-sale-detail-modal 
+      [sale]="selectedSale()!" 
+      [sellerName]="selectedSellerName() || ''"
+      (close)="closeDetail()">
+    </app-sale-detail-modal>
+  }
+</div>

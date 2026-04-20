@@ -1,15 +1,18 @@
 import { inject, Injectable, signal } from '@angular/core';
-import { HttpErrorResponse } from '@angular/common/http';
 import { catchError, finalize, of } from 'rxjs';
 
-import { LoggerService } from '@core/logging/logger.service';
+import { LOGGER_PORT } from '@core/logging/logger.port';
 import { GetProductTypesUseCase } from '@features/sales/product-types/application/usecase/get-product-types.usecase';
 import { ProductType } from '@features/sales/product-types/domain/entities/product-type.entity';
+import {
+  ProductTypeFetchError,
+  ProductTypeMutationError,
+} from '@features/sales/product-types/domain/errors/product-types.errors';
 
 @Injectable({ providedIn: 'root' })
 export class ProductTypesFacade {
   private readonly getProductTypesUseCase = inject(GetProductTypesUseCase);
-  private readonly logger = inject(LoggerService).withContext('ProductTypesFacade');
+  private readonly logger = inject(LOGGER_PORT).withContext('ProductTypesFacade');
 
   private readonly _productTypes = signal<readonly ProductType[]>([]);
   private readonly _loading = signal(false);
@@ -42,8 +45,11 @@ export class ProductTypesFacade {
   }
 
   private resolveErrorMessage(error: unknown): string {
-    if (error instanceof HttpErrorResponse) {
-      return error.message || 'No fue posible cargar las categorias.';
+    if (
+      error instanceof ProductTypeFetchError ||
+      error instanceof ProductTypeMutationError
+    ) {
+      return error.message;
     }
 
     if (error instanceof Error && error.message) {

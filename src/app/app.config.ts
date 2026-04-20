@@ -1,5 +1,6 @@
 import {
   ApplicationConfig,
+  computed,
   importProvidersFrom,
   provideZoneChangeDetection,
 } from '@angular/core';
@@ -8,29 +9,49 @@ import { provideRouter } from '@angular/router';
 
 import { authTokenInterceptor } from '@features/auth/infrastructure/http/auth-token.interceptor';
 import { httpErrorInterceptor } from '@core/interceptors/http-error.interceptor';
-import { STORAGE_PORT } from '@core/ports/storage.port';
+import { trailingSlashInterceptor } from '@core/interceptors/trailing-slash.interceptor';
+import { PERSISTENT_STORAGE_PORT, STORAGE_PORT } from '@core/ports/storage.port';
+import { InMemoryStorageService } from '@core/services/in-memory-storage.service';
 import { LocalStorageService } from '@core/services/local-storage.service';
 import { APP_ENV } from '@core/tokens/app-env.token';
 import { environment } from '@env/environment';
+import { Environment } from '@env/environment.model';
+import { LOGGER_PORT } from '@core/logging/logger.port';
+import { LoggerService } from '@core/logging/logger.service';
+import { LOGGING_LEVEL_TOKEN } from '@core/logging/logging-level.token';
+import { LogLevel } from '@core/logging/log-level.enum';
 import { AuthRepository } from '@features/auth/domain/repository/auth-repository';
 import { AuthRepositoryImpl } from '@features/auth/infrastructure/repositories/auth-repository.impl';
+import { AuthFacade } from '@features/auth';
 import { MovementRepository } from '@features/movements/domain/repository/movement-repository';
 import { MovementRepositoryImpl } from '@features/movements/infrastructure/repositories/movement-repository.impl';
-import { PaymentMethodRepository as SalesPaymentMethodRepository } from '@features/sales/domain/repository/payment-method-repository';
-import { PaymentMethodRepositoryImpl as SalesPaymentMethodRepositoryImpl } from '@features/sales/infrastructure/repositories/payment-method-repository.impl';
-import { ProductTypeRepository } from '@features/sales/product-types/domain/repository/product-type-repository';
-import { ProductTypeRepositoryImpl } from '@features/sales/product-types/infrastructure/repositories/product-type-repository.impl';
-import { SaleDetailRepository } from '@features/sale-details/domain/repository/sale-detail-repository';
-import { SaleDetailRepositoryImpl } from '@features/sale-details/infrastructure/repositories/sale-detail-repository.impl';
+import { SaleDetailRepository } from '@features/sales/domain/repository/sale-detail-repository';
+import { SaleDetailRepositoryImpl } from '@features/sales/infrastructure/repositories/sale-detail-repository.impl';
 import { SaleRepository } from '@features/sales/domain/repository/sale-repository';
 import { SaleRepositoryImpl } from '@features/sales/infrastructure/repositories/sale-repository.impl';
+import { PaymentMethodRepository } from '@features/sales/domain/repository/payment-method-repository';
+import { PaymentMethodRepositoryImpl } from '@features/sales/infrastructure/repositories/payment-method-repository.impl';
+import { ProductTypeRepository } from '@features/sales/product-types/domain/repository/product-type-repository';
+import { ProductTypeRepositoryImpl } from '@features/sales/product-types/infrastructure/repositories/product-type-repository.impl';
 import { SupplierRepository } from '@features/suppliers/domain/repository/supplier-repository';
 import { SupplierRepositoryImpl } from '@features/suppliers/infrastructure/repositories/supplier-repository.impl';
 import { UserRepository } from '@features/users/domain/repository/user-repository';
 import { UserRepositoryImpl } from '@features/users/infrastructure/repositories/user-repository.impl';
 import { ProductRepository } from '@features/inventory/domain/repository/product-repository';
 import { ProductRepositoryImpl } from '@features/inventory/infrastructure/repositories/product-repository.impl';
+import { ReportRepository } from '@features/reports/domain/repository/report-repository';
+import { ReportRepositoryImpl } from '@features/reports/infrastructure/repositories/report-repository.impl';
+import { SEARCH_STRATEGY } from '@core/search/search.strategy';
+import { DefaultSearchStrategy } from '@core/search/default-search.strategy';
 import { routes } from '@app/app.routes';
+import { SHELL_USER_ROLE } from '@shell/config/shell-user-role.token';
+import { NotificationPort } from '@shell/application/ports/notification.port';
+import { NotificationService } from '@shell/services/notification.service';
+import {
+  SHELL_IS_AUTHENTICATED,
+  SHELL_LOGOUT,
+  SHELL_USERNAME,
+} from '@shell/config/shell-auth.token';
 import {
   Bell,
   Eye,
@@ -50,9 +71,27 @@ import {
   CreditCard,
   BanknoteIcon,
   ArrowLeftRightIcon,
-  CircleAlertIcon,
+  CircleAlert,
+  CircleCheck,
+  TriangleAlert,
+  OctagonX,
   Trash2,
   X,
+  Plus,
+  Pencil,
+  Edit,
+  PlusCircle,
+  Tag,
+  Barcode,
+  Layers,
+  DollarSign,
+  TrendingUp,
+  Archive,
+  ShieldCheck,
+  Save,
+  Check,
+  BarChart3,
+  Truck,
 } from 'lucide-angular';
 
 export const appConfig: ApplicationConfig = {
@@ -60,7 +99,7 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideHttpClient(
-      withInterceptors([httpErrorInterceptor, authTokenInterceptor]),
+      withInterceptors([httpErrorInterceptor, authTokenInterceptor, trailingSlashInterceptor]),
     ),
     importProvidersFrom(
       LucideAngularModule.pick({
@@ -81,9 +120,27 @@ export const appConfig: ApplicationConfig = {
         CreditCard,
         BanknoteIcon,
         ArrowLeftRightIcon,
-        CircleAlertIcon,
+        CircleAlert,
+        CircleCheck,
+        TriangleAlert,
+        OctagonX,
         Trash2,
         X,
+        Plus,
+        Pencil,
+        Edit,
+        PlusCircle,
+        Tag,
+        Barcode,
+        Layers,
+        DollarSign,
+        TrendingUp,
+        Archive,
+        ShieldCheck,
+        Save,
+        Check,
+        BarChart3,
+        Truck,
       }),
     ),
     {
@@ -91,12 +148,53 @@ export const appConfig: ApplicationConfig = {
       useValue: environment,
     },
     {
+      provide: LOGGING_LEVEL_TOKEN,
+      useFactory: (env: Environment) => env.production ? LogLevel.ERROR : LogLevel.DEBUG,
+      deps: [APP_ENV]
+    },
+    {
+      provide: LOGGER_PORT,
+      useExisting: LoggerService,
+    },
+    {
       provide: STORAGE_PORT,
-      useExisting: LocalStorageService,
+      useClass: InMemoryStorageService,
+    },
+    {
+      provide: PERSISTENT_STORAGE_PORT,
+      useClass: LocalStorageService,
     },
     {
       provide: AuthRepository,
-      useExisting: AuthRepositoryImpl,
+      useClass: AuthRepositoryImpl,
+    },
+    {
+      provide: SHELL_USER_ROLE,
+      useFactory: (authFacade: AuthFacade) =>
+        computed(() => {
+          const role = authFacade.role();
+          return role ? String(role) : null;
+        }),
+      deps: [AuthFacade],
+    },
+    {
+      provide: SHELL_USERNAME,
+      useFactory: (authFacade: AuthFacade) => authFacade.username,
+      deps: [AuthFacade],
+    },
+    {
+      provide: SHELL_IS_AUTHENTICATED,
+      useFactory: (authFacade: AuthFacade) => authFacade.isAuthenticated,
+      deps: [AuthFacade],
+    },
+    {
+      provide: SHELL_LOGOUT,
+      useFactory: (authFacade: AuthFacade) => () => authFacade.logout(),
+      deps: [AuthFacade],
+    },
+    {
+      provide: NotificationPort,
+      useExisting: NotificationService,
     },
     {
       provide: UserRepository,
@@ -111,14 +209,6 @@ export const appConfig: ApplicationConfig = {
       useExisting: ProductRepositoryImpl,
     },
     {
-      provide: ProductTypeRepository,
-      useExisting: ProductTypeRepositoryImpl,
-    },
-    {
-      provide: SalesPaymentMethodRepository,
-      useExisting: SalesPaymentMethodRepositoryImpl,
-    },
-    {
       provide: MovementRepository,
       useExisting: MovementRepositoryImpl,
     },
@@ -128,7 +218,23 @@ export const appConfig: ApplicationConfig = {
     },
     {
       provide: SaleRepository,
-      useExisting: SaleRepositoryImpl,
+      useClass: SaleRepositoryImpl,
+    },
+    {
+      provide: PaymentMethodRepository,
+      useClass: PaymentMethodRepositoryImpl,
+    },
+    {
+      provide: ProductTypeRepository,
+      useClass: ProductTypeRepositoryImpl,
+    },
+    {
+      provide: ReportRepository,
+      useClass: ReportRepositoryImpl,
+    },
+    {
+      provide: SEARCH_STRATEGY,
+      useClass: DefaultSearchStrategy,
     },
   ],
 };

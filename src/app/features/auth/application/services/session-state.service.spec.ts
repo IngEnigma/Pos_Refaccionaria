@@ -1,32 +1,32 @@
 import { TestBed } from '@angular/core/testing';
 
-import { LoggerPort } from '@core/logging/logger.port';
-import { LoggerService } from '@core/logging/logger.service';
-import { STORAGE_PORT, StoragePort } from '@core/ports/storage.port';
+import { LoggerPort, LOGGER_PORT } from '@core/logging/logger.port';
+import { STORAGE_PORT, StoragePort, PERSISTENT_STORAGE_PORT } from '@core/ports/storage.port';
 import { Session } from '@features/auth/domain/entities/auth-session.entity';
 import { UserRole } from '@features/auth/domain/value-objects/auth-user-role.enum';
 import { SessionStateService } from './session-state.service';
 
 describe('SessionStateService', () => {
-  let storageSpy: jasmine.SpyObj<StoragePort>;
-  let loggerSpy: jasmine.SpyObj<LoggerPort>;
+  let storageSpy: jest.Mocked<StoragePort>;
+  let loggerSpy: jest.Mocked<LoggerPort>;
 
   beforeEach(() => {
-    storageSpy = jasmine.createSpyObj<StoragePort>('StoragePort', [
-      'getItem',
-      'getJSON',
-      'setItem',
-      'setJSON',
-      'removeItem',
-    ]);
+    storageSpy = {
+      getItem: jest.fn(),
+      getJSON: jest.fn(),
+      setItem: jest.fn(),
+      setJSON: jest.fn(),
+      removeItem: jest.fn(),
+    } as unknown as jest.Mocked<StoragePort>;
 
-    loggerSpy = jasmine.createSpyObj<LoggerPort>('LoggerPort', [
-      'debug',
-      'info',
-      'warn',
-      'error',
-      'fatal',
-    ]);
+    loggerSpy = {
+      debug: jest.fn(),
+      info: jest.fn(),
+      warn: jest.fn(),
+      error: jest.fn(),
+      fatal: jest.fn(),
+      withContext: jest.fn().mockReturnThis(),
+    } as unknown as jest.Mocked<LoggerPort>;
   });
 
   function configureTestingModule(): void {
@@ -34,11 +34,10 @@ describe('SessionStateService', () => {
       providers: [
         SessionStateService,
         { provide: STORAGE_PORT, useValue: storageSpy },
+        { provide: PERSISTENT_STORAGE_PORT, useValue: storageSpy },
         {
-          provide: LoggerService,
-          useValue: {
-            withContext: () => loggerSpy,
-          },
+          provide: LOGGER_PORT,
+          useValue: loggerSpy,
         },
       ],
     });
@@ -46,7 +45,11 @@ describe('SessionStateService', () => {
 
   it('loads a valid session from storage on startup', () => {
     const now = Math.floor(Date.now() / 1000);
-    storageSpy.getJSON.and.returnValue({
+    storageSpy.getItem.mockImplementation((key) => {
+      if (key === 'session:remember') return 'true';
+      return null;
+    });
+    storageSpy.getJSON.mockReturnValue({
       accessToken: 'access',
       refreshToken: 'refresh',
       accessExp: now + 3600,
@@ -64,7 +67,11 @@ describe('SessionStateService', () => {
 
   it('clears persisted session when access token is expired', () => {
     const now = Math.floor(Date.now() / 1000);
-    storageSpy.getJSON.and.returnValue({
+    storageSpy.getItem.mockImplementation((key) => {
+      if (key === 'session:remember') return 'true';
+      return null;
+    });
+    storageSpy.getJSON.mockReturnValue({
       accessToken: 'access',
       refreshToken: 'refresh',
       accessExp: now - 10,
@@ -81,7 +88,7 @@ describe('SessionStateService', () => {
   });
 
   it('persists session when setSession is called with persist=true', () => {
-    storageSpy.getJSON.and.returnValue(null);
+    storageSpy.getJSON.mockReturnValue(null);
     configureTestingModule();
     const service = TestBed.inject(SessionStateService);
     const now = Math.floor(Date.now() / 1000);

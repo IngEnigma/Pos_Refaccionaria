@@ -1,27 +1,36 @@
 import { inject, Injectable, signal } from '@angular/core';
-import { HttpErrorResponse } from '@angular/common/http';
 import { catchError, finalize, map, Observable, of } from 'rxjs';
 
-import { LoggerService } from '@core/logging/logger.service';
+import { LOGGER_PORT } from '@core/logging/logger.port';
 import { LoginUseCase } from '@features/auth/application/usecase/login.usecase';
-import { LoginCredentials } from '@features/auth/domain/repository/auth-repository';
+import { LoginCommand } from '@features/auth/application/commands/login.command';
+import { SessionStateService } from '@features/auth/application/services/session-state.service';
+import {
+  AuthError,
+  InvalidCredentialsError,
+  NetworkAuthError,
+} from '@features/auth/domain/errors/auth.errors';
 
 @Injectable({ providedIn: 'root' })
 export class AuthFacade {
   private readonly loginUseCase = inject(LoginUseCase);
-  private readonly logger = inject(LoggerService).withContext('AuthFacade');
+  private readonly sessionState = inject(SessionStateService);
+  private readonly logger = inject(LOGGER_PORT).withContext('AuthFacade');
 
   private readonly _loading = signal(false);
   private readonly _errorMessage = signal<string | null>(null);
 
   readonly loading = this._loading.asReadonly();
   readonly errorMessage = this._errorMessage.asReadonly();
+  readonly username = this.sessionState.username;
+  readonly role = this.sessionState.role;
+  readonly isAuthenticated = this.sessionState.isAuthenticated;
 
-  login(credentials: LoginCredentials): Observable<boolean> {
+  login(command: LoginCommand): Observable<boolean> {
     this._loading.set(true);
-    this._errorMessage.set(null);
+      this._errorMessage.set(null);
 
-    return this.loginUseCase.execute(credentials).pipe(
+    return this.loginUseCase.execute(command).pipe(
       map(() => true),
       catchError((error: unknown) => {
         const message = this.resolveErrorMessage(error);
@@ -35,35 +44,25 @@ export class AuthFacade {
     );
   }
 
-  private resolveErrorMessage(error: unknown): string {
-    if (error instanceof HttpErrorResponse) {
-      return (
-        this.extractMessage(error.error) ??
-        error.message ??
-        'Error de autenticación'
-      );
-    }
+  logout(): void {
+    this.sessionState.clearSession();
+    this.logger.info('User logged out');
+  }
 
+  private resolveErrorMessage(error: unknown): string {
+    if (error instanceof InvalidCredentialsError) {
+      return 'Credenciales inválidas';
+    }
+    if (error instanceof NetworkAuthError) {
+      return 'Error de red. Verifica tu conexión.';
+    }
+    if (error instanceof AuthError) {
+      return error.message;
+    }
     if (error instanceof Error && error.message) {
       return error.message;
     }
 
     return 'Error de autenticación';
-  }
-
-  private extractMessage(payload: unknown): string | null {
-    if (!payload || typeof payload !== 'object') {
-      return null;
-    }
-
-    if ('detail' in payload && typeof payload.detail === 'string') {
-      return payload.detail;
-    }
-
-    if ('message' in payload && typeof payload.message === 'string') {
-      return payload.message;
-    }
-
-    return null;
   }
 }

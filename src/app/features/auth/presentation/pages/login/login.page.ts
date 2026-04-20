@@ -2,12 +2,10 @@ import { ChangeDetectionStrategy, Component, DestroyRef, inject, effect } from '
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { AppRoutes } from '@app/app-routes';
 import { AuthFacade } from '@features/auth/application/facades/auth.facade';
-import { InputComponent } from '@app/shared/ui/form-controls/input/input.component';
-import { ButtonComponent } from '@app/shared/ui/form-controls/button/button.component';
-import { ToastService } from '@app/shared/ui/components/toast/toast.service';
+import { InputComponent, ButtonComponent, ToastService } from '@shared/ui';
 
 @Component({
   selector: 'app-login-page',
@@ -23,6 +21,7 @@ export class LoginPageComponent {
 
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   private readonly authFacade = inject(AuthFacade);
   private readonly destroyRef = inject(DestroyRef);
   private readonly toastService = inject(ToastService);
@@ -60,7 +59,8 @@ export class LoginPageComponent {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((isSuccess) => {
         if (isSuccess) {
-          this.router.navigateByUrl(`/${AppRoutes.sales}`);
+          const redirectTo = this.route.snapshot.queryParams['redirectTo'];
+          this.router.navigateByUrl(redirectTo ?? `/${AppRoutes.sales}`);
         }
       });
   }

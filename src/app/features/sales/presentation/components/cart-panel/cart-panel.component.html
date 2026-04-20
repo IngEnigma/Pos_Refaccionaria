@@ -35,13 +35,15 @@
     />
 
     <div class="panel-footer">
-      <button
-        class="process-btn"
-        type="button"
-        (click)="processTransaction.emit()"
+      <app-button
+        [fullWidth]="true"
+        [disabled]="disabled()"
+        [loading]="loading()"
+        loadingText="Procesando transacción..."
+        (onClick)="processTransaction.emit()"
       >
         Procesar transacción
-      </button>
+      </app-button>
     </div>
   </div>
 </aside>

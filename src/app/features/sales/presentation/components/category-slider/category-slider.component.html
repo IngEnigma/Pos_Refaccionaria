@@ -1,12 +1,23 @@
 <div class="category-scroll" role="list">
-  @for (cat of categories(); track cat.id) {
-    <button
-      class="category-btn"
-      type="button"
-      [class.selected]="selectedCategoryId() === cat.id"
-      (click)="selectCategory(cat)"
-    >
-      {{ cat.nombre }}
-    </button>
+  @if (isLoading()) {
+    @for (i of [1, 2, 3, 4, 5]; track i) {
+      <app-skeleton
+        width="120px"
+        height="40px"
+        [rounded]="true"
+        class="category-skeleton"
+      />
+    }
+  } @else {
+    @for (cat of categories(); track cat.id) {
+      <button
+        class="category-btn"
+        type="button"
+        [class.selected]="selectedCategoryId() === cat.id"
+        (click)="selectCategory(cat)"
+      >
+        {{ cat.nombre }}
+      </button>
+    }
   }
 </div>

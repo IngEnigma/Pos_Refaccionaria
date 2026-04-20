@@ -1,54 +1,13 @@
 @import '@angular/cdk/overlay-prebuilt.css';
-
-:root {
-  --font-title-family: "Montserrat", sans-serif;
-  --font-text-family: "Roboto", sans-serif;
-
-  --font-title-weight: 600;
-  --font-text-weight: 400;
-
-  --font-size-sm: 0.875rem;
-  --font-size-base: 1rem;
-  --font-size-lg: 1.125rem;
-  
-  --color-primary-700: #1a2764;
-  --color-primary-600: #233387;
-  --color-primary-100: #e6f0ff;
-  --color-primary-50: #ebf3ff;
-
-  --color-bg: #f9fafb;
-  --color-surface: #ffffff;
-  --color-surface-muted: #f3f4f6;
-  --color-border: #d1d4db;
-  --color-border-strong: #e5e7eb;
-  --color-text: #374151;
-  --color-text-muted: #6b7280;
-  --color-text-strong: #111827;
-
-  --color-success: #059669;
-  --color-warning: #f59e0b;
-  --color-danger: #dc2626;
-
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 10px;
-  --radius-xl: 12px;
-  --radius-full: 9999px;
-
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-5: 20px;
-  --space-6: 24px;
-
-  --shadow-sm: 0 2px 6px rgba(15, 23, 42, 0.06);
-  --shadow-panel: -2px 0 6px rgba(2, 6, 23, 0.03);
-}
+@import './app/shared/ui/tokens/tokens.css';
+@import './app/shared/ui/tokens/animations.css';
 
 body {
   margin: 0;
   border: 0;
   padding: 0;
   box-sizing: border-box;
+  background-color: var(--ds-bg-app);
+  color: var(--ds-text-base);
+  font-family: var(--pr-font-text);
 }

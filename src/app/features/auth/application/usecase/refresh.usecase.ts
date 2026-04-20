@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { catchError, map, Observable, tap, throwError } from 'rxjs';
 
-import { LoggerService } from '@core/logging/logger.service';
+import { LOGGER_PORT } from '@core/logging/logger.port';
 import { SessionStateService } from '@features/auth/application/services/session-state.service';
 import { JwtUtils } from '@core/utils/jwt.utils';
 import { Session } from '@features/auth/domain/entities/auth-session.entity';
@@ -11,7 +11,7 @@ import { AuthRepository } from '@features/auth/domain/repository/auth-repository
 export class RefreshTokenUseCase {
   private readonly authRepository = inject(AuthRepository);
   private readonly sessionService = inject(SessionStateService);
-  private readonly logger = inject(LoggerService).withContext('RefreshTokenUseCase');
+  private readonly logger = inject(LOGGER_PORT).withContext('RefreshTokenUseCase');
 
   execute(): Observable<Session> {
     const currentSession = this.sessionService.getSession();

@@ -1,0 +1,71 @@
+<div class="table-container">
+  <table class="premium-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Fecha / Hora</th>
+        <th>Vendedor</th>
+        <th>Método</th>
+        <th class="text-right">Total</th>
+        <th class="text-right">Detalle</th>
+      </tr>
+    </thead>
+    <tbody>
+      @if (loading()) {
+        @for (i of [1, 2, 3, 4, 5]; track i) {
+          <tr class="skeleton-row">
+            <td><app-skeleton height="20px" width="40px" /></td>
+            <td><app-skeleton height="20px" width="120px" /></td>
+            <td><app-skeleton height="20px" width="100px" /></td>
+            <td><app-skeleton height="20px" width="80px" /></td>
+            <td class="text-right"><app-skeleton height="20px" width="80px" /></td>
+            <td class="text-right"><app-skeleton height="20px" width="60px" /></td>
+          </tr>
+        }
+      } @else {
+        @for (sale of sales(); track sale.id) {
+          <tr class="fade-in">
+            <td><span class="badge-id">#{{ sale.id }}</span></td>
+            <td class="date-cell">
+              <span class="primary-date">{{ sale.fecha?.value | date: 'dd/MM/yyyy' }}</span>
+              <span class="secondary-time">{{ sale.fecha?.value | date: 'HH:mm' }}</span>
+            </td>
+            <td>
+              <div class="user-chip">
+                <span>{{ sale.usuarioNombre }}</span>
+              </div>
+            </td>
+            <td>
+              <span class="payment-badge" [ngClass]="sale.idMetodoPago === 1 ? 'cash' : 'card'">
+                <i [class]="sale.idMetodoPago === 1 ? 'lucide-banknote' : 'lucide-credit-card'"></i>
+                {{ sale.idMetodoPago === 1 ? 'Efectivo' : 'Tarjeta' }}
+              </span>
+            </td>
+            <td class="text-right total-cell">
+              {{ sale.total.value | currency: 'MXN' }}
+            </td>
+            <td class="text-right">
+              <button 
+                class="btn-view" 
+                (click)="onViewDetail(sale.id)"
+              >
+                <i class="lucide-eye"></i>
+                Detalle
+              </button>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="6" class="empty-state">
+              <div class="empty-content">
+                <i class="lucide-search-x"></i>
+                <h3>No se encontraron ventas</h3>
+                <p>Intenta ajustar tus filtros de búsqueda.</p>
+              </div>
+            </td>
+          </tr>
+        }
+      }
+    </tbody>
+  </table>
+</div>

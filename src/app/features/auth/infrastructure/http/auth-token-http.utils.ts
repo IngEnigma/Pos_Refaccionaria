@@ -1,5 +1,5 @@
 import { HttpErrorResponse, HttpRequest } from '@angular/common/http';
-import { API_ENDPOINTS } from '@core/config/api-endpoints';
+import { AUTH_ENDPOINTS } from '@features/auth/config/auth-endpoints';
 
 export function withBearerToken<T>(
   request: HttpRequest<T>,
@@ -19,5 +19,5 @@ export function isUnauthorizedError(
 }
 
 export function isRefreshRequest(request: HttpRequest<unknown>): boolean {
-  return request.url.includes(API_ENDPOINTS.AUTH.REFRESH);
+  return request.url.includes(AUTH_ENDPOINTS.REFRESH);
 }

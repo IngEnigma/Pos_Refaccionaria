@@ -1,9 +1,15 @@
 <article class="product-card">
-  <img
-    class="product-img"
-    [src]="product().imagen"
-    [alt]="product().nombre"
-  />
+  @if (product().imagen) {
+    <img
+      class="product-img"
+      [src]="product().imagen"
+      [alt]="product().nombre"
+    />
+  } @else {
+    <div class="product-img-placeholder">
+      <lucide-icon name="Package" [size]="48" class="placeholder-icon"></lucide-icon>
+    </div>
+  }
   <h3 class="product-name">{{ product().nombre }}</h3>
   <p class="product-desc">{{ product().descripcion }}</p>
 
@@ -12,5 +18,12 @@
     <span class="product-stock">{{ product().stock }}</span>
   </div>
 
-  <button class="add-btn" type="button" (click)="onAdd()">Añadir</button>
+  <app-button
+    variant="primary"
+    size="compact"
+    [fullWidth]="true"
+    (onClick)="onAdd()"
+  >
+    Añadir
+  </app-button>
 </article>

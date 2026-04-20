@@ -13,9 +13,9 @@ describe('Session', () => {
       'testuser'
     );
 
-    expect(session.isAccessTokenExpired()).toBeFalse();
-    expect(session.isAuthenticated).toBeTrue();
-    expect(session.isRefreshTokenExpired()).toBeFalse();
+    expect(session.isAccessTokenExpired()).toBe(false);
+    expect(session.isAuthenticated).toBe(true);
+    expect(session.isRefreshTokenExpired()).toBe(false);
   });
 
   it('marks session as expired when access token is missing', () => {
@@ -29,7 +29,19 @@ describe('Session', () => {
       'testuser'
     );
 
-    expect(session.isAccessTokenExpired()).toBeTrue();
-    expect(session.isAuthenticated).toBeFalse();
+    expect(session.isAccessTokenExpired()).toBe(true);
+    expect(session.isAuthenticated).toBe(false);
+  });
+
+  describe('hasRole', () => {
+    it('should return true if user has the role', () => {
+      const session = new Session('a', 'r', 0, 0, 'u', UserRole.Admin, 'user');
+      expect(session.hasRole(UserRole.Admin)).toBe(true);
+    });
+
+    it('should return false if user does NOT have the role', () => {
+      const session = new Session('a', 'r', 0, 0, 'u', UserRole.Seller, 'user');
+      expect(session.hasRole(UserRole.Admin)).toBe(false);
+    });
   });
 });

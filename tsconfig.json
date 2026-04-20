@@ -15,6 +15,7 @@
     "sourceMap": true,
     "declaration": false,
     "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "moduleResolution": "bundler",
     "importHelpers": true,
     "target": "ES2022",
@@ -30,6 +31,7 @@
       "@core/*": ["src/app/core/*"],
       "@shared/*": ["src/app/shared/*"],
       "@features/*": ["src/app/features/*"],
+      "@shell/*": ["src/app/shell/*"],
     }
   },
   "angularCompilerOptions": {

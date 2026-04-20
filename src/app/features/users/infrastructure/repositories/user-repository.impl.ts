@@ -17,7 +17,7 @@ import { UserMapper } from '@features/users/infrastructure/mappers/user.mapper';
 export class UserRepositoryImpl implements UserRepository {
   private readonly http = inject(HttpClient);
   private readonly env = inject<Environment>(APP_ENV);
-  private readonly endpoint = `${this.env.apiUrl}/usuarios`;
+  private readonly endpoint = `${this.env.apiUrl}/users`;
 
   getUsers(): Observable<User[]> {
     return this.http.get<UserResponseDto[]>(this.endpoint).pipe(

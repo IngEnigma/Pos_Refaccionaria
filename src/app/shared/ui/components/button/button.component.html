@@ -1,0 +1,30 @@
+<button
+  [type]="type()"
+  [disabled]="disabled() || loading()"
+  [attr.aria-busy]="loading() ? 'true' : null"
+  [attr.aria-disabled]="disabled() || loading() ? 'true' : null"
+  class="button-base"
+  [class.button-primary]="variant() === 'primary'"
+  [class.button-secondary]="variant() === 'secondary'"
+  [class.button-danger]="variant() === 'danger'"
+  [class.button-outline]="variant() === 'outline'"
+  [class.button-ghost]="variant() === 'ghost'"
+  [class.button-sm]="size() === 'sm'"
+  [class.button-md]="size() === 'md'"
+  [class.button-lg]="size() === 'lg'"
+  [class.button-compact]="size() === 'compact'"
+  [class.button-full]="fullWidth()"
+  (click)="handleInternalClick($event)"
+>
+  <div class="button-content-wrapper">
+    <div class="button-content" [class.hidden]="loading()">
+      <ng-content select="[leading]"></ng-content>
+      <ng-content></ng-content>
+      <ng-content select="[trailing]"></ng-content>
+    </div>
+    <div class="button-loading" [class.hidden]="!loading()">
+      <span class="spinner" aria-hidden="true"></span>
+      <span>{{ loadingText() }}</span>
+    </div>
+  </div>
+</button>

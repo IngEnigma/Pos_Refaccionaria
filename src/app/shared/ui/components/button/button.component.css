@@ -1,0 +1,97 @@
+@import './button.shared.css';
+@import './button-variants.shared.css';
+
+:host {
+  display: inline-flex;
+  min-width: 0;
+}
+
+.button-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--pr-space-2);
+  border-radius: var(--comp-radius);
+  font-family: var(--pr-font-title);
+  font-size: var(--comp-font-size);
+  font-weight: var(--pr-weight-semibold);
+  cursor: pointer;
+  transition: var(--comp-transition);
+  border: var(--comp-border-width) solid transparent;
+  outline: none;
+  white-space: nowrap;
+}
+
+.button-base:disabled {
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+.button-base:focus-visible {
+  box-shadow: 0 0 0 var(--comp-focus-ring-width) color-mix(in srgb, var(--ds-color-primary) 30%, transparent);
+}
+
+.button-sm {
+  padding: var(--pr-space-2) var(--pr-space-3);
+  font-size: var(--pr-font-size-xs);
+}
+
+.button-md {
+  padding: var(--pr-space-3) var(--pr-space-6);
+  font-size: var(--pr-font-size-base);
+}
+
+.button-lg {
+  padding: var(--pr-space-4) var(--pr-space-8);
+  font-size: var(--pr-font-size-lg);
+}
+
+.button-compact {
+  padding: var(--pr-space-1) var(--pr-space-3);
+  font-size: var(--pr-font-size-base);
+}
+
+
+.button-content-wrapper {
+  display: grid;
+  grid-template-areas: "stack";
+  width: 100%;
+  height: 100%;
+}
+
+.button-content,
+.button-loading {
+  grid-area: stack;/* VARIANTS */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: opacity 0.2s ease-in-out, visibility 0.2s;
+}
+
+.button-content.hidden,
+.button-loading.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.spinner {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  border: 2px solid color-mix(in srgb, var(--ds-text-strong) 20%, transparent);
+  border-radius: 50%;
+  border-top-color: currentColor;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.button-full {
+  width: 100%;
+}

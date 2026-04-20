@@ -40,3 +40,20 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# Skills and Agents
+.agent/
+AGENT.md
+skills-lock.json
+.gemini/
+
+# Electron build output
+/dist_electron/
+
+# Environment and local config
+.env
+*.local
+.env.*
+
+# Temporary files
+tmp.ts

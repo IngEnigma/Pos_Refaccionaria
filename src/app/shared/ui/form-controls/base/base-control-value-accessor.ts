@@ -1,31 +1,51 @@
-import { ControlValueAccessor } from '@angular/forms';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { Provider, Type, forwardRef, signal } from '@angular/core';
 
 export abstract class BaseControlValueAccessor<T> implements ControlValueAccessor {
-  value: T;
-  disabled = false;
+  private readonly _value = signal<T | undefined>(undefined);
+  private readonly _disabled = signal(false);
 
-  protected readonly initialValue: T;
-  onChangeFn: (value: T) => void = () => {};
-  onTouchedFn: () => void = () => {};
+  private _onChangeFn: (value: T) => void = () => {};
+  private _onTouchedFn: () => void = () => {};
 
-  protected constructor(initialValue: T) {
-    this.initialValue = initialValue;
-    this.value = initialValue;
+  get value(): T | undefined {
+    return this._value();
+  }
+
+  get disabled(): boolean {
+    return this._disabled();
+  }
+
+  protected updateValue(value: T): void {
+    this._value.set(value);
+    this._onChangeFn(value);
+  }
+
+  protected markAsTouched(): void {
+    this._onTouchedFn();
   }
 
   writeValue(value: T | null): void {
-    this.value = value ?? this.initialValue;
+    this._value.set(value ?? (undefined as T));
   }
 
   registerOnChange(fn: (value: T) => void): void {
-    this.onChangeFn = fn;
+    this._onChangeFn = fn;
   }
 
   registerOnTouched(fn: () => void): void {
-    this.onTouchedFn = fn;
+    this._onTouchedFn = fn;
   }
 
   setDisabledState(isDisabled: boolean): void {
-    this.disabled = isDisabled;
+    this._disabled.set(isDisabled);
   }
+}
+
+export function provideControlValueAccessor(component: Type<any>): Provider {
+  return {
+    provide: NG_VALUE_ACCESSOR,
+    useExisting: forwardRef(() => component),
+    multi: true,
+  };
 }

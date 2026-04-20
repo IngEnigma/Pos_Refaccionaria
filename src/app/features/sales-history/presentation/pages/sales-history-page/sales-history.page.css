@@ -1,0 +1,153 @@
+.page-container {
+  padding: var(--pr-space-6);
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pr-space-6);
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.page-title {
+  margin: 0;
+  font-family: var(--pr-font-title);
+  font-weight: var(--pr-weight-semibold);
+  font-size: 2rem;
+  color: var(--ds-text-strong);
+  letter-spacing: -0.02em;
+}
+
+.page-subtitle {
+  margin: var(--pr-space-1) 0 0;
+  color: var(--ds-text-muted);
+  font-size: var(--pr-font-size-base);
+}
+
+/* Actions */
+.btn-refresh {
+  display: flex;
+  align-items: center;
+  gap: var(--pr-space-2);
+  padding: 10px 20px;
+  background: var(--ds-bg-surface);
+  border: 1px solid var(--ds-border-base);
+  border-radius: var(--pr-radius-lg);
+  color: var(--ds-text-base);
+  font-weight: var(--pr-weight-semibold);
+  cursor: pointer;
+  transition: var(--comp-transition);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-refresh:hover:not(:disabled) {
+  background: var(--ds-color-primary-ghost);
+  border-color: var(--ds-color-primary);
+  color: var(--ds-color-primary);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+
+/* Filter Bar */
+.filter-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--pr-space-4);
+  background: var(--ds-bg-surface);
+  padding: var(--pr-space-3) var(--pr-space-4);
+  border-radius: var(--pr-radius-lg);
+  border: 1px solid var(--ds-border-subtle);
+}
+
+.search-box {
+  flex: 1;
+  max-width: 400px;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-box i {
+  position: absolute;
+  left: 12px;
+  color: var(--ds-text-muted);
+  font-size: 1rem;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 10px 12px 10px 40px;
+  border: 1px solid var(--ds-border-base);
+  border-radius: var(--pr-radius-md);
+  font-size: var(--pr-font-size-sm);
+  transition: var(--comp-transition);
+  outline: none;
+}
+
+.search-box input:focus {
+  border-color: var(--ds-color-primary);
+  box-shadow: 0 0 0 3px var(--ds-color-primary-ghost);
+}
+
+.filter-actions select {
+  padding: 10px 16px;
+  border: 1px solid var(--ds-border-base);
+  border-radius: var(--pr-radius-md);
+  font-size: var(--pr-font-size-sm);
+  background: var(--ds-bg-surface);
+  color: var(--ds-text-base);
+  outline: none;
+  cursor: pointer;
+}
+
+/* States */
+.error-state {
+  padding: var(--pr-space-6);
+  background: var(--pr-red-50);
+  color: var(--ds-color-danger);
+  border: 1px solid var(--pr-red-200);
+  border-radius: var(--pr-radius-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--pr-space-4);
+  text-align: center;
+}
+
+.error-state button {
+  background: var(--ds-color-danger);
+  color: white;
+  border: none;
+  padding: 8px 24px;
+  border-radius: var(--pr-radius-md);
+  cursor: pointer;
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Animation */
+/* Using global .animate-fade-in and .animate-slide-up from animations.css */
+
+@media (max-width: 768px) {
+  .filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .search-box {
+    max-width: none;
+  }
+}

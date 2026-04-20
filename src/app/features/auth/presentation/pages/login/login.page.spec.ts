@@ -1,16 +1,17 @@
 import { signal, WritableSignal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { of } from 'rxjs';
 
 import { AuthFacade } from '@features/auth/application/facades/auth.facade';
 import { LoginPageComponent } from './login.page';
+import { LucideAngularModule, Eye, EyeOff } from 'lucide-angular';
 
 describe('LoginPageComponent', () => {
   let component: LoginPageComponent;
   let fixture: ComponentFixture<LoginPageComponent>;
-  let routerSpy: jasmine.SpyObj<Router>;
-  let authFacadeSpy: jasmine.SpyObj<AuthFacade>;
+  let routerSpy: jest.Mocked<Partial<Router>>;
+  let authFacadeSpy: jest.Mocked<Partial<AuthFacade>>;
   let loadingState: WritableSignal<boolean>;
   let errorState: WritableSignal<string | null>;
 
@@ -18,23 +19,31 @@ describe('LoginPageComponent', () => {
     loadingState = signal(false);
     errorState = signal<string | null>(null);
 
-    routerSpy = jasmine.createSpyObj<Router>('Router', ['navigateByUrl']);
-    authFacadeSpy = jasmine.createSpyObj<AuthFacade>('AuthFacade', ['login']);
+    routerSpy = {
+      navigateByUrl: jest.fn(),
+    };
 
-    Object.defineProperties(authFacadeSpy, {
-      loading: {
-        value: loadingState.asReadonly(),
-      },
-      errorMessage: {
-        value: errorState.asReadonly(),
-      },
-    });
+    authFacadeSpy = {
+      login: jest.fn(),
+      loading: loadingState.asReadonly(),
+      errorMessage: errorState.asReadonly(),
+    } as any;
 
     await TestBed.configureTestingModule({
-      imports: [LoginPageComponent],
+      imports: [
+        LoginPageComponent,
+        LucideAngularModule.pick({ Eye, EyeOff })
+      ],
       providers: [
         { provide: Router, useValue: routerSpy },
         { provide: AuthFacade, useValue: authFacadeSpy },
+        {
+          provide: ActivatedRoute,
+          useValue: {
+            snapshot: { queryParams: {} },
+            queryParams: of({}),
+          },
+        },
       ],
     }).compileComponents();
 
@@ -47,12 +56,12 @@ describe('LoginPageComponent', () => {
     component.onSubmit();
 
     expect(authFacadeSpy.login).not.toHaveBeenCalled();
-    expect(component.usernameCtrl.touched).toBeTrue();
-    expect(component.passwordCtrl.touched).toBeTrue();
+    expect(component.usernameCtrl.touched).toBe(true);
+    expect(component.passwordCtrl.touched).toBe(true);
   });
 
   it('calls facade and redirects on successful login', () => {
-    authFacadeSpy.login.and.returnValue(of(true));
+    (authFacadeSpy.login as jest.Mock).mockReturnValue(of(true));
 
     component.loginForm.setValue({
       username: 'admin',
@@ -73,9 +82,9 @@ describe('LoginPageComponent', () => {
       username: 'admin',
       password: '123456',
     });
-    expect(component.submitDisabled).toBeFalse();
+    expect(component.submitDisabled).toBe(false);
 
     loadingState.set(true);
-    expect(component.submitDisabled).toBeTrue();
+    expect(component.submitDisabled).toBe(true);
   });
 });

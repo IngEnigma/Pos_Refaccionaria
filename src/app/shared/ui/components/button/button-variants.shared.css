@@ -1,0 +1,58 @@
+/* Standard Button Variants */
+
+.button-primary,
+.button-primary:disabled {
+  background-color: var(--ds-color-primary);
+  color: var(--ds-text-on-primary);
+}
+
+.button-primary:hover:not(:disabled) {
+  background-color: var(--ds-color-primary);
+}
+
+.button-danger,
+.button-danger:disabled {
+  background-color: var(--ds-bg-surface);
+  border: 2px solid var(--ds-border-base);
+  color: var(--ds-text-base);
+}
+
+.button-danger:hover:not(:disabled) {
+  background-color: color-mix(in srgb, var(--ds-color-danger) 5%, var(--ds-bg-surface));
+  color: var(--ds-color-danger);
+}
+
+.button-base.button-danger {
+  border: 2px solid var(--ds-border-base);
+}
+
+.button-secondary {
+  background-color: var(--ds-bg-surface);
+  color: var(--ds-text-base);
+  border-color: var(--ds-border-base);
+}
+
+.button-secondary:hover:not(:disabled) {
+  background-color: var(--ds-color-danger);
+  color: var(--ds-text-strong);
+  border-color: var(--ds-border-base);
+}
+
+.button-outline {
+  background-color: transparent;
+  color: var(--ds-text-base);
+  border: 2px solid color-mix(in srgb, var(--ds-text-strong) 20%, transparent);
+}
+
+.button-outline:hover:not(:disabled) {
+  background-color: transparent;
+}
+
+.button-ghost {
+  background-color: transparent;
+  color: var(--ds-text-base);
+}
+
+.button-ghost:hover:not(:disabled) {
+  background-color: transparent;
+}

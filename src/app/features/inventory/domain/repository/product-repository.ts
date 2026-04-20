@@ -1,5 +1,6 @@
 import { Observable } from 'rxjs';
 
+import { PaginationParams, PaginatedResponse } from '@core/models/pagination.model';
 import { Product } from '@features/inventory/domain/entities/product.entity';
 
 export interface CreateProductPayload {
@@ -33,7 +34,9 @@ export interface UpdateProductPayload {
 }
 
 export abstract class ProductRepository {
-  abstract getProducts(): Observable<Product[]>;
+  abstract getProducts(params?: PaginationParams): Observable<PaginatedResponse<Product>>;
+  abstract getProductsByCategoria(categoria: string, params?: PaginationParams): Observable<PaginatedResponse<Product>>;
+  abstract searchProducts(query: string, params?: PaginationParams): Observable<PaginatedResponse<Product>>;
   abstract createProduct(payload: CreateProductPayload): Observable<Product>;
   abstract updateProduct(id: number, payload: UpdateProductPayload): Observable<Product>;
   abstract deleteProduct(id: number): Observable<void>;

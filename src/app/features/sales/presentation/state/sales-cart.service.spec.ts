@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
 
-import { SessionStateService } from '@features/auth/application/services/session-state.service';
+
 import { SalesFacade } from '@features/sales/application/facades/sales.facade';
 import { SalesCartService } from './sales-cart.service';
 import { SalesProduct } from '../models/sales-ui.models';
@@ -12,16 +12,13 @@ describe('SalesCartService', () => {
     createSale: () => of(void 0),
     loadSales: () => void 0,
   };
-  const sessionStateStub = {
-    getSession: () => ({ userId: '1' }),
-  };
+
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
         SalesCartService,
         { provide: SalesFacade, useValue: salesFacadeStub },
-        { provide: SessionStateService, useValue: sessionStateStub },
       ],
     });
     service = TestBed.inject(SalesCartService);
@@ -96,5 +93,43 @@ describe('SalesCartService', () => {
     expect(subtotal).toBeGreaterThan(0);
     expect(iva).toBeGreaterThan(0);
     expect(total).toBeGreaterThan(0);
+  });
+
+  describe('confirmSale', () => {
+    it('throws error if cart is empty', (done) => {
+      service.confirmSale().subscribe({
+        error: (err) => {
+          expect(err.message).toBe('El carrito está vacío.');
+          done();
+        },
+      });
+    });
+
+    it('throws error if no payment method selected', (done) => {
+      service.addToCart({ id: 1, nombre: 'Test', precio: 10, stock: 5, imagen: '', descripcion: '' });
+      service.confirmSale().subscribe({
+        error: (err) => {
+          expect(err.message).toBe('Selecciona un método de pago.');
+          done();
+        },
+      });
+    });
+
+    it('calls facade.createSale when successful', (done) => {
+      const spy = jest.spyOn(salesFacadeStub, 'createSale').mockReturnValue(of(void 0));
+      service.addToCart({ id: 1, nombre: 'P1', precio: 100, stock: 5, imagen: '', descripcion: '' });
+      service.selectPayment({ id: 1, tipo: 'EFECTIVO', descripcion: 'Efectivo' });
+
+      service.confirmSale().subscribe({
+        next: () => {
+          expect(spy).toHaveBeenCalledWith({
+            idMetodoPago: 1,
+            productos: [{ id: 1, cantidad: 1 }]
+          });
+          expect(service.cart().length).toBe(0); // Cart is cleared
+          done();
+        }
+      });
+    });
   });
 });

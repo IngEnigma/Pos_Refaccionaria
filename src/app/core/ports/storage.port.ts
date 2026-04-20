@@ -6,6 +6,11 @@ export interface StoragePort {
   setItem(key: string, value: string): void;
   setJSON<T>(key: string, value: T): void;
   removeItem(key: string): void;
+  clear(): void;
 }
 
 export const STORAGE_PORT = new InjectionToken<StoragePort>('STORAGE_PORT');
+
+export const PERSISTENT_STORAGE_PORT = new InjectionToken<StoragePort>(
+  'PERSISTENT_STORAGE_PORT',
+);

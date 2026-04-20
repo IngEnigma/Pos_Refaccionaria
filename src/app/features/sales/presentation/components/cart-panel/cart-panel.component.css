@@ -61,14 +61,3 @@
   padding-top: var(--space-3);
 }
 
-.process-btn {
-  width: 100%;
-  padding: var(--space-3);
-  border-radius: var(--radius-lg);
-  border: none;
-  background: var(--color-primary-600);
-  font-family: var(--font-title-family);
-  font-weight: var(--font-title-weight);
-  color: #fff;
-  cursor: pointer;
-}

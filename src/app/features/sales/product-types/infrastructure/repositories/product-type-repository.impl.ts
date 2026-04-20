@@ -16,12 +16,13 @@ import {
   ProductTypeMutationError,
 } from '@features/sales/product-types/domain/errors/product-types.errors';
 import { ProductTypeMapper } from '@features/sales/product-types/infrastructure/mappers/product-type.mapper';
+import { SALE_ENDPOINTS } from '@features/sales/config/sale-endpoints';
 
 @Injectable({ providedIn: 'root' })
 export class ProductTypeRepositoryImpl implements ProductTypeRepository {
   private readonly http = inject(HttpClient);
   private readonly env = inject<Environment>(APP_ENV);
-  private readonly endpoint = `${this.env.apiUrl}/tipos`;
+  private readonly endpoint = `${this.env.apiUrl}${SALE_ENDPOINTS.CATEGORIES}`;
 
   getProductTypes(): Observable<ProductType[]> {
     return this.http.get<ProductTypeResponseDto[]>(this.endpoint).pipe(

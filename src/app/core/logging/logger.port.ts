@@ -1,7 +1,10 @@
-export interface LoggerPort {
-  debug(message: string, data?: unknown): void;
-  info(message: string, data?: unknown): void;
-  warn(message: string, data?: unknown): void;
-  error(message: string, data?: unknown): void;
-  fatal(message: string, data?: unknown): void;
-}
+import { inject, InjectionToken } from '@angular/core';
+import { LoggerPort } from './log.model';
+import { LoggerService } from './logger.service';
+
+export type { LoggerPort } from './log.model';
+
+export const LOGGER_PORT = new InjectionToken<LoggerPort>('LOGGER_PORT', {
+  providedIn: 'root',
+  factory: () => inject(LoggerService)
+});

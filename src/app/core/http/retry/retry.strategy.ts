@@ -1,36 +1,35 @@
-import { Observable, throwError, timer } from 'rxjs';
+import { inject, Injectable } from '@angular/core';
+import { Observable, throwError } from 'rxjs';
 import { HttpRequest } from '@angular/common/http';
 
-import {
-  canRetryRequest,
-  getExponentialBackoffDelay,
-} from '@core/http/retry/retry.utils';
-import { HTTP_RETRY_CONFIG } from '@core/config/http-retry.config';
-import { LoggerPort } from '@core/logging/logger.port';
+import { RETRY_CONFIG } from './retry-config.token';
+import { RETRY_COUNT } from './retry.context';
+import { RETRY_STRATEGY } from './retry-strategy.token';
+import { LoggerPort, LOGGER_PORT } from '@core/logging/logger.port';
 
-export function createRetryStrategy(
-  req: HttpRequest<unknown>,
-  logger: LoggerPort,
-) {
-  return {
-    count: HTTP_RETRY_CONFIG.maxRetries,
+@Injectable({ providedIn: 'root' })
+export class RetryStrategyService {
+  private readonly config = inject(RETRY_CONFIG);
+  private readonly strategy = inject(RETRY_STRATEGY);
+  private readonly logger: LoggerPort = inject(LOGGER_PORT).withContext('RetryStrategyService');
 
-    delay: (error: unknown, retryCount: number): Observable<number> => {
-      if (!canRetryRequest(req.method, error)) {
-        return throwError(() => error);
-      }
+  createRetryStrategy(req: HttpRequest<unknown>) {
+    const maxRetries = req.context.get(RETRY_COUNT) ?? this.config.maxRetries;
 
-      logger.warn(`Retrying request (${retryCount})`, {
-        url: req.url,
-        status: error.status,
-      });
+    return {
+      count: maxRetries,
+      delay: (error: unknown, retryCount: number): Observable<number> => {
+        if (!this.strategy.canRetry(req, error, retryCount) || retryCount > maxRetries) {
+          return throwError(() => error);
+        }
 
-      const delayTime = getExponentialBackoffDelay(
-        retryCount,
-        HTTP_RETRY_CONFIG.baseDelayMs,
-      );
+        this.logger.warn(`Retrying request (${retryCount}/${maxRetries})`, {
+          url: req.url,
+          strategy: this.strategy.constructor.name,
+        });
 
-      return timer(delayTime);
-    },
-  };
+        return this.strategy.getDelay(error, retryCount);
+      },
+    };
+  }
 }

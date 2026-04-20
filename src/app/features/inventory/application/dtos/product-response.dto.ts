@@ -11,6 +11,14 @@ export interface ProductResponseDto {
   marca: string;
   existencia: number;
   costo: number;
-  codigo_sat: string | null;
-  codigoSAT?: string | null;
+  codigoSAT: string | null;
+}
+
+export interface PaginatedProductResponseDto {
+  data?: ProductResponseDto[];
+  results?: ProductResponseDto[];
+  total: number;
+  page: number;
+  limit?: number;
+  page_size?: number;
 }

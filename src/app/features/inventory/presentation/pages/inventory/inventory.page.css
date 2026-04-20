@@ -1,0 +1,85 @@
+:host {
+  display: block;
+  overflow: hidden;
+}
+
+.inventory-root {
+  display: flex;
+  gap: 3rem;
+  padding: 1rem 1rem 0 1rem;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.inventory-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding-right: var(--pr-space-5);
+  overflow: hidden;
+  min-height: 0;
+}
+
+.catalog-section {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 4px;
+  min-height: 0;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: var(--font-title-weight);
+  font-family: var(--font-title-family);
+  margin: 6px 0 10px 0;
+  color: var(--font-text-strong);
+  flex-shrink: 0; 
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2px;
+  padding-right: var(--pr-space-2);
+}
+
+.section-header .section-title {
+  margin-bottom: 0; 
+}
+
+app-inventory-product-grid {
+  display: block;
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  padding-bottom: var(--space-5);
+}
+
+.btn-add-product {
+  background: var(--color-primary-600);
+  color: #fff;
+  border: none;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  font-family: var(--font-text-family);
+  font-weight: var(--font-text-weight);
+  font-size: var(--font-size-md);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  transition: background 0.15s ease, transform 0.1s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-add-product:hover {
+  background: var(--color-primary-700);
+  transform: translateY(-1px);
+}
+
+.btn-add-product:active {
+  transform: translateY(0);
+}

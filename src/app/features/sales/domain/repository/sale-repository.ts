@@ -18,8 +18,11 @@ export interface UpdateSalePayload {
   fecha?: string;
 }
 
+import { DetailedSale } from '@features/sales/domain/entities/detailed-sale.entity';
+
 export abstract class SaleRepository {
   abstract getSales(): Observable<Sale[]>;
+  abstract getSaleDetail(id: number): Observable<DetailedSale>;
   abstract createSale(payload: CreateSalePayload): Observable<Sale>;
   abstract updateSale(id: number, payload: UpdateSalePayload): Observable<Sale>;
   abstract deleteSale(id: number): Observable<boolean>;

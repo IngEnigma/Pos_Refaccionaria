@@ -1,4 +1,15 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject, effect, signal, computed } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  OnInit,
+  computed,
+  effect,
+  inject,
+  signal,
+  untracked,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { ToastService } from '@app/shared/ui/components/toast/toast.service';
 import { SalesFacade } from '@features/sales/application/facades/sales.facade';
@@ -14,6 +25,8 @@ import {
 import { SalesCartService } from '@features/sales/presentation/state/sales-cart.service';
 import { InventoryFacade } from '@features/inventory';
 import { ProductType } from '@features/sales/product-types/domain/entities/product-type.entity';
+import { GlobalSearchService } from '@core/search/global-search.service';
+import { SalesSearchStrategy } from '@features/sales/application/strategies/sales-search.strategy';
 
 @Component({
   selector: 'app-sales-page',
@@ -30,6 +43,14 @@ export class SalesPageComponent implements OnInit {
   readonly inventoryFacade = inject(InventoryFacade);
   readonly toastService = inject(ToastService);
   readonly cartService = inject(SalesCartService);
+  private readonly destroyRef = inject(DestroyRef);
+
+  readonly loadingProducts = computed(() => this.inventoryFacade.loading());
+  readonly loadingCategories = computed(() => this.productTypesFacade.loading());
+  readonly isCreatingSale = this.salesFacade.isCreatingSale;
+  readonly submitDisabled = computed(() =>
+    this.isCreatingSale() || this.cartItems().length === 0 || !this.selectedPayment()
+  );
 
   constructor() {
     effect(() => {
@@ -52,6 +73,24 @@ export class SalesPageComponent implements OnInit {
         this.toastService.error(errorMsg);
       }
     });
+
+    effect(() => {
+      const query = this.searchQuery();
+      const currentFilter = untracked(() => this.inventoryFacade.productFilter());
+
+      // If query is empty
+      if (query.trim() === '') {
+        // Only reset to 'all' if we were currently in a 'search' state
+        if (currentFilter.type === 'search') {
+          this.inventoryFacade.loadProducts(1, false);
+        }
+        return;
+      }
+
+      // Trigger search
+      this.inventoryFacade.searchProducts(query);
+    }, { allowSignalWrites: true });
+
   }
 
   ngOnInit(): void {
@@ -73,13 +112,14 @@ export class SalesPageComponent implements OnInit {
   ]);
   readonly selectedCategoryId = signal<number | null>(null);
 
-  readonly productos = computed<SalesProduct[]>(() => {
-    const selectedId = this.selectedCategoryId();
-    const products = this.inventoryFacade.products();
-    const filtered =
-      selectedId && selectedId > 0 ? products.filter((product) => product.idTipo === selectedId) : products;
+  private readonly globalSearchService = inject(GlobalSearchService);
+  private readonly salesSearchStrategy = inject(SalesSearchStrategy);
+  readonly searchQuery = this.globalSearchService.searchQuery;
 
-    return filtered.map((product) => ({
+  readonly productos = computed<SalesProduct[]>(() => {
+    const products = this.inventoryFacade.products();
+
+    return products.map((product) => ({
       id: product.id,
       nombre: product.nombre,
       descripcion: product.descripcion || '',
@@ -103,6 +143,11 @@ export class SalesPageComponent implements OnInit {
 
   onSelectCategory(category: ProductType): void {
     this.selectedCategoryId.set(category.id);
+    if (category.nombre === 'Todos') {
+      this.inventoryFacade.loadProducts(1, false);
+    } else {
+      this.inventoryFacade.loadProductsByCategoria(category.nombre, 1, false);
+    }
   }
 
   onIncreaseQty(item: SalesCartItem): void {
@@ -121,12 +166,14 @@ export class SalesPageComponent implements OnInit {
     this.cartService.selectPayment(method);
   }
 
-  processTransaction() {
+  processTransaction(): void {
     this.cartService
       .confirmSale()
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
           this.toastService.success('Venta registrada correctamente.');
+          this.inventoryFacade.loadProducts();
         },
         error: (error: unknown) => {
           const message =
@@ -136,5 +183,9 @@ export class SalesPageComponent implements OnInit {
           this.toastService.error(message);
         },
       });
+  }
+
+  onLoadMore(): void {
+    this.inventoryFacade.loadMore();
   }
 }

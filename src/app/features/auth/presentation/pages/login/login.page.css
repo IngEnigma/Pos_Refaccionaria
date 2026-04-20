@@ -37,8 +37,8 @@
 
 .login-title {
   font-size: 2rem;
-  font-weight: var(--font-title-weight);
-  font-family: var(--font-title-family);
+  font-weight: var(--pr-weight-semibold);
+  font-family: var(--pr-font-title);
   color: var(--color-text-strong);
   margin-top: 0;
   margin-bottom: 0.5rem;
@@ -46,9 +46,9 @@
 }
 
 .login-description {
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-text-weight);
-  font-family: var(--font-text-family);
+  font-size: var(--pr-font-size-sm);
+  font-weight: var(--pr-weight-regular);
+  font-family: var(--pr-font-text);
   color: var(--color-text);
   margin-bottom: 2rem;
   line-height: 1.5;
@@ -65,7 +65,7 @@
   background-color: color-mix(in srgb, var(--color-danger) 12%, white);
   color: var(--color-danger);
   border-radius: var(--radius-md);
-  font-size: var(--font-size-sm);
+  font-size: var(--pr-font-size-sm);
   text-align: center;
   border: 1px solid color-mix(in srgb, var(--color-danger) 35%, white);
 }

@@ -1,14 +1,19 @@
-<div class="search-container">
-
-  <lucide-icon name="search" [size]="20" class="search-icon" aria-hidden="true"></lucide-icon>
-
-  <input
-    id="layout-search"
-    type="text"
-    [placeholder]="searchPlaceholder()"
-    class="search-input"
-    aria-label="Buscar en el sistema"
-    (input)="onSearchInput($event)"
-  />
-
+<div class="search-input-container">
+  @if (hasVisibleLabel()) {
+    <label class="search-input-label" [for]="inputId()">{{ label() }}</label>
+  }
+  <div class="search-input-wrapper">
+    <lucide-icon name="search" class="search-icon" [size]="18" aria-hidden="true"></lucide-icon>
+    <input 
+      [id]="inputId()"
+      type="text" 
+      class="search-input" 
+      [placeholder]="placeholder()"
+      [value]="value || ''"
+      [disabled]="disabled"
+      [attr.aria-label]="resolvedAriaLabel()"
+      (input)="onSearchInput($event)"
+      (blur)="markAsTouched()"
+    >
+  </div>
 </div>

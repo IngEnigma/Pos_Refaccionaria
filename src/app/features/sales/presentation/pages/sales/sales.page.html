@@ -1,10 +1,11 @@
 <div class="sales-root">
-  <main class="sales-main">
+  <main class="sales-main animate-slide-up">
     <section class="catalog-section">
       <h2 class="section-title">Categorías</h2>
 
       <app-category-slider
         [categories]="categories()"
+        [isLoading]="loadingCategories()"
         [selectedCategoryId]="selectedCategoryId()"
         (selected)="onSelectCategory($event)"
       />
@@ -13,13 +14,15 @@
 
       <app-product-grid
         [products]="productos()"
+        [loadingProducts]="loadingProducts()"
         (addToCart)="onAddToCart($event)"
+        (loadMore)="onLoadMore()"
       />
 
     </section>
   </main>
 
-  <app-cart-panel
+  <app-cart-panel class="animate-fade-in"
     [cartItems]="cartItems()"
     [subtotal]="subtotal()"
     [descuento]="descuento()"
@@ -27,6 +30,8 @@
     [total]="total()"
     [paymentMethods]="paymentMethods()"
     [selectedPayment]="selectedPayment()"
+    [loading]="isCreatingSale()"
+    [disabled]="submitDisabled()"
     (removeItem)="onRemoveItem($event)"
     (increaseQty)="onIncreaseQty($event)"
     (decreaseQty)="onDecreaseQty($event)"

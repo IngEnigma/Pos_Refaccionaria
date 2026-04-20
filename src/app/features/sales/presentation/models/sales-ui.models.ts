@@ -15,6 +15,7 @@ export interface SalesCartItem {
   precio: number;
   imagen: string;
   qty: number;
+  stock: number;
 }
 
 export type SalesPaymentMethod = PaymentMethod;

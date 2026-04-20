@@ -1,0 +1,56 @@
+.btn-flat {
+  background-color: var(--ds-color-primary);
+  color: var(--ds-text-on-primary);
+}
+
+.btn-flat:hover {
+  background-color: var(--ds-color-primary-strong);
+  box-shadow: 0 4px 6px color-mix(in srgb, var(--ds-color-primary) 25%, transparent);
+}
+
+.btn-auth {
+  width: 100%;
+}
+
+.btn-soft {
+  background-color: var(--ds-color-primary-muted);
+  color: var(--ds-color-primary);
+}
+
+.btn-soft:hover {
+  background-color: var(--ds-color-primary-ghost);
+}
+
+.btn-danger-alt {
+  background-color: var(--ds-color-base);
+  color: var(--ds-text-on-primary);
+}
+
+.btn-danger-alt:hover {
+  background-color: color-mix(in srgb, var(--ds-color-danger) 80%, black);
+  box-shadow: 0 4px 6px color-mix(in srgb, var(--ds-color-danger) 25%, transparent);
+}
+
+.btn-secondary-alt {
+  color: var(--ds-text-base);
+  border: 1px solid var(--ds-border-subtle);
+  background-color: var(--ds-bg-app);
+}
+
+.btn-secondary-alt:hover {
+  background-color: var(--ds-bg-surface);
+  border-color: var(--ds-text-strong);
+}
+
+.btn-ghost-alt {
+  color: var(--ds-text-base);
+  background: transparent;
+}
+
+.btn-ghost-alt:hover {
+  background-color: var(--ds-bg-surface);
+}
+
+.button-full {
+  width: 100%;
+}

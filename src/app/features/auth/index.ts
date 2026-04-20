@@ -1,9 +1,6 @@
-export * from './auth.routes';
-export * from './application/facades/auth.facade';
-export * from './application/usecase/login.usecase';
-export * from './application/usecase/refresh.usecase';
-export * from './domain/entities/auth-session.entity';
-export * from './domain/entities/auth-user.entity';
-export * from './domain/repository/auth-repository';
-export * from './domain/value-objects/auth-user-role.enum';
-export * from './presentation/pages/login/login.page';
+export { AuthFacade } from './application/facades/auth.facade';
+export { Session } from './domain/entities/auth-session.entity';
+export type { SessionPrimitives } from './domain/entities/auth-session.entity';
+export { UserRole } from './domain/value-objects/auth-user-role.enum';
+export { authGuard } from './presentation/guards/auth.guard';
+export { AUTH_ROUTES } from './auth.routes';

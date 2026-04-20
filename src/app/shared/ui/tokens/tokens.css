@@ -1,0 +1,175 @@
+:root {
+  /* ========================================================================
+     1. PRIMITIVES (Raw values)
+     ======================================================================== */
+
+  /* Colors - Base Palette */
+  --pr-grey-50:  #f9fafb;
+  --pr-grey-100: #f3f4f6;
+  --pr-grey-200: #e5e7eb;
+  --pr-grey-300: #d1d5db;
+  --pr-grey-400: #9ca3af;
+  --pr-grey-500: #6b7280;
+  --pr-grey-600: #4b5563;
+  --pr-grey-700: #374151;
+  --pr-grey-800: #1f2937;
+  --pr-grey-900: #111827;
+
+  --pr-blue-50:  #ebf3ff;
+  --pr-blue-100: #e6f0ff;
+  --pr-blue-600: #233387;
+  --pr-blue-700: #1a2764;
+
+  --pr-green-600: #059669;
+  --pr-yellow-500: #f59e0b;
+  --pr-red-600:   #dc2626;
+
+  --pr-white: #ffffff;
+  --pr-black: #000000;
+
+  /* Spacing */
+  --pr-space-1: 4px;
+  --pr-space-2: 8px;
+  --pr-space-3: 12px;
+  --pr-space-4: 16px;
+  --pr-space-5: 20px;
+  --pr-space-6: 24px;
+
+  /* Typography */
+  --pr-font-title: "Montserrat", sans-serif;
+  --pr-font-text:  "Roboto", sans-serif;
+  --pr-weight-regular: 400;
+  --pr-weight-semibold: 600;
+
+  /* Radius */
+  --pr-radius-sm: 6px;
+  --pr-radius-md: 8px;
+  --pr-radius-lg: 10px;
+  --pr-radius-xl: 12px;
+  --pr-radius-full: 9999px;
+
+  /* Font Sizes */
+  --pr-font-size-xs:   0.75rem;
+  --pr-font-size-sm:   0.875rem;
+  --pr-font-size-base: 1rem;
+  --pr-font-size-lg:   1.125rem;
+
+  /* Shadows */
+  --pr-shadow-sm: 0 2px 6px rgba(15, 23, 42, 0.06);
+  --pr-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  --pr-shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+
+  /* ========================================================================
+     2. SEMANTICS (Purpose-based)
+     ======================================================================== */
+
+  /* Colors */
+  --ds-color-primary:        var(--pr-blue-600);
+  --ds-color-primary-strong: var(--pr-blue-700);
+  --ds-color-primary-muted:  var(--pr-blue-100);
+  --ds-color-primary-ghost:  var(--pr-blue-50);
+
+  --ds-color-success: var(--pr-green-600);
+  --ds-color-warning: var(--pr-yellow-500);
+  --ds-color-danger:  var(--pr-red-600);
+
+  /* Backgrounds */
+  --ds-bg-app:     var(--pr-grey-50);
+  --ds-bg-surface: var(--pr-white);
+  --ds-bg-muted:   var(--pr-grey-100);
+
+  /* Borders */
+  --ds-border-subtle: var(--pr-grey-200);
+  --ds-border-base:   var(--pr-grey-300);
+  --ds-border-strong: var(--pr-grey-400);
+
+  /* Text */
+  --ds-text-base:    var(--pr-grey-700);
+  --ds-text-muted:   var(--pr-grey-500);
+  --ds-text-strong:  var(--pr-grey-900);
+  --ds-text-on-primary: var(--pr-white);
+
+  /* Interactive States */
+  --ds-state-hover:  var(--ds-color-primary-ghost);
+  --ds-state-active: var(--ds-color-primary);
+  --ds-state-hover-overlay: rgba(0, 0, 0, 0.04);
+  --ds-state-active-overlay: rgba(0, 0, 0, 0.08);
+  --ds-color-primary-pressed: var(--ds-color-primary);
+
+  /* ========================================================================
+     3. COMPONENTS (Specific use cases)
+     ======================================================================== */
+
+  /* Button */
+  
+  /* Components - Shared Tokens (Inputs & Buttons) */
+  --comp-radius:        var(--pr-radius-xl);
+  --comp-border-width:  2px;
+  --comp-font-size:     var(--pr-font-size-base);
+  --comp-transition:    all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --comp-focus-ring-width: 3px;
+
+  /* Input */
+  --input-bg: var(--ds-bg-surface);
+  --input-border: var(--ds-border-base);
+  --input-focus-ring: color-mix(in srgb, var(--ds-color-primary) 10%, white);
+
+  /* Dropdown */
+  --dropdown-bg:     var(--ds-bg-surface);
+  --dropdown-border: var(--ds-border-subtle);
+  --dropdown-shadow: var(--pr-shadow-xl);
+  
+  /* Skeleton */
+  --skeleton-base:   var(--ds-bg-muted);
+  --skeleton-active: var(--ds-border-subtle);
+
+  /* ========================================================================
+     4. BACKWARD COMPATIBILITY (Temporary aliases)
+     ======================================================================== */
+  --color-primary-700: var(--pr-blue-700);
+  --color-primary-600: var(--pr-blue-600);
+  --color-primary-100: var(--pr-blue-100);
+  --color-primary-50:  var(--pr-blue-50);
+
+  --color-bg:      var(--ds-bg-app);
+  --color-surface: var(--ds-bg-surface);
+  --color-surface-muted: var(--ds-bg-muted);
+  --color-border:        var(--ds-border-subtle);
+  --color-border-strong: var(--ds-border-base);
+  
+  --color-text:        var(--ds-text-base);
+  --color-text-muted:   var(--ds-text-muted);
+  --color-text-strong:  var(--ds-text-strong);
+
+  --color-success: var(--ds-color-success);
+  --color-warning: var(--ds-color-warning);
+  --color-danger:  var(--ds-color-danger);
+
+  --radius-sm: var(--pr-radius-sm);
+  --radius-md: var(--pr-radius-md);
+  --radius-lg: var(--pr-radius-lg);
+  --radius-xl: var(--pr-radius-xl);
+  --radius-full: var(--pr-radius-full);
+
+  --space-1: var(--pr-space-1);
+  --space-2: var(--pr-space-2);
+  --space-3: var(--pr-space-3);
+  --space-4: var(--pr-space-4);
+  --space-5: var(--pr-space-5);
+  --space-6: var(--pr-space-6);
+
+  --shadow-sm: var(--pr-shadow-sm);
+  --shadow-md: var(--pr-shadow-md);
+  --shadow-xl: var(--pr-shadow-xl);
+  --shadow-panel: var(--pr-shadow-sm);
+
+  --font-title-family: var(--pr-font-title);
+  --font-text-family:  var(--pr-font-text);
+  --font-title-weight: var(--pr-weight-semibold);
+  --font-text-weight:  var(--pr-weight-regular);
+
+  --font-size-xs:   var(--pr-font-size-xs);
+  --font-size-sm:   var(--pr-font-size-sm);
+  --font-size-base: var(--pr-font-size-base);
+  --font-size-lg:   var(--pr-font-size-lg);
+}

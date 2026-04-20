@@ -1,0 +1,17 @@
+<div class="products-grid" aria-label="Lista de productos en inventario">
+  @for (producto of products(); track producto.id) {
+    <app-inventory-product-card
+      [product]="producto"
+      (modifyProduct)="modifyProduct.emit($event)"
+      (deleteProduct)="deleteProduct.emit($event)"
+    />
+  }
+
+  @if (loadingProducts()) {
+    @for (item of skeletonItems; track item) {
+      <app-product-card-skeleton />
+    }
+  }
+</div>
+
+<div #sentinel class="scroll-sentinel"></div>

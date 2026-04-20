@@ -39,3 +39,8 @@
   background: var(--color-primary-600);
   color: #ffffff;
 }
+
+.category-skeleton {
+  flex-shrink: 0;
+  border-radius: var(--radius-md);
+}

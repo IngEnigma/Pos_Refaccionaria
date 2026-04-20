@@ -5,4 +5,12 @@
       (addToCart)="addToCart.emit($event)"
     />
   }
+
+  @if (loadingProducts()) {
+    @for (item of skeletonItems; track item) {
+      <app-product-card-skeleton />
+    }
+  }
 </div>
+
+<div #sentinel class="scroll-sentinel"></div>

@@ -1,27 +1,38 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  input,
+} from '@angular/core';
 
 @Component({
   selector: 'app-skeleton',
   standalone: true,
-  template: `<div class="skeleton" [style]="styles()"></div>`,
+  template: `<div class="skeleton" [style]="styles()" role="presentation" aria-hidden="true"></div>`,
   styles: [
     `
       .skeleton {
         background: linear-gradient(
           90deg,
-          rgba(238, 238, 238, 0.7) 25%,
-          rgba(224, 224, 224, 0.7) 50%,
-          rgba(238, 238, 238, 0.7) 75%
+          var(--skeleton-base) 30%,
+          var(--skeleton-active) 45%,
+          var(--skeleton-base) 60%
         );
         background-size: 200% 100%;
-        animation: shimmer 1.5s ease-in-out infinite;
+        animation: shimmer 2s linear infinite;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .skeleton {
+          animation: none;
+          background: var(--skeleton-base);
+        }
       }
       @keyframes shimmer {
         0% {
-          background-position: 200% 0;
+          background-position: 100% 0;
         }
         100% {
-          background-position: -200% 0;
+          background-position: -100% 0;
         }
       }
     `,
@@ -32,10 +43,11 @@ export class SkeletonComponent {
   readonly width = input('100%');
   readonly height = input('1rem');
   readonly rounded = input(false);
+  readonly borderRadius = input<string>();
 
   readonly styles = computed(() => ({
     width: this.width(),
     height: this.height(),
-    borderRadius: this.rounded() ? '9999px' : '0.5rem',
+    borderRadius: this.borderRadius() || (this.rounded() ? 'var(--pr-radius-full)' : 'var(--pr-radius-md)'),
   }));
 }

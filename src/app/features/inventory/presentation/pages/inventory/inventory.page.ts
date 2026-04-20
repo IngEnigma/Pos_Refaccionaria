@@ -1,196 +1,184 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { LucideAngularModule } from 'lucide-angular';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, effect, inject, signal, untracked } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ToastService } from '../../../../../shared/ui/components/toast/toast.service';
-
-type InventoryModalType = 'add' | 'edit' | 'delete';
-
-interface InventoryProduct {
-  id: number;
-  nombre: string;
-  descripcion: string;
-  precio: number;
-  stock: number;
-  imagen: string;
-}
+import { Dialog, DialogModule } from '@angular/cdk/dialog';
+import { ToastService } from '@shared/ui/components/toast/toast.service';
+import { ConfirmDialogComponent } from '@shared/ui/components/confirm-dialog/confirm-dialog.component';
+import { GlobalSearchService } from '@app/core/search/global-search.service';
+import { InventoryFacade } from '@app/features/inventory/application/facades/inventory.facade';
+import { SalesFacade, ProductTypesFacade, ProductType } from '@app/features/sales';
+import { SalesSearchStrategy } from '@app/features/sales/application/strategies/sales-search.strategy';
+import { CategorySliderComponent } from '@app/features/sales/presentation/components/category-slider/category-slider.component';
+import { InventoryProductGridComponent } from '../../components/inventory-product-grid/inventory-product-grid.component';
+import { ProductFormDialogComponent } from '../../components/product-form-dialog/product-form-dialog.component';
+import { Product } from '../../../domain/entities/product.entity';
 
 @Component({
   selector: 'app-inventory-page',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    CategorySliderComponent,
+    InventoryProductGridComponent,
+    LucideAngularModule,
+    DialogModule
+  ],
   templateUrl: './inventory.page.html',
-  styleUrls: ['./inventory.page.layout.css', './inventory.page.modal.css'],
+  styleUrls: ['./inventory.page.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InventoryPageComponent {
-  private readonly toast = inject(ToastService);
+  readonly salesFacade = inject(SalesFacade);
+  readonly productTypesFacade = inject(ProductTypesFacade);
+  readonly inventoryFacade = inject(InventoryFacade);
+  readonly toastService = inject(ToastService);
+  private readonly dialog = inject(Dialog);
 
-  mostrarModal = false;
-  tipoModal: InventoryModalType | null = null;
-  form: Partial<InventoryProduct> = {};
+  readonly loadingCategories = computed(() => this.productTypesFacade.loading());
 
-  productos: InventoryProduct[] = [
-    {
-      id: 1,
-      nombre: 'Aceite Castrol',
-      descripcion: 'Aceite 10W-40 1L',
-      precio: 180,
-      stock: 25,
-      imagen: 'assets/images/Refaccionaria.webp',
-    },
-    {
-      id: 2,
-      nombre: 'Filtro Bosch',
-      descripcion: 'Filtro de aceite universal',
-      precio: 90,
-      stock: 40,
-      imagen: 'assets/images/Refaccionaria.webp',
-    },
-    {
-      id: 3,
-      nombre: 'Bujía NGK',
-      descripcion: 'Bujía iridium',
-      precio: 120,
-      stock: 12,
-      imagen: 'assets/images/Refaccionaria.webp',
-    },
-  ];
+  constructor() {
+    effect(() => {
+      const errorMsg = this.salesFacade.errorMessage();
+      if (errorMsg) {
+        this.toastService.error(errorMsg);
+      }
+    });
 
-  abrirModal(tipo: InventoryModalType, producto?: InventoryProduct): void {
-    this.tipoModal = tipo;
-    this.mostrarModal = true;
+    effect(() => {
+      const errorMsg = this.inventoryFacade.errorMessage();
+      if (errorMsg) {
+        this.toastService.error(errorMsg);
+      }
+    });
 
-    if (tipo === 'edit' && producto) {
-      this.form = { ...producto };
-      return;
-    }
+    effect(() => {
+      const errorMsg = this.productTypesFacade.errorMessage();
+      if (errorMsg) {
+        this.toastService.error(errorMsg);
+      }
+    });
+    
+    effect(() => {
+      const query = this.searchQuery();
+      const currentFilter = untracked(() => this.inventoryFacade.productFilter());
 
-    this.form = {};
+      // If query is empty
+      if (query.trim() === '') {
+        // Only reset to 'all' if we were currently in a 'search' state
+        if (currentFilter.type === 'search') {
+          this.inventoryFacade.loadProducts(1, false);
+        }
+        return;
+      }
+
+      // Trigger search
+      this.inventoryFacade.searchProducts(query);
+    }, { allowSignalWrites: true });
+
   }
 
-  cerrarModal(): void {
-    this.mostrarModal = false;
-    this.tipoModal = null;
-    this.form = {};
+  ngOnInit(): void {
+    this.salesFacade.loadSales();
+    this.salesFacade.loadPaymentMethods();
+    this.inventoryFacade.loadProducts();
+    this.productTypesFacade.loadProductTypes();
   }
 
-  guardarCambios(): void {
-    if (!this.tipoModal) {
-      return;
-    }
+  reloadSales(): void {
+    this.salesFacade.loadSales();
+    this.inventoryFacade.loadProducts();
+  }
+  
+  private readonly defaultCategory: ProductType = { id: 0, nombre: 'Todos' };
+  readonly categories = computed<ProductType[]>(() => [
+    this.defaultCategory,
+    ...this.productTypesFacade.productTypes(),
+  ]);
+  readonly selectedCategoryId = signal<number | null>(null);
 
-    const nombre = (this.form.nombre ?? '').toString().trim();
-    const descripcion = (this.form.descripcion ?? '').toString().trim();
-    const precio = Number(this.form.precio);
-    const stock = Number(this.form.stock);
+  private readonly globalSearchService = inject(GlobalSearchService);
+  private readonly salesSearchStrategy = inject(SalesSearchStrategy);
+  readonly searchQuery = this.globalSearchService.searchQuery;
 
-    if (!nombre) {
-      this.toast.warning('El nombre del producto es obligatorio.');
-      return;
-    }
-
-    if (this.tipoModal === 'add') {
-      if (Number.isNaN(precio) || precio < 0) {
-        this.toast.warning('Ingresa un precio válido.');
-        return;
-      }
-      if (Number.isNaN(stock) || stock < 0) {
-        this.toast.warning('Ingresa una cantidad en stock válida.');
-        return;
-      }
-
-      const maxId = this.productos.reduce((max, product) => Math.max(max, product.id), 0);
-      const nuevo: InventoryProduct = {
-        id: maxId + 1,
-        nombre,
-        descripcion,
-        precio,
-        stock,
-        imagen: this.form.imagen?.trim() || 'assets/images/Refaccionaria.webp',
-      };
-
-      this.productos = [nuevo, ...this.productos];
-      this.cerrarModal();
-      this.toast.success('Producto agregado correctamente.');
-      return;
-    }
-
-    if (this.tipoModal === 'edit') {
-      if (typeof this.form.id === 'undefined') {
-        this.toast.error('Producto no identificado para edición.');
-        return;
-      }
-      if (Number.isNaN(precio) || precio < 0) {
-        this.toast.warning('Ingresa un precio válido.');
-        return;
-      }
-      if (Number.isNaN(stock) || stock < 0) {
-        this.toast.warning('Ingresa una cantidad en stock válida.');
-        return;
-      }
-
-      const idx = this.productos.findIndex((product) => product.id === this.form.id);
-      if (idx === -1) {
-        this.toast.error('No se encontró el producto a editar.');
-        return;
-      }
-
-      const actualizado: InventoryProduct = {
-        ...this.productos[idx],
-        nombre,
-        descripcion,
-        precio,
-        stock,
-        imagen: this.form.imagen?.trim() || this.productos[idx].imagen,
-      };
-
-      this.productos = [
-        ...this.productos.slice(0, idx),
-        actualizado,
-        ...this.productos.slice(idx + 1),
-      ];
-
-      this.cerrarModal();
-      this.toast.success('Producto actualizado correctamente.');
+  onSelectCategory(category: ProductType): void {
+    this.selectedCategoryId.set(category.id);
+    if (category.nombre === 'Todos') {
+      this.inventoryFacade.loadProducts(1, false);
+    } else {
+      this.inventoryFacade.loadProductsByCategoria(category.nombre, 1, false);
     }
   }
 
-  eliminarProducto(): void {
-    if (this.tipoModal !== 'delete') {
-      return;
-    }
+  onLoadMore(): void {
+    this.inventoryFacade.loadMore();
+  }
 
-    const nombreAEliminar = (this.form.nombre ?? '').toString().trim();
-    if (!nombreAEliminar) {
-      this.toast.warning('Escribe el nombre del producto a eliminar.');
-      return;
-    }
+  onAddProduct(): void {
+    const dialogRef = this.dialog.open(ProductFormDialogComponent, {
+      data: {}
+    });
 
-    const exactIndex = this.productos.findIndex(
-      (product) => product.nombre.toLowerCase() === nombreAEliminar.toLowerCase(),
-    );
-
-    if (exactIndex === -1) {
-      const partialIndex = this.productos.findIndex((product) =>
-        product.nombre.toLowerCase().includes(nombreAEliminar.toLowerCase()),
-      );
-
-      if (partialIndex === -1) {
-        this.toast.error(`No se encontró ningún producto con el nombre "${nombreAEliminar}".`);
-        return;
+    dialogRef.closed.subscribe(result => {
+      if (result) {
+        this.inventoryFacade.createProduct(result as any).subscribe({
+          next: () => {
+            this.toastService.success('Producto creado correctamente');
+            this.inventoryFacade.loadProducts();
+          },
+          error: () => {
+            // Error is handled by facade
+          }
+        });
       }
+    });
+  }
 
-      const matched = this.productos[partialIndex];
+  onModifyProduct(product: Product): void {
+    const dialogRef = this.dialog.open(ProductFormDialogComponent, {
+      data: { product }
+    });
 
-      this.productos = this.productos.filter((_, index) => index !== partialIndex);
-      this.cerrarModal();
-      this.toast.success(`Producto "${matched.nombre}" eliminado correctamente.`);
-      return;
-    }
+    dialogRef.closed.subscribe(result => {
+      if (result) {
+        this.inventoryFacade.updateProduct(product.id, result as any).subscribe({
+          next: () => {
+            this.toastService.success('Producto actualizado correctamente');
+            this.inventoryFacade.loadProducts();
+          },
+          error: () => {
+            // Error is handled by facade
+          }
+        });
+      }
+    });
+  }
 
-    const nombreExacto = this.productos[exactIndex].nombre;
-    this.productos = this.productos.filter((_, index) => index !== exactIndex);
-    this.cerrarModal();
-    this.toast.success(`Producto "${nombreExacto}" eliminado correctamente.`);
+  onDeleteProduct(product: Product): void {
+    const dialogRef = this.dialog.open<boolean>(ConfirmDialogComponent, {
+      data: {
+        title: 'Eliminar Producto',
+        message: `¿Estás seguro de que deseas eliminar el producto "${product.nombre}"? Esta acción no se puede deshacer.`,
+        confirmText: 'Eliminar',
+        cancelText: 'Cancelar',
+        variant: 'danger'
+      }
+    });
+
+    dialogRef.closed.subscribe(result => {
+      if (result) {
+        this.inventoryFacade.deleteProduct(product.id).subscribe({
+          next: () => {
+            this.toastService.success('Producto eliminado correctamente');
+            // We reload products to refresh the list
+            this.inventoryFacade.loadProducts();
+          },
+          error: () => {
+             // Error is already handled/logged by facade, but we can add specific logic here if needed
+          }
+        });
+      }
+    });
   }
 }

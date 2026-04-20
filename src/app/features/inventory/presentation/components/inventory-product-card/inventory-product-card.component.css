@@ -1,0 +1,102 @@
+.product-card {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  border: 2px solid var(--color-border);
+  align-items: stretch;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.12s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-2px);
+}
+
+.product-img-placeholder {
+  height: 140px;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--color-surface-hover);
+}
+
+.placeholder-icon {
+  opacity: 0.5;
+  color: var(--color-text);
+}
+
+.product-name {
+  font-size: var(--font-size-lg);
+  font-family: var(--font-title-family);
+  font-weight: var(--pr-weight-semibold);
+  color: var(--color-text-strong);
+  margin: 0 0;
+  text-align: left;
+  min-height: 2.6em;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; 
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.product-desc {
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+  font-family: var(--font-text-family);
+  font-weight: var(--font-text-weight);
+  text-align: left;
+  margin: 0 0 2px 0;
+  min-height: 2.4em;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.product-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-3);
+}
+
+.product-price {
+  color: var(--color-primary-600);
+  font-family: var(--font-title-family);
+  font-size: 1.3rem;
+  font-weight: var(--font-title-weight);
+}
+
+.product-stock {
+  font-size: var(--font-size-sm);
+  font-family: var(--font-text-family);
+  font-weight: var(--font-text-weight);
+  text-align: right;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 1px 5px;
+  color: var(--color-text);
+}
+.product-stock.low-stock {
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+}
+
+.product-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+  margin-top: auto;
+  width: 100%;
+}
+
+.product-actions app-button {
+  width: 100%;
+}

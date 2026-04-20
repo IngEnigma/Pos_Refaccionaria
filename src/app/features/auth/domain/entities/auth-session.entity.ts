@@ -1,5 +1,19 @@
 import { UserRole } from '@features/auth/domain/value-objects/auth-user-role.enum';
 
+export interface SessionPrimitives {
+  accessToken: string;
+  refreshToken: string | null;
+  accessExp: number;
+  refreshExp: number;
+  userId: string;
+  role: UserRole;
+  username: string;
+}
+
+export type LegacySessionPrimitives = Omit<SessionPrimitives, 'accessExp'> & {
+  accesExp?: number;
+};
+
 export class Session {
   constructor(
     public readonly accessToken: string,
@@ -11,16 +25,8 @@ export class Session {
     public readonly username: string,
   ) {}
 
-  get isAdmin(): boolean {
-    return this.role === UserRole.Admin;
-  }
-
-  get isManager(): boolean {
-    return this.role === UserRole.Manager;
-  }
-
-  get isSeller(): boolean {
-    return this.role === UserRole.Seller;
+  hasRole(role: UserRole): boolean {
+    return this.role === role;
   }
 
   get isAuthenticated(): boolean {
@@ -63,4 +69,29 @@ export class Session {
     return this.refreshExp < currentTime;
   }
 
+  static fromPrimitives(primitives: SessionPrimitives | LegacySessionPrimitives): Session {
+    const accessExp = 'accessExp' in primitives ? primitives.accessExp : (primitives.accesExp ?? 0);
+
+    return new Session(
+      primitives.accessToken,
+      primitives.refreshToken,
+      accessExp,
+      primitives.refreshExp,
+      primitives.userId,
+      primitives.role,
+      primitives.username || '',
+    );
+  }
+
+  toPrimitives(): SessionPrimitives {
+    return {
+      accessToken: this.accessToken,
+      refreshToken: this.refreshToken,
+      accessExp: this.accessExp,
+      refreshExp: this.refreshExp,
+      userId: this.userId,
+      role: this.role,
+      username: this.username,
+    };
+  }
 }

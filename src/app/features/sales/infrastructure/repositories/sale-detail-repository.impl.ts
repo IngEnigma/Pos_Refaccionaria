@@ -11,24 +11,33 @@ import {
   UpdateSaleDetailPayload,
 } from '@features/sales/domain/repository/sale-detail-repository';
 import { SaleDetail, SaleDetailFactory } from '@features/sales/domain/entities/sale-detail.entity';
-import {
-  SaleDetailFetchError,
-  SaleDetailMutationError,
-} from '@features/sales/domain/errors/sales.errors';
+import { SaleDetailFetchError, SaleDetailMutationError } from '@features/sales/domain/errors/sales.errors';
 import { SaleDetailMapper } from '@features/sales/infrastructure/mappers/sale-detail.mapper';
+import { LOGGER_PORT } from '@core/logging/logger.port';
+import { SALE_ENDPOINTS } from '@features/sales/config/sale-endpoints';
+import { resolveHttpErrorMessage } from '@features/sales/infrastructure/utils/http-error-resolver';
 
 @Injectable({ providedIn: 'root' })
 export class SaleDetailRepositoryImpl implements SaleDetailRepository {
   private readonly http = inject(HttpClient);
   private readonly env = inject<Environment>(APP_ENV);
-  private readonly endpoint = `${this.env.apiUrl}/detalle`;
+  private readonly logger = inject(LOGGER_PORT).withContext('SaleDetailRepository');
+  private readonly endpoint = `${this.env.apiUrl}${SALE_ENDPOINTS.DETAIL}`;
+
 
   getSaleDetails(): Observable<SaleDetail[]> {
     return this.http.get<SaleDetailResponseDto[]>(this.endpoint).pipe(
       map((response) => response.map((dto) => SaleDetailMapper.fromResponseDto(dto))),
-      catchError((error: unknown) =>
-        throwError(() => new SaleDetailFetchError('Failed to fetch sale details', error)),
-      ),
+      catchError((error: unknown) => {
+        this.logger.error('Failed to fetch sale details', { url: this.endpoint, error });
+        return throwError(
+          () =>
+            new SaleDetailFetchError(
+              resolveHttpErrorMessage(error, 'Failed to fetch sale details'),
+              error,
+            ),
+        );
+      }),
     );
   }
 
@@ -37,29 +46,50 @@ export class SaleDetailRepositoryImpl implements SaleDetailRepository {
       .post<unknown>(this.endpoint, SaleDetailMapper.toCreateRequestDto(payload))
       .pipe(
         map((response) => this.resolveSaleDetailResponse(response, payload)),
-        catchError((error: unknown) =>
-          throwError(() => new SaleDetailMutationError('Failed to create sale detail', error)),
-        ),
+        catchError((error: unknown) => {
+          this.logger.error('Failed to create sale detail', { url: this.endpoint, error });
+          return throwError(
+            () =>
+              new SaleDetailMutationError(
+                resolveHttpErrorMessage(error, 'Failed to create sale detail'),
+                error,
+              ),
+          );
+        }),
       );
   }
 
   updateSaleDetail(id: number, payload: UpdateSaleDetailPayload): Observable<SaleDetail> {
     return this.http
-      .put<unknown>(`${this.endpoint}/${id}`, SaleDetailMapper.toUpdateRequestDto(payload))
+      .put<unknown>(`${this.endpoint}${id}/`, SaleDetailMapper.toUpdateRequestDto(payload))
       .pipe(
         map((response) => this.resolveSaleDetailResponse(response, payload, id)),
-        catchError((error: unknown) =>
-          throwError(() => new SaleDetailMutationError('Failed to update sale detail', error)),
-        ),
+        catchError((error: unknown) => {
+          this.logger.error('Failed to update sale detail', { url: this.endpoint, id, error });
+          return throwError(
+            () =>
+              new SaleDetailMutationError(
+                resolveHttpErrorMessage(error, 'Failed to update sale detail'),
+                error,
+              ),
+          );
+        }),
       );
   }
 
   deleteSaleDetail(id: number): Observable<boolean> {
-    return this.http.delete<void>(`${this.endpoint}/${id}`).pipe(
+    return this.http.delete<void>(`${this.endpoint}${id}/`).pipe(
       map(() => true),
-      catchError((error: unknown) =>
-        throwError(() => new SaleDetailMutationError('Failed to delete sale detail', error)),
-      ),
+      catchError((error: unknown) => {
+        this.logger.error('Failed to delete sale detail', { url: this.endpoint, id, error });
+        return throwError(
+          () =>
+            new SaleDetailMutationError(
+              resolveHttpErrorMessage(error, 'Failed to delete sale detail'),
+              error,
+            ),
+        );
+      }),
     );
   }
 

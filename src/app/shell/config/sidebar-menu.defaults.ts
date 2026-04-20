@@ -1,0 +1,47 @@
+import { SidebarNavItem } from '@shell/models/sidebar-nav-item.model';
+
+export const DEFAULT_SIDEBAR_NAV_ITEMS: readonly SidebarNavItem[] = [
+  {
+    id: 'sales',
+    label: 'Menú',
+    icon: 'house',
+    route: '/sales',
+    exact: true,
+    roles: ['admin', 'seller', 'manager'],
+  },
+  {
+    id: 'inventory',
+    label: 'Inventario',
+    icon: 'package',
+    route: '/inventory',
+    roles: ['admin', 'seller', 'manager'],
+  },
+  {
+    id: 'reports',
+    label: 'Reportes',
+    icon: 'bar-chart-3',
+    route: '/reports',
+    roles: ['admin', 'manager', 'seller'],
+  },
+  {
+    id: 'history',
+    label: 'Historial',
+    icon: 'history',
+    route: '/history',
+    roles: ['admin', 'manager', 'seller'],
+  },
+  {
+    id: 'suppliers',
+    label: 'Proveedores',
+    icon: 'truck',
+    route: '/suppliers',
+    roles: ['admin', 'manager', 'seller'],
+  },
+  {
+    id: 'admin',
+    label: 'Administración',
+    icon: 'settings',
+    route: '/admin',
+    roles: ['admin'],
+  },
+];

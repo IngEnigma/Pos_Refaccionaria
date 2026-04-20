@@ -1,0 +1,27 @@
+<div class="confirm-dialog">
+  <header class="dialog-header">
+    <div class="icon-container" [class]="data.variant || 'warning'">
+      <lucide-icon [name]="data.variant === 'danger' ? 'TriangleAlert' : 'CircleAlert'" [size]="24"></lucide-icon>
+    </div>
+    <h2 class="dialog-title">{{ data.title }}</h2>
+  </header>
+
+  <div class="dialog-body">
+    <p>{{ data.message }}</p>
+  </div>
+
+  <footer class="dialog-actions">
+    <app-button
+      [variant]="data.variant === 'danger' ? 'danger' : 'secondary'"
+      (click)="onCancel()"
+    >
+      {{ data.cancelText || 'Cancelar' }}
+    </app-button>
+    <app-button
+      variant="primary"
+      (click)="onConfirm()"
+    >
+      {{ data.confirmText || 'Confirmar' }}
+    </app-button>
+  </footer>
+</div>

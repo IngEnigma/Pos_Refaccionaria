@@ -5,53 +5,71 @@
   display: block;
 }
 
-.search-container {
+.search-input-container {
+  display: flex;
+  flex-direction: column;
   position: relative;
-  max-width: 100%;
+  width: 100%;
+}
+
+.search-input-label {
+  font-weight: var(--pr-weight-semibold);
+  font-family: var(--pr-font-title);
+  margin-bottom: var(--pr-space-2);
+  color: var(--ds-text-base);
+}
+
+.search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
 }
 
 .search-icon {
   position: absolute;
-  left: 8px;
-  top: 50%;
-  transform: translateY(-50%);
-
-  width: 1.4rem;
-  height: 1.4rem;
-
-  color: var(--color-border);
+  left: var(--pr-space-4);
+  color: var(--ds-text-muted);
   pointer-events: none;
-
-  transition: color 0.2s ease;
+  display: flex;
+  align-items: center;
 }
 
 .search-input {
   width: 100%;
-  padding: 0.55rem 0.75rem 0.55rem 2.2rem;
+  padding: 5px var(--pr-space-4) var(--pr-space-2) 2.75rem;
+  background-color: var(--ds-bg-surface);
+  border: var(--comp-border-width) solid var(--ds-border-base);
+  border-radius: var(--comp-radius);
+  font-family: var(--pr-font-text);
+  font-size: var(--comp-font-size);
+  color: var(--ds-text-strong);
+  transition: var(--comp-transition);
+}
 
-  font-family: var(--font-text-family);
-  font-weight: var(--font-text-weight);
-  font-size: var(--font-size-sm);
-
-  min-width: 0;
-
-  border-radius: var(--radius-md);
-  border: 2px solid var(--color-border);
-
+.search-input:focus {
   outline: none;
-
-  color: var(--color-text-strong);
-
-  background-color: color-mix(in srgb, var(--color-bg) 65%, white);
-
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  background-color: var(--ds-bg-surface);
+  border-color: var(--ds-color-primary);
+  box-shadow: 0 0 0 var(--comp-focus-ring-width) var(--input-focus-ring);
 }
 
-.search-input:focus-visible {
-  border-color: var(--color-primary-600);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary-600) 10%, white);
+.search-input::placeholder {
+  color: var(--ds-text-muted);
+  opacity: 0.7;
 }
 
-.search-container:focus-within .search-icon {
-  color: var(--color-primary-600);
+.icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+/* Variant styles if needed */
+.search-input--active {
+  border-color: var(--ds-color-primary);
+}
+
+.search-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: var(--ds-bg-muted);
 }

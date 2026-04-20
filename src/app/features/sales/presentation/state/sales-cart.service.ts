@@ -1,8 +1,9 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Observable, map, tap, throwError } from 'rxjs';
 
-import { SessionStateService } from '@features/auth/application/services/session-state.service';
+
 import { SalesFacade } from '@features/sales/application/facades/sales.facade';
+import { Order } from '@features/sales/domain/entities/order.entity';
 import {
   SalesCartItem,
   SalesPaymentMethod,
@@ -12,32 +13,31 @@ import {
 @Injectable()
 export class SalesCartService {
   private readonly facade = inject(SalesFacade);
-  private readonly sessionState = inject(SessionStateService);
+
   private readonly _cart = signal<SalesCartItem[]>([]);
   private readonly _selectedPayment = signal<SalesPaymentMethod | null>(null);
   private readonly _descuento = signal(0);
-  private readonly _ivaRate = 0.16;
 
   readonly cart = this._cart.asReadonly();
   readonly selectedPayment = this._selectedPayment.asReadonly();
   readonly descuento = this._descuento.asReadonly();
-  readonly ivaRate = this._ivaRate;
 
-  readonly subtotal = computed(() =>
-    this.cart().reduce((sum, it) => sum + it.precio * it.qty, 0),
-  );
-
-  readonly iva = computed(() => {
-    const base = Math.max(0, this.subtotal() - this.descuento());
-    return +(base * this.ivaRate).toFixed(2);
+  readonly order = computed(() => {
+    const o = new Order();
+    o.setDiscount(this.descuento());
+    this.cart().forEach(item => 
+      o.addItem({ productId: item.productId, price: item.precio, quantity: item.qty })
+    );
+    return o;
   });
 
-  readonly total = computed(() => {
-    const base = Math.max(0, this.subtotal() - this.descuento());
-    return +(base + this.iva()).toFixed(2);
-  });
+  readonly subtotal = computed(() => this.order().subtotal.value);
+  readonly iva = computed(() => this.order().iva.value);
+  readonly total = computed(() => this.order().total.value);
 
   addToCart(product: SalesProduct): void {
+    if (product.stock <= 0) return;
+
     this._cart.update((items) => {
       const exists = items.find((c) => c.productId === product.id);
       if (!exists) {
@@ -49,24 +49,30 @@ export class SalesCartService {
             precio: product.precio,
             imagen: product.imagen,
             qty: 1,
+            stock: product.stock,
           },
         ];
       }
-      return items.map((item) =>
-        item.productId === product.id
-          ? { ...item, qty: Math.min(999, item.qty + 1) }
-          : item,
-      );
+
+      return items.map((item) => {
+        if (item.productId !== product.id) return item;
+        const newQty = item.qty + 1;
+        return newQty <= item.stock
+          ? { ...item, qty: newQty }
+          : item;
+      });
     });
   }
 
   increaseQty(item: SalesCartItem): void {
     this._cart.update((items) =>
-      items.map((current) =>
-        current.productId === item.productId
-          ? { ...current, qty: Math.min(999, current.qty + 1) }
-          : current,
-      ),
+      items.map((current) => {
+        if (current.productId !== item.productId) return current;
+        const newQty = current.qty + 1;
+        return newQty <= current.stock
+          ? { ...current, qty: newQty }
+          : current;
+      }),
     );
   }
 
@@ -107,12 +113,6 @@ export class SalesCartService {
       return throwError(() => new Error('Selecciona un método de pago.'));
     }
 
-    const session = this.sessionState.getSession();
-    const userId = session ? Number(session.userId) : NaN;
-    if (!Number.isFinite(userId)) {
-      return throwError(() => new Error('No se pudo determinar el usuario actual.'));
-    }
-
     const productos = cartItems.map((item) => ({
       id: item.productId,
       cantidad: item.qty,
@@ -120,7 +120,6 @@ export class SalesCartService {
 
     return this.facade
       .createSale({
-        idUsuario: userId,
         idMetodoPago: paymentMethod.id,
         productos,
       })

@@ -1,10 +1,14 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 
 import { APP_ENV } from '@core/tokens/app-env.token';
 import { Environment } from '@env/environment.model';
-import { ProductResponseDto } from '@features/inventory/application/dtos/product-response.dto';
+import { PaginationParams, PaginatedResponse } from '@core/models/pagination.model';
+import {
+  PaginatedProductResponseDto,
+  ProductResponseDto,
+} from '@features/inventory/application/dtos/product-response.dto';
 import { Product } from '@features/inventory/domain/entities/product.entity';
 import {
   CreateProductPayload,
@@ -19,10 +23,38 @@ export class ProductRepositoryImpl implements ProductRepository {
   private readonly env = inject<Environment>(APP_ENV);
   private readonly endpoint = `${this.env.apiUrl}/productos`;
 
-  getProducts(): Observable<Product[]> {
-    return this.http.get<ProductResponseDto[]>(this.endpoint).pipe(
-      map((response) => response.map((dto) => ProductMapper.fromResponseDto(dto))),
-    );
+  getProducts(params?: PaginationParams): Observable<PaginatedResponse<Product>> {
+    const httpParams = this.buildPaginationParams(new HttpParams(), params);
+
+    return this.http
+      .get<PaginatedProductResponseDto>(this.endpoint, { params: httpParams })
+      .pipe(map((response) => ProductMapper.mapPaginatedResponse(response)));
+  }
+
+  getProductsByCategoria(categoria: string, params?: PaginationParams): Observable<PaginatedResponse<Product>> {
+    let httpParams = new HttpParams().set('categoria', categoria);
+    httpParams = this.buildPaginationParams(httpParams, params);
+
+    return this.http
+      .get<PaginatedProductResponseDto>(this.endpoint, { params: httpParams })
+      .pipe(map((response) => ProductMapper.mapPaginatedResponse(response)));
+  }
+  
+  searchProducts(query: string, params?: PaginationParams): Observable<PaginatedResponse<Product>> {
+    let httpParams = new HttpParams().set('query', query);
+    httpParams = this.buildPaginationParams(httpParams, params);
+
+    return this.http
+      .get<PaginatedProductResponseDto>(`${this.endpoint}/search/`, { params: httpParams })
+      .pipe(map((response) => ProductMapper.mapPaginatedResponse(response)));
+  }
+
+  private buildPaginationParams(httpParams: HttpParams, params?: PaginationParams): HttpParams {
+    if (params) {
+      if (params.page) httpParams = httpParams.set('page', params.page.toString());
+      if (params.limit) httpParams = httpParams.set('page_size', params.limit.toString());
+    }
+    return httpParams;
   }
 
   createProduct(payload: CreateProductPayload): Observable<Product> {

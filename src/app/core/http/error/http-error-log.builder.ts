@@ -3,10 +3,11 @@ import { HttpErrorResponse, HttpRequest } from '@angular/common/http';
 export function buildHttpErrorLog(
     req: HttpRequest<unknown>,
     error: HttpErrorResponse,
+    sanitizedUrl: string
 ) {
     return {
         method: req.method,
-        url: req.urlWithParams,
+        url: sanitizedUrl,
         status: error.status,
         statusText: error.statusText,
         message: error.message,

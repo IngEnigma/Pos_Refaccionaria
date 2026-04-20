@@ -1,7 +1,7 @@
 import { Money } from '@features/sales/domain/value-objects/money.value';
 import { SaleDate } from '@features/sales/domain/value-objects/sale-date.value';
 
-export interface Sale {
+export interface SaleProps {
   id: number;
   idUsuario: number | null;
   idMetodoPago: number | null;
@@ -9,11 +9,24 @@ export interface Sale {
   fecha: string | null;
 }
 
-export class SaleFactory {
-  static fromPrimitives(data: Sale): Sale {
-    Money.fromNumber(data.total, 'Sale.total');
-    SaleDate.fromNullable(data.fecha, 'Sale.fecha');
+export class Sale {
+  readonly id: number;
+  readonly idUsuario: number | null;
+  readonly idMetodoPago: number | null;
+  readonly total: Money;
+  readonly fecha: SaleDate | null;
 
-    return { ...data };
+  constructor(props: SaleProps) {
+    this.id = props.id;
+    this.idUsuario = props.idUsuario;
+    this.idMetodoPago = props.idMetodoPago;
+    this.total = Money.fromNumber(props.total, 'Sale.total');
+    this.fecha = SaleDate.fromNullable(props.fecha, 'Sale.fecha');
+  }
+}
+
+export class SaleFactory {
+  static fromPrimitives(data: SaleProps): Sale {
+    return new Sale(data);
   }
 }

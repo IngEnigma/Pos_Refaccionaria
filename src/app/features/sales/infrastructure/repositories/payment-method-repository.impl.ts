@@ -16,12 +16,13 @@ import {
   PaymentMethodMutationError,
 } from '@features/sales/domain/errors/sales.errors';
 import { PaymentMethodMapper } from '@features/sales/infrastructure/mappers/payment-method.mapper';
+import { SALE_ENDPOINTS } from '@features/sales/config/sale-endpoints';
 
 @Injectable({ providedIn: 'root' })
 export class PaymentMethodRepositoryImpl implements PaymentMethodRepository {
   private readonly http = inject(HttpClient);
   private readonly env = inject<Environment>(APP_ENV);
-  private readonly endpoint = `${this.env.apiUrl}/metodopago`;
+  private readonly endpoint = `${this.env.apiUrl}${SALE_ENDPOINTS.PAYMENT_METHODS}`;
 
   getPaymentMethods(): Observable<PaymentMethod[]> {
     return this.http.get<PaymentMethodResponseDto[]>(this.endpoint).pipe(

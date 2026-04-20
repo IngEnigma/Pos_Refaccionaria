@@ -10,5 +10,5 @@ export interface ProductUpdateRequestDto {
   marca?: string;
   existencia?: number;
   costo?: number;
-  codigo_sat?: string | null;
+  codigoSAT?: string | null;
 }

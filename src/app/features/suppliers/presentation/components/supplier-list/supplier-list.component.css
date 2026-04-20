@@ -1,0 +1,145 @@
+.table-container {
+  background: white;
+  border-radius: 1rem;
+  box-shadow: var(--ds-shadow-sm);
+  overflow: hidden;
+  border: 1px solid var(--ds-border-base);
+}
+
+.supplier-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+thead {
+  background: var(--ds-background-subtle);
+}
+
+th {
+  padding: 1rem 1.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ds-text-muted);
+  border-bottom: 1px solid var(--ds-border-base);
+}
+
+td {
+  padding: 1rem 1.5rem;
+  font-size: 0.875rem;
+  color: var(--ds-text-base);
+  border-bottom: 1px solid var(--ds-border-base);
+  vertical-align: middle;
+}
+
+.supplier-row {
+  transition: background-color 0.2s;
+}
+
+.supplier-row:hover {
+  background-color: #f8fafc;
+}
+
+.supplier-name {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-weight: 600;
+  color: var(--ds-text-strong);
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  background: var(--pr-blue-100);
+  color: var(--pr-blue-700);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+}
+
+.text-truncate {
+  max-width: 250px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mail-link {
+  color: var(--pr-blue-600);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.mail-link:hover {
+  text-decoration: underline;
+}
+
+.actions-cell {
+  text-align: right;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.btn-action {
+  width: 34px;
+  height: 34px;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--ds-border-base);
+  background: white;
+  color: var(--ds-text-muted);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-action:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--ds-shadow-sm);
+}
+
+.btn-action.edit:hover {
+  background: var(--pr-blue-50);
+  color: var(--pr-blue-600);
+  border-color: var(--pr-blue-200);
+}
+
+.btn-action.delete:hover {
+  background: #fef2f2;
+  color: #ef4444;
+  border-color: #fecaca;
+}
+
+.empty-state {
+  padding: 4rem 1.5rem;
+  text-align: center;
+}
+
+.empty-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  color: var(--ds-text-muted);
+}
+
+.empty-content lucide-icon {
+  opacity: 0.3;
+}
+
+@media (max-width: 768px) {
+  th:nth-child(2), td:nth-child(2),
+  th:nth-child(4), td:nth-child(4) {
+    display: none;
+  }
+}

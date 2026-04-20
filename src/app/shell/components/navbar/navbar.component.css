@@ -1,0 +1,41 @@
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--pr-space-4);
+  background-color: var(--ds-bg-surface);
+  padding: var(--pr-space-3) var(--pr-space-5);
+  border-bottom: calc(var(--pr-space-1) / 2) solid var(--ds-border-subtle);
+}
+
+.user-section {
+  display: flex;
+  align-items: center;
+  gap: var(--pr-space-3);
+}
+
+.user-info {
+  text-align: right;
+}
+
+.username {
+  display: block;
+  font-size: var(--pr-font-size-base);
+  font-weight: var(--pr-weight-semibold);
+  font-family: var(--pr-font-title);
+  color: var(--ds-text-strong);
+}
+
+.date {
+  font-size: var(--pr-font-size-sm);
+  font-weight: var(--pr-weight-regular);
+  font-family: var(--pr-font-text);
+  color: var(--ds-text-base);
+}
+
+.notification-description {
+  display: block;
+  font-size: var(--pr-font-size-xs);
+  color: var(--ds-text-muted);
+  margin-top: calc(var(--pr-space-1) / 2);
+}

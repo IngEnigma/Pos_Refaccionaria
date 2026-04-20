@@ -10,5 +10,5 @@ export interface ProductCreateRequestDto {
   marca: string;
   existencia: number;
   costo: number;
-  codigo_sat: string | null;
+  codigoSAT: string | null;
 }
