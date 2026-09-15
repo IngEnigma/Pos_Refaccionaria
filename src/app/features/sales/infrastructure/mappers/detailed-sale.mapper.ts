@@ -19,6 +19,7 @@ export class DetailedSaleMapper {
 
     return new DetailedSale({
       id: dto.id,
+      idInventario: dto.id_inventario,
       fecha: dto.fecha,
       total: Number(dto.total),
       detalles,

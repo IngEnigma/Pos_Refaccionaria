@@ -1,7 +1,14 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { Component } from '@angular/core';
 import { NavbarComponent } from './navbar.component';
 import { LucideAngularModule, User, LogOut, CircleAlert, Search, Bell } from 'lucide-angular';
-import { NotificationItem } from '@shell/models/notification.model';
+
+@Component({
+  selector: 'app-notifications-badge',
+  standalone: true,
+  template: '',
+})
+class MockNotificationsBadgeComponent {}
 
 describe('NavbarComponent', () => {
   let component: NavbarComponent;
@@ -14,14 +21,18 @@ describe('NavbarComponent', () => {
         LucideAngularModule.pick({ User, LogOut, CircleAlert, Search, Bell })
       ]
     })
+    .overrideComponent(NavbarComponent, {
+      add: { imports: [MockNotificationsBadgeComponent] },
+      remove: { imports: [] }
+    })
     .compileComponents();
 
     fixture = TestBed.createComponent(NavbarComponent);
     component = fixture.componentInstance;
-    
+
     fixture.componentRef.setInput('username', 'testuser');
     fixture.componentRef.setInput('currentDate', '2024-01-01');
-    
+
     fixture.detectChanges();
   });
 
@@ -67,27 +78,10 @@ describe('NavbarComponent', () => {
     fixture.detectChanges();
 
     expect(searchSpy).toHaveBeenCalledWith('filtro aceite');
-  });
-
-  it('renderiza notificaciones cuando recibe datos', fakeAsync(() => {
-    const notifications: NotificationItem[] = [
-      { id: 1, title: 'Stock bajo', description: '2 piezas' },
-      { id: 2, title: 'Pedido pendiente' },
-    ];
-
-    fixture.componentRef.setInput('notifications', notifications);
-    tick();
-    fixture.detectChanges();
-
-    const notificationsButton = fixture.nativeElement.querySelector(
-      'button[aria-label="Notificaciones"]',
-    ) as HTMLButtonElement;
-    notificationsButton.click();
-    tick();
-    fixture.detectChanges();
-
-    const overlayText = document.body.textContent ?? '';
-    expect(overlayText).toContain('Stock bajo');
-    expect(overlayText).toContain('Pedido pendiente');
   }));
+
+  it('renderiza el badge de notificaciones', () => {
+    const badge = fixture.nativeElement.querySelector('app-notifications-badge');
+    expect(badge).toBeTruthy();
+  });
 });

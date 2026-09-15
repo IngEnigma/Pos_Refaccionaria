@@ -1,10 +1,11 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { interval, map, startWith } from 'rxjs';
 import { NavbarComponent } from '../../components/navbar/navbar.component';
 import { SidebarComponent } from '../../components/sidebar/sidebar.component';
 import { ShellFacade } from '../../application/facades/shell.facade';
+import { AuthFacade } from '@features/auth';
 import { formatDate } from '@app/shared/utils/date-format.util';
 
 @Component({
@@ -15,13 +16,14 @@ import { formatDate } from '@app/shared/utils/date-format.util';
   styleUrl: './main-layout.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class MainLayoutComponent {
+export class MainLayoutComponent implements OnInit {
 
   private readonly shellFacade = inject(ShellFacade);
+  private readonly authFacade = inject(AuthFacade);
 
   readonly username = this.shellFacade.user;
+  readonly sucursalId = this.authFacade.sucursalId;
   readonly sidebarItems = this.shellFacade.filteredSidebarItems;
-  readonly notifications = this.shellFacade.notifications;
   readonly currentDate = toSignal(
     interval(60_000).pipe(
       startWith(0),
@@ -29,6 +31,10 @@ export class MainLayoutComponent {
     ),
     { initialValue: formatDate(new Date()) },
   );
+
+  ngOnInit(): void {
+    this.authFacade.refreshProfile().subscribe();
+  }
 
   onLogout(): void {
     this.shellFacade.logout();

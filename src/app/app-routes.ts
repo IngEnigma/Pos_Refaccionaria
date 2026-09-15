@@ -6,4 +6,11 @@ export const AppRoutes = {
   reports: 'reports',
   history: 'history',
   suppliers: 'suppliers',
+  branches: 'branches',
+  clients: 'clients',
+  admin: 'admin',
+  manager: 'manager',
+  notifications: 'notifications',
+  inventoryByBranch: 'inventory-by-branch',
+  branchPricing: 'branch-pricing',
 } as const;

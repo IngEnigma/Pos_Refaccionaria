@@ -1,0 +1,90 @@
+<div class="branch-form-container">
+  <header class="dialog-header">
+    <div class="header-icon">
+      <lucide-icon [name]="isEditMode ? 'Edit' : 'PlusCircle'" [size]="24"></lucide-icon>
+    </div>
+    <div class="header-content">
+      <h2 class="dialog-title">{{ isEditMode ? 'Editar Sucursal' : 'Nueva Sucursal' }}</h2>
+      <p class="dialog-subtitle">Gestiona la información de la sucursal.</p>
+    </div>
+    <button class="btn-close" (click)="onCancel()" aria-label="Cerrar">
+      <lucide-icon name="X" [size]="20"></lucide-icon>
+    </button>
+  </header>
+
+  <form [formGroup]="branchForm" (ngSubmit)="onSubmit()" class="dialog-form">
+    <div class="form-grid">
+      <div class="form-group full-width">
+        <label for="nombreSucursal">Nombre de la Sucursal</label>
+        <div class="input-wrapper" [class.error]="isFieldInvalid('nombreSucursal')">
+          <lucide-icon name="Building" [size]="18" class="input-icon"></lucide-icon>
+          <input id="nombreSucursal" type="text" formControlName="nombreSucursal" placeholder="Ej. Sucursal Centro">
+        </div>
+        <span class="error-text" *ngIf="isFieldInvalid('nombreSucursal')">El nombre es requerido (mín. 3 caracteres)</span>
+      </div>
+
+      <div class="form-group full-width">
+        <label for="ubicacion">Ubicación</label>
+        <div class="input-wrapper" [class.error]="isFieldInvalid('ubicacion')">
+          <lucide-icon name="MapPin" [size]="18" class="input-icon"></lucide-icon>
+          <input id="ubicacion" type="text" formControlName="ubicacion" placeholder="Calle, Número, Colonia, Ciudad">
+        </div>
+        <span class="error-text" *ngIf="isFieldInvalid('ubicacion')">La ubicación es requerida</span>
+      </div>
+
+      <div class="form-group">
+        <label for="codigoPostal">Código Postal</label>
+        <div class="input-wrapper" [class.error]="isFieldInvalid('codigoPostal')">
+          <lucide-icon name="Hash" [size]="18" class="input-icon"></lucide-icon>
+          <input id="codigoPostal" type="text" formControlName="codigoPostal" placeholder="29000">
+        </div>
+        <span class="error-text" *ngIf="isFieldInvalid('codigoPostal')">El código postal es requerido</span>
+      </div>
+
+      <div class="form-group">
+        <label for="numeroTelefono">Teléfono</label>
+        <div class="input-wrapper" [class.error]="isFieldInvalid('numeroTelefono')">
+          <lucide-icon name="Phone" [size]="18" class="input-icon"></lucide-icon>
+          <input id="numeroTelefono" type="text" formControlName="numeroTelefono" placeholder="2711234567">
+        </div>
+        <span class="error-text" *ngIf="isFieldInvalid('numeroTelefono')">Teléfono inválido (solo números)</span>
+      </div>
+
+      <div class="form-group full-width">
+        <label for="correoElectronico">Correo Electrónico</label>
+        <div class="input-wrapper" [class.error]="isFieldInvalid('correoElectronico')">
+          <lucide-icon name="Mail" [size]="18" class="input-icon"></lucide-icon>
+          <input id="correoElectronico" type="email" formControlName="correoElectronico" placeholder="sucursal@refaccionaria.com">
+        </div>
+        <span class="error-text" *ngIf="isFieldInvalid('correoElectronico')">Ingrese un correo electrónico válido</span>
+      </div>
+
+      <div class="form-group full-width" *ngIf="isEditMode && data?.branch?.codigoSucursal">
+        <label for="codigoSucursal">Código de Sucursal</label>
+        <div class="input-wrapper readonly">
+          <lucide-icon name="Barcode" [size]="18" class="input-icon"></lucide-icon>
+          <input id="codigoSucursal" type="text" [value]="data!.branch!.codigoSucursal" readonly>
+        </div>
+        <span class="help-text">Código auto-generado (solo lectura)</span>
+      </div>
+    </div>
+
+    <footer class="dialog-footer">
+      <app-button
+        type="button"
+        variant="secondary"
+        (click)="onCancel()"
+        class="footer-btn">
+        Cancelar
+      </app-button>
+      <app-button
+        type="submit"
+        variant="primary"
+        [disabled]="branchForm.invalid"
+        class="footer-btn">
+        <lucide-icon [name]="isEditMode ? 'Save' : 'Check'" [size]="18"></lucide-icon>
+        {{ isEditMode ? 'Guardar Cambios' : 'Registrar Sucursal' }}
+      </app-button>
+    </footer>
+  </form>
+</div>

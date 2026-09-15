@@ -13,6 +13,7 @@ import { Product } from '@features/inventory/domain/entities/product.entity';
 import {
   CreateProductPayload,
   ProductRepository,
+  ProductSearchParams,
   UpdateProductPayload,
 } from '@features/inventory/domain/repository/product-repository';
 import { ProductMapper } from '@features/inventory/infrastructure/mappers/product.mapper';
@@ -23,12 +24,21 @@ export class ProductRepositoryImpl implements ProductRepository {
   private readonly env = inject<Environment>(APP_ENV);
   private readonly endpoint = `${this.env.apiUrl}/productos`;
 
-  getProducts(params?: PaginationParams): Observable<PaginatedResponse<Product>> {
-    const httpParams = this.buildPaginationParams(new HttpParams(), params);
+  getProducts(params?: PaginationParams, searchParams?: ProductSearchParams): Observable<PaginatedResponse<Product>> {
+    let httpParams = this.buildPaginationParams(new HttpParams(), params);
+    httpParams = this.buildSearchParams(httpParams, searchParams);
+
+    const hasSucursalFilter = searchParams?.sucursalId != null;
 
     return this.http
       .get<PaginatedProductResponseDto>(this.endpoint, { params: httpParams })
-      .pipe(map((response) => ProductMapper.mapPaginatedResponse(response)));
+      .pipe(
+        map((response) =>
+          hasSucursalFilter
+            ? ProductMapper.mapStockPaginatedResponse(response) as PaginatedResponse<Product>
+            : ProductMapper.mapPaginatedResponse(response)
+        ),
+      );
   }
 
   getProductsByCategoria(categoria: string, params?: PaginationParams): Observable<PaginatedResponse<Product>> {
@@ -40,13 +50,62 @@ export class ProductRepositoryImpl implements ProductRepository {
       .pipe(map((response) => ProductMapper.mapPaginatedResponse(response)));
   }
   
-  searchProducts(query: string, params?: PaginationParams): Observable<PaginatedResponse<Product>> {
-    let httpParams = new HttpParams().set('query', query);
+  searchProducts(query: string, params?: PaginationParams, searchParams?: ProductSearchParams): Observable<PaginatedResponse<Product>> {
+    let httpParams = new HttpParams().set('search', query);
     httpParams = this.buildPaginationParams(httpParams, params);
+    httpParams = this.buildSearchParams(httpParams, searchParams);
+
+    const hasSucursalFilter = searchParams?.sucursalId != null;
 
     return this.http
-      .get<PaginatedProductResponseDto>(`${this.endpoint}/search/`, { params: httpParams })
-      .pipe(map((response) => ProductMapper.mapPaginatedResponse(response)));
+      .get<PaginatedProductResponseDto>(this.endpoint, { params: httpParams })
+      .pipe(
+        map((response) =>
+          hasSucursalFilter
+            ? ProductMapper.mapStockPaginatedResponse(response) as PaginatedResponse<Product>
+            : ProductMapper.mapPaginatedResponse(response)
+        ),
+      );
+  }
+
+  getByBarcode(codigoBarras: string): Observable<Product | null> {
+    const url = `${this.endpoint}/codigo-barras/`;
+    const params = new HttpParams().set('codigo_barras', codigoBarras);
+
+    return this.http
+      .get<ProductResponseDto>(url, { params })
+      .pipe(
+        map((dto) => ProductMapper.fromResponseDto(dto)),
+        // map 404 → null (handled by catchError in caller or here)
+      );
+  }
+
+  private buildSearchParams(httpParams: HttpParams, searchParams?: ProductSearchParams): HttpParams {
+    if (!searchParams) return httpParams;
+
+    if (searchParams.sucursalId != null) {
+      httpParams = httpParams.set('sucursal_id', searchParams.sucursalId.toString());
+    }
+    if (searchParams.search) {
+      httpParams = httpParams.set('search', searchParams.search);
+    }
+    if (searchParams.clave) {
+      httpParams = httpParams.set('clave', searchParams.clave);
+    }
+    if (searchParams.marca) {
+      httpParams = httpParams.set('marca', searchParams.marca);
+    }
+    if (searchParams.codigoBarras) {
+      httpParams = httpParams.set('codigo_barras', searchParams.codigoBarras);
+    }
+    if (searchParams.tipoId != null) {
+      httpParams = httpParams.set('tipo_id', searchParams.tipoId.toString());
+    }
+    if (searchParams.proveedorId != null) {
+      httpParams = httpParams.set('proveedor_id', searchParams.proveedorId.toString());
+    }
+
+    return httpParams;
   }
 
   private buildPaginationParams(httpParams: HttpParams, params?: PaginationParams): HttpParams {

@@ -3,8 +3,8 @@ import { Observable } from 'rxjs';
 import { Sale } from '@features/sales/domain/entities/sale.entity';
 
 export interface CreateSalePayload {
-  idUsuario: number;
   idMetodoPago: number;
+  idInventario: number;
   productos: Array<{
     id: number;
     cantidad: number;

@@ -17,10 +17,12 @@ export class SalesCartService {
   private readonly _cart = signal<SalesCartItem[]>([]);
   private readonly _selectedPayment = signal<SalesPaymentMethod | null>(null);
   private readonly _descuento = signal(0);
+  private readonly _ventaInventarioId = signal<number | null>(null);
 
   readonly cart = this._cart.asReadonly();
   readonly selectedPayment = this._selectedPayment.asReadonly();
   readonly descuento = this._descuento.asReadonly();
+  readonly ventaInventarioId = this._ventaInventarioId.asReadonly();
 
   readonly order = computed(() => {
     const o = new Order();
@@ -36,7 +38,7 @@ export class SalesCartService {
   readonly total = computed(() => this.order().total.value);
 
   addToCart(product: SalesProduct): void {
-    if (product.stock <= 0) return;
+    if (product.stock !== 0 && product.stock <= 0) return;
 
     this._cart.update((items) => {
       const exists = items.find((c) => c.productId === product.id);
@@ -57,6 +59,7 @@ export class SalesCartService {
       return items.map((item) => {
         if (item.productId !== product.id) return item;
         const newQty = item.qty + 1;
+        if (item.stock === 0) return { ...item, qty: newQty };
         return newQty <= item.stock
           ? { ...item, qty: newQty }
           : item;
@@ -69,6 +72,7 @@ export class SalesCartService {
       items.map((current) => {
         if (current.productId !== item.productId) return current;
         const newQty = current.qty + 1;
+        if (current.stock === 0) return { ...current, qty: newQty };
         return newQty <= current.stock
           ? { ...current, qty: newQty }
           : current;
@@ -102,6 +106,10 @@ export class SalesCartService {
     this._descuento.set(0);
   }
 
+  setVentaInventarioId(idInventario: number | null): void {
+    this._ventaInventarioId.set(idInventario);
+  }
+
   confirmSale(): Observable<void> {
     const cartItems = this.cart();
     if (cartItems.length === 0) {
@@ -113,6 +121,11 @@ export class SalesCartService {
       return throwError(() => new Error('Selecciona un método de pago.'));
     }
 
+    const inventarioId = this.ventaInventarioId();
+    if (inventarioId == null) {
+      return throwError(() => new Error('No hay inventario asignado para esta sucursal.'));
+    }
+
     const productos = cartItems.map((item) => ({
       id: item.productId,
       cantidad: item.qty,
@@ -121,6 +134,7 @@ export class SalesCartService {
     return this.facade
       .createSale({
         idMetodoPago: paymentMethod.id,
+        idInventario: inventarioId,
         productos,
       })
       .pipe(

@@ -4,6 +4,9 @@
   <div class="user-section">
     <div class="user-info">
     <span class="username">{{ username() }}</span>
+    @if (sucursalId()) {
+      <span class="sucursal-chip">SUC-{{ sucursalId() }}</span>
+    }
     <span class="date">{{ currentDate() }}</span>
   </div>
 
@@ -22,28 +25,6 @@
       </app-dropdown-menu>
     </app-dropdown>
 
-    <app-dropdown #notificationsDropdown>
-      <app-icon-button
-        appDropdownTrigger
-        [icon]="notificationsIconPath()"
-        [isActive]="notificationsDropdown.open()"
-        ariaLabel="Notificaciones"
-        label="Notificaciones"
-      />
-      <app-dropdown-menu>
-        @for (notification of notifications(); track notification.id) {
-          <app-dropdown-item [icon]="notification.icon ?? 'circle-alert'">
-            {{ notification.title }}
-            @if (notification.description) {
-              <span class="notification-description">{{ notification.description }}</span>
-            }
-          </app-dropdown-item>
-        } @empty {
-          <app-dropdown-item>
-            No hay notificaciones
-          </app-dropdown-item>
-        }
-      </app-dropdown-menu>
-    </app-dropdown>
+    <app-notifications-badge />
   </div>
 </header>

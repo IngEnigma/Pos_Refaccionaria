@@ -1,0 +1,73 @@
+<div class="inventory-table-wrapper">
+  <table class="inventory-table" *ngIf="!loading() && items().length > 0">
+    <thead>
+      <tr>
+        <th>Producto</th>
+        <th>Clave</th>
+        <th>Marca</th>
+        <th>Código de Barras</th>
+        <th class="numeric">Stock</th>
+        <th class="numeric">Precio</th>
+        <th class="actions">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of items()">
+        <td>
+          <div class="product-cell">
+            <div class="product-icon">
+              <lucide-icon name="Package" [size]="18"></lucide-icon>
+            </div>
+            <div class="product-info">
+              <span class="product-name">{{ item.nombre }}</span>
+            </div>
+          </div>
+        </td>
+        <td class="mono">{{ item.clave }}</td>
+        <td>{{ item.marca }}</td>
+        <td class="mono">{{ item.codigoBarras }}</td>
+        <td class="numeric">
+          <span class="stock-badge" [class.low]="item.cantidad <= 5" [class.medium]="item.cantidad > 5 && item.cantidad <= 15">
+            {{ item.cantidad }}
+          </span>
+        </td>
+        <td class="numeric">
+          <div class="price-cell">
+            <span class="price-value">{{ item.precioVenta | number:'1.2-2' }}</span>
+            <span class="price-sucursal-badge" *ngIf="item.precioSucursal !== null">Sucursal</span>
+          </div>
+        </td>
+        <td class="actions">
+          <button class="btn-movement" (click)="registerMovement.emit(item)" title="Registrar movimiento">
+            <lucide-icon name="ArrowLeftRight" [size]="16"></lucide-icon>
+            Movimiento
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Loading State -->
+  <div class="table-skeleton" *ngIf="loading()">
+    <div class="skeleton-row header">
+      <div class="skeleton-cell" *ngFor="let i of [1,2,3,4,5,6,7]"></div>
+    </div>
+    <div class="skeleton-row" *ngFor="let i of [1,2,3,4,5]">
+      <div class="skeleton-cell"></div>
+      <div class="skeleton-cell short"></div>
+      <div class="skeleton-cell short"></div>
+      <div class="skeleton-cell short"></div>
+      <div class="skeleton-cell short"></div>
+      <div class="skeleton-cell short"></div>
+      <div class="skeleton-cell short"></div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!loading() && items().length === 0">
+    <div class="empty-content">
+      <lucide-icon name="Package" [size]="48"></lucide-icon>
+      <p>No hay productos en el inventario de esta sucursal.</p>
+    </div>
+  </div>
+</div>

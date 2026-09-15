@@ -86,20 +86,12 @@
       </div>
 
       <div class="form-group">
-        <label for="existencia">Existencia Inicial</label>
-        <div class="input-wrapper" [class.error]="isFieldInvalid('existencia')">
-          <lucide-icon name="Archive" [size]="18" class="input-icon"></lucide-icon>
-          <input id="existencia" type="number" formControlName="existencia">
-        </div>
-        <span class="error-text" *ngIf="isFieldInvalid('existencia')">Stock inválido</span>
-      </div>
-
-       <div class="form-group">
         <label for="codigoSat">Código SAT (Opcional)</label>
-        <div class="input-wrapper">
+        <div class="input-wrapper" [class.error]="isFieldInvalid('codigoSat')">
           <lucide-icon name="ShieldCheck" [size]="18" class="input-icon"></lucide-icon>
-          <input id="codigoSat" type="text" formControlName="codigoSat" placeholder="Clave SAT">
+          <input id="codigoSat" type="text" formControlName="codigoSat" placeholder="Clave SAT" maxlength="8">
         </div>
+        <span class="error-text" *ngIf="isFieldInvalid('codigoSat')">Máximo 8 caracteres</span>
       </div>
 
       <div class="form-group full-width">

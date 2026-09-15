@@ -1,0 +1,251 @@
+<div class="admin-root">
+  <main class="admin-main animate-slide-up">
+    <section class="page-header">
+      <div>
+        <p class="eyebrow">Administración</p>
+        <h1 class="page-title">Sucursales y usuarios</h1>
+        <p class="page-subtitle">Crea sucursales, registra gerentes y cajeros, y asigna responsables por sucursal.</p>
+      </div>
+      <button class="btn-primary" type="button">
+        <lucide-icon name="Plus" [size]="18" aria-hidden="true"></lucide-icon>
+        Nueva sucursal
+      </button>
+    </section>
+
+    <section class="summary-grid" aria-label="Resumen administrativo">
+      <article class="summary-card">
+        <span class="summary-icon">
+          <lucide-icon name="Truck" [size]="20" aria-hidden="true"></lucide-icon>
+        </span>
+        <div>
+          <strong>3</strong>
+          <span>Sucursales</span>
+        </div>
+      </article>
+      <article class="summary-card">
+        <span class="summary-icon">
+          <lucide-icon name="ShieldCheck" [size]="20" aria-hidden="true"></lucide-icon>
+        </span>
+        <div>
+          <strong>4</strong>
+          <span>Gerentes</span>
+        </div>
+      </article>
+      <article class="summary-card">
+        <span class="summary-icon">
+          <lucide-icon name="Users" [size]="20" aria-hidden="true"></lucide-icon>
+        </span>
+        <div>
+          <strong>10</strong>
+          <span>Cajeros</span>
+        </div>
+      </article>
+    </section>
+
+    <section class="content-grid">
+      <article class="panel">
+        <div class="panel-header">
+          <div>
+            <h2>Crear sucursal</h2>
+            <p>Información base de la nueva ubicación.</p>
+          </div>
+        </div>
+
+        <form class="form-grid">
+          <div class="field">
+            <label for="branch-name">Nombre de sucursal</label>
+            <input id="branch-name" type="text" placeholder="Ej. Sucursal Poniente" />
+          </div>
+          <div class="field">
+            <label for="branch-phone">Teléfono</label>
+            <input id="branch-phone" type="tel" placeholder="55 1234 5678" />
+          </div>
+          <div class="field full">
+            <label for="branch-address">Dirección</label>
+            <input id="branch-address" type="text" placeholder="Calle, número, colonia y ciudad" />
+          </div>
+          <div class="field">
+            <label for="branch-code">Código interno</label>
+            <input id="branch-code" type="text" placeholder="SUC-004" />
+          </div>
+          <div class="field">
+            <label for="branch-status">Estado</label>
+            <select id="branch-status">
+              <option>Activa</option>
+              <option>Pendiente</option>
+            </select>
+          </div>
+          <div class="form-actions full">
+            <button class="btn-secondary" type="button">Limpiar</button>
+            <button class="btn-primary" type="button">
+              <lucide-icon name="Save" [size]="17" aria-hidden="true"></lucide-icon>
+              Guardar sucursal
+            </button>
+          </div>
+        </form>
+      </article>
+
+      <article class="panel">
+        <div class="panel-header">
+          <div>
+            <h2>Crear usuario</h2>
+            <p>Alta visual para administradores, gerentes o cajeros.</p>
+          </div>
+        </div>
+
+        <form class="form-grid">
+          <div class="field full">
+            <label for="user-name">Nombre completo</label>
+            <input id="user-name" type="text" placeholder="Nombre y apellidos" />
+          </div>
+          <div class="field">
+            <label for="user-email">Correo</label>
+            <input id="user-email" type="email" placeholder="usuario@trt.com" />
+          </div>
+          <div class="field">
+            <label for="user-role">Rol</label>
+            <select id="user-role">
+              <option>Gerente</option>
+              <option>Cajero</option>
+              <option>Administrador</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="user-branch">Sucursal inicial</label>
+            <select id="user-branch">
+              <option>Matriz Centro</option>
+              <option>Norte Refacciones</option>
+              <option>Sucursal Oriente</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="user-status">Estado</label>
+            <select id="user-status">
+              <option>Activo</option>
+              <option>Invitado</option>
+            </select>
+          </div>
+          <div class="form-actions full">
+            <button class="btn-secondary" type="button">Cancelar</button>
+            <button class="btn-primary" type="button">
+              <lucide-icon name="Plus" [size]="17" aria-hidden="true"></lucide-icon>
+              Crear usuario
+            </button>
+          </div>
+        </form>
+      </article>
+    </section>
+
+    <section class="panel">
+      <div class="panel-header wide">
+        <div>
+          <h2>Asignar gerentes a sucursal</h2>
+          <p>Una sucursal puede tener uno o varios gerentes responsables.</p>
+        </div>
+        <button class="btn-secondary compact" type="button">
+          <lucide-icon name="Check" [size]="17" aria-hidden="true"></lucide-icon>
+          Aplicar cambios
+        </button>
+      </div>
+
+      <div class="assignment-layout">
+        <div class="field">
+          <label for="assignment-branch">Sucursal</label>
+          <select id="assignment-branch">
+            <option>Matriz Centro</option>
+            <option>Norte Refacciones</option>
+            <option>Sucursal Oriente</option>
+          </select>
+        </div>
+
+        <div class="manager-picker" aria-label="Gerentes disponibles">
+          @for (manager of managerOptions; track manager) {
+            <label class="manager-chip">
+              <input type="checkbox" [checked]="$index < 2" />
+              <span>{{ manager }}</span>
+            </label>
+          }
+        </div>
+      </div>
+    </section>
+
+    <section class="data-grid">
+      <article class="table-panel">
+        <div class="panel-header">
+          <div>
+            <h2>Sucursales registradas</h2>
+            <p>Vista de control y responsables.</p>
+          </div>
+        </div>
+
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Sucursal</th>
+                <th>Gerentes</th>
+                <th>Cajeros</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (branch of branches; track branch.id) {
+                <tr>
+                  <td>
+                    <strong>{{ branch.name }}</strong>
+                    <span>{{ branch.id }} · {{ branch.address }}</span>
+                  </td>
+                  <td>
+                    @if (branch.managers.length > 0) {
+                      <div class="tag-list">
+                        @for (manager of branch.managers; track manager) {
+                          <span class="tag">{{ manager }}</span>
+                        }
+                      </div>
+                    } @else {
+                      <span class="muted">Sin gerente</span>
+                    }
+                  </td>
+                  <td>{{ branch.cashiers }}</td>
+                  <td><span class="status" [class.pending]="branch.status === 'Pendiente'">{{ branch.status }}</span></td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="table-panel">
+        <div class="panel-header">
+          <div>
+            <h2>Usuarios recientes</h2>
+            <p>Roles creados desde administración.</p>
+          </div>
+        </div>
+
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Usuario</th>
+                <th>Rol</th>
+                <th>Sucursal</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (user of users; track user.name) {
+                <tr>
+                  <td><strong>{{ user.name }}</strong></td>
+                  <td>{{ user.role }}</td>
+                  <td>{{ user.branch }}</td>
+                  <td><span class="status" [class.pending]="user.status === 'Invitado'">{{ user.status }}</span></td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+  </main>
+</div>

@@ -8,9 +8,6 @@
 
   <div class="product-row">
     <span class="product-price">${{ product().precioVenta }}</span>
-    <span class="product-stock" [class.low-stock]="product().existencia <= 5">
-      {{ product().existencia }}
-    </span>
   </div>
 
   <div class="product-actions">

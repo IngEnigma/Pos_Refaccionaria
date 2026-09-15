@@ -48,6 +48,59 @@ export const routes: Routes = [
       import('@features/suppliers/suppliers.routes').then((m) => m.SUPPLIERS_ROUTES),
   },
   {
+    path: AppRoutes.branches,
+    canActivate: [authGuard],
+    component: MainLayoutComponent,
+    loadChildren: () =>
+      import('@features/branches/branches.routes').then((m) => m.BRANCHES_ROUTES),
+  },
+  {
+    path: AppRoutes.clients,
+    canActivate: [authGuard],
+    component: MainLayoutComponent,
+    loadChildren: () =>
+      import('@features/clients/clients.routes').then((m) => m.CLIENTS_ROUTES),
+  },
+  {
+    path: AppRoutes.admin,
+    canActivate: [authGuard],
+    component: MainLayoutComponent,
+    loadChildren: () =>
+      import('@features/admin/admin.routes').then((m) => m.ADMIN_ROUTES),
+  },
+  {
+    path: AppRoutes.manager,
+    canActivate: [authGuard],
+    component: MainLayoutComponent,
+    loadChildren: () =>
+      import('@features/manager/manager.routes').then((m) => m.MANAGER_ROUTES),
+  },
+  {
+    path: AppRoutes.notifications,
+    canActivate: [authGuard],
+    component: MainLayoutComponent,
+    loadChildren: () =>
+      import('@features/notifications/notifications.routes').then((m) => m.NOTIFICATIONS_ROUTES),
+  },
+  {
+    path: AppRoutes.branchPricing,
+    canActivate: [authGuard],
+    component: MainLayoutComponent,
+    loadChildren: () =>
+      import('@features/branch-pricing/branch-pricing.routes').then(
+        (m) => m.BRANCH_PRICING_ROUTES,
+      ),
+  },
+  {
+    path: AppRoutes.inventoryByBranch,
+    canActivate: [authGuard],
+    component: MainLayoutComponent,
+    loadChildren: () =>
+      import('@features/inventory-by-branch/inventory-by-branch.routes').then(
+        (m) => m.INVENTORY_BY_BRANCH_ROUTES,
+      ),
+  },
+  {
     path: '',
     pathMatch: 'full',
     redirectTo: AppRoutes.login,

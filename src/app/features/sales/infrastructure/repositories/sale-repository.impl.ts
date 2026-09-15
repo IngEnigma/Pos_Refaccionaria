@@ -132,8 +132,9 @@ export class SaleRepositoryImpl implements SaleRepository {
 
     return SaleFactory.fromPrimitives({
       id: id ?? 0,
-      idUsuario: (payload as CreateSalePayload).idUsuario ?? null,
-      idMetodoPago: (payload as CreateSalePayload).idMetodoPago ?? null,
+      idUsuario: null,
+      idInventario: 'idInventario' in payload ? (payload as CreateSalePayload).idInventario : null,
+      idMetodoPago: (payload as CreateSalePayload).idMetodoPago ?? (payload as UpdateSalePayload).idMetodoPago ?? null,
       total,
       fecha,
     });

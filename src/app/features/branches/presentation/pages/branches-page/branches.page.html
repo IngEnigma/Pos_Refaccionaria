@@ -1,0 +1,55 @@
+<div class="branches-root">
+  <main class="branches-main animate-slide-up">
+    <section class="branches-section">
+      <div class="section-header">
+        <div>
+          <h1 class="page-title">Sucursales</h1>
+          <p class="page-subtitle">Gestiona las sucursales de tu refaccionaria.</p>
+        </div>
+        <button class="btn-add-branch" (click)="onAddBranch()">
+          <lucide-icon name="Plus" [size]="18"></lucide-icon> Registrar Sucursal
+        </button>
+      </div>
+
+      <div class="branches-grid">
+        <ng-container *ngIf="!branchesFacade.loading()">
+          <app-branch-card
+            *ngFor="let branch of branchesFacade.branches()"
+            [branch]="branch"
+            (edit)="onEditBranch($event)"
+            (delete)="onDeleteBranch($event)"
+          />
+        </ng-container>
+
+        <!-- Loading State -->
+        <ng-container *ngIf="branchesFacade.loading()">
+          <div *ngFor="let i of [1,2,3]" class="branch-card skeleton-card">
+            <div class="skeleton-header">
+              <div class="skeleton-avatar"></div>
+              <div class="skeleton-lines">
+                <div class="skeleton-line short"></div>
+                <div class="skeleton-line tiny"></div>
+              </div>
+            </div>
+            <div class="skeleton-body">
+              <div class="skeleton-line"></div>
+              <div class="skeleton-line"></div>
+            </div>
+            <div class="skeleton-footer">
+              <div class="skeleton-btn"></div>
+              <div class="skeleton-btn"></div>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="!branchesFacade.loading() && branchesFacade.branches().length === 0" class="empty-state">
+        <div class="empty-content">
+          <lucide-icon name="Building" [size]="48"></lucide-icon>
+          <p>No se encontraron sucursales registradas.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>

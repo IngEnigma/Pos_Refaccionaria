@@ -1,0 +1,38 @@
+<article
+  class="notification-item"
+  [class.unread]="!notification().leida"
+  [attr.aria-label]="notification().titulo"
+>
+  <div class="notification-icon" [class]="colorClass">
+    <lucide-icon [name]="icon" [size]="18"></lucide-icon>
+  </div>
+
+  <div class="notification-content">
+    <h4 class="notification-title">{{ notification().titulo }}</h4>
+    <p class="notification-message">{{ notification().mensaje }}</p>
+    <time class="notification-date" [attr.datetime]="notification().creadoEn.toISOString()">
+      {{ notification().creadoEn | date:'short' }}
+    </time>
+  </div>
+
+  <div class="notification-actions">
+    @if (!notification().leida) {
+      <button
+        class="action-btn"
+        (click)="onMarkAsRead($event)"
+        title="Marcar como leída"
+        aria-label="Marcar como leída"
+      >
+        <lucide-icon name="Check" [size]="16"></lucide-icon>
+      </button>
+    }
+    <button
+      class="action-btn danger"
+      (click)="onDelete($event)"
+      title="Eliminar notificación"
+      aria-label="Eliminar notificación"
+    >
+      <lucide-icon name="Trash2" [size]="16"></lucide-icon>
+    </button>
+  </div>
+</article>

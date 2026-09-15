@@ -1,0 +1,116 @@
+<div class="cashiers-root">
+  <main class="cashiers-main animate-slide-up">
+    <section class="page-header">
+      <div>
+        <p class="eyebrow">Gerente</p>
+        <h1 class="page-title">Cajeros de mi sucursal</h1>
+        <p class="page-subtitle">Alta visual de cajeros asignados a la sucursal del gerente.</p>
+      </div>
+      <button class="btn-primary" type="button">
+        <lucide-icon name="Plus" [size]="18" aria-hidden="true"></lucide-icon>
+        Nuevo cajero
+      </button>
+    </section>
+
+    <section class="layout-grid">
+      <article class="panel">
+        <div class="panel-header">
+          <div>
+            <h2>Crear cajero</h2>
+            <p>El gerente solo puede registrar usuarios con rol cajero.</p>
+          </div>
+        </div>
+
+        <form class="form-grid">
+          <div class="field full">
+            <label for="cashier-name">Nombre completo</label>
+            <input id="cashier-name" type="text" placeholder="Nombre y apellidos" />
+          </div>
+          <div class="field">
+            <label for="cashier-email">Correo</label>
+            <input id="cashier-email" type="email" placeholder="cajero@trt.com" />
+          </div>
+          <div class="field">
+            <label for="cashier-phone">Teléfono</label>
+            <input id="cashier-phone" type="tel" placeholder="55 1234 5678" />
+          </div>
+          <div class="field">
+            <label for="cashier-shift">Turno</label>
+            <select id="cashier-shift">
+              <option>Matutino</option>
+              <option>Vespertino</option>
+              <option>Mixto</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="cashier-status">Estado</label>
+            <select id="cashier-status">
+              <option>Activo</option>
+              <option>Invitado</option>
+            </select>
+          </div>
+          <div class="form-actions full">
+            <button class="btn-secondary" type="button">Limpiar</button>
+            <button class="btn-primary" type="button">
+              <lucide-icon name="Save" [size]="17" aria-hidden="true"></lucide-icon>
+              Crear cajero
+            </button>
+          </div>
+        </form>
+      </article>
+
+      <aside class="summary-panel">
+        <div class="summary-card">
+          <span class="summary-icon">
+            <lucide-icon name="Users" [size]="20" aria-hidden="true"></lucide-icon>
+          </span>
+          <div>
+            <strong>3</strong>
+            <span>Cajeros registrados</span>
+          </div>
+        </div>
+        <div class="summary-card">
+          <span class="summary-icon">
+            <lucide-icon name="ShieldCheck" [size]="20" aria-hidden="true"></lucide-icon>
+          </span>
+          <div>
+            <strong>Matriz Centro</strong>
+            <span>Sucursal asignada</span>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="table-panel">
+      <div class="panel-header">
+        <div>
+          <h2>Cajeros recientes</h2>
+          <p>Vista de usuarios creados por el gerente.</p>
+        </div>
+      </div>
+
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Cajero</th>
+              <th>Correo</th>
+              <th>Turno</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (cashier of cashiers; track cashier.email) {
+              <tr>
+                <td><strong>{{ cashier.name }}</strong></td>
+                <td>{{ cashier.email }}</td>
+                <td>{{ cashier.shift }}</td>
+                <td><span class="status" [class.pending]="cashier.status === 'Invitado'">{{ cashier.status }}</span></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>

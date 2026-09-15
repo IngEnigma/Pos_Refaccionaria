@@ -16,9 +16,16 @@ export class ReportRepositoryImpl implements ReportRepository {
   getReport(params: ReportParams): Observable<Blob> {
     let httpParams = new HttpParams().set('tipo', params.tipo);
 
-    if (params.tipo === 'month') {
+    if (params.tipo === 'month' || params.tipo === 'quincena') {
       if (params.year) httpParams = httpParams.set('year', params.year.toString());
       if (params.month) httpParams = httpParams.set('month', params.month.toString());
+      if (params.tipo === 'quincena' && params.quincena) {
+        httpParams = httpParams.set('quincena', params.quincena.toString());
+      }
+    }
+
+    if (params.tipo === 'year') {
+      if (params.year) httpParams = httpParams.set('year', params.year.toString());
     }
 
     return this.http.get(this.endpoint, {

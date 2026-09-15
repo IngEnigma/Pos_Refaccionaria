@@ -1,24 +1,44 @@
 <div class="sales-root">
   <main class="sales-main animate-slide-up">
     <section class="catalog-section">
-      <h2 class="section-title">Categorías</h2>
+      @if (!authFacade.sucursalId()) {
+        <div class="empty-state">
+          <div class="empty-content">
+            <p>Tu usuario no tiene sucursal asignada.</p>
+            <span class="empty-hint">Contacta al administrador para asignarte una sucursal.</span>
+          </div>
+        </div>
+      } @else {
+        <h2 class="section-title">Categorías</h2>
 
-      <app-category-slider
-        [categories]="categories()"
-        [isLoading]="loadingCategories()"
-        [selectedCategoryId]="selectedCategoryId()"
-        (selected)="onSelectCategory($event)"
-      />
-      
-      <h2 class="section-title">Productos</h2>
+        <app-category-slider
+          [categories]="categories()"
+          [isLoading]="loadingCategories()"
+          [selectedCategoryId]="selectedCategoryId()"
+          (selected)="onSelectCategory($event)"
+        />
 
-      <app-product-grid
-        [products]="productos()"
-        [loadingProducts]="loadingProducts()"
-        (addToCart)="onAddToCart($event)"
-        (loadMore)="onLoadMore()"
-      />
+        <div class="barcode-input-wrapper">
+          <input
+            type="text"
+            class="barcode-input"
+            placeholder="Escanear código de barras..."
+            [ngModel]="barcodeInput()"
+            (ngModelChange)="barcodeInput.set($event)"
+            (keydown)="onBarcodeKeyDown($event)"
+            autofocus
+          />
+        </div>
+        
+        <h2 class="section-title">Productos</h2>
 
+        <app-product-grid
+          [products]="productos()"
+          [loadingProducts]="loadingProducts()"
+          (addToCart)="onAddToCart($event)"
+          (loadMore)="onLoadMore()"
+        />
+      }
     </section>
   </main>
 

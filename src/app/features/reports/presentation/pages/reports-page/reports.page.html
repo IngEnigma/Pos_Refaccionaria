@@ -24,14 +24,15 @@
               <select id="periodType" [ngModel]="selectedType()" (ngModelChange)="selectedType.set($event)">
                 <option value="day">Hoy</option>
                 <option value="week">Semana Actual</option>
-                <option value="biweek">Quincena Actual</option>
+                <option value="quincena">Quincenal (Específico)</option>
                 <option value="month">Mensual (Específico)</option>
+                <option value="year">Anual (Específico)</option>
               </select>
             </div>
           </div>
 
           <!-- Conditional Selectors -->
-          @if (selectedType() === 'month') {
+          @if (selectedType() === 'month' || selectedType() === 'quincena') {
             <div class="input-group animate-fade-in">
               <label for="monthSelect">Mes</label>
               <div class="select-wrapper">
@@ -42,7 +43,22 @@
                 </select>
               </div>
             </div>
+          }
 
+          @if (selectedType() === 'quincena') {
+            <div class="input-group animate-fade-in">
+              <label for="quincenaSelect">Quincena</label>
+              <div class="select-wrapper">
+                <select id="quincenaSelect" [ngModel]="selectedQuincena()" (ngModelChange)="selectedQuincena.set($event)">
+                  @for (q of quincenas; track q.value) {
+                    <option [value]="q.value">{{ q.label }}</option>
+                  }
+                </select>
+              </div>
+            </div>
+          }
+
+          @if (selectedType() === 'month' || selectedType() === 'quincena' || selectedType() === 'year') {
             <div class="input-group animate-fade-in">
               <label for="yearSelect">Año</label>
               <div class="select-wrapper">

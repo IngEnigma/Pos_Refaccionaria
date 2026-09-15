@@ -1,0 +1,46 @@
+<div class="pricing-root">
+  <main class="pricing-main animate-slide-up">
+    <section class="pricing-section">
+      <div class="section-header">
+        <div>
+          <h1 class="page-title">Precios por Sucursal</h1>
+          <p class="page-subtitle">Configura precios especiales por producto en cada sucursal.</p>
+        </div>
+      </div>
+
+      <div class="branch-selector-card">
+        <div class="selector-content">
+          <lucide-icon name="Building" [size]="20" class="selector-icon"></lucide-icon>
+          <label for="branch-select">Sucursal:</label>
+          <select
+            id="branch-select"
+            class="branch-select"
+            [ngModel]="selectedSucursalId()"
+            (ngModelChange)="onBranchChange($event)"
+          >
+            <option [ngValue]="null" disabled>Selecciona una sucursal</option>
+            <option *ngFor="let branch of branches()" [ngValue]="branch.id">
+              {{ branch.nombreSucursal }} — {{ branch.ubicacion }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <ng-container *ngIf="selectedSucursalId() as sid; else noBranchSelected">
+        <app-branch-pricing-table
+          [sucursalId]="sid"
+          (setPrice)="onSetPrice({ productId: $event, sucursalId: sid })"
+        />
+      </ng-container>
+
+      <ng-template #noBranchSelected>
+        <div class="empty-state">
+          <div class="empty-content">
+            <lucide-icon name="Building" [size]="48"></lucide-icon>
+            <p>Selecciona una sucursal para gestionar sus precios.</p>
+          </div>
+        </div>
+      </ng-template>
+    </section>
+  </main>
+</div>

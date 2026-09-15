@@ -1,0 +1,47 @@
+<div class="movement-list">
+  <h3 class="list-title">Movimientos recientes</h3>
+
+  <div class="movements" *ngIf="!loading() && movements().length > 0">
+    <div
+      *ngFor="let movement of movements()"
+      class="movement-item"
+      [class]="movementClass(movement.tipo)">
+      <div class="movement-icon">
+        <lucide-icon [name]="movementIcon(movement.tipo)" [size]="18"></lucide-icon>
+      </div>
+      <div class="movement-body">
+        <div class="movement-header">
+          <span class="movement-type">{{ movementLabel(movement.tipo) }}</span>
+          <span class="movement-date">{{ formatDate(movement.fecha) }}</span>
+        </div>
+        <div class="movement-meta">
+          <span class="movement-quantity">Cantidad: {{ movement.cantidad }}</span>
+          <span class="movement-reason">{{ movement.razon }}</span>
+        </div>
+        <div class="movement-observations" *ngIf="movement.observaciones">
+          <lucide-icon name="Info" [size]="12"></lucide-icon>
+          {{ movement.observaciones }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="movements-skeleton" *ngIf="loading()">
+    <div class="movement-skeleton" *ngFor="let i of [1,2,3,4]">
+      <div class="skeleton-icon"></div>
+      <div class="skeleton-lines">
+        <div class="skeleton-line short"></div>
+        <div class="skeleton-line"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!loading() && movements().length === 0">
+    <div class="empty-content">
+      <lucide-icon name="History" [size]="32"></lucide-icon>
+      <p>No hay movimientos registrados.</p>
+    </div>
+  </div>
+</div>

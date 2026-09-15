@@ -1,5 +1,6 @@
 export interface DetailedSaleDTO {
   id: number;
+  id_inventario: number | null;
   fecha: string;
   total: string;
   detalles: Array<{

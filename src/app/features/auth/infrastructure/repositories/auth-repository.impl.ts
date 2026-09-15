@@ -3,6 +3,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, catchError, map, tap, throwError } from 'rxjs';
 
 import { AUTH_ENDPOINTS } from '@features/auth/config/auth-endpoints';
+import { withoutTrailingSlash } from '@core/interceptors/trailing-slash.interceptor';
 import { APP_ENV } from '@core/tokens/app-env.token';
 import { Environment } from '@env/environment.model';
 import { LOGGER_PORT } from '@core/logging/logger.port';
@@ -35,7 +36,9 @@ export class AuthRepositoryImpl implements AuthRepository {
       password: credentials.password,
     };
 
-    return this.http.post<LoginResponseDto>(url, payload).pipe(
+    // El backend define `login` sin slash final: sin el bypass, el interceptor
+    // lo convierte en `/api/login/` y Django responde 404.
+    return this.http.post<LoginResponseDto>(url, payload, { context: withoutTrailingSlash() }).pipe(
       map((dto) => SessionMapper.fromLoginResponse(dto)),
       tap((session) => {
         this.logger.debug('Login request succeeded', { url, userId: session.userId });
@@ -51,7 +54,8 @@ export class AuthRepositoryImpl implements AuthRepository {
     const url = `${this.env.apiUrl}${AUTH_ENDPOINTS.REFRESH}`;
     const payload: RefreshTokenRequestDto = { refresh: refreshToken };
 
-    return this.http.post<RefreshTokenResponseDto>(url, payload).pipe(
+    // Igual que login: el backend define `token/refresh` sin slash final.
+    return this.http.post<RefreshTokenResponseDto>(url, payload, { context: withoutTrailingSlash() }).pipe(
       map((dto) => dto.access),
       tap(() => {
         this.logger.debug('Refresh request succeeded', { url });

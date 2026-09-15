@@ -1,0 +1,43 @@
+<div class="notifications-page">
+  <header class="page-header">
+    <h1 class="page-title">
+      <lucide-icon name="Bell" [size]="24"></lucide-icon>
+      Notificaciones
+    </h1>
+    @if (facade.unreadCount() > 0) {
+      <app-button variant="ghost" size="sm" (onClick)="onMarkAllAsRead()">
+        <lucide-icon name="CheckCheck" [size]="16"></lucide-icon>
+        Marcar todo como leído
+      </app-button>
+    }
+  </header>
+
+  @if (facade.errorMessage()) {
+    <div class="error-banner">
+      <lucide-icon name="CircleAlert" [size]="18"></lucide-icon>
+      {{ facade.errorMessage() }}
+    </div>
+  }
+
+  @if (facade.loading() && facade.notifications().length === 0) {
+    <div class="loading-state">
+      <lucide-icon name="RefreshCw" [size]="24" class="spin"></lucide-icon>
+      Cargando notificaciones...
+    </div>
+  } @else if (facade.notifications().length === 0) {
+    <div class="empty-state">
+      <lucide-icon name="BellOff" [size]="48"></lucide-icon>
+      <p>No tienes notificaciones</p>
+    </div>
+  } @else {
+    <section class="notifications-list" aria-label="Lista de notificaciones">
+      @for (notification of facade.notifications(); track notification.id) {
+        <app-notification-item
+          [notification]="notification"
+          (markAsRead)="onMarkAsRead($event)"
+          (deleteNotification)="onDelete($event)"
+        />
+      }
+    </section>
+  }
+</div>

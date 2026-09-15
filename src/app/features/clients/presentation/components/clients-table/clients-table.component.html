@@ -1,0 +1,76 @@
+<div class="table-container">
+  <table class="clients-table">
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Teléfono</th>
+        <th>Correo</th>
+        <th>RFC</th>
+        <th class="actions-column">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Loading State -->
+      <ng-container *ngIf="loading()">
+        <tr *ngFor="let i of skeletonRows">
+          <td><app-skeleton width="180px" height="20px"></app-skeleton></td>
+          <td><app-skeleton width="100px" height="20px"></app-skeleton></td>
+          <td><app-skeleton width="150px" height="20px"></app-skeleton></td>
+          <td><app-skeleton width="100px" height="20px"></app-skeleton></td>
+          <td class="actions-cell">
+            <app-skeleton width="80px" height="32px"></app-skeleton>
+          </td>
+        </tr>
+      </ng-container>
+
+      <!-- Data State -->
+      <ng-container *ngIf="!loading()">
+        <tr *ngFor="let client of clients()" class="client-row">
+          <td>
+            <div class="client-name">
+              <div class="avatar">
+                {{ client.nombre.charAt(0).toUpperCase() }}
+              </div>
+              <span>{{ getFullName(client) }}</span>
+            </div>
+          </td>
+          <td>{{ client.telefono }}</td>
+          <td>
+            <ng-container *ngIf="client.correo; else noEmail">
+              <a [href]="'mailto:' + client.correo" class="mail-link">{{ client.correo }}</a>
+            </ng-container>
+            <ng-template #noEmail>
+              <span class="text-muted">—</span>
+            </ng-template>
+          </td>
+          <td>
+            <span class="rfc-badge" *ngIf="client.rfc; else noRfc">{{ client.rfc }}</span>
+            <ng-template #noRfc>
+              <span class="text-muted">—</span>
+            </ng-template>
+          </td>
+          <td class="actions-cell">
+            <div class="action-buttons">
+              <button class="btn-action edit" (click)="edit.emit(client)" title="Editar">
+                <lucide-icon name="Pencil" [size]="16"></lucide-icon>
+              </button>
+              <button class="btn-action delete" (click)="delete.emit(client)" title="Eliminar">
+                <lucide-icon name="Trash2" [size]="16"></lucide-icon>
+              </button>
+            </div>
+          </td>
+        </tr>
+
+        <!-- Empty State -->
+        <tr *ngIf="clients().length === 0">
+          <td colspan="5" class="empty-state">
+            <div class="empty-content">
+              <lucide-icon name="Users" [size]="48"></lucide-icon>
+              <p>No se encontraron clientes registrados.</p>
+            </div>
+          </td>
+        </tr>
+      </ng-container>
+    </tbody>
+  </table>
+</div>

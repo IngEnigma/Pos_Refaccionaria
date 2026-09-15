@@ -7,11 +7,12 @@ import { PaginationParams } from '@core/models/pagination.model';
 import { GetProductsUseCase } from '../usecase/get-products.usecase';
 import { GetProductsByCategoryUseCase } from '../usecase/get-products-by-category.usecase';
 import { SearchProductsUseCase } from '../usecase/search-products.usecase';
+import { GetProductByBarcodeUseCase } from '../usecase/get-product-by-barcode.usecase';
 import { CreateProductUseCase } from '../usecase/create-product.usecase';
 import { UpdateProductUseCase } from '../usecase/update-product.usecase';
 import { DeleteProductUseCase } from '../usecase/delete-product.usecase';
 import { Product } from '../../domain/entities/product.entity';
-import { CreateProductPayload, UpdateProductPayload } from '../../domain/repository/product-repository';
+import { CreateProductPayload, ProductSearchParams, UpdateProductPayload } from '../../domain/repository/product-repository';
 
 export type ProductFilter = 
   | { type: 'all' }
@@ -23,6 +24,7 @@ export class InventoryFacade {
   private readonly getProductsUseCase = inject(GetProductsUseCase);
   private readonly getProductsByCategoryUseCase = inject(GetProductsByCategoryUseCase);
   private readonly searchProductsUseCase = inject(SearchProductsUseCase);
+  private readonly getProductByBarcodeUseCase = inject(GetProductByBarcodeUseCase);
   private readonly deleteProductUseCase = inject(DeleteProductUseCase);
   private readonly createProductUseCase = inject(CreateProductUseCase);
   private readonly updateProductUseCase = inject(UpdateProductUseCase);
@@ -46,9 +48,9 @@ export class InventoryFacade {
   readonly pageSize = this._pageSize.asReadonly();
   readonly productFilter = this._productFilter.asReadonly();
 
-  loadProducts(pageIndex: number = 1, append: boolean = false): void {
+  loadProducts(pageIndex: number = 1, append: boolean = false, searchParams?: ProductSearchParams): void {
     this._productFilter.set({ type: 'all' });
-    this.fetchProducts(this._productFilter(), pageIndex, append);
+    this.fetchProducts(this._productFilter(), pageIndex, append, searchParams);
   }
 
   loadProductsByCategoria(categoria: string, pageIndex: number = 1, append: boolean = false): void {
@@ -57,18 +59,21 @@ export class InventoryFacade {
     this.fetchProducts(filter, pageIndex, append);
   }
 
-  searchProducts(query: string, pageIndex: number = 1, append: boolean = false): void {
+  searchProducts(query: string, pageIndex: number = 1, append: boolean = false, searchParams?: ProductSearchParams): void {
     if (!query.trim()) {
-      this.loadProducts(1, false);
+      this.loadProducts(1, false, searchParams);
       return;
     }
     const filter: ProductFilter = { type: 'search', query };
     this._productFilter.set(filter);
-    this.fetchProducts(filter, pageIndex, append);
+    this.fetchProducts(filter, pageIndex, append, searchParams);
   }
 
-  private fetchProducts(filter: ProductFilter, pageIndex: number, append: boolean): void {
-    // Cancel any pending request before starting a new one
+  getProductByBarcode(codigoBarras: string): Observable<Product | null> {
+    return this.getProductByBarcodeUseCase.execute(codigoBarras);
+  }
+
+  private fetchProducts(filter: ProductFilter, pageIndex: number, append: boolean, searchParams?: ProductSearchParams): void {
     this._fetchSubscription?.unsubscribe();
 
     this._loading.set(true);
@@ -90,10 +95,10 @@ export class InventoryFacade {
         useCase$ = this.getProductsByCategoryUseCase.execute(filter.categoryName, params);
         break;
       case 'search':
-        useCase$ = this.searchProductsUseCase.execute(filter.query, params);
+        useCase$ = this.searchProductsUseCase.execute(filter.query, params, searchParams);
         break;
       default:
-        useCase$ = this.getProductsUseCase.execute(params);
+        useCase$ = this.getProductsUseCase.execute(params, searchParams);
         break;
     }
 

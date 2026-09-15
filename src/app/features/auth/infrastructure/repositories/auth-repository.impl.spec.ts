@@ -76,11 +76,12 @@ describe('AuthRepositoryImpl', () => {
   });
 
   it('posts refresh request and returns access token', () => {
+    // El backend expone POST /api/token/refresh (SimpleJWT, ver usuario/urls.py).
     repository.refresh('refresh-token').subscribe((access) => {
       expect(access).toBe('new-access');
     });
 
-    const req = httpMock.expectOne('http://api.test/refresh');
+    const req = httpMock.expectOne('http://api.test/token/refresh');
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toEqual({ refresh: 'refresh-token' });
     req.flush({ access: 'new-access' });

@@ -22,6 +22,7 @@ export class ReportsPageComponent {
   readonly selectedType = signal<ReportType>('day');
   readonly selectedYear = signal(new Date().getFullYear());
   readonly selectedMonth = signal(new Date().getMonth() + 1);
+  readonly selectedQuincena = signal<1 | 2>(1);
 
   readonly years = computed(() => {
     const currentYear = new Date().getFullYear();
@@ -43,14 +44,26 @@ export class ReportsPageComponent {
     { value: 12, label: 'Diciembre' },
   ];
 
-  generateReport(): void {
-    const params: ReportParams = {
-      tipo: this.selectedType(),
-    };
+  readonly quincenas = [
+    { value: 1 as 1 | 2, label: 'Primera Quincena' },
+    { value: 2 as 1 | 2, label: 'Segunda Quincena' },
+  ];
 
-    if (this.selectedType() === 'month') {
+  generateReport(): void {
+    const tipo = this.selectedType();
+    const params: ReportParams = { tipo };
+
+    if (tipo === 'month' || tipo === 'quincena') {
       params.year = this.selectedYear();
       params.month = this.selectedMonth();
+    }
+
+    if (tipo === 'quincena') {
+      params.quincena = this.selectedQuincena();
+    }
+
+    if (tipo === 'year') {
+      params.year = this.selectedYear();
     }
 
     this.loading.set(true);

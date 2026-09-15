@@ -22,9 +22,9 @@ import { LOGGING_LEVEL_TOKEN } from '@core/logging/logging-level.token';
 import { LogLevel } from '@core/logging/log-level.enum';
 import { AuthRepository } from '@features/auth/domain/repository/auth-repository';
 import { AuthRepositoryImpl } from '@features/auth/infrastructure/repositories/auth-repository.impl';
+import { ProfileRepository } from '@features/auth/domain/repository/profile-repository';
+import { ProfileRepositoryImpl } from '@features/auth/infrastructure/repositories/profile-repository.impl';
 import { AuthFacade } from '@features/auth';
-import { MovementRepository } from '@features/movements/domain/repository/movement-repository';
-import { MovementRepositoryImpl } from '@features/movements/infrastructure/repositories/movement-repository.impl';
 import { SaleDetailRepository } from '@features/sales/domain/repository/sale-detail-repository';
 import { SaleDetailRepositoryImpl } from '@features/sales/infrastructure/repositories/sale-detail-repository.impl';
 import { SaleRepository } from '@features/sales/domain/repository/sale-repository';
@@ -41,6 +41,14 @@ import { ProductRepository } from '@features/inventory/domain/repository/product
 import { ProductRepositoryImpl } from '@features/inventory/infrastructure/repositories/product-repository.impl';
 import { ReportRepository } from '@features/reports/domain/repository/report-repository';
 import { ReportRepositoryImpl } from '@features/reports/infrastructure/repositories/report-repository.impl';
+import { NotificationRepository } from '@features/notifications/domain/repository/notification-repository';
+import { NotificationRepositoryImpl } from '@features/notifications/infrastructure/repositories/notification-repository.impl';
+import { BranchRepository } from '@features/branches/domain/repository/branch-repository';
+import { BranchRepositoryImpl } from '@features/branches/infrastructure/repositories/branch-repository.impl';
+import { InventoryRepository } from '@features/inventory-by-branch/domain/repository/inventory-repository';
+import { InventoryRepositoryImpl } from '@features/inventory-by-branch/infrastructure/repositories/inventory-repository.impl';
+import { InventoryMovementRepository } from '@features/inventory-by-branch/domain/repository/movement-repository';
+import { InventoryMovementRepositoryImpl } from '@features/inventory-by-branch/infrastructure/repositories/movement-repository.impl';
 import { SEARCH_STRATEGY } from '@core/search/search.strategy';
 import { DefaultSearchStrategy } from '@core/search/default-search.strategy';
 import { routes } from '@app/app.routes';
@@ -54,12 +62,16 @@ import {
 } from '@shell/config/shell-auth.token';
 import {
   Bell,
+  BellOff,
+  Check,
+  CheckCheck,
   Eye,
   EyeClosed,
   EyeOff,
   FileText,
   History,
   House,
+  Info,
   LogOut,
   LucideAngularModule,
   Package,
@@ -89,9 +101,16 @@ import {
   Archive,
   ShieldCheck,
   Save,
-  Check,
   BarChart3,
   Truck,
+  Building,
+  MapPin,
+  Phone,
+  Warehouse,
+  ArrowDownLeft,
+  ArrowUpRight,
+  Hash,
+  Activity,
 } from 'lucide-angular';
 
 export const appConfig: ApplicationConfig = {
@@ -113,6 +132,10 @@ export const appConfig: ApplicationConfig = {
         EyeClosed,
         EyeOff,
         Bell,
+        BellOff,
+        Check,
+        CheckCheck,
+        Info,
         RefreshCw,
         Search,
         Settings,
@@ -138,9 +161,16 @@ export const appConfig: ApplicationConfig = {
         Archive,
         ShieldCheck,
         Save,
-        Check,
         BarChart3,
         Truck,
+        Building,
+        MapPin,
+        Phone,
+        Warehouse,
+        ArrowDownLeft,
+        ArrowUpRight,
+        Hash,
+        Activity,
       }),
     ),
     {
@@ -167,6 +197,10 @@ export const appConfig: ApplicationConfig = {
     {
       provide: AuthRepository,
       useClass: AuthRepositoryImpl,
+    },
+    {
+      provide: ProfileRepository,
+      useClass: ProfileRepositoryImpl,
     },
     {
       provide: SHELL_USER_ROLE,
@@ -209,10 +243,6 @@ export const appConfig: ApplicationConfig = {
       useExisting: ProductRepositoryImpl,
     },
     {
-      provide: MovementRepository,
-      useExisting: MovementRepositoryImpl,
-    },
-    {
       provide: SaleDetailRepository,
       useExisting: SaleDetailRepositoryImpl,
     },
@@ -231,6 +261,22 @@ export const appConfig: ApplicationConfig = {
     {
       provide: ReportRepository,
       useClass: ReportRepositoryImpl,
+    },
+    {
+      provide: NotificationRepository,
+      useClass: NotificationRepositoryImpl,
+    },
+    {
+      provide: BranchRepository,
+      useClass: BranchRepositoryImpl,
+    },
+    {
+      provide: InventoryRepository,
+      useClass: InventoryRepositoryImpl,
+    },
+    {
+      provide: InventoryMovementRepository,
+      useClass: InventoryMovementRepositoryImpl,
     },
     {
       provide: SEARCH_STRATEGY,

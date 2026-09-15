@@ -16,6 +16,7 @@ export class SaleMapper {
     return SaleFactory.fromPrimitives({
       id: dto.id,
       idUsuario: dto.id_usuario,
+      idInventario: dto.id_inventario,
       idMetodoPago: dto.id_metodoPago,
       total,
       fecha: dto.fecha,
@@ -24,7 +25,7 @@ export class SaleMapper {
 
   static toCreateRequestDto(payload: CreateSalePayload): SaleCreateRequestDto {
     return {
-      id_usuario: payload.idUsuario,
+      id_inventario: payload.idInventario,
       id_metodoPago: payload.idMetodoPago,
       productos: payload.productos,
     };

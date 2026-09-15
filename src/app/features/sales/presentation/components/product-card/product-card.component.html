@@ -14,14 +14,22 @@
   <p class="product-desc">{{ product().descripcion }}</p>
 
   <div class="product-row">
-    <span class="product-price">${{ product().precio }}</span>
-    <span class="product-stock">{{ product().stock }}</span>
+    <span class="product-price">
+      ${{ product().precio }}
+      @if (product().hasSucursalPrice) {
+        <span class="sucursal-badge">Sucursal</span>
+      }
+    </span>
+    <span class="product-stock" [class.stock-zero]="product().stock === 0">
+      {{ product().stock }}
+    </span>
   </div>
 
   <app-button
     variant="primary"
     size="compact"
     [fullWidth]="true"
+    [disabled]="product().stock === 0"
     (onClick)="onAdd()"
   >
     Añadir

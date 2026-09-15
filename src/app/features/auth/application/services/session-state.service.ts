@@ -11,6 +11,7 @@ import { JwtUtils } from '@core/utils/jwt.utils';
 @Injectable({ providedIn: 'root' })
 export class SessionStateService {
   private readonly _session = signal<Session | null>(null);
+  private readonly _currentSucursalId = signal<number | null>(null);
   private readonly STORAGE_KEY = 'session';
   private readonly REMEMBER_KEY = 'session:remember';
   private rememberSession = false;
@@ -19,6 +20,7 @@ export class SessionStateService {
   private readonly persistentStorage =
     inject<StoragePort>(PERSISTENT_STORAGE_PORT);
   readonly session = this._session.asReadonly();
+  readonly currentSucursalId = this._currentSucursalId.asReadonly();
   readonly isAuthenticated = computed(() => {
     const session = this.session();
     if (!session) return false;
@@ -123,8 +125,14 @@ export class SessionStateService {
     }
   }
 
+  setSucursalId(idSucursal: number | null): void {
+    this._currentSucursalId.set(idSucursal);
+    this.logger.debug('Sucursal ID set', { idSucursal });
+  }
+
   clearSession() {
     this.setSession(null, { persist: true });
+    this._currentSucursalId.set(null);
     this.logger.info('Session cleared');
   }
 

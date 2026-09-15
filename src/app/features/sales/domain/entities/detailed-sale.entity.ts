@@ -16,6 +16,7 @@ export interface DetailedSaleItem {
 
 export interface DetailedSaleProps {
   id: number;
+  idInventario: number | null;
   fecha: string;
   total: number;
   detalles: DetailedSaleItem[];
@@ -23,12 +24,14 @@ export interface DetailedSaleProps {
 
 export class DetailedSale {
   readonly id: number;
+  readonly idInventario: number | null;
   readonly fecha: SaleDate;
   readonly total: Money;
   readonly detalles: DetailedSaleItem[];
 
   constructor(props: DetailedSaleProps) {
     this.id = props.id;
+    this.idInventario = props.idInventario;
     this.fecha = SaleDate.fromPrimitive(props.fecha, 'DetailedSale.fecha');
     this.total = Money.fromNumber(props.total, 'DetailedSale.total');
     this.detalles = props.detalles;

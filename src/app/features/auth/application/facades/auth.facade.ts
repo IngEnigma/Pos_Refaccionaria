@@ -1,9 +1,11 @@
 import { inject, Injectable, signal } from '@angular/core';
-import { catchError, finalize, map, Observable, of } from 'rxjs';
+import { catchError, finalize, map, Observable, of, tap } from 'rxjs';
 
 import { LOGGER_PORT } from '@core/logging/logger.port';
 import { LoginUseCase } from '@features/auth/application/usecase/login.usecase';
 import { LoginCommand } from '@features/auth/application/commands/login.command';
+import { GetMyProfileUseCase } from '@features/auth/application/usecases/get-my-profile.usecase';
+import { UpdateMySucursalUseCase } from '@features/auth/application/usecases/update-my-sucursal.usecase';
 import { SessionStateService } from '@features/auth/application/services/session-state.service';
 import {
   AuthError,
@@ -14,6 +16,8 @@ import {
 @Injectable({ providedIn: 'root' })
 export class AuthFacade {
   private readonly loginUseCase = inject(LoginUseCase);
+  private readonly getMyProfileUseCase = inject(GetMyProfileUseCase);
+  private readonly updateMySucursalUseCase = inject(UpdateMySucursalUseCase);
   private readonly sessionState = inject(SessionStateService);
   private readonly logger = inject(LOGGER_PORT).withContext('AuthFacade');
 
@@ -25,6 +29,7 @@ export class AuthFacade {
   readonly username = this.sessionState.username;
   readonly role = this.sessionState.role;
   readonly isAuthenticated = this.sessionState.isAuthenticated;
+  readonly sucursalId = this.sessionState.currentSucursalId;
 
   login(command: LoginCommand): Observable<boolean> {
     this._loading.set(true);
@@ -41,6 +46,28 @@ export class AuthFacade {
       finalize(() => {
         this._loading.set(false);
       }),
+    );
+  }
+
+  refreshProfile(): Observable<void> {
+    return this.getMyProfileUseCase.execute().pipe(
+      tap((profile) => {
+        this.sessionState.setSucursalId(profile.idSucursal);
+      }),
+      map(() => undefined),
+      catchError((error: unknown) => {
+        this.logger.warn('Failed to refresh profile', error);
+        return of(undefined);
+      }),
+    );
+  }
+
+  updateMySucursal(idSucursal: number | null): Observable<void> {
+    return this.updateMySucursalUseCase.execute(idSucursal).pipe(
+      tap((profile) => {
+        this.sessionState.setSucursalId(profile.idSucursal);
+      }),
+      map(() => undefined),
     );
   }
 

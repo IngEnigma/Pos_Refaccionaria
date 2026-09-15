@@ -26,6 +26,19 @@
   color: var(--ds-text-strong);
 }
 
+.sucursal-chip {
+  display: inline-block;
+  font-size: var(--pr-font-size-xs);
+  font-weight: var(--pr-weight-medium);
+  font-family: var(--pr-font-text);
+  color: var(--ds-text-base);
+  background-color: var(--ds-bg-subtle);
+  border: 1px solid var(--ds-border-subtle);
+  border-radius: var(--pr-radius-sm);
+  padding: calc(var(--pr-space-1) / 4) var(--pr-space-2);
+  margin-top: calc(var(--pr-space-1) / 2);
+}
+
 .date {
   font-size: var(--pr-font-size-sm);
   font-weight: var(--pr-weight-regular);

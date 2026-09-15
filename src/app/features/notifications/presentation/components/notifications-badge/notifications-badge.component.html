@@ -1,0 +1,45 @@
+<app-dropdown #notificationsDropdown>
+  <app-icon-button
+    appDropdownTrigger
+    icon="bell"
+    label="Notificaciones"
+    [isActive]="notificationsDropdown.open()"
+  />
+
+  <app-dropdown-menu>
+    <div class="notifications-header">
+      <span class="notifications-title">Notificaciones</span>
+      @if (facade.unreadCount() > 0) {
+        <button class="mark-all-btn" (click)="onMarkAllAsRead()">
+          Marcar todo como leído
+        </button>
+      }
+    </div>
+
+    <div class="notifications-list">
+      @if (facade.loading()) {
+        <app-dropdown-item [disabled]="true">
+          Cargando...
+        </app-dropdown-item>
+      } @else if (facade.notifications().length === 0) {
+        <app-dropdown-item [disabled]="true">
+          No hay notificaciones
+        </app-dropdown-item>
+      } @else {
+        @for (notification of facade.notifications(); track notification.id) {
+          <app-notification-item
+            [notification]="notification"
+            (markAsRead)="onMarkAsRead($event)"
+            (deleteNotification)="onDelete($event)"
+          />
+        }
+      }
+    </div>
+  </app-dropdown-menu>
+</app-dropdown>
+
+@if (facade.unreadCount() > 0) {
+  <span class="unread-badge" [attr.aria-label]="facade.unreadCount() + ' notificaciones sin leer'">
+    {{ facade.unreadCount() }}
+  </span>
+}

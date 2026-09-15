@@ -1,5 +1,6 @@
 import 'zone.js';
 import 'zone.js/testing';
+import '@testing-library/jest-dom';
 import { TestBed } from '@angular/core/testing';
 import {
   BrowserDynamicTestingModule,

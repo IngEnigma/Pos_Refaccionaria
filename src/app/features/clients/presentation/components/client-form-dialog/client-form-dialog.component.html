@@ -1,0 +1,97 @@
+<div class="client-form-container">
+  <header class="dialog-header">
+    <div class="header-icon">
+      <lucide-icon [name]="isEditMode ? 'Edit' : 'PlusCircle'" [size]="24"></lucide-icon>
+    </div>
+    <div class="header-content">
+      <h2 class="dialog-title">{{ isEditMode ? 'Editar Cliente' : 'Nuevo Cliente' }}</h2>
+      <p class="dialog-subtitle">Información de contacto y datos fiscales.</p>
+    </div>
+    <button class="btn-close" (click)="onCancel()" aria-label="Cerrar">
+      <lucide-icon name="X" [size]="20"></lucide-icon>
+    </button>
+  </header>
+
+  <form [formGroup]="clientForm" (ngSubmit)="onSubmit()" class="dialog-form">
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="nombre">Nombre(s)</label>
+        <div class="input-wrapper" [class.error]="isFieldInvalid('nombre')">
+          <lucide-icon name="User" [size]="18" class="input-icon"></lucide-icon>
+          <input id="nombre" type="text" formControlName="nombre" placeholder="Juan">
+        </div>
+        <span class="error-text" *ngIf="isFieldInvalid('nombre')">El nombre es requerido (mín. 2 caracteres)</span>
+      </div>
+
+      <div class="form-group">
+        <label for="apellidoPaterno">Apellido Paterno</label>
+        <div class="input-wrapper" [class.error]="isFieldInvalid('apellidoPaterno')">
+          <lucide-icon name="User" [size]="18" class="input-icon"></lucide-icon>
+          <input id="apellidoPaterno" type="text" formControlName="apellidoPaterno" placeholder="Pérez">
+        </div>
+        <span class="error-text" *ngIf="isFieldInvalid('apellidoPaterno')">El apellido paterno es requerido</span>
+      </div>
+
+      <div class="form-group">
+        <label for="apellidoMaterno">Apellido Materno</label>
+        <div class="input-wrapper">
+          <lucide-icon name="User" [size]="18" class="input-icon"></lucide-icon>
+          <input id="apellidoMaterno" type="text" formControlName="apellidoMaterno" placeholder="García (opcional)">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="telefono">Teléfono</label>
+        <div class="input-wrapper" [class.error]="isFieldInvalid('telefono')">
+          <lucide-icon name="Phone" [size]="18" class="input-icon"></lucide-icon>
+          <input id="telefono" type="text" formControlName="telefono" placeholder="2711234567">
+        </div>
+        <span class="error-text" *ngIf="isFieldInvalid('telefono')">Teléfono inválido (7-15 caracteres)</span>
+      </div>
+
+      <div class="form-group">
+        <label for="correo">Correo Electrónico</label>
+        <div class="input-wrapper" [class.error]="isFieldInvalid('correo')">
+          <lucide-icon name="FileText" [size]="18" class="input-icon"></lucide-icon>
+          <input id="correo" type="email" formControlName="correo" placeholder="correo@ejemplo.com (opcional)">
+        </div>
+        <span class="error-text" *ngIf="isFieldInvalid('correo')">Correo electrónico inválido</span>
+      </div>
+
+      <div class="form-group">
+        <label for="rfc">RFC</label>
+        <div class="input-wrapper" [class.error]="isFieldInvalid('rfc')">
+          <lucide-icon name="Hash" [size]="18" class="input-icon"></lucide-icon>
+          <input id="rfc" type="text" formControlName="rfc" placeholder="XXXX000000XXX (opcional)" maxlength="13">
+        </div>
+        <span class="error-text" *ngIf="isFieldInvalid('rfc')">Máximo 13 caracteres</span>
+      </div>
+
+      <div class="form-group full-width">
+        <label for="direccion">Dirección</label>
+        <div class="input-wrapper">
+          <lucide-icon name="MapPin" [size]="18" class="input-icon"></lucide-icon>
+          <input id="direccion" type="text" formControlName="direccion" placeholder="Calle, Número, Colonia, Ciudad (opcional)">
+        </div>
+      </div>
+    </div>
+
+    <footer class="dialog-footer">
+      <app-button 
+        type="button" 
+        variant="secondary" 
+        (click)="onCancel()"
+        class="footer-btn">
+        Cancelar
+      </app-button>
+      <app-button 
+        type="submit" 
+        variant="primary" 
+        [disabled]="clientForm.invalid"
+        class="footer-btn">
+        <lucide-icon [name]="isEditMode ? 'Save' : 'Check'" [size]="18"></lucide-icon>
+        {{ isEditMode ? 'Guardar Cambios' : 'Registrar Cliente' }}
+      </app-button>
+    </footer>
+  </form>
+</div>

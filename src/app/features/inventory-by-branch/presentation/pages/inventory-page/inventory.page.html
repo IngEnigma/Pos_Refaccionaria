@@ -1,0 +1,51 @@
+<div class="inventory-root">
+  <main class="inventory-main animate-slide-up">
+    <section class="inventory-section">
+      <div class="section-header">
+        <div>
+          <h1 class="page-title">Inventario por Sucursal</h1>
+          <p class="page-subtitle">Consulta existencias y registra movimientos de tu sucursal.</p>
+        </div>
+        <button class="btn-add-movement" (click)="onAddMovement()">
+          <lucide-icon name="Plus" [size]="18"></lucide-icon> Registrar Movimiento
+        </button>
+      </div>
+
+      <!-- Empty state: sin sucursal asignada -->
+      <div class="empty-state" *ngIf="!authFacade.sucursalId()">
+        <div class="empty-content">
+          <lucide-icon name="Warehouse" [size]="48"></lucide-icon>
+          <p>Tu usuario no tiene sucursal asignada.</p>
+          <span class="empty-hint">Contacta al administrador para asignarte una sucursal.</span>
+        </div>
+      </div>
+
+      <!-- Contenido con sucursal -->
+      <div class="inventory-content" *ngIf="authFacade.sucursalId()">
+        <div class="inventory-panel">
+          <div class="panel-header">
+            <h2 class="panel-title">
+              <lucide-icon name="Package" [size]="20"></lucide-icon>
+              Productos en Inventario
+            </h2>
+            <span class="panel-badge" *ngIf="inventoryFacade.allItems().length > 0">
+              {{ inventoryFacade.allItems().length }} productos
+            </span>
+          </div>
+          <app-inventory-table
+            [items]="inventoryFacade.allItems()"
+            [loading]="inventoryFacade.loading()"
+            (registerMovement)="onRegisterMovement($event)"
+          />
+        </div>
+
+        <div class="movements-panel">
+          <app-movement-list
+            [movements]="inventoryFacade.movements()"
+            [loading]="inventoryFacade.loading()"
+          />
+        </div>
+      </div>
+    </section>
+  </main>
+</div>

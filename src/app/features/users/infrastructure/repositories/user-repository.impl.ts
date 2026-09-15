@@ -3,6 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 
 import { APP_ENV } from '@core/tokens/app-env.token';
+import { withoutTrailingSlash } from '@core/interceptors/trailing-slash.interceptor';
 import { Environment } from '@env/environment.model';
 import { UserResponseDto } from '@features/users/application/dtos/user-response.dto';
 import { User } from '@features/users/domain/entities/user.entity';
@@ -19,25 +20,27 @@ export class UserRepositoryImpl implements UserRepository {
   private readonly env = inject<Environment>(APP_ENV);
   private readonly endpoint = `${this.env.apiUrl}/users`;
 
+  // El backend define `users` y `users/<id>` sin slash final (ver usuario/urls.py):
+  // sin el bypass, el interceptor los convierte en `.../users/` y Django responde 404.
   getUsers(): Observable<User[]> {
-    return this.http.get<UserResponseDto[]>(this.endpoint).pipe(
+    return this.http.get<UserResponseDto[]>(this.endpoint, { context: withoutTrailingSlash() }).pipe(
       map((response) => response.map((dto) => UserMapper.fromResponseDto(dto))),
     );
   }
 
   createUser(payload: CreateUserPayload): Observable<User> {
     return this.http
-      .post<UserResponseDto>(this.endpoint, UserMapper.toCreateRequestDto(payload))
+      .post<UserResponseDto>(this.endpoint, UserMapper.toCreateRequestDto(payload), { context: withoutTrailingSlash() })
       .pipe(map((dto) => UserMapper.fromResponseDto(dto)));
   }
 
   updateUser(id: number, payload: UpdateUserPayload): Observable<User> {
     return this.http
-      .put<UserResponseDto>(`${this.endpoint}/${id}`, UserMapper.toUpdateRequestDto(payload))
+      .put<UserResponseDto>(`${this.endpoint}/${id}`, UserMapper.toUpdateRequestDto(payload), { context: withoutTrailingSlash() })
       .pipe(map((dto) => UserMapper.fromResponseDto(dto)));
   }
 
   deleteUser(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.endpoint}/${id}`);
+    return this.http.delete<void>(`${this.endpoint}/${id}`, { context: withoutTrailingSlash() });
   }
 }

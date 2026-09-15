@@ -47,14 +47,12 @@ export class ProductFormDialogComponent implements OnInit {
       clave: [p?.clave || '', [Validators.required]],
       codigoBarras: [p?.codigoBarras || '', [Validators.required]],
       idTipo: [p?.idTipo || null, [Validators.required]],
-      precioVenta: [p?.precioVenta || 0, [Validators.required, Validators.min(0)]],
-      costo: [p?.costo || 0, [Validators.required, Validators.min(0)]],
-      existencia: [p?.existencia || 0, [Validators.required, Validators.min(0)]],
+      precioVenta: [p?.precioVenta ?? 0, [Validators.required, Validators.min(0)]],
+      costo: [p?.costo ?? 0, [Validators.required, Validators.min(0)]],
       marca: [p?.marca || '', [Validators.required]],
-      descripcion: [p?.descripcion || ''],
-      codigoSat: [p?.codigoSat || ''],
-      idProveedor: [p?.idProveedor || null],
-      idMovimientos: [p?.idMovimientos || null],
+      descripcion: [p?.descripcion ?? ''],
+      codigoSat: [p?.codigoSat ?? '', [Validators.maxLength(8)]],
+      idProveedor: [p?.idProveedor ?? null],
     });
   }
 
@@ -64,7 +62,19 @@ export class ProductFormDialogComponent implements OnInit {
       return;
     }
 
-    this.dialogRef.close(this.productForm.value);
+    const rawValue = this.productForm.value;
+    const payload = {
+      ...rawValue,
+      descripcion: this.normalizeOptionalString(rawValue.descripcion),
+      codigoSat: this.normalizeOptionalString(rawValue.codigoSat),
+    };
+
+    this.dialogRef.close(payload);
+  }
+
+  private normalizeOptionalString(value: string | null | undefined): string | null {
+    const trimmed = value?.trim();
+    return trimmed || null;
   }
 
   onCancel(): void {

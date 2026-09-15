@@ -7,8 +7,9 @@ export class SessionMapper {
 
   static fromLoginResponse(response: LoginResponseDto): Session {
     const { accessToken, refreshToken } = this.normalizeResponse(response);
+    const normalizedUser = this.normalizeUser(response.user);
 
-    const role = mapAuthUserRole(response.user.isAdmin, response.user.isStaff);
+    const role = mapAuthUserRole(normalizedUser.isAdmin, normalizedUser.isStaff);
     const accessExp = JwtUtils.decodeExpiration(accessToken);
     const refreshExp = refreshToken ? JwtUtils.decodeExpiration(refreshToken) : 0;
 
@@ -27,6 +28,13 @@ export class SessionMapper {
     return {
       accessToken: response.accessToken ?? response.access ?? '',
       refreshToken: response.refreshToken ?? response.refresh ?? null,
+    };
+  }
+
+  static normalizeUser(user: any): { isAdmin: boolean; isStaff: boolean } {
+    return {
+      isAdmin: user.isAdmin ?? user.isadmin ?? false,
+      isStaff: user.isStaff ?? user.isstaff ?? false,
     };
   }
 }

@@ -1,7 +1,6 @@
 import { inject, Injectable, signal } from '@angular/core';
-import { catchError, finalize, of, throwError } from 'rxjs';
+import { catchError, finalize, of } from 'rxjs';
 
-import { SessionStateService } from '@features/auth/application/services/session-state.service';
 import { LOGGER_PORT } from '@core/logging/logger.port';
 import { CreateSaleUseCase } from '@features/sales/application/usecase/create-sale.usecase';
 import { GetSalesUseCase } from '@features/sales/application/usecase/get-sales.usecase';
@@ -17,7 +16,6 @@ export class SalesFacade {
   private readonly getSalesUseCase = inject(GetSalesUseCase);
   private readonly getPaymentMethodsUseCase = inject(GetPaymentMethodsUseCase);
   private readonly logger = inject(LOGGER_PORT).withContext('SalesFacade');
-  private readonly sessionState = inject(SessionStateService);
 
   private readonly _sales = signal<readonly Sale[]>([]);
   private readonly _paymentMethods = signal<readonly PaymentMethod[]>([]);
@@ -77,15 +75,9 @@ export class SalesFacade {
       });
   }
 
-  createSale(payload: Omit<CreateSalePayload, 'idUsuario'>) {
-    const session = this.sessionState.getSession();
-    const userId = session ? Number(session.userId) : NaN;
-    if (!Number.isFinite(userId)) {
-      return throwError(() => new Error('No se pudo determinar el usuario actual.'));
-    }
-
+  createSale(payload: CreateSalePayload) {
     this._isCreatingSale.set(true);
-    return this.createSaleUseCase.execute({ ...payload, idUsuario: userId }).pipe(
+    return this.createSaleUseCase.execute(payload).pipe(
       finalize(() => {
         this._isCreatingSale.set(false);
       })

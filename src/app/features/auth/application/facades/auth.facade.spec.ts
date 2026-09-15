@@ -1,10 +1,15 @@
 import { TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
 
+import { TestBed } from '@angular/core/testing';
+import { of, throwError } from 'rxjs';
+
 import { AuthFacade } from './auth.facade';
 import { SessionStateService } from '@features/auth/application/services/session-state.service';
 import { STORAGE_PORT, PERSISTENT_STORAGE_PORT } from '@core/ports/storage.port';
 import { LoginUseCase } from '@features/auth/application/usecase/login.usecase';
+import { GetMyProfileUseCase } from '@features/auth/application/usecases/get-my-profile.usecase';
+import { UpdateMySucursalUseCase } from '@features/auth/application/usecases/update-my-sucursal.usecase';
 import { LOGGER_PORT, LoggerPort } from '@core/logging/logger.port';
 import { Session } from '@features/auth/domain/entities/auth-session.entity';
 import { UserRole } from '@features/auth/domain/value-objects/auth-user-role.enum';
@@ -34,6 +39,9 @@ describe('AuthFacade', () => {
         AuthFacade,
         SessionStateService,
         { provide: LoginUseCase, useValue: loginUseCase },
+        // La facade (Fase 1 perfil/sucursal) también inyecta estos use-cases.
+        { provide: GetMyProfileUseCase, useValue: { execute: jest.fn() } },
+        { provide: UpdateMySucursalUseCase, useValue: { execute: jest.fn() } },
         { provide: LOGGER_PORT, useValue: loggerPort },
         { provide: STORAGE_PORT, useValue: { getItem: jest.fn(), setJSON: jest.fn(), removeItem: jest.fn() } },
         { provide: PERSISTENT_STORAGE_PORT, useValue: { getItem: jest.fn(), setJSON: jest.fn(), removeItem: jest.fn(), getJSON: jest.fn() } },

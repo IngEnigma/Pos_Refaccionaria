@@ -11,7 +11,7 @@ import { DropdownTriggerDirective } from '@shared/ui/components/dropdown/dropdow
 import { DropdownMenuComponent } from '@shared/ui/components/dropdown/dropdown-menu.component';
 import { DropdownItemComponent } from '@shared/ui/components/dropdown/dropdown-item.component';
 import { LucideAngularModule } from 'lucide-angular';
-import { NotificationItem } from '@shell/models/notification.model';
+import { NotificationsBadgeComponent } from '@features/notifications/presentation/components/notifications-badge/notifications-badge.component';
 
 @Component({
   selector: 'app-navbar',
@@ -24,6 +24,7 @@ import { NotificationItem } from '@shell/models/notification.model';
     DropdownMenuComponent,
     DropdownItemComponent,
     LucideAngularModule,
+    NotificationsBadgeComponent,
   ],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.css',
@@ -33,8 +34,7 @@ export class NavbarComponent {
   readonly username = input.required<string>();
   readonly currentDate = input.required<string>();
   readonly profileIconPath = input('user');
-  readonly notificationsIconPath = input('bell');
-  readonly notifications = input<NotificationItem[]>([]);
+  readonly sucursalId = input<number | null>(null);
 
   readonly logoutClick = output<void>();
   readonly searchChange = output<string>();

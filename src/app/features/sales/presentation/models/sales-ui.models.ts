@@ -6,7 +6,9 @@ export interface SalesProduct {
   descripcion: string;
   precio: number;
   stock: number;
+  codigoBarras: string;
   imagen: string;
+  hasSucursalPrice: boolean;
 }
 
 export interface SalesCartItem {

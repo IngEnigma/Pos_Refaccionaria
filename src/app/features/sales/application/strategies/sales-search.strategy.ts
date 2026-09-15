@@ -12,24 +12,23 @@ export class SalesSearchStrategy implements SearchStrategy<SalesProduct> {
 
     const trimmedQuery = query.trim();
 
-    // 1. Coincidencia exacta por ID (asumiendo que funge como código de barras en este modelo)
-    const exactMatch = items.find(
-      (item) => item.id.toString() === trimmedQuery
+    const barcodeMatch = items.find(
+      (item) => item.codigoBarras === trimmedQuery
     );
 
-    if (exactMatch) {
-      return [exactMatch];
+    if (barcodeMatch) {
+      return [barcodeMatch];
     }
 
-    // 2. Búsqueda difusa (fuzzy search) con Fuse.js
     const fuse = new Fuse(items, {
       keys: [
-        { name: 'nombre', weight: 0.7 },
-        { name: 'descripcion', weight: 0.3 }
+        { name: 'nombre', weight: 0.6 },
+        { name: 'descripcion', weight: 0.2 },
+        { name: 'codigoBarras', weight: 0.2 },
       ],
-      threshold: 0.4, // Qué tan estricta es la similitud (0.0 exacto, 1.0 muy flexible)
+      threshold: 0.4,
       includeScore: true,
-      shouldSort: true
+      shouldSort: true,
     });
 
     const results = fuse.search(trimmedQuery);

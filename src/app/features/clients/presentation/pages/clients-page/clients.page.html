@@ -1,0 +1,22 @@
+<div class="clients-root">
+  <main class="clients-main animate-slide-up">
+    <section class="clients-section">
+      <div class="section-header">
+        <div>
+          <h1 class="page-title">Clientes</h1>
+          <p class="page-subtitle">Gestiona el registro de clientes de la sucursal.</p>
+        </div>
+        <button class="btn-add-client" (click)="onAddClient()">
+          <lucide-icon name="Plus" [size]="18"></lucide-icon> Registrar Cliente
+        </button>
+      </div>
+
+      <app-clients-table
+        [clients]="clientsFacade.clients()"
+        [loading]="clientsFacade.loading()"
+        (edit)="onEditClient($event)"
+        (delete)="onDeleteClient($event)"
+      />
+    </section>
+  </main>
+</div>

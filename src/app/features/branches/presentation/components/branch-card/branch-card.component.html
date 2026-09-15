@@ -1,0 +1,37 @@
+<div class="branch-card">
+  <div class="branch-header">
+    <div class="branch-avatar">
+      <lucide-icon name="Building" [size]="22"></lucide-icon>
+    </div>
+    <div class="branch-meta">
+      <span class="branch-code" *ngIf="branch().codigoSucursal">{{ branch().codigoSucursal }}</span>
+      <h3 class="branch-name">{{ branch().nombreSucursal || 'Sin nombre' }}</h3>
+    </div>
+  </div>
+
+  <div class="branch-body">
+    <div class="branch-info" *ngIf="branch().ubicacion">
+      <lucide-icon name="MapPin" [size]="16"></lucide-icon>
+      <span>{{ branch().ubicacion }}</span>
+    </div>
+    <div class="branch-info" *ngIf="branch().numeroTelefono">
+      <lucide-icon name="Phone" [size]="16"></lucide-icon>
+      <span>{{ branch().numeroTelefono }}</span>
+    </div>
+    <div class="branch-info" *ngIf="branch().correoElectronico">
+      <lucide-icon name="Mail" [size]="16"></lucide-icon>
+      <span>{{ branch().correoElectronico }}</span>
+    </div>
+  </div>
+
+  <div class="branch-footer">
+    <button class="btn-action edit" (click)="edit.emit(branch())" title="Editar">
+      <lucide-icon name="Pencil" [size]="16"></lucide-icon>
+      Editar
+    </button>
+    <button class="btn-action delete" (click)="delete.emit(branch())" title="Eliminar">
+      <lucide-icon name="Trash2" [size]="16"></lucide-icon>
+      Eliminar
+    </button>
+  </div>
+</div>
