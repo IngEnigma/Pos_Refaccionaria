@@ -9,6 +9,7 @@ import { SalesProduct } from '../models/sales-ui.models';
 describe('SalesCartService', () => {
   let service: SalesCartService;
   const salesFacadeStub = {
+    createCompleteSale: () => of({ id: 1 } as never),
     createSale: () => of(void 0),
     loadSales: () => void 0,
   };
@@ -31,6 +32,8 @@ describe('SalesCartService', () => {
       descripcion: 'Desc',
       precio: 50,
       stock: 10,
+      codigoBarras: '7501234567890',
+      hasSucursalPrice: false,
       imagen: 'assets/images/test.jpg',
     };
 
@@ -48,6 +51,8 @@ describe('SalesCartService', () => {
       descripcion: 'Filtro 1234 • 2.5L',
       precio: 120,
       stock: 15,
+      codigoBarras: '7501234567891',
+      hasSucursalPrice: false,
       imagen: 'assets/images/filtro.jpg',
     };
 
@@ -65,6 +70,8 @@ describe('SalesCartService', () => {
       nombre: 'Filtro de aceite',
       precio: 120,
       stock: 15,
+      codigoBarras: '7501234567892',
+      hasSucursalPrice: false,
       imagen: 'assets/images/filtro.jpg',
       descripcion: '',
     };
@@ -81,6 +88,8 @@ describe('SalesCartService', () => {
       nombre: 'Filtro de aceite',
       precio: 120,
       stock: 15,
+      codigoBarras: '7501234567893',
+      hasSucursalPrice: false,
       imagen: 'assets/images/filtro.jpg',
       descripcion: '',
     };
@@ -106,7 +115,7 @@ describe('SalesCartService', () => {
     });
 
     it('throws error if no payment method selected', (done) => {
-      service.addToCart({ id: 1, nombre: 'Test', precio: 10, stock: 5, imagen: '', descripcion: '' });
+      service.addToCart({ id: 1, nombre: 'Test', precio: 10, stock: 5, codigoBarras: '001', hasSucursalPrice: false, imagen: '', descripcion: '' });
       service.confirmSale().subscribe({
         error: (err) => {
           expect(err.message).toBe('Selecciona un método de pago.');
@@ -115,9 +124,9 @@ describe('SalesCartService', () => {
       });
     });
 
-    it('calls facade.createSale when successful', (done) => {
-      const spy = jest.spyOn(salesFacadeStub, 'createSale').mockReturnValue(of(void 0));
-      service.addToCart({ id: 1, nombre: 'P1', precio: 100, stock: 5, imagen: '', descripcion: '' });
+    it('calls facade.createCompleteSale when successful', (done) => {
+      const spy = jest.spyOn(salesFacadeStub, 'createCompleteSale').mockReturnValue(of({ id: 99 } as never));
+      service.addToCart({ id: 1, nombre: 'P1', precio: 100, stock: 5, codigoBarras: '003', hasSucursalPrice: false, imagen: '', descripcion: '' });
       service.selectPayment({ id: 1, tipo: 'EFECTIVO', descripcion: 'Efectivo' });
 
       service.confirmSale().subscribe({

@@ -25,9 +25,7 @@ export class SaleMapper {
 
   static toCreateRequestDto(payload: CreateSalePayload): SaleCreateRequestDto {
     return {
-      id_inventario: payload.idInventario,
       id_metodoPago: payload.idMetodoPago,
-      productos: payload.productos,
     };
   }
 

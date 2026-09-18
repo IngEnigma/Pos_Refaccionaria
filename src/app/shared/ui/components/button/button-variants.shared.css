@@ -1,9 +1,15 @@
 /* Standard Button Variants */
 
-.button-primary,
-.button-primary:disabled {
+.button-primary {
   background-color: var(--ds-color-primary);
   color: var(--ds-text-on-primary);
+}
+
+.button-primary:disabled {
+  background-color: color-mix(in srgb, var(--pr-blue-600) 42%, var(--pr-grey-400) 58%);
+  color: var(--pr-grey-100);
+  border-color: transparent;
+  box-shadow: none;
 }
 
 .button-primary:hover:not(:disabled) {

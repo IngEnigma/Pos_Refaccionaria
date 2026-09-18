@@ -4,7 +4,9 @@ import { Sale } from '@features/sales/domain/entities/sale.entity';
 
 export interface CreateSalePayload {
   idMetodoPago: number;
-  idInventario: number;
+}
+
+export interface CreateCompleteSalePayload extends CreateSalePayload {
   productos: Array<{
     id: number;
     cantidad: number;

@@ -25,12 +25,9 @@ import {
   SalesProduct,
 } from '@features/sales/presentation/models/sales-ui.models';
 import { SalesCartService } from '@features/sales/presentation/state/sales-cart.service';
-import { InventoryFacade } from '@features/inventory';
 import { InventoryByBranchFacade } from '@features/inventory-by-branch';
-import { Product, ProductStock } from '@features/inventory/domain/entities/product.entity';
 import { ProductType } from '@features/sales/product-types/domain/entities/product-type.entity';
 import { GlobalSearchService } from '@core/search/global-search.service';
-import { SalesSearchStrategy } from '@features/sales/application/strategies/sales-search.strategy';
 
 @Component({
   selector: 'app-sales-page',
@@ -45,13 +42,12 @@ export class SalesPageComponent implements OnInit {
   readonly authFacade = inject(AuthFacade);
   readonly salesFacade = inject(SalesFacade);
   readonly productTypesFacade = inject(ProductTypesFacade);
-  readonly inventoryFacade = inject(InventoryFacade);
   readonly inventoryByBranchFacade = inject(InventoryByBranchFacade);
   readonly toastService = inject(ToastService);
   readonly cartService = inject(SalesCartService);
   private readonly destroyRef = inject(DestroyRef);
 
-  readonly loadingProducts = computed(() => this.inventoryFacade.loading());
+  readonly loadingProducts = computed(() => this.inventoryByBranchFacade.loading());
   readonly loadingCategories = computed(() => this.productTypesFacade.loading());
   readonly isCreatingSale = this.salesFacade.isCreatingSale;
   readonly submitDisabled = computed(() =>
@@ -69,7 +65,7 @@ export class SalesPageComponent implements OnInit {
     });
 
     effect(() => {
-      const errorMsg = this.inventoryFacade.errorMessage();
+      const errorMsg = this.inventoryByBranchFacade.errorMessage();
       if (errorMsg) {
         this.toastService.error(errorMsg);
       }
@@ -82,29 +78,16 @@ export class SalesPageComponent implements OnInit {
       }
     });
 
-    effect(() => {
-      const inventories = this.inventoryByBranchFacade.inventory();
-      if (inventories.length > 0) {
-        const firstInventory = inventories[0];
-        this.cartService.setVentaInventarioId(firstInventory.idInventario);
-      }
-    });
-
-    effect(() => {
-      const query = this.searchQuery();
-      const currentFilter = untracked(() => this.inventoryFacade.productFilter());
-      const sucursalId = untracked(() => this.authFacade.sucursalId());
-      const searchParams = sucursalId != null ? { sucursalId } : undefined;
-
-      if (query.trim() === '') {
-        if (currentFilter.type === 'search') {
-          this.inventoryFacade.loadProducts(1, false, searchParams);
+    // Carga reactiva: si sucursalId llega después (refreshProfile async en MainLayout)
+    effect(
+      () => {
+        const sucursalId = this.authFacade.sucursalId();
+        if (sucursalId != null) {
+          this.inventoryByBranchFacade.loadMyBranchInventory();
         }
-        return;
-      }
-
-      this.inventoryFacade.searchProducts(query, 1, false, searchParams);
-    }, { allowSignalWrites: true });
+      },
+      { allowSignalWrites: true }
+    );
   }
 
   ngOnInit(): void {
@@ -112,27 +95,16 @@ export class SalesPageComponent implements OnInit {
     this.salesFacade.loadPaymentMethods();
     this.productTypesFacade.loadProductTypes();
 
+    // Carga inicial si ya hay sucursal (ej. refresh)
     const sucursalId = this.authFacade.sucursalId();
     if (sucursalId != null) {
-      this.cartService.setVentaInventarioId(null);
       this.inventoryByBranchFacade.loadMyBranchInventory();
-
-      const searchParams = { sucursalId };
-      this.inventoryFacade.loadProducts(1, false, searchParams);
-    } else {
-      this.inventoryFacade.loadProducts();
     }
   }
 
   reloadSales(): void {
     this.salesFacade.loadSales();
-
-    const sucursalId = this.authFacade.sucursalId();
-    if (sucursalId != null) {
-      this.inventoryFacade.loadProducts(1, false, { sucursalId });
-    } else {
-      this.inventoryFacade.loadProducts();
-    }
+    this.inventoryByBranchFacade.loadMyBranchInventory();
   }
 
   private readonly defaultCategory: ProductType = { id: 0, nombre: 'Todos' };
@@ -142,30 +114,38 @@ export class SalesPageComponent implements OnInit {
   ]);
   readonly selectedCategoryId = signal<number | null>(null);
 
-  private readonly globalSearchService = inject(GlobalSearchService);
-  private readonly salesSearchStrategy = inject(SalesSearchStrategy);
-  readonly searchQuery = this.globalSearchService.searchQuery;
+  readonly searchQuery = inject(GlobalSearchService).searchQuery;
 
+  // Productos vienen exclusivamente de mi-sucursal (única fuente de stock/precio)
   readonly productos = computed<SalesProduct[]>(() => {
-    const products = this.inventoryFacade.products();
+    const items = this.inventoryByBranchFacade.allItems();
+    // Filtro local por búsqueda y categoría (sin consulta adicional a /productos)
+    const query = this.searchQuery().trim().toLowerCase();
+    const selectedCategoryId = this.selectedCategoryId();
+    // Nota: InventoryItem no expone id_tipo; filtro categoría deshabilitado si no hay mapeo
+    // Se mantiene el slider pero el filtrado se hace por nombre/clave si hay query
+    let filtered = items;
+    if (query) {
+      filtered = filtered.filter(
+        (it) =>
+          it.nombre.toLowerCase().includes(query) ||
+          it.clave.toLowerCase().includes(query) ||
+          it.codigoBarras.toLowerCase().includes(query) ||
+          it.marca.toLowerCase().includes(query)
+      );
+    }
+    // TODO: si se requiere filtro por tipo, InventoryItem debería incluir id_tipo/nombre_tipo
 
-    return products.map((product) => {
-      const hasStock = this.isProductStock(product);
-      const stock = hasStock ? (product as ProductStock).cantidad : 0;
-      const precioSucursal = hasStock ? (product as ProductStock).precioSucursal : null;
-      const precioBase = hasStock ? (product as ProductStock).precioBase : product.precioVenta;
-
-      return {
-        id: product.id,
-        nombre: product.nombre,
-        descripcion: product.descripcion || '',
-        precio: precioSucursal ?? precioBase,
-        stock,
-        codigoBarras: product.codigoBarras,
-        imagen: 'assets/images/Refaccionaria.webp',
-        hasSucursalPrice: precioSucursal !== null,
-      };
-    });
+    return filtered.map((item) => ({
+      id: item.idProducto,
+      nombre: item.nombre,
+      descripcion: item.clave,
+      precio: item.precioSucursal ?? item.precioBase,
+      stock: item.cantidad,
+      codigoBarras: item.codigoBarras,
+      imagen: 'assets/images/Refaccionaria.webp',
+      hasSucursalPrice: item.precioSucursal !== null,
+    }));
   });
 
   readonly cartItems = this.cartService.cart;
@@ -182,33 +162,22 @@ export class SalesPageComponent implements OnInit {
     const codigo = this.barcodeInput().trim();
     if (!codigo) return;
 
-    this.inventoryFacade.getProductByBarcode(codigo)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (product) => {
-          if (!product) {
-            this.toastService.error('Producto no registrado');
-            return;
-          }
+    // Búsqueda local en mi-sucursal (sin llamada a /productos/codigo-barras)
+    const existingProducts = this.productos();
+    const matched = existingProducts.find(
+      (p) => p.codigoBarras.trim().toLowerCase() === codigo.toLowerCase()
+    );
 
-          const existingProducts = this.productos();
-          const matched = existingProducts.find(p => p.id === product.id);
-
-          if (matched) {
-            if (matched.stock <= 0) {
-              this.toastService.error('Producto sin existencias en esta sucursal');
-              return;
-            }
-            this.onAddToCart(matched);
-            this.toastService.success(`${product.nombre} agregado al carrito`);
-          } else {
-            this.toastService.warning('Producto encontrado pero sin stock en esta sucursal');
-          }
-        },
-        error: () => {
-          this.toastService.error('Error al buscar producto por código de barras');
-        },
-      });
+    if (!matched) {
+      this.toastService.warning('Producto no encontrado en tu sucursal o sin stock');
+    } else {
+      if (matched.stock <= 0) {
+        this.toastService.error('Producto sin existencias en esta sucursal');
+      } else {
+        this.onAddToCart(matched);
+        this.toastService.success(`${matched.nombre} agregado al carrito`);
+      }
+    }
 
     this.barcodeInput.set('');
   }
@@ -219,14 +188,8 @@ export class SalesPageComponent implements OnInit {
 
   onSelectCategory(category: ProductType): void {
     this.selectedCategoryId.set(category.id);
-    const sucursalId = this.authFacade.sucursalId();
-    const searchParams = sucursalId != null ? { sucursalId } : undefined;
-
-    if (category.nombre === 'Todos') {
-      this.inventoryFacade.loadProducts(1, false, searchParams);
-    } else {
-      this.inventoryFacade.loadProductsByCategoria(category.nombre, 1, false);
-    }
+    // Filtrado local sobre mi-sucursal; no se consulta /productos
+    // Si necesitas filtro por categoría real, agregar id_tipo a InventoryItem
   }
 
   onIncreaseQty(item: SalesCartItem): void {
@@ -246,18 +209,32 @@ export class SalesPageComponent implements OnInit {
   }
 
   processTransaction(): void {
+    // Validación fresca contra stock actual de mi-sucursal (evita POST si el stock cambió desde que se agregó al carrito)
+    const freshStockById = new Map<number, number>(
+      this.inventoryByBranchFacade.allItems().map((it) => [it.idProducto, it.cantidad]),
+    );
+    for (const item of this.cartService.cart()) {
+      const freshStock = freshStockById.get(item.productId);
+      if (freshStock === undefined) {
+        this.toastService.error(`"${item.nombre}" ya no está disponible en tu sucursal. Recarga el catálogo.`);
+        this.inventoryByBranchFacade.loadMyBranchInventory();
+        return;
+      }
+      if (item.qty > freshStock) {
+        this.toastService.error(
+          `Stock insuficiente para "${item.nombre}": solicitas ${item.qty}, disponible ${freshStock}.`,
+        );
+        return;
+      }
+    }
+
     this.cartService
       .confirmSale()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
           this.toastService.success('Venta registrada correctamente.');
-          const sucursalId = this.authFacade.sucursalId();
-          if (sucursalId != null) {
-            this.inventoryFacade.loadProducts(1, false, { sucursalId });
-          } else {
-            this.inventoryFacade.loadProducts();
-          }
+          this.inventoryByBranchFacade.loadMyBranchInventory();
         },
         error: (error: unknown) => {
           const message =
@@ -265,15 +242,15 @@ export class SalesPageComponent implements OnInit {
               ? error.message
               : 'No fue posible registrar la venta.';
           this.toastService.error(message);
+          // Si el backend reportó stock insuficiente, refrescar para mostrar stock real
+          if (/stock|disponible|inventario/i.test(message)) {
+            this.inventoryByBranchFacade.loadMyBranchInventory();
+          }
         },
       });
   }
 
   onLoadMore(): void {
-    this.inventoryFacade.loadMore();
-  }
-
-  private isProductStock(product: Product): product is ProductStock {
-    return 'cantidad' in product && 'precioSucursal' in product;
+    // Paginación local no necesaria; mi-sucursal trae todo el inventario
   }
 }

@@ -17,12 +17,9 @@ export class SalesCartService {
   private readonly _cart = signal<SalesCartItem[]>([]);
   private readonly _selectedPayment = signal<SalesPaymentMethod | null>(null);
   private readonly _descuento = signal(0);
-  private readonly _ventaInventarioId = signal<number | null>(null);
-
   readonly cart = this._cart.asReadonly();
   readonly selectedPayment = this._selectedPayment.asReadonly();
   readonly descuento = this._descuento.asReadonly();
-  readonly ventaInventarioId = this._ventaInventarioId.asReadonly();
 
   readonly order = computed(() => {
     const o = new Order();
@@ -106,8 +103,9 @@ export class SalesCartService {
     this._descuento.set(0);
   }
 
-  setVentaInventarioId(idInventario: number | null): void {
-    this._ventaInventarioId.set(idInventario);
+  /** @deprecated idInventario ya no se envía al backend; se mantiene no-op para compatibilidad */
+  setVentaInventarioId(_idInventario: number | null): void {
+    return;
   }
 
   confirmSale(): Observable<void> {
@@ -121,20 +119,14 @@ export class SalesCartService {
       return throwError(() => new Error('Selecciona un método de pago.'));
     }
 
-    const inventarioId = this.ventaInventarioId();
-    if (inventarioId == null) {
-      return throwError(() => new Error('No hay inventario asignado para esta sucursal.'));
-    }
-
     const productos = cartItems.map((item) => ({
       id: item.productId,
       cantidad: item.qty,
     }));
 
     return this.facade
-      .createSale({
+      .createCompleteSale({
         idMetodoPago: paymentMethod.id,
-        idInventario: inventarioId,
         productos,
       })
       .pipe(

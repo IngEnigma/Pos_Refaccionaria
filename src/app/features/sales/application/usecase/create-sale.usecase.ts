@@ -13,14 +13,7 @@ export class CreateSaleUseCase {
   private readonly repository = inject(SaleRepository);
 
   execute(payload: CreateSalePayload): Observable<Sale> {
-    if (!payload.productos.length) {
-      throw new Error('CreateSale: at least one product is required');
-    }
-
-    payload.productos.forEach((item) => {
-      Quantity.fromNumber(item.cantidad, 'CreateSale.productos.cantidad');
-    });
-
+    if (!payload.idMetodoPago) throw new Error('CreateSale: idMetodoPago requerido');
     return this.repository.createSale(payload);
   }
 }

@@ -6,7 +6,7 @@ import { APP_ENV } from '@core/tokens/app-env.token';
 import { Environment } from '@env/environment.model';
 import { LOGGER_PORT } from '@core/logging/logger.port';
 import { SaleResponseDto } from '@features/sales/infrastructure/dtos/sale-response.dto';
-import { DetailedSaleDTO } from '@features/sales/infrastructure/dtos/detailed-sale.dto';
+import { SaleTicketDto } from '@features/sales/infrastructure/dtos/sale-ticket.dto';
 import { Sale, SaleFactory } from '@features/sales/domain/entities/sale.entity';
 import { DetailedSale } from '@features/sales/domain/entities/detailed-sale.entity';
 import {
@@ -50,9 +50,9 @@ export class SaleRepositoryImpl implements SaleRepository {
   }
 
   getSaleDetail(id: number): Observable<DetailedSale> {
-    const detailUrl = `${this.env.apiUrl}${SALE_ENDPOINTS.DETAIL}${id}/`;
-    return this.http.get<DetailedSaleDTO>(detailUrl).pipe(
-      map((dto) => DetailedSaleMapper.toDomain(dto)),
+    const detailUrl = `${this.env.apiUrl}${SALE_ENDPOINTS.TICKET}${id}/ticket/`;
+    return this.http.get<SaleTicketDto>(detailUrl).pipe(
+      map((dto) => DetailedSaleMapper.fromTicket(dto)),
       catchError((error: unknown) => {
         this.logger.error('Failed to fetch sale detail', { url: detailUrl, id, error });
         return throwError(
@@ -133,7 +133,7 @@ export class SaleRepositoryImpl implements SaleRepository {
     return SaleFactory.fromPrimitives({
       id: id ?? 0,
       idUsuario: null,
-      idInventario: 'idInventario' in payload ? (payload as CreateSalePayload).idInventario : null,
+      idInventario: null,
       idMetodoPago: (payload as CreateSalePayload).idMetodoPago ?? (payload as UpdateSalePayload).idMetodoPago ?? null,
       total,
       fecha,

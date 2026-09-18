@@ -38,6 +38,9 @@
           (addToCart)="onAddToCart($event)"
           (loadMore)="onLoadMore()"
         />
+        @if (!loadingProducts() && productos().length === 0) {
+          <p class="empty-hint">Sin productos con stock en tu sucursal.</p>
+        }
       }
     </section>
   </main>
