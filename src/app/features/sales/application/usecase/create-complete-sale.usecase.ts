@@ -7,6 +7,13 @@ import { SaleDetailRepository } from '@features/sales/domain/repository/sale-det
 import { Sale } from '@features/sales/domain/entities/sale.entity';
 import { Quantity } from '@features/sales/domain/value-objects/quantity.value';
 import { LOGGER_PORT } from '@core/logging/logger.port';
+import { SaleTicket } from '@features/sales/domain/entities/sale-ticket.entity';
+
+export interface CompleteSaleResult {
+  sale: Sale;
+  ticket: SaleTicket;
+}
+
 
 @Injectable({ providedIn: 'root' })
 export class CreateCompleteSaleUseCase {
@@ -14,7 +21,7 @@ export class CreateCompleteSaleUseCase {
   private readonly saleDetailRepository = inject(SaleDetailRepository);
   private readonly logger = inject(LOGGER_PORT).withContext('CreateCompleteSaleUseCase');
 
-  execute(payload: CreateCompleteSalePayload): Observable<Sale> {
+  execute(payload: CreateCompleteSalePayload): Observable<CompleteSaleResult> {
     if (!payload.productos.length) {
       return throwError(() => new Error('CreateCompleteSale: at least one product is required'));
     }
@@ -29,6 +36,7 @@ export class CreateCompleteSaleUseCase {
     }).pipe(
       concatMap((sale: Sale) => {
         createdSaleId = sale.id;
+
         const detailCalls = payload.productos.map((p) =>
           this.saleDetailRepository.createSaleDetail({
             productId: p.id,
@@ -36,21 +44,38 @@ export class CreateCompleteSaleUseCase {
             cantidad: p.cantidad,
           })
         );
+
         return forkJoin(detailCalls).pipe(
-          map(() => sale),
           catchError((error: unknown) => {
-            this.logger.error('Detalle falló, rollback venta', { saleId: createdSaleId, error });
+            this.logger.error('Detalle falló, rollback venta', {
+              saleId: createdSaleId,
+              error,
+            });
+
             if (createdSaleId != null) {
               return this.saleRepository.deleteSale(createdSaleId).pipe(
                 catchError((rollbackError: unknown) => {
-                  this.logger.error('Rollback falló', { saleId: createdSaleId, rollbackError });
+                  this.logger.error('Rollback falló', {
+                    saleId: createdSaleId,
+                    rollbackError,
+                  });
+
                   return throwError(() => error);
                 }),
                 concatMap(() => throwError(() => error))
               );
             }
+
             return throwError(() => error);
-          })
+          }),
+          concatMap(() =>
+            this.saleRepository.getSaleTicket(sale.id).pipe(
+              map((ticket) => ({
+                sale,
+                ticket,
+              })),
+            )
+          ),
         );
       })
     );

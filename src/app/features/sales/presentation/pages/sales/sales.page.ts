@@ -232,9 +232,17 @@ export class SalesPageComponent implements OnInit {
       .confirmSale()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: () => {
+        next: (result) => {
           this.toastService.success('Venta registrada correctamente.');
           this.inventoryByBranchFacade.loadMyBranchInventory();
+
+          window.desktop.generateTicket(result.ticket).then((response) => {
+            if (!response.success) {
+              this.toastService.error(
+                response.message ?? 'No fue posible generar el ticket.',
+              );
+            }
+          });
         },
         error: (error: unknown) => {
           const message =

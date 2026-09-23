@@ -8,6 +8,7 @@ import { LOGGER_PORT } from '@core/logging/logger.port';
 import { SaleResponseDto } from '@features/sales/infrastructure/dtos/sale-response.dto';
 import { SaleTicketDto } from '@features/sales/infrastructure/dtos/sale-ticket.dto';
 import { Sale, SaleFactory } from '@features/sales/domain/entities/sale.entity';
+import { SaleTicket } from '@features/sales/domain/entities/sale-ticket.entity';
 import { DetailedSale } from '@features/sales/domain/entities/detailed-sale.entity';
 import {
   SaleCreationError,
@@ -22,6 +23,7 @@ import {
 } from '@features/sales/domain/repository/sale-repository';
 import { SaleMapper } from '@features/sales/infrastructure/mappers/sale.mapper';
 import { DetailedSaleMapper } from '@features/sales/infrastructure/mappers/detailed-sale.mapper';
+import { SaleTicketMapper } from '@features/sales/infrastructure/mappers/sale-ticket.mapper';
 import { SALE_ENDPOINTS } from '@features/sales/config/sale-endpoints';
 import { resolveHttpErrorMessage } from '@features/sales/infrastructure/utils/http-error-resolver';
 
@@ -59,6 +61,29 @@ export class SaleRepositoryImpl implements SaleRepository {
           () =>
             new SaleFetchError(
               resolveHttpErrorMessage(error, 'Failed to fetch sale detail'),
+              error,
+            ),
+        );
+      }),
+    );
+  }
+
+  getSaleTicket(id: number): Observable<SaleTicket> {
+    const ticketUrl = `${this.env.apiUrl}${SALE_ENDPOINTS.TICKET}${id}/ticket/`;
+
+    return this.http.get<SaleTicketDto>(ticketUrl).pipe(
+      map((dto) => SaleTicketMapper.fromResponseDto(dto)),
+      catchError((error: unknown) => {
+        this.logger.error('Failed to fetch sale ticket', {
+          url: ticketUrl,
+          id,
+          error,
+        });
+
+        return throwError(
+          () =>
+            new SaleFetchError(
+              resolveHttpErrorMessage(error, 'Failed to fetch sale ticket'),
               error,
             ),
         );

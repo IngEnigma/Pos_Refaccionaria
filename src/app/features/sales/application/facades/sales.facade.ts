@@ -11,6 +11,7 @@ import { GetSaleDetailsUseCase } from '@features/sales/application/usecase/get-s
 import { CreateSaleDetailUseCase } from '@features/sales/application/usecase/create-sale-detail.usecase';
 import { UpdateSaleDetailUseCase } from '@features/sales/application/usecase/update-sale-detail.usecase';
 import { DeleteSaleDetailUseCase } from '@features/sales/application/usecase/delete-sale-detail.usecase';
+import { GetSaleTicketUseCase } from '@features/sales/application/usecase/get-sale-ticket.usecase';
 import { PaymentMethod } from '@features/sales/domain/entities/payment-method.entity';
 import { Sale } from '@features/sales/domain/entities/sale.entity';
 import { DetailedSale } from '@features/sales/domain/entities/detailed-sale.entity';
@@ -25,6 +26,7 @@ export class SalesFacade {
   private readonly createCompleteSaleUseCase = inject(CreateCompleteSaleUseCase);
   private readonly getSalesUseCase = inject(GetSalesUseCase);
   private readonly getSaleDetailUseCase = inject(GetSaleDetailUseCase);
+  private readonly getSaleTicketUseCase = inject(GetSaleTicketUseCase);
   private readonly getSaleDetailsUseCase = inject(GetSaleDetailsUseCase);
   private readonly createSaleDetailUseCase = inject(CreateSaleDetailUseCase);
   private readonly updateSaleDetailUseCase = inject(UpdateSaleDetailUseCase);
@@ -114,6 +116,10 @@ export class SalesFacade {
 
   getSaleDetail(id: number) {
     return this.getSaleDetailUseCase.execute(id);
+  }
+
+  getSaleTicket(id: number) {
+    return this.getSaleTicketUseCase.execute(id);
   }
 
   loadSaleDetails(): void {
