@@ -3,6 +3,7 @@ const path = require('path');
 const fs = require('fs');
 
 const { registerWindowIpc } = require('./ipc/window.ipc');
+const { registerPrinterIpc } = require('./ipc/printer.ipc');
 
 const DEV_SERVER_URL = 'http://localhost:4200';
 const PROJECT_ROOT = path.resolve(__dirname, '..');
@@ -94,6 +95,7 @@ function createMainWindow() {
 
 app.whenReady().then(() => {
   registerWindowIpc();
+  registerPrinterIpc();
   createMainWindow();
 
   app.on('activate', () => {

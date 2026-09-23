@@ -1,6 +1,6 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Observable, map, tap, throwError } from 'rxjs';
-
+import { CompleteSaleResult } from '@features/sales/application/usecase/create-complete-sale.usecase';
 
 import { SalesFacade } from '@features/sales/application/facades/sales.facade';
 import { Order } from '@features/sales/domain/entities/order.entity';
@@ -24,7 +24,7 @@ export class SalesCartService {
   readonly order = computed(() => {
     const o = new Order();
     o.setDiscount(this.descuento());
-    this.cart().forEach(item => 
+    this.cart().forEach(item =>
       o.addItem({ productId: item.productId, price: item.precio, quantity: item.qty })
     );
     return o;
@@ -108,7 +108,7 @@ export class SalesCartService {
     return;
   }
 
-  confirmSale(): Observable<void> {
+  confirmSale(): Observable<CompleteSaleResult> {
     const cartItems = this.cart();
     if (cartItems.length === 0) {
       return throwError(() => new Error('El carrito está vacío.'));
@@ -134,7 +134,6 @@ export class SalesCartService {
           this.clearCart();
           this.facade.loadSales();
         }),
-        map(() => undefined),
       );
   }
 }
