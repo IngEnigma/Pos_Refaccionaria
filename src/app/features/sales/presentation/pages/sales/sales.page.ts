@@ -19,6 +19,7 @@ import { ProductTypesFacade } from '@features/sales/application/facades/product-
 import { CategorySliderComponent } from '@features/sales/presentation/components/category-slider/category-slider.component';
 import { CartPanelComponent } from '@features/sales/presentation/components/cart-panel/cart-panel.component';
 import { ProductGridComponent } from '@features/sales/presentation/components/product-grid/product-grid.component';
+import { TicketModalComponent } from '@features/sales/presentation/components/ticket-modal/ticket-modal.component';
 import {
   SalesCartItem,
   SalesPaymentMethod,
@@ -28,11 +29,12 @@ import { SalesCartService } from '@features/sales/presentation/state/sales-cart.
 import { InventoryByBranchFacade } from '@features/inventory-by-branch';
 import { ProductType } from '@features/sales/product-types/domain/entities/product-type.entity';
 import { GlobalSearchService } from '@core/search/global-search.service';
+import { SaleTicket } from '@features/sales/domain/entities/sale-ticket.entity';
 
 @Component({
   selector: 'app-sales-page',
   standalone: true,
-  imports: [FormsModule, CategorySliderComponent, ProductGridComponent, CartPanelComponent],
+  imports: [FormsModule, CategorySliderComponent, ProductGridComponent, CartPanelComponent, TicketModalComponent],
   templateUrl: './sales.page.html',
   styleUrl: './sales.page.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -55,6 +57,7 @@ export class SalesPageComponent implements OnInit {
   );
 
   readonly barcodeInput = signal('');
+  readonly lastTicket = signal<SaleTicket | null>(null);
 
   constructor() {
     effect(() => {
@@ -208,6 +211,10 @@ export class SalesPageComponent implements OnInit {
     this.cartService.selectPayment(method);
   }
 
+  onTicketModalClose(): void {
+    this.lastTicket.set(null);
+  }
+
   processTransaction(): void {
     // Validación fresca contra stock actual de mi-sucursal (evita POST si el stock cambió desde que se agregó al carrito)
     const freshStockById = new Map<number, number>(
@@ -235,14 +242,32 @@ export class SalesPageComponent implements OnInit {
         next: (result) => {
           this.toastService.success('Venta registrada correctamente.');
           this.inventoryByBranchFacade.loadMyBranchInventory();
+          this.lastTicket.set(result.ticket);
 
-          window.desktop.generateTicket(result.ticket).then((response) => {
-            if (!response.success) {
-              this.toastService.error(
-                response.message ?? 'No fue posible generar el ticket.',
-              );
-            }
-          });
+          const desktop = (window as unknown as { desktop?: { generateTicket: (d: unknown) => Promise<{ success: boolean; message?: string }> } }).desktop;
+          if (desktop?.generateTicket) {
+            const ticketPayload = {
+              folio: result.ticket.folio,
+              fecha: result.ticket.fecha,
+              vendedor: result.ticket.vendedor,
+              metodo_pago: result.ticket.metodoPago,
+              sucursal: result.ticket.sucursal,
+              productos: result.ticket.productos.map((p) => ({
+                nombre: p.nombre,
+                cantidad: p.cantidad,
+                subtotal: p.subtotal,
+                precio_unitario: p.precioUnitario,
+              })),
+              total: result.ticket.total,
+            };
+            desktop.generateTicket(ticketPayload).then((response) => {
+              if (!response.success) {
+                this.toastService.error(
+                  response.message ?? 'No fue posible generar el ticket.',
+                );
+              }
+            });
+          }
         },
         error: (error: unknown) => {
           const message =

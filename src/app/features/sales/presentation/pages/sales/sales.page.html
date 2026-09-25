@@ -61,4 +61,8 @@
     (selectPayment)="onSelectPayment($event)"
     (processTransaction)="processTransaction()"
   />
+
+  @if (lastTicket(); as ticket) {
+    <app-ticket-modal [ticket]="ticket" (close)="onTicketModalClose()" />
+  }
 </div>

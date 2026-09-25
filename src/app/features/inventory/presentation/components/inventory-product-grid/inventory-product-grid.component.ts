@@ -1,8 +1,11 @@
 import { ChangeDetectionStrategy, Component, input, output, ViewChild, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
 
 import { Product } from '../../../domain/entities/product.entity';
+import { InventoryItem } from '@features/inventory-by-branch/domain/entities/inventory-item.entity';
 import { InventoryProductCardComponent } from '../inventory-product-card/inventory-product-card.component';
 import { ProductCardSkeletonComponent } from '../../../../../features/sales/presentation/components/product-card/product-card-skeleton.component';
+
+type GridProduct = Product | InventoryItem;
 
 @Component({
   selector: 'app-inventory-product-grid',
@@ -13,11 +16,12 @@ import { ProductCardSkeletonComponent } from '../../../../../features/sales/pres
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InventoryProductGridComponent implements AfterViewInit, OnDestroy {
-  readonly products = input<readonly Product[]>([]);
+  readonly products = input<readonly GridProduct[]>([]);
   readonly loadingProducts = input(false);
-  
-  readonly modifyProduct = output<Product>();
-  readonly deleteProduct = output<Product>();
+
+  readonly modifyProduct = output<GridProduct>();
+  readonly deleteProduct = output<GridProduct>();
+  readonly changePrice = output<GridProduct>();
   readonly loadMore = output<void>();
 
   @ViewChild('sentinel') sentinelRef?: ElementRef<HTMLElement>;

@@ -1,9 +1,10 @@
 <div class="products-grid" aria-label="Lista de productos en inventario">
-  @for (producto of products(); track producto.id) {
+  @for (producto of products(); track $any(producto).id || $any(producto).idProducto) {
     <app-inventory-product-card
-      [product]="producto"
+      [product]="$any(producto)"
       (modifyProduct)="modifyProduct.emit($event)"
       (deleteProduct)="deleteProduct.emit($event)"
+      (changePrice)="changePrice.emit($event)"
     />
   }
 

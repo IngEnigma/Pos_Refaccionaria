@@ -1,30 +1,43 @@
 <div class="inventory-root">
   <main class="inventory-main animate-slide-up">
     <section class="catalog-section">
-      <h2 class="section-title">Categorías</h2>
+      @if (!authFacade.sucursalId()) {
+        <div class="empty-state">
+          <p>Tu usuario no tiene sucursal asignada.</p>
+          <span class="empty-hint">Contacta al administrador para asignarte una sucursal y ver productos de tu sucursal.</span>
+        </div>
+      } @else {
+        <h2 class="section-title">Categorías</h2>
 
-      <app-category-slider
-        [categories]="categories()"
-        [isLoading]="loadingCategories()"
-        [selectedCategoryId]="selectedCategoryId()"
-        (selected)="onSelectCategory($event)"
-      />
-      
-      <div class="section-header">
-        <h2 class="section-title">Productos</h2>
-        <button class="btn-add-product" (click)="onAddProduct()">
-          <lucide-icon name="Plus" [size]="18"></lucide-icon> Añadir Producto
-        </button>
-      </div>
+        <app-category-slider
+          [categories]="categories()"
+          [isLoading]="loadingCategories()"
+          [selectedCategoryId]="selectedCategoryId()"
+          (selected)="onSelectCategory($event)"
+        />
 
-      <app-inventory-product-grid
-        [products]="inventoryFacade.products()"
-        [loadingProducts]="inventoryFacade.loading()"
-        (modifyProduct)="onModifyProduct($event)"
-        (deleteProduct)="onDeleteProduct($event)"
-        (loadMore)="onLoadMore()"
-      />
+        <div class="section-header">
+          <h2 class="section-title">Productos — Mi Sucursal</h2>
+          <button class="btn-add-product" (click)="onAddProduct()">
+            <lucide-icon name="Plus" [size]="18"></lucide-icon> Añadir Producto
+          </button>
+        </div>
 
+        <app-inventory-product-grid
+          [products]="paginatedProducts()"
+          [loadingProducts]="loadingProducts()"
+          (modifyProduct)="onModifyProduct($event)"
+          (deleteProduct)="onDeleteProduct($event)"
+          (changePrice)="onChangePrice($event)"
+          (loadMore)="onLoadMore()"
+        />
+        @if (!loadingProducts() && paginatedProducts().length === 0) {
+          <p class="empty-hint">Sin productos en tu sucursal. Crea uno o registra movimiento de entrada.</p>
+        }
+        @if (hasMore() && !loadingProducts()) {
+          <p class="empty-hint">{{ paginatedProducts().length }} de {{ totalItems() }} — desplázate para cargar más</p>
+        }
+      }
     </section>
   </main>
 </div>
