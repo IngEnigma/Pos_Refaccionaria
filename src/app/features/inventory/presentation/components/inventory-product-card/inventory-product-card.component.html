@@ -1,46 +1,60 @@
-<article class="product-card">
-  <div class="product-img-placeholder">
-    <lucide-icon name="Package" [size]="48" class="placeholder-icon"></lucide-icon>
-  </div>
-  <h3 class="product-name">{{ product().nombre }}</h3>
-  <p class="product-desc">{{ $any(product()).clave || $any(product()).descripcion || 'Sin descripción' }} · {{ $any(product()).marca }}</p>
+<article class="inv-card" [class.inv-card--low]="isLowStock()" [class.inv-card--out]="stock() === 0">
+  <div class="inv-card__stripe" [attr.data-stock]="stock()"></div>
 
-  <div class="product-row">
-    <span class="product-price">
-      ${{ effectivePrice() | number:'1.2-2' }}
-      @if (hasSucursalPrice()) {
-        <span class="price-badge">Sucursal</span>
+  <div class="inv-card__media">
+    <div class="inv-card__media-hatch" aria-hidden="true"></div>
+    <div class="inv-card__icon-wrap">
+      <lucide-icon name="Package" [size]="32" class="inv-card__icon"></lucide-icon>
+    </div>
+    <span class="inv-card__sku">#{{ $any(product()).clave || '—' }}</span>
+    <span class="inv-card__rivet inv-card__rivet--tl" aria-hidden="true"></span>
+    <span class="inv-card__rivet inv-card__rivet--tr" aria-hidden="true"></span>
+  </div>
+
+  <div class="inv-card__body">
+    <div class="inv-card__eyebrow">
+      <span class="inv-card__brand">{{ $any(product()).marca || 'Sin marca' }}</span>
+      <span class="inv-card__dot" aria-hidden="true"></span>
+      <span class="inv-card__code">{{ $any(product()).codigoBarras || '—' }}</span>
+    </div>
+
+    <h3 class="inv-card__name" [title]="product().nombre">{{ product().nombre }}</h3>
+    <p class="inv-card__desc">{{ $any(product()).descripcion || 'Sin descripción' }}</p>
+
+    <div class="inv-card__price-row">
+      <div class="inv-card__price">
+        <span class="inv-card__price-currency">$</span>
+        <span class="inv-card__price-value">{{ effectivePrice() | number:'1.2-2' }}</span>
+        @if (hasSucursalPrice()) {
+          <span class="inv-card__badge">Sucursal</span>
+        }
+      </div>
+      @if (stock() !== null) {
+        <div class="inv-card__stock" [class.inv-card__stock--low]="isLowStock()" [class.inv-card__stock--out]="stock() === 0">
+          <span class="inv-card__stock-dot"></span>
+          <span class="inv-card__stock-text">{{ stock() }} en stock</span>
+        </div>
       }
-    </span>
+    </div>
+
     @if (stock() !== null) {
-      <span class="product-stock" [class.low-stock]="isLowStock()">{{ stock() }} en stock</span>
+      <div class="inv-card__gauge" aria-hidden="true">
+        <div class="inv-card__gauge-fill" [style.width.%]="stock() !== null ? (stock()! > 20 ? 100 : stock()! * 5) : 0"></div>
+      </div>
     }
   </div>
 
-  <div class="product-actions">
-    <app-button
-      variant="primary"
-      size="sm"
-      [fullWidth]="true"
-      (click)="onModify()"
-    >
-      Modificar
-    </app-button>
-    <app-button
-      variant="secondary"
-      size="sm"
-      [fullWidth]="true"
-      (click)="onChangePrice()"
-    >
-      Precio
-    </app-button>
-    <app-button
-      variant="danger"
-      size="sm"
-      [fullWidth]="true"
-      (click)="onDelete()"
-    >
-      Eliminar
-    </app-button>
+  <div class="inv-card__actions">
+    <button type="button" class="inv-card__btn inv-card__btn--primary" (click)="onModify()" aria-label="Modificar producto">
+      <lucide-icon name="Pencil" [size]="14"></lucide-icon>
+      <span>Editar</span>
+    </button>
+    <button type="button" class="inv-card__btn inv-card__btn--ghost" (click)="onChangePrice()" aria-label="Cambiar precio sucursal">
+      <lucide-icon name="Tag" [size]="14"></lucide-icon>
+      <span>Precio</span>
+    </button>
+    <button type="button" class="inv-card__btn inv-card__btn--icon inv-card__btn--danger" (click)="onDelete()" aria-label="Eliminar producto">
+      <lucide-icon name="Trash2" [size]="16"></lucide-icon>
+    </button>
   </div>
 </article>

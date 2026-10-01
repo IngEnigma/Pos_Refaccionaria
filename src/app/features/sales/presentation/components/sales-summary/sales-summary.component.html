@@ -1,19 +1,19 @@
 <div class="panel-summary">
   <div class="summary-row">
     <span>Subtotal</span>
-    <span>${{ subtotal() }}</span>
+    <span>${{ subtotal() | number:'1.2-2' }}</span>
   </div>
   <div class="summary-row">
     <span>Descuento</span>
-    <span>${{ descuento() }}</span>
+    <span>${{ descuento() | number:'1.2-2' }}</span>
   </div>
   <div class="summary-row">
     <span>IVA</span>
-    <span>${{ iva() }}</span>
+    <span>${{ iva() | number:'1.2-2' }}</span>
   </div>
 
   <div class="summary-total">
     <span>Total</span>
-    <span class="total-amount">${{ total() }}</span>
+    <span class="total-amount">${{ total() | number:'1.2-2' }}</span>
   </div>
 </div>

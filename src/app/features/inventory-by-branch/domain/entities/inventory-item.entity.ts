@@ -10,4 +10,5 @@ export interface InventoryItem {
   precioBase: number;
   costo: number;
   cantidad: number;
+  vigenteDesde: string | null;
 }

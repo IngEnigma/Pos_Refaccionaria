@@ -25,6 +25,7 @@ export class InventoryMapper {
       precioBase: parseFloat(dto.precio_base),
       costo: parseFloat(dto.costo),
       cantidad: dto.cantidad,
+      vigenteDesde: dto.vigente_desde ?? null,
     };
   }
 }

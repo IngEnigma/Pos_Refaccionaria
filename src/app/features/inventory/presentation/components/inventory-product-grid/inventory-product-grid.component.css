@@ -1,13 +1,27 @@
 .products-grid {
-  padding-top: var(--space-1);
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: var(--space-3);
-  padding-right: var(--space-2);
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+  padding: 8px 4px 8px 0;
+  align-items: start;
+}
+
+@media (min-width: 1280px) {
+  .products-grid {
+    grid-template-columns: repeat(auto-fill, minmax(285px, 1fr));
+    gap: 18px;
+  }
+}
+
+@media (max-width: 640px) {
+  .products-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+  }
 }
 
 .scroll-sentinel {
-  height: 20px;
+  height: 24px;
   width: 100%;
-  margin-top: var(--space-4);
+  margin-top: var(--pr-space-4);
 }

@@ -49,6 +49,8 @@ import { InventoryRepository } from '@features/inventory-by-branch/domain/reposi
 import { InventoryRepositoryImpl } from '@features/inventory-by-branch/infrastructure/repositories/inventory-repository.impl';
 import { InventoryMovementRepository } from '@features/inventory-by-branch/domain/repository/movement-repository';
 import { InventoryMovementRepositoryImpl } from '@features/inventory-by-branch/infrastructure/repositories/movement-repository.impl';
+import { BranchPriceRepository } from '@features/branch-pricing/domain/repository/branch-price-repository';
+import { BranchPriceRepositoryImpl } from '@features/branch-pricing/infrastructure/repositories/branch-price-repository.impl';
 import { SEARCH_STRATEGY } from '@core/search/search.strategy';
 import { DefaultSearchStrategy } from '@core/search/default-search.strategy';
 import { routes } from '@app/app.routes';
@@ -277,6 +279,10 @@ export const appConfig: ApplicationConfig = {
     {
       provide: InventoryMovementRepository,
       useClass: InventoryMovementRepositoryImpl,
+    },
+    {
+      provide: BranchPriceRepository,
+      useClass: BranchPriceRepositoryImpl,
     },
     {
       provide: SEARCH_STRATEGY,

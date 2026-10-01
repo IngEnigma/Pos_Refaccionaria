@@ -10,6 +10,7 @@ export interface InventoryItemDto {
   precio_base: string;
   costo: string;
   cantidad: number;
+  vigente_desde: string | null;
 }
 
 export interface BranchInventoryDto {

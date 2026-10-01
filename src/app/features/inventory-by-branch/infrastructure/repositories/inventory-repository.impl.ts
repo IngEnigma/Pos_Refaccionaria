@@ -19,8 +19,23 @@ export class InventoryRepositoryImpl implements InventoryRepository {
 
   getMyBranchInventory(): Observable<BranchInventory[]> {
     return this.http
-      .get<BranchInventoryDto[]>(`${this.endpoint}/mi-sucursal/`)
-      .pipe(map((dtos) => dtos.map((dto) => InventoryMapper.fromBranchInventoryDto(dto))));
+      .get<BranchInventoryDto[] | { results: BranchInventoryDto[] } | { detalles: InventoryItemDto[]; id_inventario: number; descripcion: string; id_sucursal: number } | { total: number; page: number; page_size: number; total_pages: number; results: BranchInventoryDto[] }>(`${this.endpoint}/mi-sucursal/`)
+      .pipe(
+        map((response: unknown) => {
+          if (Array.isArray(response)) {
+            return (response as BranchInventoryDto[]).map((dto) => InventoryMapper.fromBranchInventoryDto(dto));
+          }
+          const obj = response as Record<string, unknown>;
+          if (obj && Array.isArray(obj['results'])) {
+            return (obj['results'] as BranchInventoryDto[]).map((dto) => InventoryMapper.fromBranchInventoryDto(dto));
+          }
+          if (obj && Array.isArray(obj['detalles'])) {
+            const single = obj as unknown as BranchInventoryDto;
+            return [InventoryMapper.fromBranchInventoryDto(single)];
+          }
+          return [];
+        }),
+      );
   }
 
   getInventarios(): Observable<InventarioRef[]> {

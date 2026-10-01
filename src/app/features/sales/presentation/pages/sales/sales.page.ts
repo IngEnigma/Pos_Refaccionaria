@@ -124,10 +124,20 @@ export class SalesPageComponent implements OnInit {
     const items = this.inventoryByBranchFacade.allItems();
     // Filtro local por búsqueda y categoría (sin consulta adicional a /productos)
     const query = this.searchQuery().trim().toLowerCase();
+    const barcodeQuery = this.barcodeInput().trim().toLowerCase();
     const selectedCategoryId = this.selectedCategoryId();
     // Nota: InventoryItem no expone id_tipo; filtro categoría deshabilitado si no hay mapeo
     // Se mantiene el slider pero el filtrado se hace por nombre/clave si hay query
     let filtered = items;
+    // Filtrado en vivo mientras se escribe/escanea el código QR/barras
+    if (barcodeQuery) {
+      filtered = filtered.filter(
+        (it) =>
+          it.codigoBarras.toLowerCase().includes(barcodeQuery) ||
+          it.clave.toLowerCase().includes(barcodeQuery) ||
+          it.nombre.toLowerCase().includes(barcodeQuery)
+      );
+    }
     if (query) {
       filtered = filtered.filter(
         (it) =>

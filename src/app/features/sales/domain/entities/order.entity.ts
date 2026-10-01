@@ -19,7 +19,7 @@ export class OrderItem {
   }
 
   get subtotal(): Money {
-    return Money.fromNumber(this.price.value * this.quantity.value, 'OrderItem.subtotal');
+    return Money.fromNumber(+(this.price.value * this.quantity.value).toFixed(2), 'OrderItem.subtotal');
   }
 }
 
@@ -38,7 +38,7 @@ export class Order {
 
   get subtotal(): Money {
     const sum = this._items.reduce((acc, item) => acc + item.subtotal.value, 0);
-    return Money.fromNumber(sum, 'Order.subtotal');
+    return Money.fromNumber(+sum.toFixed(2), 'Order.subtotal');
   }
 
   get iva(): Money {
