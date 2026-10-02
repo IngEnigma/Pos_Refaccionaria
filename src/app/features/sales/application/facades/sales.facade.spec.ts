@@ -7,6 +7,7 @@ import { CreateCompleteSaleUseCase } from '@features/sales/application/usecase/c
 import { GetSalesUseCase } from '@features/sales/application/usecase/get-sales.usecase';
 import { GetPaymentMethodsUseCase } from '@features/sales/application/usecase/get-payment-methods.usecase';
 import { GetSaleDetailUseCase } from '@features/sales/application/usecase/get-sale-detail.usecase';
+import { GetSaleTicketUseCase } from '@features/sales/application/usecase/get-sale-ticket.usecase';
 import { GetSaleDetailsUseCase } from '@features/sales/application/usecase/get-sale-details.usecase';
 import { CreateSaleDetailUseCase } from '@features/sales/application/usecase/create-sale-detail.usecase';
 import { UpdateSaleDetailUseCase } from '@features/sales/application/usecase/update-sale-detail.usecase';
@@ -51,6 +52,7 @@ describe('SalesFacade', () => {
         { provide: CreateSaleUseCase, useValue: createSaleUseCase },
         { provide: CreateCompleteSaleUseCase, useValue: createCompleteSaleUseCase },
         { provide: GetSaleDetailUseCase, useValue: { execute: jest.fn() } },
+        { provide: GetSaleTicketUseCase, useValue: { execute: jest.fn() } },
         { provide: GetSaleDetailsUseCase, useValue: { execute: jest.fn() } },
         { provide: CreateSaleDetailUseCase, useValue: { execute: jest.fn() } },
         { provide: UpdateSaleDetailUseCase, useValue: { execute: jest.fn() } },

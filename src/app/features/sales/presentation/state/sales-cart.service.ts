@@ -35,7 +35,7 @@ export class SalesCartService {
   readonly total = computed(() => this.order().total.value);
 
   addToCart(product: SalesProduct): void {
-    if (product.stock !== 0 && product.stock <= 0) return;
+    if (product.stock <= 0) return;
 
     this._cart.update((items) => {
       const exists = items.find((c) => c.productId === product.id);
@@ -45,6 +45,7 @@ export class SalesCartService {
           {
             productId: product.id,
             nombre: product.nombre,
+            descripcion: product.descripcion,
             precio: product.precio,
             imagen: product.imagen,
             qty: 1,
@@ -56,7 +57,6 @@ export class SalesCartService {
       return items.map((item) => {
         if (item.productId !== product.id) return item;
         const newQty = item.qty + 1;
-        if (item.stock === 0) return { ...item, qty: newQty };
         return newQty <= item.stock
           ? { ...item, qty: newQty }
           : item;
@@ -69,7 +69,6 @@ export class SalesCartService {
       items.map((current) => {
         if (current.productId !== item.productId) return current;
         const newQty = current.qty + 1;
-        if (current.stock === 0) return { ...current, qty: newQty };
         return newQty <= current.stock
           ? { ...current, qty: newQty }
           : current;
