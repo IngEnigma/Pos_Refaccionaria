@@ -5,6 +5,7 @@ import { catchError, concatMap, map } from 'rxjs/operators';
 import { SaleRepository, CreateCompleteSalePayload } from '@features/sales/domain/repository/sale-repository';
 import { SaleDetailRepository } from '@features/sales/domain/repository/sale-detail-repository';
 import { Sale } from '@features/sales/domain/entities/sale.entity';
+import { SaleTicketPendingError } from '@features/sales/domain/errors/sales.errors';
 import { Quantity } from '@features/sales/domain/value-objects/quantity.value';
 import { LOGGER_PORT } from '@core/logging/logger.port';
 import { SaleTicket } from '@features/sales/domain/entities/sale-ticket.entity';
@@ -74,6 +75,21 @@ export class CreateCompleteSaleUseCase {
                 sale,
                 ticket,
               })),
+              // Solo la etapa del ticket genera estado pendiente: venta + detalles ya existen.
+              catchError((ticketError: unknown) => {
+                if (sale.id > 0) {
+                  this.logger.error('Ticket falló, venta registrada queda pendiente', {
+                    saleId: sale.id,
+                    error: ticketError,
+                  });
+                  const message =
+                    ticketError instanceof Error && ticketError.message
+                      ? ticketError.message
+                      : 'No se pudo obtener el ticket.';
+                  return throwError(() => new SaleTicketPendingError(sale.id, message, ticketError));
+                }
+                return throwError(() => ticketError);
+              }),
             )
           ),
         );

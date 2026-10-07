@@ -60,3 +60,14 @@ export class SaleDetailFetchError extends SalesDomainError {
     this.name = 'SaleDetailFetchError';
   }
 }
+
+export class SaleTicketPendingError extends SalesDomainError {
+  constructor(
+    readonly saleId: number,
+    message: string,
+    override readonly cause?: unknown,
+  ) {
+    super(message, cause);
+    this.name = 'SaleTicketPendingError';
+  }
+}

@@ -17,6 +17,7 @@ import {
   SaleCreationError,
   SaleDetailMutationError,
   SaleFetchError,
+  SaleTicketPendingError,
 } from '@features/sales/domain/errors/sales.errors';
 
 // Integración real: UseCase -> Repositorios reales -> HttpClient (falso transporte).
@@ -218,12 +219,15 @@ describe('CreateCompleteSaleUseCase (integración)', () => {
     httpMock.expectOne(`${API}/ventas/0/ticket/`).flush({ ...ticketDto, folio: 0 });
   });
 
-  // Verifica que un 404 con {"detail"} al pedir el ticket llegue como SaleFetchError con ese mensaje.
-  it('propaga el 404 del ticket con el mensaje del backend', (done) => {
+  // Verifica el Caso C (BUG2): ticket 404 tras venta+detalles OK llega como SaleTicketPendingError con saleId y causa.
+  it('ticket 404 tras venta OK llega como SaleTicketPendingError con saleId', (done) => {
+    // Conducta anterior: SaleFetchError sin saleId. Conducta nueva aprobada: error tipado con el ID.
     useCase.execute({ idMetodoPago: 1, productos: [{ id: 10, cantidad: 2 }] }).subscribe({
       error: (err) => {
-        expect(err).toBeInstanceOf(SaleFetchError);
+        expect(err).toBeInstanceOf(SaleTicketPendingError);
+        expect(err.saleId).toBe(50);
         expect(err.message).toBe('Venta no encontrada.');
+        expect(err.cause).toBeInstanceOf(SaleFetchError);
         done();
       },
     });
@@ -231,5 +235,21 @@ describe('CreateCompleteSaleUseCase (integración)', () => {
     httpMock.expectOne(VENTAS).flush(saleDto);
     httpMock.expectOne(DETALLE).flush(detailDto(11, 10, 2));
     httpMock.expectOne(`${API}/ventas/50/ticket/`).flush({ detail: 'Venta no encontrada.' }, { status: 404, statusText: 'Not Found' });
+    httpMock.expectNone(DETALLE);
+  });
+
+  // Verifica el Caso G (BUG2): con sale.id 0 no se genera pendiente, se propaga el error genérico.
+  it('ticket fallido con sale.id 0 no genera SaleTicketPendingError', (done) => {
+    useCase.execute({ idMetodoPago: 1, productos: [{ id: 10, cantidad: 2 }] }).subscribe({
+      error: (err) => {
+        expect(err).not.toBeInstanceOf(SaleTicketPendingError);
+        expect(err).toBeInstanceOf(SaleFetchError);
+        done();
+      },
+    });
+
+    httpMock.expectOne(VENTAS).flush({});
+    httpMock.expectOne(DETALLE).flush(detailDto(11, 10, 2));
+    httpMock.expectOne(`${API}/ventas/0/ticket/`).flush({ detail: 'No hay ticket.' }, { status: 404, statusText: 'Not Found' });
   });
 });

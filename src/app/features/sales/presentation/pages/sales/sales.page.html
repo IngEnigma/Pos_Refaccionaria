@@ -1,4 +1,17 @@
 <div class="sales-root">
+  @if (pendingTicketSaleId() !== null) {
+    <div class="pending-ticket-banner" role="alert">
+      <span class="pending-ticket-text">Venta #{{ pendingTicketSaleId() }} registrada correctamente. No se pudo obtener el ticket en este momento.</span>
+      <div class="pending-ticket-actions">
+        <button class="pending-ticket-btn primary" type="button" (click)="recoverPendingTicket()" [disabled]="isRecoveringTicket()">
+          Reintentar ticket
+        </button>
+        <button class="pending-ticket-btn" type="button" (click)="dismissPendingTicket()">
+          Descartar
+        </button>
+      </div>
+    </div>
+  }
   <main class="sales-main animate-slide-up">
     <section class="catalog-section">
       @if (!authFacade.sucursalId()) {

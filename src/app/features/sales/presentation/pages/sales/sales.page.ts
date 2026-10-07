@@ -31,6 +31,7 @@ import { InventoryByBranchFacade } from '@features/inventory-by-branch';
 import { ProductType } from '@features/sales/product-types/domain/entities/product-type.entity';
 import { GlobalSearchService } from '@core/search/global-search.service';
 import { SaleTicket } from '@features/sales/domain/entities/sale-ticket.entity';
+import { SaleTicketPendingError } from '@features/sales/domain/errors/sales.errors';
 
 @Component({
   selector: 'app-sales-page',
@@ -59,6 +60,8 @@ export class SalesPageComponent implements OnInit {
 
   readonly barcodeInput = signal('');
   readonly lastTicket = signal<SaleTicket | null>(null);
+  readonly pendingTicketSaleId = signal<number | null>(null);
+  readonly isRecoveringTicket = signal(false);
 
   constructor() {
     effect(() => {
@@ -216,6 +219,36 @@ export class SalesPageComponent implements OnInit {
     this.lastTicket.set(null);
   }
 
+  recoverPendingTicket(): void {
+    const saleId = this.pendingTicketSaleId();
+    if (saleId == null || this.isRecoveringTicket()) return;
+
+    // Recuperación GET-only: nunca vuelve a crear la venta ni sus detalles.
+    this.isRecoveringTicket.set(true);
+    this.salesFacade
+      .getSaleTicket(saleId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (ticket) => {
+          this.lastTicket.set(ticket);
+          this.pendingTicketSaleId.set(null);
+          this.toastService.success('Ticket recuperado correctamente.');
+        },
+        error: (error: unknown) => {
+          const message =
+            error instanceof Error && error.message
+              ? error.message
+              : 'No se pudo recuperar el ticket.';
+          this.toastService.error(message);
+        },
+      })
+      .add(() => this.isRecoveringTicket.set(false));
+  }
+
+  dismissPendingTicket(): void {
+    this.pendingTicketSaleId.set(null);
+  }
+
   processTransaction(): void {
     // Guardia in-flight: si ya hay una transacción en curso se ignora (evita doble POST).
     if (this.isCreatingSale()) return;
@@ -274,6 +307,17 @@ export class SalesPageComponent implements OnInit {
           }
         },
         error: (error: unknown) => {
+          // Venta registrada pero ticket no disponible: estado pendiente, sin reprocesar.
+          if (error instanceof SaleTicketPendingError) {
+            this.pendingTicketSaleId.set(error.saleId);
+            this.cartService.clearCart();
+            this.salesFacade.loadSales();
+            this.inventoryByBranchFacade.loadMyBranchInventory();
+            this.toastService.warning(
+              `Venta #${error.saleId} registrada. No se pudo obtener el ticket en este momento.`,
+            );
+            return;
+          }
           const message =
             error instanceof Error && error.message
               ? error.message

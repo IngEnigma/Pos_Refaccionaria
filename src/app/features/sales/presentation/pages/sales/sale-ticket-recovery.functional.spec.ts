@@ -63,9 +63,9 @@ import { InventoryRepositoryImpl } from '@features/inventory-by-branch/infrastru
 import { InventoryMovementRepository } from '@features/inventory-by-branch/domain/repository/movement-repository';
 import { InventoryMovementRepositoryImpl } from '@features/inventory-by-branch/infrastructure/repositories/movement-repository.impl';
 
-// Funcional: catálogo de ventas real (búsqueda, vacíos, skeletons, slider, venta multi-producto,
-// fallo de ticket, recarga). Todos los colaboradores son reales; solo el transporte HTTP es falso.
-describe('Catálogo de ventas (funcional)', () => {
+// Funcional BUG2: venta registrada con ticket pendiente y su recuperación GET-only.
+// Todos los colaboradores son reales; solo el transporte HTTP es falso.
+describe('Recuperación de ticket pendiente (funcional BUG2)', () => {
   const API = environment.apiUrl;
   const INV = `${API}/inventarios/mi-sucursal/`;
   const VENTAS = `${API}/ventas/`;
@@ -77,19 +77,22 @@ describe('Catálogo de ventas (funcional)', () => {
   let fixture: ComponentFixture<SalesPageComponent>;
   let page: SalesPageComponent;
   let toasts: ToastService;
-  let search: GlobalSearchService;
 
-  const filtroDto = {
+  const itemDto = {
     id: 1, id_producto: 101, nombre: 'Filtro de aceite', clave: 'FLT-1234', marca: 'ACME',
     codigo_barras: '7501234567890', precio_venta: '150.00', precio_sucursal: '120.00',
     precio_base: '100.00', costo: '80.00', cantidad: 5,
   };
-  const bujiaDto = {
-    id: 2, id_producto: 202, nombre: 'Bujía NGK', clave: 'BJ-5678', marca: 'NGK',
-    codigo_barras: '7509990001112', precio_venta: '60.00', precio_sucursal: null,
-    precio_base: '50.00', costo: '30.00', cantidad: 8,
+  const inventoryDto = [{ id_inventario: 7, descripcion: 'Central', id_sucursal: 3, detalles: [itemDto] }];
+  const PAGO = { id: 1, tipo: 'EFECTIVO', descripcion: 'Efectivo' };
+  const saleDto = { id: 70, id_usuario: 1, id_inventario: 7, id_metodoPago: 1, total: '120.00', fecha: '2024-01-01' };
+  const detailDto = { id: 71, id_producto: 101, id_venta: 70, subtotal: '120.00', cantidad: 1 };
+  const ticketDto = {
+    folio: 70, fecha: '2024-01-01T00:00:00Z', vendedor: 'vendedora', metodo_pago: 'EFECTIVO',
+    sucursal: 'Central',
+    productos: [{ nombre: 'Filtro de aceite', cantidad: 1, precio_unitario: '120.00', subtotal: '120.00' }],
+    total: '139.20',
   };
-  const inventoryDto = [{ id_inventario: 7, descripcion: 'Central', id_sucursal: 3, detalles: [filtroDto, bujiaDto] }];
 
   beforeAll(() => {
     // Shims de entorno: jsdom no expone crypto.randomUUID ni IntersectionObserver.
@@ -157,7 +160,6 @@ describe('Catálogo de ventas (funcional)', () => {
     });
     httpMock = TestBed.inject(HttpTestingController);
     toasts = TestBed.inject(ToastService);
-    search = TestBed.inject(GlobalSearchService);
     TestBed.inject(SessionStateService).setSucursalId(7);
     fixture = TestBed.createComponent(SalesPageComponent);
     page = fixture.componentInstance;
@@ -166,174 +168,167 @@ describe('Catálogo de ventas (funcional)', () => {
     httpMock.match(VENTAS).forEach((r) => r.flush([]));
     httpMock.match(METODOS).forEach((r) => r.flush([]));
     httpMock.match(TIPOS).forEach((r) => r.flush([]));
-    fixture.detectChanges();
   });
 
-  afterEach(() => {
-    search.setSearchQuery('');
-    httpMock.verify();
-  });
+  afterEach(() => httpMock.verify());
 
-  function cardNames(): string[] {
-    return Array.from(fixture.nativeElement.querySelectorAll('.product-name') as NodeListOf<HTMLElement>)
-      .map((el) => el.textContent.trim());
+  function lastToast() {
+    const all = toasts.toasts();
+    return all[all.length - 1];
   }
 
-  // P2.1a: verifica que el buscador filtre el grid por nombre de producto.
-  it('P2.1a: el buscador filtra por nombre', () => {
-    search.setSearchQuery('bujía');
-    fixture.detectChanges();
-
-    expect(cardNames()).toEqual(['Bujía NGK']);
-  });
-
-  // P2.1b: verifica que el buscador filtre por clave del producto.
-  it('P2.1b: el buscador filtra por clave', () => {
-    search.setSearchQuery('FLT-1234');
-    fixture.detectChanges();
-
-    expect(cardNames()).toEqual(['Filtro de aceite']);
-  });
-
-  // P2.1c: verifica que el buscador filtre por código de barras.
-  it('P2.1c: el buscador filtra por código de barras', () => {
-    search.setSearchQuery('7509990001112');
-    fixture.detectChanges();
-
-    expect(cardNames()).toEqual(['Bujía NGK']);
-  });
-
-  // P2.1d: verifica que el buscador filtre por marca del producto.
-  it('P2.1d: el buscador filtra por marca', () => {
-    search.setSearchQuery('ngk');
-    fixture.detectChanges();
-
-    expect(cardNames()).toEqual(['Bujía NGK']);
-  });
-
-  // P2.2: verifica que con inventario vacío el usuario vea el aviso correspondiente.
-  it('P2.2: inventario vacío muestra el aviso al usuario', () => {
-    TestBed.inject(InventoryByBranchFacade).loadMyBranchInventory();
-    httpMock.expectOne(INV).flush([]);
-    fixture.detectChanges();
-
-    expect(cardNames()).toEqual([]);
-    expect(fixture.nativeElement.textContent).toContain('Sin productos con stock en tu sucursal.');
-  });
-
-  // P2.3: verifica skeletons durante la carga y su reemplazo por el contenido al terminar.
-  it('P2.3: skeletons durante la carga y contenido al terminar', () => {
-    TestBed.inject(InventoryByBranchFacade).loadMyBranchInventory();
-    fixture.detectChanges();
-    expect(fixture.nativeElement.querySelector('app-product-card-skeleton')).toBeTruthy();
-
-    httpMock.expectOne(INV).flush(inventoryDto);
-    fixture.detectChanges();
-    expect(fixture.nativeElement.querySelector('app-product-card-skeleton')).toBeNull();
-    expect(cardNames()).toEqual(['Filtro de aceite', 'Bujía NGK']);
-  });
-
-  // P2.4: verifica que el slider auto-seleccione la primera categoría sin filtrar el catálogo (comportamiento real).
-  it('P2.4: el slider auto-selecciona la primera categoría sin filtrar el catálogo', () => {
-    TestBed.inject(ProductTypesFacade).loadProductTypes();
-    httpMock.expectOne(TIPOS).flush([{ id: 5, nombre: 'Filtros' }]);
-    fixture.detectChanges();
-
-    // El slider emite cats[0] (Todos, id 0) y la página lo registra; el filtrado por tipo
-    // está deshabilitado en el código, así que el catálogo sigue completo (conducta real).
-    expect(page.selectedCategoryId()).toBe(0);
-    expect(cardNames()).toEqual(['Filtro de aceite', 'Bujía NGK']);
-  });
-
-  // P2.5: verifica la venta con dos productos: dos detalles y ticket con dos líneas.
-  it('P2.5: venta con dos productos genera dos detalles y ticket con dos líneas', () => {
+  // Lleva la página al estado pendiente: venta+detalle OK y ticket 404, con recargas atendidas.
+  function driveToPending() {
     page.onAddToCart(page.productos()[0]);
-    page.onAddToCart(page.productos()[1]);
-    page.onSelectPayment({ id: 1, tipo: 'EFECTIVO', descripcion: 'Efectivo' });
-
+    page.onSelectPayment(PAGO);
     page.processTransaction();
 
-    httpMock.expectOne(VENTAS).flush({ id: 60, id_usuario: 1, id_inventario: 7, id_metodoPago: 1, total: '170.00', fecha: '2024-01-01' });
-    const details = httpMock.match(DETALLE);
-    expect(details).toHaveLength(2);
-    expect(details.map((r) => r.request.body)).toEqual([
-      { id_producto: 101, id_venta: 60, cantidad: 1 },
-      { id_producto: 202, id_venta: 60, cantidad: 1 },
-    ]);
-    details[0].flush({ id: 21, id_producto: 101, id_venta: 60, subtotal: '120.00', cantidad: 1 });
-    details[1].flush({ id: 22, id_producto: 202, id_venta: 60, subtotal: '50.00', cantidad: 1 });
-    httpMock.expectOne(`${API}/ventas/60/ticket/`).flush({
-      folio: 60, fecha: '2024-01-01T00:00:00Z', vendedor: 'vendedora', metodo_pago: 'EFECTIVO',
-      sucursal: 'Central',
-      productos: [
-        { nombre: 'Filtro de aceite', cantidad: 1, precio_unitario: '120.00', subtotal: '120.00' },
-        { nombre: 'Bujía NGK', cantidad: 1, precio_unitario: '50.00', subtotal: '50.00' },
-      ],
-      total: '197.20',
-    });
+    httpMock.expectOne(VENTAS).flush(saleDto);
+    httpMock.expectOne(DETALLE).flush(detailDto);
+    httpMock.expectOne(`${API}/ventas/70/ticket/`).flush({ detail: 'Ticket no disponible.' }, { status: 404, statusText: 'Not Found' });
     httpMock.match(VENTAS).forEach((r) => r.flush([]));
     httpMock.match(INV).forEach((r) => r.flush(inventoryDto));
     fixture.detectChanges();
+  }
 
-    expect(page.lastTicket()?.productos).toHaveLength(2);
-    expect(page.cartItems()).toHaveLength(0);
-    expect(fixture.nativeElement.textContent).toContain('Ticket #60');
-  });
-
-  // P2.6 / Caso C (regresión BUG2): verifica que el ticket 404 deje venta pendiente con saleId.
-  it('P2.6: fallo 404 del ticket deja venta pendiente con saleId (BUG2)', () => {
-    // Conducta anterior: carrito intacto sin saleId (riesgo de duplicado). Conducta nueva aprobada:
-    // banner con folio, carrito limpio, historial+inventario recargados, sin POST adicionales.
+  // Caso A (BUG2): verifica que si falla crear la venta no haya pendiente, el carrito siga y se pueda reintentar.
+  it('Caso A: fallo al crear la venta conserva el carrito y permite reintentar', () => {
     page.onAddToCart(page.productos()[0]);
-    page.onSelectPayment({ id: 1, tipo: 'EFECTIVO', descripcion: 'Efectivo' });
+    page.onSelectPayment(PAGO);
 
     page.processTransaction();
-
-    httpMock.expectOne(VENTAS).flush({ id: 61, id_usuario: 1, id_inventario: 7, id_metodoPago: 1, total: '120.00', fecha: '2024-01-01' });
-    httpMock.expectOne(DETALLE).flush({ id: 23, id_producto: 101, id_venta: 61, subtotal: '120.00', cantidad: 1 });
-    httpMock.expectOne(`${API}/ventas/61/ticket/`).flush({ detail: 'Ticket no disponible.' }, { status: 404, statusText: 'Not Found' });
-    httpMock.match(VENTAS).forEach((r) => r.flush([]));
-    httpMock.match(INV).forEach((r) => r.flush(inventoryDto));
+    httpMock.expectOne(VENTAS).flush({ error: 'Fallo al crear.' }, { status: 500, statusText: 'Server Error' });
     fixture.detectChanges();
 
-    expect(page.pendingTicketSaleId()).toBe(61);
-    expect(page.cartItems()).toHaveLength(0);
-    expect(page.lastTicket()).toBeNull();
-    expect(fixture.nativeElement.querySelector('.pending-ticket-banner')).toBeTruthy();
-    expect(fixture.nativeElement.textContent).toContain('Venta #61');
-    httpMock.expectNone((req) => req.method === 'POST');
-    const all = toasts.toasts();
-    expect(all[all.length - 1].type).toBe('warning');
-  });
-
-  // P2.6b (regresión BUG3): verifica que un error real de stock (400) sí recargue el inventario.
-  it('P2.6b: error 400 de stock sí recarga el inventario', () => {
-    page.onAddToCart(page.productos()[0]);
-    page.onSelectPayment({ id: 1, tipo: 'EFECTIVO', descripcion: 'Efectivo' });
-
-    page.processTransaction();
-
-    httpMock.expectOne(VENTAS).flush({ error: 'Stock insuficiente para el producto.' }, { status: 400, statusText: 'Bad Request' });
-    httpMock.expectOne(INV).flush(inventoryDto);
-    fixture.detectChanges();
-
+    expect(page.pendingTicketSaleId()).toBeNull();
     expect(page.cartItems()).toHaveLength(1);
-    const all = toasts.toasts();
-    expect(all[all.length - 1].type).toBe('error');
-    expect(all[all.length - 1].message).toContain('Stock insuficiente');
-  });
+    expect(lastToast().type).toBe('error');
 
-  // P2.7: verifica que recargar actualice ventas e inventario observables en la página.
-  it('P2.7: recargar actualiza ventas e inventario observables', () => {
-    page.reloadSales();
-
-    httpMock.expectOne(VENTAS).flush([
-      { id: 9, id_usuario: 1, id_inventario: 7, id_metodoPago: 1, total: '139.20', fecha: '2024-01-02' },
-    ]);
-    httpMock.expectOne(INV).flush(inventoryDto);
+    page.processTransaction();
+    httpMock.expectOne(VENTAS).flush(saleDto);
+    httpMock.expectOne(DETALLE).flush(detailDto);
+    httpMock.expectOne(`${API}/ventas/70/ticket/`).flush(ticketDto);
+    httpMock.match(VENTAS).forEach((r) => r.flush([]));
+    httpMock.match(INV).forEach((r) => r.flush(inventoryDto));
     fixture.detectChanges();
 
-    expect(TestBed.inject(SalesFacade).sales()).toHaveLength(1);
-    expect(page.productos()).toHaveLength(2);
+    expect(page.lastTicket()?.folio).toBe(70);
+    expect(page.cartItems()).toHaveLength(0);
+  });
+
+  // Caso B (BUG2): verifica que si falla un detalle haya rollback, carrito intacto y reintento permitido.
+  it('Caso B: fallo de detalle hace rollback y permite reintentar la venta completa', () => {
+    page.onAddToCart(page.productos()[0]);
+    page.onSelectPayment(PAGO);
+
+    page.processTransaction();
+    httpMock.expectOne(VENTAS).flush(saleDto);
+    httpMock.expectOne(DETALLE).flush('Fallo detalle', { status: 500, statusText: 'Server Error' });
+    const rollback = httpMock.expectOne(`${API}/ventas/70/`);
+    expect(rollback.request.method).toBe('DELETE');
+    rollback.flush(null);
+    fixture.detectChanges();
+
+    expect(page.pendingTicketSaleId()).toBeNull();
+    expect(page.cartItems()).toHaveLength(1);
+
+    page.processTransaction();
+    httpMock.expectOne(VENTAS).flush(saleDto);
+    httpMock.expectOne(DETALLE).flush(detailDto);
+    httpMock.expectOne(`${API}/ventas/70/ticket/`).flush(ticketDto);
+    httpMock.match(VENTAS).forEach((r) => r.flush([]));
+    httpMock.match(INV).forEach((r) => r.flush(inventoryDto));
+    fixture.detectChanges();
+
+    expect(page.lastTicket()?.folio).toBe(70);
+    expect(page.cartItems()).toHaveLength(0);
+  });
+
+  // Caso D (BUG2): verifica que recuperar el ticket use solo GET y muestre el ticket sin crear otra venta.
+  it('Caso D: recuperar el ticket usa solo GET y muestra el ticket', () => {
+    driveToPending();
+    expect(page.pendingTicketSaleId()).toBe(70);
+
+    page.recoverPendingTicket();
+
+    const retry = httpMock.expectOne(`${API}/ventas/70/ticket/`);
+    expect(retry.request.method).toBe('GET');
+    httpMock.expectNone((req) => req.method === 'POST');
+    retry.flush(ticketDto);
+    fixture.detectChanges();
+
+    expect(page.lastTicket()?.folio).toBe(70);
+    expect(page.pendingTicketSaleId()).toBeNull();
+    expect(fixture.nativeElement.querySelector('.pending-ticket-banner')).toBeNull();
+    expect(fixture.nativeElement.textContent).toContain('Ticket #70');
+    httpMock.expectNone((req) => req.method === 'POST');
+  });
+
+  // Caso E (BUG2): verifica que si la recuperación falla, el pendiente siga y se pueda reintentar.
+  it('Caso E: recuperación fallida conserva el pendiente y permite otro intento', () => {
+    driveToPending();
+
+    page.recoverPendingTicket();
+    httpMock.expectOne(`${API}/ventas/70/ticket/`).flush('Sigue fallando', { status: 500, statusText: 'Server Error' });
+    fixture.detectChanges();
+
+    expect(page.pendingTicketSaleId()).toBe(70);
+    expect(page.isRecoveringTicket()).toBe(false);
+    expect(lastToast().type).toBe('error');
+    httpMock.expectNone((req) => req.method === 'POST');
+
+    page.recoverPendingTicket();
+    httpMock.expectOne(`${API}/ventas/70/ticket/`).flush(ticketDto);
+    fixture.detectChanges();
+
+    expect(page.lastTicket()?.folio).toBe(70);
+    expect(page.pendingTicketSaleId()).toBeNull();
+  });
+
+  // Caso F (BUG2): verifica que el doble click en recuperar emita un solo GET.
+  it('Caso F: doble reintento de ticket en vuelo emite un solo GET', () => {
+    driveToPending();
+
+    page.recoverPendingTicket();
+    page.recoverPendingTicket();
+
+    const retries = httpMock.match(`${API}/ventas/70/ticket/`);
+    expect(retries).toHaveLength(1);
+    retries[0].flush(ticketDto);
+    fixture.detectChanges();
+
+    expect(page.lastTicket()?.folio).toBe(70);
+    expect(page.pendingTicketSaleId()).toBeNull();
+  });
+
+  // Verifica que descartar el pendiente limpie el estado sin tocar backend ni carrito.
+  it('Descartar el pendiente limpia el banner sin tocar backend', () => {
+    driveToPending();
+    expect(fixture.nativeElement.querySelector('.pending-ticket-banner')).toBeTruthy();
+
+    (fixture.nativeElement.querySelectorAll('.pending-ticket-btn')[1] as HTMLButtonElement).click();
+    fixture.detectChanges();
+
+    expect(page.pendingTicketSaleId()).toBeNull();
+    expect(fixture.nativeElement.querySelector('.pending-ticket-banner')).toBeNull();
+    expect(TestBed.inject(SalesFacade).sales()).toHaveLength(0);
+  });
+
+  // Caso H (BUG2): verifica que la venta exitosa normal siga intacta (ticket, limpieza y recargas).
+  it('Caso H: venta exitosa normal conserva el flujo completo', () => {
+    page.onAddToCart(page.productos()[0]);
+    page.onSelectPayment(PAGO);
+
+    page.processTransaction();
+    httpMock.expectOne(VENTAS).flush(saleDto);
+    httpMock.expectOne(DETALLE).flush(detailDto);
+    httpMock.expectOne(`${API}/ventas/70/ticket/`).flush(ticketDto);
+    httpMock.match(VENTAS).forEach((r) => r.flush([]));
+    httpMock.match(INV).forEach((r) => r.flush(inventoryDto));
+    fixture.detectChanges();
+
+    expect(page.lastTicket()?.folio).toBe(70);
+    expect(page.pendingTicketSaleId()).toBeNull();
+    expect(page.cartItems()).toHaveLength(0);
   });
 });
