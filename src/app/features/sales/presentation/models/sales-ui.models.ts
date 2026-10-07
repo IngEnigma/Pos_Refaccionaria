@@ -14,6 +14,7 @@ export interface SalesProduct {
 export interface SalesCartItem {
   productId: number;
   nombre: string;
+  descripcion: string;
   precio: number;
   imagen: string;
   qty: number;

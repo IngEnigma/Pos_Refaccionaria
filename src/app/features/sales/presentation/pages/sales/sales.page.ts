@@ -10,6 +10,7 @@ import {
   untracked,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { HttpErrorResponse } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 
 import { ToastService } from '@app/shared/ui/components/toast/toast.service';
@@ -226,6 +227,9 @@ export class SalesPageComponent implements OnInit {
   }
 
   processTransaction(): void {
+    // Guardia in-flight: si ya hay una transacción en curso se ignora (evita doble POST).
+    if (this.isCreatingSale()) return;
+
     // Validación fresca contra stock actual de mi-sucursal (evita POST si el stock cambió desde que se agregó al carrito)
     const freshStockById = new Map<number, number>(
       this.inventoryByBranchFacade.allItems().map((it) => [it.idProducto, it.cantidad]),
@@ -285,8 +289,9 @@ export class SalesPageComponent implements OnInit {
               ? error.message
               : 'No fue posible registrar la venta.';
           this.toastService.error(message);
-          // Si el backend reportó stock insuficiente, refrescar para mostrar stock real
-          if (/stock|disponible|inventario/i.test(message)) {
+          // Si el backend reportó stock insuficiente, refrescar para mostrar stock real.
+          // Un 404 (p. ej. ticket no encontrado) nunca es error de stock aunque el texto coincida.
+          if (/stock|disponible|inventario/i.test(message) && !isNotFoundError(error)) {
             this.inventoryByBranchFacade.loadMyBranchInventory();
           }
         },
@@ -296,4 +301,16 @@ export class SalesPageComponent implements OnInit {
   onLoadMore(): void {
     // Paginación local no necesaria; mi-sucursal trae todo el inventario
   }
+}
+
+/** Recorre la cadena `cause` buscando un 404 (p. ej. ticket no encontrado). */
+function isNotFoundError(error: unknown): boolean {
+  let current: unknown = error;
+  while (current instanceof Error) {
+    const cause: unknown = (current as { cause?: unknown }).cause;
+    if (cause instanceof HttpErrorResponse) return cause.status === 404;
+    if (!(cause instanceof Error)) return false;
+    current = cause;
+  }
+  return false;
 }

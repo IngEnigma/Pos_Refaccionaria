@@ -17,6 +17,7 @@ import {
 } from '@features/sales/domain/errors/sales.errors';
 import { PaymentMethodMapper } from '@features/sales/infrastructure/mappers/payment-method.mapper';
 import { SALE_ENDPOINTS } from '@features/sales/config/sale-endpoints';
+import { resolveHttpErrorMessage } from '@features/sales/infrastructure/utils/http-error-resolver';
 
 @Injectable({ providedIn: 'root' })
 export class PaymentMethodRepositoryImpl implements PaymentMethodRepository {
@@ -28,7 +29,13 @@ export class PaymentMethodRepositoryImpl implements PaymentMethodRepository {
     return this.http.get<PaymentMethodResponseDto[]>(this.endpoint).pipe(
       map((response) => response.map((dto) => PaymentMethodMapper.fromResponseDto(dto))),
       catchError((error: unknown) =>
-        throwError(() => new PaymentMethodFetchError('Failed to fetch payment methods', error)),
+        throwError(
+          () =>
+            new PaymentMethodFetchError(
+              resolveHttpErrorMessage(error, 'Failed to fetch payment methods'),
+              error,
+            ),
+        ),
       ),
     );
   }
