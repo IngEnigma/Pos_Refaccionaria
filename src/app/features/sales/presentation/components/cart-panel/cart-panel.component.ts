@@ -25,6 +25,7 @@ export class CartPanelComponent {
   readonly total = input(0);
   paymentMethods = input<readonly PaymentMethod[]>([]);
   selectedPayment = input<PaymentMethod | null>(null);
+  readonly clienteLabel = input('Público general');
   readonly disabled = input(false);
   readonly loading = input(false);
 
@@ -32,5 +33,6 @@ export class CartPanelComponent {
   readonly increaseQty = output<SalesCartItem>();
   readonly decreaseQty = output<SalesCartItem>();
   readonly selectPayment = output<PaymentMethod>();
+  readonly changeCliente = output<void>();
   readonly processTransaction = output<void>();
 }

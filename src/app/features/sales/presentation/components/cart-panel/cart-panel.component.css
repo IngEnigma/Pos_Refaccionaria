@@ -28,6 +28,60 @@
   color: var(--color-text);
 }
 
+.client-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+  padding: 8px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm, 8px);
+  background: var(--color-surface, #fff);
+}
+
+.client-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.client-caption {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted, #64748b);
+}
+
+.client-value {
+  font-family: var(--font-text-family);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.client-change {
+  flex-shrink: 0;
+  padding: 6px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm, 8px);
+  background: transparent;
+  color: var(--color-primary, #2563eb);
+  font-family: var(--font-text-family);
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.client-change:hover {
+  background: var(--color-surface-hover, #eff6ff);
+}
+
 .divider {
   height: 2px;
   background: var(--color-border);

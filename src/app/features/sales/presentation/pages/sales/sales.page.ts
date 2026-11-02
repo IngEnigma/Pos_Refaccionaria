@@ -21,6 +21,7 @@ import { CategorySliderComponent } from '@features/sales/presentation/components
 import { CartPanelComponent } from '@features/sales/presentation/components/cart-panel/cart-panel.component';
 import { ProductGridComponent } from '@features/sales/presentation/components/product-grid/product-grid.component';
 import { TicketModalComponent } from '@features/sales/presentation/components/ticket-modal/ticket-modal.component';
+import { ClientSelectorModalComponent } from '@features/sales/presentation/components/client-selector-modal/client-selector-modal.component';
 import {
   SalesCartItem,
   SalesPaymentMethod,
@@ -31,11 +32,12 @@ import { InventoryByBranchFacade } from '@features/inventory-by-branch';
 import { ProductType } from '@features/sales/product-types/domain/entities/product-type.entity';
 import { GlobalSearchService } from '@core/search/global-search.service';
 import { SaleTicket } from '@features/sales/domain/entities/sale-ticket.entity';
+import { Client } from '@features/clients/domain/entities/client.entity';
 
 @Component({
   selector: 'app-sales-page',
   standalone: true,
-  imports: [FormsModule, CategorySliderComponent, ProductGridComponent, CartPanelComponent, TicketModalComponent],
+  imports: [FormsModule, CategorySliderComponent, ProductGridComponent, CartPanelComponent, TicketModalComponent, ClientSelectorModalComponent],
   templateUrl: './sales.page.html',
   styleUrl: './sales.page.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -59,6 +61,18 @@ export class SalesPageComponent implements OnInit {
 
   readonly barcodeInput = signal('');
   readonly lastTicket = signal<SaleTicket | null>(null);
+  readonly clientSelectorOpen = signal(false);
+
+  /** Etiqueta del cliente de la venta actual: nombre completo o "Público general". */
+  readonly clienteLabel = computed(() => {
+    const client = this.cartService.selectedClient();
+    if (!client) return 'Público general';
+    const apellidos = [client.apellidoPaterno, client.apellidoMaterno]
+      .filter(Boolean)
+      .join(' ')
+      .trim();
+    return `${client.nombre} ${apellidos}`.trim();
+  });
 
   constructor() {
     effect(() => {
@@ -224,6 +238,19 @@ export class SalesPageComponent implements OnInit {
 
   onTicketModalClose(): void {
     this.lastTicket.set(null);
+  }
+
+  onOpenClientSelector(): void {
+    this.clientSelectorOpen.set(true);
+  }
+
+  onCloseClientSelector(): void {
+    this.clientSelectorOpen.set(false);
+  }
+
+  onSelectClient(client: Client | null): void {
+    this.cartService.selectClient(client);
+    this.clientSelectorOpen.set(false);
   }
 
   processTransaction(): void {

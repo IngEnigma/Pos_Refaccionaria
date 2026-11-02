@@ -136,6 +136,36 @@ describe('CreateCompleteSaleUseCase (integración)', () => {
     httpMock.expectNone(VENTAS);
   });
 
+  // Verifica que con cliente registrado el POST incluya id_cliente junto a id_metodoPago.
+  it('envía id_cliente en el POST cuando el payload incluye cliente', (done) => {
+    useCase
+      .execute({ idMetodoPago: 1, idCliente: 25, productos: [{ id: 10, cantidad: 2 }] })
+      .subscribe({ next: () => done(), error: done.fail });
+
+    const saleReq = httpMock.expectOne(VENTAS);
+    expect(saleReq.request.method).toBe('POST');
+    expect(saleReq.request.body).toEqual({ id_metodoPago: 1, id_cliente: 25 });
+    saleReq.flush(saleDto);
+
+    httpMock.expectOne(DETALLE).flush(detailDto(11, 10, 2));
+    httpMock.expectOne(`${API}/ventas/50/ticket/`).flush(ticketDto);
+  });
+
+  // Verifica que para Público general el campo id_cliente se omita por completo (nunca null).
+  it('omite id_cliente por completo para Público general', (done) => {
+    useCase
+      .execute({ idMetodoPago: 1, productos: [{ id: 10, cantidad: 2 }] })
+      .subscribe({ next: () => done(), error: done.fail });
+
+    const saleReq = httpMock.expectOne(VENTAS);
+    expect(saleReq.request.body).toEqual({ id_metodoPago: 1 });
+    expect(saleReq.request.body).not.toHaveProperty('id_cliente');
+    saleReq.flush(saleDto);
+
+    httpMock.expectOne(DETALLE).flush(detailDto(11, 10, 2));
+    httpMock.expectOne(`${API}/ventas/50/ticket/`).flush(ticketDto);
+  });
+
   // Verifica que una cantidad inválida aborte el flujo antes de cualquier petición HTTP.
   it('rechaza cantidad cero sin tocar la red', () => {
     expect(() =>

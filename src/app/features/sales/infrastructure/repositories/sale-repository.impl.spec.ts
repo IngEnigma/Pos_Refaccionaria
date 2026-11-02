@@ -78,6 +78,36 @@ describe('SaleRepositoryImpl', () => {
     expect(req.request.body).toEqual({
       id_metodoPago: 2,
     });
+    // Público general: el campo id_cliente debe omitirse por completo.
+    expect(req.request.body).not.toHaveProperty('id_cliente');
+    req.flush(response);
+  });
+
+  it('creates sale with registered client sending id_cliente', () => {
+    const payload: CreateSalePayload = {
+      idMetodoPago: 2,
+      idCliente: 25,
+    };
+    const response: SaleResponseDto = {
+      id: 101,
+      id_usuario: 1,
+      id_inventario: 1,
+      id_metodoPago: 2,
+      total: '50.00',
+      fecha: '2024-01-01',
+    };
+
+    repository.createSale(payload).subscribe((sale) => {
+      expect(sale.id).toBe(101);
+    });
+
+    const expectedUrl = `${envStub.apiUrl}${SALE_ENDPOINTS.BASE}`;
+    const req = httpMock.expectOne(expectedUrl);
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual({
+      id_metodoPago: 2,
+      id_cliente: 25,
+    });
     req.flush(response);
   });
 

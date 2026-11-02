@@ -5,6 +5,7 @@ import { of, throwError } from 'rxjs';
 import { SalesFacade } from '@features/sales/application/facades/sales.facade';
 import { SalesCartService } from './sales-cart.service';
 import { SalesProduct } from '../models/sales-ui.models';
+import { Client } from '@features/clients/domain/entities/client.entity';
 
 describe('SalesCartService', () => {
   let service: SalesCartService;
@@ -486,6 +487,164 @@ describe('SalesCartService', () => {
       const order = service.order();
       expect(order.items).toHaveLength(1);
       expect(order.subtotal.value).toBe(100);
+    });
+  });
+
+  describe('selección de cliente', () => {
+    const makeClient = (overrides: Partial<Client> = {}): Client => ({
+      id: 25,
+      idSucursal: 3,
+      nombre: 'Juan',
+      apellidoPaterno: 'Pérez',
+      apellidoMaterno: 'López',
+      telefono: '5512345678',
+      correo: null,
+      direccion: null,
+      rfc: null,
+      ...overrides,
+    });
+
+    const makeProduct = (overrides: Partial<SalesProduct> = {}): SalesProduct => ({
+      id: 1,
+      nombre: 'Filtro',
+      descripcion: '',
+      precio: 120,
+      stock: 10,
+      codigoBarras: '001',
+      hasSucursalPrice: false,
+      imagen: '',
+      ...overrides,
+    });
+
+    // Verifica que toda venta nueva inicie en Público general (selectedClient null).
+    it('estado inicial: Público general (selectedClient null)', () => {
+      expect(service.selectedClient()).toBeNull();
+    });
+
+    // Verifica que seleccionar un cliente registre la selección.
+    it('selectClient guarda el cliente seleccionado', () => {
+      const client = makeClient();
+      service.selectClient(client);
+      expect(service.selectedClient()).toEqual(client);
+    });
+
+    // Verifica el cambio de un cliente registrado a otro distinto.
+    it('cambia de un cliente registrado a otro', () => {
+      service.selectClient(makeClient({ id: 25, nombre: 'Juan' }));
+      const otro = makeClient({ id: 30, nombre: 'María', apellidoPaterno: 'Gómez' });
+      service.selectClient(otro);
+      expect(service.selectedClient()?.id).toBe(30);
+      expect(service.selectedClient()?.nombre).toBe('María');
+    });
+
+    // Verifica regresar a Público general con selectClient(null).
+    it('volver a Público general con selectClient(null)', () => {
+      service.selectClient(makeClient());
+      service.selectClient(null);
+      expect(service.selectedClient()).toBeNull();
+    });
+
+    // Verifica que cambiar de cliente no altere productos, cantidades ni totales.
+    it('seleccionar cliente no modifica el carrito ni los cálculos', () => {
+      service.addToCart(makeProduct({ precio: 120 }));
+      const subtotalAntes = service.subtotal();
+      const totalAntes = service.total();
+      const cartAntes = service.cart();
+
+      service.selectClient(makeClient());
+      expect(service.cart()).toEqual(cartAntes);
+      expect(service.subtotal()).toBe(subtotalAntes);
+      expect(service.total()).toBe(totalAntes);
+
+      service.selectClient(null);
+      expect(service.cart()).toEqual(cartAntes);
+      expect(service.subtotal()).toBe(subtotalAntes);
+      expect(service.total()).toBe(totalAntes);
+    });
+
+    // Verifica que clearCart (venta completada) regrese a Público general.
+    it('clearCart regresa a Público general', () => {
+      service.selectClient(makeClient());
+      service.addToCart(makeProduct());
+      service.clearCart();
+      expect(service.selectedClient()).toBeNull();
+      expect(service.cart()).toEqual([]);
+    });
+
+    // Verifica que al confirmar con cliente el facade reciba idCliente.
+    it('confirmSale con cliente envía idCliente al facade', (done) => {
+      const spy = jest
+        .spyOn(salesFacadeStub, 'createCompleteSale')
+        .mockReturnValue(of({ id: 9 } as never));
+      service.addToCart(makeProduct());
+      service.selectPayment({ id: 1, tipo: 'EFECTIVO', descripcion: 'Efectivo' });
+      service.selectClient(makeClient({ id: 25 }));
+
+      service.confirmSale().subscribe({
+        next: () => {
+          expect(spy).toHaveBeenCalledWith({
+            idMetodoPago: 1,
+            idCliente: 25,
+            productos: [{ id: 1, cantidad: 1 }],
+          });
+          done();
+        },
+      });
+    });
+
+    // Verifica que en Público general el payload NO incluya la propiedad idCliente.
+    it('confirmSale en Público general omite idCliente por completo', (done) => {
+      const spy = jest
+        .spyOn(salesFacadeStub, 'createCompleteSale')
+        .mockReturnValue(of({ id: 9 } as never));
+      service.addToCart(makeProduct());
+      service.selectPayment({ id: 1, tipo: 'EFECTIVO', descripcion: 'Efectivo' });
+
+      service.confirmSale().subscribe({
+        next: () => {
+          const args: unknown[] = spy.mock.calls[0];
+          expect(args[0]).toEqual({ idMetodoPago: 1, productos: [{ id: 1, cantidad: 1 }] });
+          expect(args[0]).not.toHaveProperty('idCliente');
+          done();
+        },
+      });
+    });
+
+    // Verifica que un fallo en la creación conserve cliente y carrito para reintentar.
+    it('si la venta falla se conservan cliente y carrito', (done) => {
+      jest
+        .spyOn(salesFacadeStub, 'createCompleteSale')
+        .mockReturnValue(throwError(() => new Error('Stock insuficiente')));
+      service.addToCart(makeProduct());
+      service.selectPayment({ id: 1, tipo: 'EFECTIVO', descripcion: 'Efectivo' });
+      service.selectClient(makeClient({ id: 25 }));
+
+      service.confirmSale().subscribe({
+        error: (err) => {
+          expect(err.message).toBe('Stock insuficiente');
+          expect(service.cart()).toHaveLength(1);
+          expect(service.selectedClient()?.id).toBe(25);
+          done();
+        },
+      });
+    });
+
+    // Verifica que tras venta exitosa el cliente vuelva a Público general junto al carrito.
+    it('tras venta exitosa regresa a Público general', (done) => {
+      jest
+        .spyOn(salesFacadeStub, 'createCompleteSale')
+        .mockReturnValue(of({ id: 5 } as never));
+      service.addToCart(makeProduct());
+      service.selectPayment({ id: 1, tipo: 'EFECTIVO', descripcion: 'Efectivo' });
+      service.selectClient(makeClient());
+
+      service.confirmSale().subscribe({
+        next: () => {
+          expect(service.selectedClient()).toBeNull();
+          expect(service.cart()).toEqual([]);
+          done();
+        },
+      });
     });
   });
 });
