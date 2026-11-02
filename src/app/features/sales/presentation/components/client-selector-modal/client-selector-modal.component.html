@@ -1,0 +1,66 @@
+<div class="modal-backdrop" (click)="onBackdropClick($event)">
+  <div class="modal-content" (click)="$event.stopPropagation()" role="dialog" aria-label="Seleccionar cliente">
+    <header class="modal-header">
+      <div class="header-left">
+        <h2 class="modal-title">Seleccionar cliente</h2>
+        <span class="modal-subtitle">Cliente de la venta actual</span>
+      </div>
+      <button class="btn-close" (click)="onCancel()" aria-label="Cerrar">✕</button>
+    </header>
+
+    <section class="modal-body">
+      <div class="search-wrapper">
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Buscar por nombre, apellidos o teléfono..."
+          [ngModel]="searchQuery()"
+          (ngModelChange)="searchQuery.set($event)"
+          aria-label="Buscar cliente"
+        />
+      </div>
+
+      <div class="client-list">
+        <button
+          type="button"
+          class="client-option public-option"
+          [class.selected]="selectedClient() === null"
+          (click)="onSelect(null)"
+        >
+          <span class="client-name">Público general</span>
+          <span class="client-hint">Sin cliente registrado</span>
+        </button>
+
+        @if (loading()) {
+          <p class="list-status">Cargando clientes...</p>
+        } @else if (errorMessage()) {
+          <p class="list-status list-error">{{ errorMessage() }}</p>
+        } @else {
+          @for (client of filteredClients(); track client.id) {
+            <button
+              type="button"
+              class="client-option"
+              [class.selected]="selectedClient()?.id === client.id"
+              (click)="onSelect(client)"
+            >
+              <span class="client-name">{{ displayName(client) }}</span>
+              <span class="client-phone">{{ client.telefono }}</span>
+            </button>
+          } @empty {
+            <p class="list-status">
+              @if (searchQuery().trim()) {
+                No se encontraron coincidencias.
+              } @else {
+                No hay clientes registrados.
+              }
+            </p>
+          }
+        }
+      </div>
+    </section>
+
+    <footer class="modal-footer">
+      <button type="button" class="btn-secondary" (click)="onCancel()">Cancelar</button>
+    </footer>
+  </div>
+</div>

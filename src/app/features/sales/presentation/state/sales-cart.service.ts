@@ -4,6 +4,7 @@ import { CompleteSaleResult } from '@features/sales/application/usecase/create-c
 
 import { SalesFacade } from '@features/sales/application/facades/sales.facade';
 import { Order } from '@features/sales/domain/entities/order.entity';
+import { Client } from '@features/clients/domain/entities/client.entity';
 import {
   SalesCartItem,
   SalesPaymentMethod,
@@ -17,9 +18,12 @@ export class SalesCartService {
   private readonly _cart = signal<SalesCartItem[]>([]);
   private readonly _selectedPayment = signal<SalesPaymentMethod | null>(null);
   private readonly _descuento = signal(0);
+  private readonly _selectedClient = signal<Client | null>(null);
   readonly cart = this._cart.asReadonly();
   readonly selectedPayment = this._selectedPayment.asReadonly();
   readonly descuento = this._descuento.asReadonly();
+  /** Cliente de la venta actual. null = Público general. */
+  readonly selectedClient = this._selectedClient.asReadonly();
 
   readonly order = computed(() => {
     const o = new Order();
@@ -96,10 +100,15 @@ export class SalesCartService {
     this._selectedPayment.set(method);
   }
 
+  selectClient(client: Client | null): void {
+    this._selectedClient.set(client);
+  }
+
   clearCart(): void {
     this._cart.set([]);
     this._selectedPayment.set(null);
     this._descuento.set(0);
+    this._selectedClient.set(null);
   }
 
   /** @deprecated idInventario ya no se envía al backend; se mantiene no-op para compatibilidad */
@@ -123,9 +132,13 @@ export class SalesCartService {
       cantidad: item.qty,
     }));
 
+    // Cliente registrado → id_cliente; Público general → se omite el campo.
+    const selectedClient = this._selectedClient();
+
     return this.facade
       .createCompleteSale({
         idMetodoPago: paymentMethod.id,
+        ...(selectedClient ? { idCliente: selectedClient.id } : {}),
         productos,
       })
       .pipe(

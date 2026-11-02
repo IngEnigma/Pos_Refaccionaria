@@ -33,6 +33,7 @@ export class CreateCompleteSaleUseCase {
 
     return this.saleRepository.createSale({
       idMetodoPago: payload.idMetodoPago,
+      idCliente: payload.idCliente,
     }).pipe(
       concatMap((sale: Sale) => {
         createdSaleId = sale.id;

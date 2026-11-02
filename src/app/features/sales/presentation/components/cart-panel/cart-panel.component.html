@@ -3,6 +3,21 @@
     <h3>Detalle de Venta</h3>
   </div>
 
+  <div class="client-row">
+    <div class="client-info">
+      <span class="client-caption">Cliente</span>
+      <span class="client-value" data-testid="cliente-actual">{{ clienteLabel() }}</span>
+    </div>
+    <button
+      type="button"
+      class="client-change"
+      (click)="changeCliente.emit()"
+      aria-label="Cambiar cliente"
+    >
+      Cambiar
+    </button>
+  </div>
+
   <div class="divider"></div>
 
   <div class="cart-list">

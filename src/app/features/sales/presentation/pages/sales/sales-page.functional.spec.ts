@@ -62,6 +62,8 @@ import { InventoryRepository } from '@features/inventory-by-branch/domain/reposi
 import { InventoryRepositoryImpl } from '@features/inventory-by-branch/infrastructure/repositories/inventory-repository.impl';
 import { InventoryMovementRepository } from '@features/inventory-by-branch/domain/repository/movement-repository';
 import { InventoryMovementRepositoryImpl } from '@features/inventory-by-branch/infrastructure/repositories/movement-repository.impl';
+import { ClientRepository } from '@features/clients/domain/repository/client-repository';
+import { ClientRepositoryImpl } from '@features/clients/infrastructure/repositories/client-repository.impl';
 
 // Funcional: página de ventas real con todos los colaboradores reales (page, carrito,
 // facades, usecases, repositorios, interceptores, sesión, toasts, iconos como en app.config).
@@ -169,6 +171,7 @@ describe('SalesPageComponent (funcional)', () => {
         RegisterMovementUseCase,
         { provide: InventoryRepository, useClass: InventoryRepositoryImpl },
         { provide: InventoryMovementRepository, useClass: InventoryMovementRepositoryImpl },
+        { provide: ClientRepository, useClass: ClientRepositoryImpl },
       ],
     });
     httpMock = TestBed.inject(HttpTestingController);
@@ -386,5 +389,180 @@ describe('SalesPageComponent (funcional)', () => {
 
     expect(page.lastTicket()?.folio).toBe(50);
     expect(page.cartItems()).toHaveLength(0);
+  });
+
+  // ===== Selección de cliente en la venta =====
+
+  const CLIENTES = `${API}/clientes/`;
+
+  const clientDto = {
+    id: 25,
+    id_sucursal: 3,
+    nombre: 'Juan',
+    apellido_paterno: 'Pérez',
+    apellido_materno: 'López',
+    telefono: '5512345678',
+    correo: null,
+    direccion: null,
+    rfc: null,
+  };
+
+  function flushClients(dtos: unknown[] = [clientDto]): void {
+    httpMock.expectOne(CLIENTES).flush(dtos);
+    fixture.detectChanges();
+  }
+
+  function clienteLabel(): string {
+    const el = fixture.nativeElement.querySelector('[data-testid="cliente-actual"]') as HTMLElement | null;
+    if (!el) throw new Error('Etiqueta de cliente no encontrada en el DOM');
+    return (el.textContent ?? '').trim();
+  }
+
+  function changeClientButton(): HTMLButtonElement {
+    const buttons = Array.from(fixture.nativeElement.querySelectorAll('button') as NodeListOf<HTMLButtonElement>);
+    const found = buttons.find((b) => b.textContent?.includes('Cambiar'));
+    if (!found) throw new Error('Botón Cambiar no encontrado en el DOM');
+    return found;
+  }
+
+  function openClientSelector(): void {
+    changeClientButton().click();
+    fixture.detectChanges();
+  }
+
+  function modalOption(text: string): HTMLButtonElement {
+    const buttons = Array.from(fixture.nativeElement.querySelectorAll('.client-option') as NodeListOf<HTMLButtonElement>);
+    const found = buttons.find((b) => b.textContent?.includes(text));
+    if (!found) throw new Error(`Opción de cliente no encontrada: ${text}`);
+    return found;
+  }
+
+  function modalButton(text: string): HTMLButtonElement {
+    const buttons = Array.from(fixture.nativeElement.querySelectorAll('button') as NodeListOf<HTMLButtonElement>);
+    const found = buttons.find((b) => b.textContent?.includes(text));
+    if (!found) throw new Error(`Botón no encontrado: ${text}`);
+    return found;
+  }
+
+  // C1: toda venta nueva inicia en Público general con opción para cambiarlo.
+  it('C1: la venta inicia en Público general con botón Cambiar', () => {
+    expect(clienteLabel()).toBe('Público general');
+    expect(changeClientButton()).toBeTruthy();
+  });
+
+  // C2: seleccionar un cliente actualiza la etiqueta y no altera carrito ni totales.
+  it('C2: seleccionar cliente cambia la etiqueta sin tocar carrito ni totales', () => {
+    page.onAddToCart(page.productos()[0]);
+    fixture.detectChanges();
+    const subtotalAntes = page.subtotal();
+    const totalAntes = page.total();
+    const cartAntes = page.cartItems().map((i) => ({ ...i }));
+
+    openClientSelector();
+    flushClients();
+    modalOption('Juan Pérez López').click();
+    fixture.detectChanges();
+
+    expect(clienteLabel()).toBe('Juan Pérez López');
+    expect(page.cartItems()).toEqual(cartAntes);
+    expect(page.subtotal()).toBe(subtotalAntes);
+    expect(page.total()).toBe(totalAntes);
+    expect(fixture.nativeElement.querySelector('app-client-selector-modal')).toBeNull();
+  });
+
+  // C3: cancelar el selector conserva la selección previa.
+  it('C3: cancelar el selector conserva la selección previa', () => {
+    openClientSelector();
+    flushClients();
+    modalOption('Juan Pérez López').click();
+    fixture.detectChanges();
+    expect(clienteLabel()).toBe('Juan Pérez López');
+
+    openClientSelector();
+    flushClients();
+    modalButton('Cancelar').click();
+    fixture.detectChanges();
+
+    expect(clienteLabel()).toBe('Juan Pérez López');
+    expect(fixture.nativeElement.querySelector('app-client-selector-modal')).toBeNull();
+  });
+
+  // C4: desde el selector se puede volver a Público general.
+  it('C4: permite volver a Público general desde el selector', () => {
+    openClientSelector();
+    flushClients();
+    modalOption('Juan Pérez López').click();
+    fixture.detectChanges();
+    expect(clienteLabel()).toBe('Juan Pérez López');
+
+    openClientSelector();
+    flushClients();
+    modalOption('Público general').click();
+    fixture.detectChanges();
+
+    expect(clienteLabel()).toBe('Público general');
+  });
+
+  // C5: el selector busca sobre el catálogo real (nombre en este caso).
+  it('C5: busca clientes por nombre dentro del selector', () => {
+    openClientSelector();
+    flushClients([
+      clientDto,
+      { ...clientDto, id: 30, nombre: 'María', apellido_paterno: 'Gómez', apellido_materno: null, telefono: '5598765432' },
+    ]);
+
+    const input: HTMLInputElement = fixture.nativeElement.querySelector('.search-input');
+    input.value = 'maría';
+    input.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+
+    const options = Array.from(fixture.nativeElement.querySelectorAll('.client-option') as NodeListOf<HTMLButtonElement>);
+    const registrados = options.filter((o) => !o.classList.contains('public-option'));
+    expect(registrados).toHaveLength(1);
+    expect(registrados[0].textContent).toContain('María Gómez');
+  });
+
+  // C6: venta con cliente envía id_cliente y al completar regresa a Público general.
+  it('C6: venta con cliente envía id_cliente y al completar vuelve a Público general', () => {
+    page.onAddToCart(page.productos()[0]);
+    page.onSelectPayment(PAGO);
+    openClientSelector();
+    flushClients();
+    modalOption('Juan Pérez López').click();
+    fixture.detectChanges();
+    expect(clienteLabel()).toBe('Juan Pérez López');
+
+    page.processTransaction();
+    const saleReq = httpMock.expectOne(VENTAS);
+    expect(saleReq.request.body).toEqual({ id_metodoPago: 1, id_cliente: 25 });
+    saleReq.flush({ id: 50, id_usuario: 1, id_inventario: 7, id_metodoPago: 1, total: '120.00', fecha: '2024-01-01' });
+
+    httpMock.expectOne(DETALLE).flush({ id: 11, id_producto: 101, id_venta: 50, subtotal: '120.00', cantidad: 1 });
+    httpMock.expectOne(`${API}/ventas/50/ticket/`).flush(ticketDto);
+    httpMock.match(VENTAS).forEach((r) => r.flush([]));
+    httpMock.match(INV).forEach((r) => r.flush(inventoryDto));
+    fixture.detectChanges();
+
+    expect(page.lastTicket()?.folio).toBe(50);
+    expect(page.cartItems()).toHaveLength(0);
+    expect(clienteLabel()).toBe('Público general');
+  });
+
+  // C7: si la venta falla se conservan cliente y carrito para reintentar.
+  it('C7: si la venta falla se conservan cliente y carrito', () => {
+    page.onAddToCart(page.productos()[0]);
+    page.onSelectPayment(PAGO);
+    openClientSelector();
+    flushClients();
+    modalOption('Juan Pérez López').click();
+    fixture.detectChanges();
+
+    page.processTransaction();
+    httpMock.expectOne(VENTAS).flush({ error: 'Error al registrar la venta.' }, { status: 500, statusText: 'Server Error' });
+    fixture.detectChanges();
+
+    expect(page.cartItems()).toHaveLength(1);
+    expect(clienteLabel()).toBe('Juan Pérez López');
+    expect(page.isCreatingSale()).toBe(false);
   });
 });

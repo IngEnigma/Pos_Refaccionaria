@@ -1,14 +1,10 @@
 import { Routes } from '@angular/router';
 
-import { ClientRepository } from './domain/repository/client-repository';
-import { ClientRepositoryImpl } from './infrastructure/repositories/client-repository.impl';
-
+// ClientRepository se provee en app.config.ts (raíz) para que el catálogo
+// de clientes también esté disponible fuera de esta ruta (p. ej. Ventas).
 export const CLIENTS_ROUTES: Routes = [
   {
     path: '',
-    providers: [
-      { provide: ClientRepository, useClass: ClientRepositoryImpl },
-    ],
     loadComponent: () =>
       import('./presentation/pages/clients-page/clients.page').then(
         (m) => m.ClientsPageComponent,

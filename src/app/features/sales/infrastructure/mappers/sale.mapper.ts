@@ -24,9 +24,14 @@ export class SaleMapper {
   }
 
   static toCreateRequestDto(payload: CreateSalePayload): SaleCreateRequestDto {
-    return {
+    const dto: SaleCreateRequestDto = {
       id_metodoPago: payload.idMetodoPago,
     };
+    // Público general: omitir id_cliente por completo (nunca id_cliente: null).
+    if (payload.idCliente != null) {
+      dto.id_cliente = payload.idCliente;
+    }
+    return dto;
   }
 
   static toUpdateRequestDto(payload: UpdateSalePayload): SaleUpdateRequestDto {

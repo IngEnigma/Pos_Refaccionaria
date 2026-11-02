@@ -53,14 +53,24 @@
     [total]="total()"
     [paymentMethods]="paymentMethods()"
     [selectedPayment]="selectedPayment()"
+    [clienteLabel]="clienteLabel()"
     [loading]="isCreatingSale()"
     [disabled]="submitDisabled()"
     (removeItem)="onRemoveItem($event)"
     (increaseQty)="onIncreaseQty($event)"
     (decreaseQty)="onDecreaseQty($event)"
     (selectPayment)="onSelectPayment($event)"
+    (changeCliente)="onOpenClientSelector()"
     (processTransaction)="processTransaction()"
   />
+
+  @if (clientSelectorOpen()) {
+    <app-client-selector-modal
+      [selectedClient]="cartService.selectedClient()"
+      (select)="onSelectClient($event)"
+      (close)="onCloseClientSelector()"
+    />
+  }
 
   @if (lastTicket(); as ticket) {
     <app-ticket-modal [ticket]="ticket" (close)="onTicketModalClose()" />

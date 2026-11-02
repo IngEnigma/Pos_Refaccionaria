@@ -6,6 +6,8 @@ import { SaleTicket } from '@features/sales/domain/entities/sale-ticket.entity';
 
 export interface CreateSalePayload {
   idMetodoPago: number;
+  /** Cliente registrado. Ausente/null = Público general (no se envía al backend). */
+  idCliente?: number;
 }
 
 export interface CreateCompleteSalePayload extends CreateSalePayload {
