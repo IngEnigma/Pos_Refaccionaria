@@ -180,6 +180,12 @@ export class InventoryPageComponent {
     const dialogRef = this.dialog.open(ProductFormDialogComponent, { data: { product: asProduct } });
     dialogRef.closed.subscribe((result) => {
       if (result) {
+        // TODO(inventario): Revisar el identificador utilizado para la operación de
+        // actualización. Los elementos InventoryItem traen "id" = fila del detalle de
+        // inventario y "idProducto" = producto; con la prioridad actual (id ?? idProducto)
+        // la petición PUT podría dirigirse al id del detalle en lugar del id del producto.
+        // Validar con el encargado del frontend qué identificador corresponde antes de
+        // modificar esta lógica. Hallazgo pendiente de revisión, no confirmado como bug definitivo.
         const id = (product as any).id ?? (product as InventoryItem).idProducto;
         this.inventoryFacade.updateProduct(id, result as any).subscribe({
           next: () => {
@@ -198,6 +204,11 @@ export class InventoryPageComponent {
       this.toastService.error('No hay sucursal asignada para cambiar precio');
       return;
     }
+    // TODO(inventario): Revisar el identificador enviado al diálogo de precios de sucursal.
+    // El mismo patrón (id ?? idProducto) puede pasar el id del detalle de inventario en
+    // lugar del id del producto, y el backend recibiría un idProducto incorrecto.
+    // Validar con el encargado del frontend qué identificador corresponde antes de
+    // modificar esta lógica. Hallazgo pendiente de revisión, no confirmado como bug definitivo.
     const idProducto = (product as any).id ?? (product as InventoryItem).idProducto;
     const dialogRef = this.dialog.open(SetPriceDialogComponent, {
       data: { idProducto, idSucursal: sucursalId },
@@ -218,6 +229,11 @@ export class InventoryPageComponent {
 
   onDeleteProduct(product: Product | InventoryItem): void {
     const nombre = (product as any).nombre;
+    // TODO(inventario): Revisar el identificador utilizado para la operación de
+    // eliminación. Con InventoryItem, "id" es la fila del detalle de inventario y no el
+    // producto; DELETE /productos/{id} podría borrarse contra un registro equivocado.
+    // Validar con el encargado del frontend qué identificador corresponde antes de
+    // modificar esta lógica. Hallazgo pendiente de revisión, no confirmado como bug definitivo.
     const id = (product as any).id ?? (product as InventoryItem).idProducto;
     const dialogRef = this.dialog.open<boolean>(ConfirmDialogComponent, {
       data: {
