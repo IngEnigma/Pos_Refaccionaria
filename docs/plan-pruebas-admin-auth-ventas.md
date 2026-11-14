@@ -139,7 +139,7 @@ Preliminares (exploración del 2026-11-13). La Fase 0 los confirma y agrega los 
 | H-01 | 🔴 | `authGuard` solo valida sesión, no rol: un cajero entra a `/admin`, `/branches`, `/branch-pricing`, `/inventory-by-branch` o `/manager` escribiendo la URL. F0 confirma: ninguna ruta de `app.routes.ts` declara `data.roles` | `auth/presentation/guards/auth.guard.ts`, `app.routes.ts` | F1 | Corregido (`f01f164`): `roleGuard` + `data.roles` en las 5 rutas; spec del guard y de `app.routes` |
 | H-02 | 🟠 | El sidebar muestra "Administración" y "Cajeros" al rol `seller` (F0 confirma: `roles: ['admin', 'seller', 'manager']` en ambos) | `shell/config/sidebar-menu.defaults.ts:73,87` | F1 | Corregido (`d3dc434`): `/admin` solo admin, `/manager/cashiers` admin+manager; test en `sidebar-filter.utils.spec.ts` |
 | H-03 | 🟠 | `admin-management.page` usa datos hardcodeados (`branches`, `users`, `managerOptions` en líneas 32, 59, 86), sin facade ni use case; la feature `users` solo tiene domain/application/infrastructure, sin facade ni UI. **Decisión F0 (usuario): opción (a)**, conectar la página a facades de `users` (crear `users.facade`) y `branches` | `features/admin`, `features/users` | F1 | Corregido (`fd879e5`) con limitación: `users.facade` creado y página conectada a `users` y `branches`. El backend no modela rol, sucursal inicial, gerentes ni cajeros por sucursal, así que se retiraron de la maqueta (asignación de gerentes, columnas rol/sucursal/gerentes/cajeros, tarjetas Gerentes/Cajeros); queda alta y lista de sucursales y de usuarios (username, correo, estado). Si el equipo quiere roles/asignación hay que ampliar primero el backend |
-| H-04 | 🟡 | Sesión con "recordar" se guarda en localStorage (expuesta ante XSS). Electron mitiga; documentar | `auth/application/services/session-state.service.ts` | — | Registrado |
+| H-04 | 🟡 | Sesión con "recordar" se guarda en localStorage (expuesta ante XSS). Electron mitiga; documentar | `auth/application/services/session-state.service.ts` | — | Registrado. F2 matiz: la UI de login no ofrece "recordar" (H-19), así que hoy esta ruta solo se activa si algo llama a `login` con `remember: true` |
 | H-05 | 🟡 | Contraseñas de cuentas de prueba versionadas en el repo | `e2e/fixtures/test-users.ts` | F0 | Cerrado: el usuario confirma que son solo de la BD de pruebas |
 | H-06 | 🟡 | `refounds.page` es un stub y el nombre tiene typo (refunds) | `sales/presentation/pages/refounds` | — | Fuera de alcance |
 | H-07 | ⚪ | `jest.config.js` reporta 8 suites rojas preexistentes | `jest.config.js` | F0 | Cerrado: hoy 88/88 suites en verde (626 tests + 1 todo); ninguna roja en auth/sales. El comentario del config está desactualizado |
@@ -153,7 +153,11 @@ Preliminares (exploración del 2026-11-13). La Fase 0 los confirma y agrega los 
 | H-15 | 🟡 | `result as any` al pasar el resultado del diálogo a la facade y `subscribe` anidados | `branches/presentation/pages/branches-page/branches.page.ts:51,71`, `branch-pricing/presentation/pages/branch-pricing-page/branch-pricing.page.ts:51` | — | Registrado |
 | H-16 | 🟡 | Violación de capas leve: application importa de infrastructure (`withBearerToken`) | `auth/application/services/auth-token-refresh-orchestrator.service.ts:16` | — | Registrado |
 | H-17 | 🟡 | Electron: `console.log(preview)` imprime el ticket completo en el log del proceso principal; el texto ESC/POS no filtra caracteres de control (datos vienen del backend) | `electron/ipc/printer.ipc.js:36`, `electron/printer/ticket-escpos.js:4` | — | Registrado |
-| H-18 | 🟡 | `redirectTo` del login no se valida. No es open redirect (`navigateByUrl` solo navega dentro del router), pero acepta cualquier ruta | `auth/presentation/pages/login/login.page.ts:62-63` | F2 (test) | Registrado |
+| H-18 | 🟡 | `redirectTo` del login no se valida. No es open redirect (`navigateByUrl` solo navega dentro del router), pero acepta cualquier ruta | `auth/presentation/pages/login/login.page.ts:62-63` | F2 (test) | Registrado. F2: test de `redirectTo` válido + `it.todo('H-18: …')` en `login.page.spec.ts` |
+| H-19 | 🟡 | `LoginCommand.remember` y la persistencia en `localStorage` existen, pero el formulario de login no tiene casilla "Recordar sesión": la sesión nunca se recuerda desde la UI (código muerto o función faltante) | `auth/presentation/pages/login/login.page.html`, `login.page.ts` | F2 | Registrado (`it.todo('H-19: …')` en `login.page.spec.ts`); decidir con el equipo si se agrega la casilla o se elimina `remember` |
+| H-20 | 🟡 | `onSubmit()` no revisa `loading()`: el único freno al doble envío es el botón deshabilitado (el navegador no hace envío implícito con el botón deshabilitado, pero un `requestSubmit()` sí pasaría). El facade tampoco lo bloquea | `auth/presentation/pages/login/login.page.ts:onSubmit`, `auth/application/facades/auth.facade.ts:login` | F2 | Registrado (`it.todo('H-20: …')` en `login.page.spec.ts`) |
+| H-21 | 🔴 | **Fuga del access token.** `attachAccessToken` agregaba `Authorization: Bearer` a toda petición: a hosts externos (latente, hoy el front no llama a ninguno) y al propio `/token/refresh`. Tras un 401 de un host externo además se reintentaba con el token | `auth/application/services/auth-token-refresh-orchestrator.service.ts` | F2 | Corregido (`b90bc41`): solo URLs relativas o del origen de `APP_ENV.apiUrl`, y nunca en el refresh; tests en el spec del orquestador y en `auth-token.interceptor.integration.spec.ts` |
+| H-22 | 🟠 | **Login incorrecto enmascarado.** El interceptor trataba cualquier 401 como "token vencido": sin sesión llamaba a `retryRequestAfterRefresh`, que limpiaba la sesión y lanzaba `Error('No refresh token available')`. El repositorio lo relanzaba tal cual y el cajero veía ese texto en inglés en vez de "Credenciales inválidas" (el regex de toast de SIS-002 es laxo; no se re-ejecutó el e2e para comprobar qué texto se ve en el navegador real) | `auth/infrastructure/http/auth-token.interceptor.ts` | F2 | Corregido (`57c664c`): si la petición no llevaba token, el 401 original pasa intacto; test de integración con el stack real (interceptor + orquestador + repo) y caso en `auth-token.interceptor.spec.ts` |
 
 Revisado sin hallazgo: no hay `[innerHTML]` ni `bypassSecurityTrust*` en `src/app`; los logs de auth no imprimen valores de tokens ni contraseñas; `buildHttpErrorLog` usa URL sanitizada y no incluye el body de la petición; Electron con `contextIsolation: true` y `nodeIntegration: false`; presentation no importa infrastructure en estos módulos; `domain/repository/*` usa `Observable` de rxjs (convención aceptada); el carrito respeta el stock al agregar/incrementar; `processTransaction` tiene guarda contra doble clic (`isCreatingSale`); los `subscribe` sin `takeUntilDestroyed` en branches/branch-pricing son de HTTP o `dialogRef.closed` (completan solos, no hay fuga).
 
@@ -196,14 +200,14 @@ Revisado sin hallazgo: no hay `[innerHTML]` ni `bypassSecurityTrust*` en `src/ap
 ### Fase 2 — Unitarias Auth
 **Sesión:** 1 · **Modelo:** Sonnet · **Subagentes:** no (módulo chico)
 
-- [ ] Lote A — domain e infraestructura pura: `domain/entities/user-profile.entity.ts`, `infrastructure/mappers/auth-role.mapper.ts`, `infrastructure/mappers/profile.mapper.ts`, `infrastructure/http/auth-token-http.utils.ts`
-- [ ] Lote B — application: `usecase/refresh.usecase.ts`, `usecases/get-my-profile.usecase.ts`, `usecases/update-my-sucursal.usecase.ts`, `commands/login.command.ts` (si tiene validación)
-- [ ] Lote C — infraestructura HTTP: `repositories/profile-repository.impl.ts`
-- [ ] Ampliar specs existentes:
+- [x] Lote A — domain e infraestructura pura: `domain/entities/user-profile.entity.ts`, `infrastructure/mappers/auth-role.mapper.ts`, `infrastructure/mappers/profile.mapper.ts`, `infrastructure/http/auth-token-http.utils.ts` *(`cfd4ac8`; `user-profile.entity.ts` es solo una interfaz, sin spec propio: lo cubre `profile.mapper.spec.ts`)*
+- [x] Lote B — application: `usecase/refresh.usecase.ts`, `usecases/get-my-profile.usecase.ts`, `usecases/update-my-sucursal.usecase.ts`, `commands/login.command.ts` (si tiene validación) *(`0e3eae2`; `login.command.ts` es una interfaz sin validación, sin spec)*
+- [x] Lote C — infraestructura HTTP: `repositories/profile-repository.impl.ts` *(`c870f20`)*
+- [x] Ampliar specs existentes: *(`eac3cf6` session-state/facade/auth-repository/auth.errors, `b90bc41` y `57c664c` interceptor + orquestador, `7cf66f5` login.page)*
   - `login.page.spec.ts`: recordar sesión, `redirectTo`, errores 401/500/red, botón deshabilitado mientras carga (no doble envío).
   - `session-state.service.spec.ts`: sesión expirada en storage, JSON corrupto, legado → actual, logout limpia ambos storages.
   - `auth-token.interceptor.spec.ts`: no adjunta token a la petición de refresh ni a hosts externos.
-- [ ] Cobertura `features/auth` ≥ 90 % líneas → §8.
+- [x] Cobertura `features/auth` ≥ 90 % líneas → §8. *(97.9 %)*
 
 ### Fase 3 — Unitarias Ventas
 **Sesiones:** 2–3 · **Modelo:** Sonnet · **Subagentes:** sí, 2 en paralelo (A+B y C+D), E en la sesión principal
@@ -301,12 +305,21 @@ Ya existen: `auth-flow`, `sale-auth`, `create-complete-sale`, `sales-facade`, `s
 Comando: `npx jest src/app/features/auth src/app/features/sales --coverage` con `collectCoverageFrom` de los 6 módulos (sin `*.spec.ts` ni `*.dto.ts`), 2026-11-13. auth + sales: 28/28 suites, 218 tests en verde + 1 `it.todo` (`auth.facade.spec.ts:80`, "logs out user"). Proyecto completo: 88/88 suites, 626 tests + 1 todo.
 E2E base: `npx playwright test e2e/auth.login.spec.ts --project=chromium` → 4/4 en verde (SIS-001 a SIS-004), 11.3 s.
 
+### Cobertura de auth tras la Fase 2
+
+| Módulo | Suites | Tests | Líneas | Ramas | Funciones |
+|---|---|---|---|---|---|
+| auth | 21 / 0 fallan | 156 + 3 `todo` | 97.9 % (430/439) | 92.9 % (92/99) | 92.2 % (95/103) |
+
+Antes (F0): 84.2 % líneas, 63.7 % ramas, 70.0 % funciones, 11 suites. El 2.1 % de líneas restante incluye `index.ts` y `auth.routes.ts` (re-exports/rutas, 0 %, excluidos por §1) y la línea 53 del orquestador. Proyecto completo: 102/102 suites, 772 tests + 3 `todo`. Mismo comando de §3.1.
+
 ### Sesiones
 
 | Fecha | Fase | Modelo | Hecho | Hallazgos nuevos | Pendiente |
 |---|---|---|---|---|---|
 | 2026-11-13 | F0 | Opus | Rama `test/admin-auth-ventas` creada (cambios previos de `master` fuera, sin commit); línea base Jest + cobertura + E2E; auditoría seguridad/arquitectura/bugs; H-03 = (a); H-05 y H-07 cerrados | H-08 🔴 doble venta si falla el ticket · H-09 🟠 rollback parcial · H-10 🟠 lógica en `sales.page` · H-11 a H-18 🟡/⚪ | F1: H-01, H-02, H-03 (a), H-08, H-10 (si ≤ 50 líneas) |
 | 2026-11-13 | F1 | Sonnet | H-08 `ff5a3ed` · H-01 `f01f164` · H-02 `d3dc434` · H-03 `fd879e5` · H-09 parcial `62e5e73`. Cada uno con su test rojo primero. Suites auth + sales + shell + admin + users en verde (`37 suites, 265 tests + 1 todo`) | Ninguno | H-10 (decisión del usuario, >50 líneas); H-09 cascada/stock con el backend (F5 INT-05); F2 |
+| 2026-11-13 | F2 | Sonnet | Lotes A `cfd4ac8`, B `0e3eae2`, C `c870f20`; ampliaciones `eac3cf6` (session-state, facade, auth-repository, auth.errors), `7cf66f5` (login.page); fixes H-21 `b90bc41` y H-22 `57c664c` (test rojo primero). auth: 11 → 21 suites, 84.2 % → 97.9 % líneas. Proyecto: 102/102 suites en verde | H-19 🟡 sin casilla "recordar" · H-20 🟡 `onSubmit` sin guarda de `loading` · H-21 🔴 fuga del access token (corregido) · H-22 🟠 login incorrecto enmascarado (corregido) | F3: ventas. Pendiente decidir H-18/H-19/H-20 (🟡, `it.todo`) y H-10 |
 
 ### Resultado final (Fase 7)
 
