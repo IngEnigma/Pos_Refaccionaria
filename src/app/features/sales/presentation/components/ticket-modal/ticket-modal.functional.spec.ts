@@ -80,4 +80,114 @@ describe('TicketModalComponent (funcional)', () => {
     expect(component.isReprinting()).toBe(false);
     expect((fixture.nativeElement.querySelector('.btn-primary') as HTMLButtonElement).disabled).toBe(false);
   });
+
+  describe('reimpresión con puente de escritorio', () => {
+    const w = window as unknown as { desktop?: unknown };
+    const generateTicket = jest.fn();
+    const lastToast = () => toasts.toasts()[toasts.toasts().length - 1];
+
+    beforeEach(() => {
+      generateTicket.mockReset();
+      w.desktop = { generateTicket };
+    });
+
+    afterEach(() => {
+      delete w.desktop;
+    });
+
+    // Verifica que se envíe el payload snake_case al puente y se avise éxito.
+    it('envía el payload snake_case y avisa éxito', async () => {
+      generateTicket.mockResolvedValue({ success: true });
+
+      await component.onReprint();
+
+      expect(generateTicket).toHaveBeenCalledWith({
+        folio: 50,
+        fecha: '2024-01-01T00:00:00Z',
+        vendedor: 'vendedora',
+        metodo_pago: 'EFECTIVO',
+        sucursal: 'Central',
+        productos: [{ nombre: 'Filtro de aceite', cantidad: 2, subtotal: '240.00', precio_unitario: '120.00' }],
+        total: '278.40',
+      });
+      expect(lastToast()).toMatchObject({ type: 'success', message: 'Ticket reimpreso correctamente.' });
+      expect(component.isReprinting()).toBe(false);
+    });
+
+    // Verifica que un fallo reportado por la impresora muestre su mensaje.
+    it('muestra el mensaje de la impresora si success es false', async () => {
+      generateTicket.mockResolvedValue({ success: false, message: 'Sin papel' });
+
+      await component.onReprint();
+
+      expect(lastToast()).toMatchObject({ type: 'error', message: 'Sin papel' });
+    });
+
+    // Verifica el mensaje por defecto cuando la impresora falla sin mensaje.
+    it('usa mensaje por defecto si success es false sin mensaje', async () => {
+      generateTicket.mockResolvedValue({ success: false });
+
+      await component.onReprint();
+
+      expect(lastToast()).toMatchObject({ type: 'error', message: 'No fue posible reimprimir el ticket.' });
+    });
+
+    // Verifica que un rechazo con Error muestre su mensaje y libere el botón.
+    it('un rechazo con Error muestra su mensaje y libera el botón', async () => {
+      generateTicket.mockRejectedValue(new Error('IPC caído'));
+
+      await component.onReprint();
+
+      expect(lastToast()).toMatchObject({ type: 'error', message: 'IPC caído' });
+      expect(component.isReprinting()).toBe(false);
+    });
+
+    // Verifica el mensaje por defecto cuando el rechazo no es un Error.
+    it('un rechazo que no es Error usa el mensaje por defecto', async () => {
+      generateTicket.mockRejectedValue('boom');
+
+      await component.onReprint();
+
+      expect(lastToast()).toMatchObject({ type: 'error', message: 'Error al reimprimir ticket' });
+    });
+
+    // Verifica que un segundo clic en vuelo no dispare otra impresión.
+    it('ignora un segundo clic mientras reimprime', async () => {
+      let release!: (v: { success: boolean }) => void;
+      generateTicket.mockReturnValue(new Promise((r) => (release = r)));
+
+      const first = component.onReprint();
+      await component.onReprint();
+      release({ success: true });
+      await first;
+
+      expect(generateTicket).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  // Verifica que los datos opcionales nulos (sucursal, fecha, vendedor, pago) no se rendericen.
+  it('oculta sucursal, fecha, vendedor y pago cuando son nulos', () => {
+    fixture.componentRef.setInput(
+      'ticket',
+      new SaleTicket({ folio: 7, fecha: null, vendedor: null, metodoPago: null, sucursal: null, productos: [], total: '0.00' }),
+    );
+    fixture.detectChanges();
+
+    const text = fixture.nativeElement.textContent as string;
+    expect(text).toContain('Ticket #7');
+    expect(text).not.toContain('Fecha:');
+    expect(text).not.toContain('Vendedor:');
+    expect(text).not.toContain('Pago:');
+    expect(fixture.nativeElement.querySelector('.ticket-branch')).toBeNull();
+  });
+
+  // Verifica que el botón ✕ del encabezado también cierre el modal.
+  it('el botón ✕ emite el cierre', () => {
+    let closed = 0;
+    component.close.subscribe(() => closed++);
+
+    (fixture.nativeElement.querySelector('.btn-close') as HTMLButtonElement).click();
+
+    expect(closed).toBe(1);
+  });
 });
