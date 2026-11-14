@@ -726,4 +726,36 @@ describe('SalesCartService', () => {
       expect(service.cart()).toBe(before);
     });
   });
+
+  describe('IVA y total con decimales', () => {
+    const product = (precio: number, id = 1): SalesProduct => ({
+      id, nombre: 'P', descripcion: '', precio, stock: 100, codigoBarras: `c${id}`, hasSucursalPrice: false, imagen: '',
+    });
+
+    // Verifica que IVA y total de 19.99 x3 (59.97) cuadren a centavos: 9.60 y 69.57.
+    it('19.99 x3 → subtotal 59.97, IVA 9.6, total 69.57', () => {
+      [1, 2, 3].forEach(() => service.addToCart(product(19.99)));
+
+      expect(service.subtotal()).toBe(59.97);
+      expect(service.iva()).toBe(9.6);
+      expect(service.total()).toBe(69.57);
+    });
+
+    // Verifica que el total sea siempre subtotal + IVA (sin diferencias de centavo).
+    it('total = subtotal + IVA en una mezcla de precios con centavos', () => {
+      service.addToCart(product(0.99, 1));
+      service.addToCart(product(12.35, 2));
+      service.addToCart(product(7.77, 3));
+
+      expect(service.total()).toBeCloseTo(service.subtotal() + service.iva(), 2);
+    });
+
+    // Verifica que el descuento siga en 0 (no hay forma de fijarlo desde la UI) y no altere totales.
+    it('el descuento inicial es 0', () => {
+      service.addToCart(product(100));
+
+      expect(service.descuento()).toBe(0);
+      expect(service.total()).toBeCloseTo(116, 2);
+    });
+  });
 });
