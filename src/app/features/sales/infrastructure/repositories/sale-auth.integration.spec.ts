@@ -101,7 +101,7 @@ describe('SaleRepositoryImpl con autenticación (integración)', () => {
 
     const req = httpMock.expectOne(VENTAS);
     expect(req.request.headers.get('Authorization')).toBe('Bearer token-sesion-123');
-    req.flush({ id: 50, id_usuario: 1, id_inventario: 1, id_metodoPago: 1, total: '100.00', fecha: '2024-01-01' });
+    req.flush({ id: 50, id_usuario: 1, id_inventario: 1, id_metodo_pago: 1, total: '100.00', fecha: '2024-01-01' });
   });
 
   // Verifica que un 401 sin refresh token limpie la sesión y llegue al repositorio como SaleCreationError.
@@ -145,6 +145,6 @@ describe('SaleRepositoryImpl con autenticación (integración)', () => {
 
     const retry = httpMock.expectOne(VENTAS);
     expect(retry.request.headers.get('Authorization')).toBe(`Bearer ${nuevoJwt}`);
-    retry.flush({ id: 51, id_usuario: 1, id_inventario: 1, id_metodoPago: 2, total: '200.00', fecha: '2024-01-01' });
+    retry.flush({ id: 51, id_usuario: 1, id_inventario: 1, id_metodo_pago: 2, total: '200.00', fecha: '2024-01-01' });
   });
 });

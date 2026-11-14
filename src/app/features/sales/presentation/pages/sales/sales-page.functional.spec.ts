@@ -212,8 +212,7 @@ describe('SalesPageComponent (funcional)', () => {
   }
 
   function flushSuccessfulSale(id: number, cantidad: number) {
-    httpMock.expectOne(VENTAS).flush({ id, id_usuario: 1, id_inventario: 7, id_metodoPago: 1, total: '120.00', fecha: '2024-01-01' });
-    httpMock.expectOne(DETALLE).flush({ id: id + 100, id_producto: 101, id_venta: id, subtotal: '120.00', cantidad });
+    httpMock.expectOne(VENTAS).flush({ id, id_usuario: 1, id_inventario: 7, id_metodo_pago: 1, total: '120.00', fecha: '2024-01-01' });
     httpMock.expectOne(`${API}/ventas/${id}/ticket/`).flush({ ...ticketDto, folio: id });
     httpMock.match(VENTAS).forEach((r) => r.flush([]));
     httpMock.match(INV).forEach((r) => r.flush(inventoryDto));
@@ -302,13 +301,9 @@ describe('SalesPageComponent (funcional)', () => {
 
     page.processTransaction();
     const saleReq = httpMock.expectOne(VENTAS);
-    expect(saleReq.request.body).toEqual({ id_metodoPago: 1 });
-    saleReq.flush({ id: 50, id_usuario: 1, id_inventario: 7, id_metodoPago: 1, total: '120.00', fecha: '2024-01-01' });
-
-    const detailReq = httpMock.expectOne(DETALLE);
-    expect(detailReq.request.body).toEqual({ id_producto: 101, id_venta: 50, cantidad: 1 });
-    expect(detailReq.request.body).not.toHaveProperty('precio');
-    detailReq.flush({ id: 11, id_producto: 101, id_venta: 50, subtotal: '120.00', cantidad: 1 });
+    expect(saleReq.request.body).toEqual({ id_metodo_pago: 1, detalles: [{ id_producto: 101, cantidad: 1 }] });
+    expect(saleReq.request.body.detalles[0]).not.toHaveProperty('precio');
+    saleReq.flush({ id: 50, id_usuario: 1, id_metodo_pago: 1, total: '120.00', fecha: '2024-01-01' });
 
     httpMock.expectOne(`${API}/ventas/50/ticket/`).flush(ticketDto);
     httpMock.match(VENTAS).forEach((r) => r.flush([]));
@@ -384,8 +379,7 @@ describe('SalesPageComponent (funcional)', () => {
 
     const sales = httpMock.match((req) => req.method === 'POST' && req.url === VENTAS);
     expect(sales).toHaveLength(1);
-    sales[0].flush({ id: 50, id_usuario: 1, id_inventario: 7, id_metodoPago: 1, total: '120.00', fecha: '2024-01-01' });
-    httpMock.expectOne(DETALLE).flush({ id: 11, id_producto: 101, id_venta: 50, subtotal: '120.00', cantidad: 1 });
+    sales[0].flush({ id: 50, id_usuario: 1, id_inventario: 7, id_metodo_pago: 1, total: '120.00', fecha: '2024-01-01' });
     httpMock.expectOne(`${API}/ventas/50/ticket/`).flush(ticketDto);
     httpMock.match(VENTAS).forEach((r) => r.flush([]));
     httpMock.match(INV).forEach((r) => r.flush(inventoryDto));
@@ -538,10 +532,12 @@ describe('SalesPageComponent (funcional)', () => {
 
     page.processTransaction();
     const saleReq = httpMock.expectOne(VENTAS);
-    expect(saleReq.request.body).toEqual({ id_metodoPago: 1, id_cliente: 25 });
-    saleReq.flush({ id: 50, id_usuario: 1, id_inventario: 7, id_metodoPago: 1, total: '120.00', fecha: '2024-01-01' });
-
-    httpMock.expectOne(DETALLE).flush({ id: 11, id_producto: 101, id_venta: 50, subtotal: '120.00', cantidad: 1 });
+    expect(saleReq.request.body).toEqual({
+      id_metodo_pago: 1,
+      id_cliente: 25,
+      detalles: [{ id_producto: 101, cantidad: 1 }],
+    });
+    saleReq.flush({ id: 50, id_usuario: 1, id_inventario: 7, id_metodo_pago: 1, total: '120.00', fecha: '2024-01-01' });
     httpMock.expectOne(`${API}/ventas/50/ticket/`).flush(ticketDto);
     httpMock.match(VENTAS).forEach((r) => r.flush([]));
     httpMock.match(INV).forEach((r) => r.flush(inventoryDto));
@@ -610,8 +606,7 @@ describe('SalesPageComponent (funcional)', () => {
     page.onSelectPayment(PAGO);
 
     page.processTransaction();
-    httpMock.expectOne(VENTAS).flush({ id: 50, id_usuario: 1, id_inventario: 7, id_metodoPago: 1, total: '120.00', fecha: '2024-01-01' });
-    httpMock.expectOne(DETALLE).flush({ id: 150, id_producto: 101, id_venta: 50, subtotal: '120.00', cantidad: 1 });
+    httpMock.expectOne(VENTAS).flush({ id: 50, id_usuario: 1, id_inventario: 7, id_metodo_pago: 1, total: '120.00', fecha: '2024-01-01' });
     httpMock.expectOne(`${API}/ventas/50/ticket/`).flush({}, { status: 500, statusText: 'Server Error' });
     httpMock.match(VENTAS).forEach((r) => r.flush([]));
     httpMock.match(INV).forEach((r) => r.flush(inventoryDto));

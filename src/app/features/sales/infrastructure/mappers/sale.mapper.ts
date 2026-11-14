@@ -17,7 +17,7 @@ export class SaleMapper {
       id: dto.id,
       idUsuario: dto.id_usuario,
       idInventario: dto.id_inventario,
-      idMetodoPago: dto.id_metodoPago,
+      idMetodoPago: dto.id_metodo_pago,
       total,
       fecha: dto.fecha,
     });
@@ -25,11 +25,14 @@ export class SaleMapper {
 
   static toCreateRequestDto(payload: CreateSalePayload): SaleCreateRequestDto {
     const dto: SaleCreateRequestDto = {
-      id_metodoPago: payload.idMetodoPago,
+      id_metodo_pago: payload.idMetodoPago,
     };
     // Público general: omitir id_cliente por completo (nunca id_cliente: null).
     if (payload.idCliente != null) {
       dto.id_cliente = payload.idCliente;
+    }
+    if (payload.productos?.length) {
+      dto.detalles = payload.productos.map((p) => ({ id_producto: p.id, cantidad: p.cantidad }));
     }
     return dto;
   }
@@ -37,7 +40,7 @@ export class SaleMapper {
   static toUpdateRequestDto(payload: UpdateSalePayload): SaleUpdateRequestDto {
     return {
       id_usuario: payload.idUsuario,
-      id_metodoPago: payload.idMetodoPago,
+      id_metodo_pago: payload.idMetodoPago,
       total: payload.total,
       fecha: payload.fecha,
     };

@@ -11,49 +11,49 @@ import { LogLevel } from '@core/logging/log-level.enum';
 import { CreateCompleteSaleUseCase } from './create-complete-sale.usecase';
 import { SaleRepository } from '@features/sales/domain/repository/sale-repository';
 import { SaleRepositoryImpl } from '@features/sales/infrastructure/repositories/sale-repository.impl';
-import { SaleDetailRepository } from '@features/sales/domain/repository/sale-detail-repository';
-import { SaleDetailRepositoryImpl } from '@features/sales/infrastructure/repositories/sale-detail-repository.impl';
-import {
-  SaleCreationError,
-  SaleDetailMutationError,
-} from '@features/sales/domain/errors/sales.errors';
+import { SaleCreationError } from '@features/sales/domain/errors/sales.errors';
 
-// Integración real: UseCase -> Repositorios reales -> HttpClient (falso transporte).
-// Sin interceptores: pertenecen al nivel aplicación global y se cubren en los specs de página/auth.
-// Sin dobles de colaboradores: todas las clases del flujo son las de producción.
-describe('CreateCompleteSaleUseCase (integración)', () => {
+/**
+ * INT-05 (H-09 / H-38): contrato REAL del backend (RefaccionariaBack, rama Develop).
+ * - `POST /ventas/` con `detalles` crea cabecera + líneas + salidas de stock en UNA transacción
+ *   (`VentaService.crear_venta_completa`): si una línea falla no queda venta huérfana ni stock descontado.
+ * - El campo se llama `id_metodo_pago` (migración ventas 0003); `id_metodo_pago` ya no existe.
+ * - `DELETE /ventas/<id>/` exige `ventas.anular` (el cajero NO lo tiene) y solo cancela la venta
+ *   (estado='cancelada', conserva detalles y repone stock): no sirve como rollback del cajero.
+ */
+describe('INT-05 venta completa atómica (UseCase -> repos reales -> HttpClient)', () => {
   const API = environment.apiUrl;
   const VENTAS = `${API}/ventas/`;
-  const DETALLE = `${API}/detalleventa/`;
   let httpMock: HttpTestingController;
   let useCase: CreateCompleteSaleUseCase;
 
-  const saleDto = {
+  const ventaDto = {
     id: 50,
     id_usuario: 1,
-    id_inventario: 5,
-    id_metodoPago: 1,
+    id_metodo_pago: 2,
+    id_sucursal: 3,
+    id_cliente: null,
+    estado: 'completada',
     total: '200.00',
-    fecha: '2024-01-01',
+    fecha: '2024-01-01T00:00:00Z',
+    detalles: [
+      { id: 11, id_producto: 10, cantidad: 1, subtotal: '100.00' },
+      { id: 12, id_producto: 20, cantidad: 1, subtotal: '100.00' },
+    ],
   };
-
-  const detailDto = (id: number, productId: number, cantidad: number) => ({
-    id,
-    id_producto: productId,
-    id_venta: 50,
-    subtotal: '100.00',
-    cantidad,
-  });
-
   const ticketDto = {
     folio: 50,
     fecha: '2024-01-01T00:00:00Z',
-    vendedor: 'vendedor1',
+    vendedor: 'cajero1',
     metodo_pago: 'EFECTIVO',
     sucursal: 'Sucursal 1',
-    productos: [{ nombre: 'Filtro', cantidad: 2, precio_unitario: '100.00', subtotal: '200.00' }],
+    productos: [{ nombre: 'Filtro', cantidad: 1, precio_unitario: '100.00', subtotal: '100.00' }],
     total: '232.00',
   };
+  const productos = [
+    { id: 10, cantidad: 1 },
+    { id: 20, cantidad: 1 },
+  ];
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -65,7 +65,6 @@ describe('CreateCompleteSaleUseCase (integración)', () => {
         { provide: LOGGING_LEVEL_TOKEN, useValue: LogLevel.FATAL },
         CreateCompleteSaleUseCase,
         { provide: SaleRepository, useClass: SaleRepositoryImpl },
-        { provide: SaleDetailRepository, useClass: SaleDetailRepositoryImpl },
       ],
     });
     httpMock = TestBed.inject(HttpTestingController);
@@ -74,196 +73,114 @@ describe('CreateCompleteSaleUseCase (integración)', () => {
 
   afterEach(() => httpMock.verify());
 
-  // Verifica el flujo completo real: POST venta -> POST detalles -> GET ticket, con cuerpos y mapeo correctos.
-  it('registra una venta válida de extremo a extremo del flujo', (done) => {
-    useCase.execute({ idMetodoPago: 1, productos: [{ id: 10, cantidad: 2 }] }).subscribe({
-      next: (result) => {
-        expect(result.sale.id).toBe(50);
-        expect(result.sale.total.value).toBe(200);
-        expect(result.ticket.folio).toBe(50);
-        expect(result.ticket.productos).toHaveLength(1);
-        expect(result.ticket.total).toBe('232.00');
-        done();
-      },
-      error: done.fail,
+  it('crea cabecera y detalles con una sola petición POST /ventas/ y luego pide el ticket', async () => {
+    const result = new Promise<unknown>((resolve, reject) =>
+      useCase.execute({ idMetodoPago: 2, idCliente: 25, productos }).subscribe({ next: resolve, error: reject }),
+    );
+
+    const req = httpMock.expectOne(VENTAS);
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual({
+      id_metodo_pago: 2,
+      id_cliente: 25,
+      detalles: [
+        { id_producto: 10, cantidad: 1 },
+        { id_producto: 20, cantidad: 1 },
+      ],
     });
+    req.flush(ventaDto);
+    httpMock.expectOne(`${API}/ventas/50/ticket/`).flush(ticketDto);
 
-    const saleReq = httpMock.expectOne(VENTAS);
-    expect(saleReq.request.method).toBe('POST');
-    expect(saleReq.request.body).toEqual({ id_metodoPago: 1 });
-    saleReq.flush(saleDto);
-
-    const detailReq = httpMock.expectOne(DETALLE);
-    expect(detailReq.request.method).toBe('POST');
-    expect(detailReq.request.body).toEqual({ id_producto: 10, id_venta: 50, cantidad: 2 });
-    detailReq.flush(detailDto(11, 10, 2));
-
-    const ticketReq = httpMock.expectOne(`${API}/ventas/50/ticket/`);
-    expect(ticketReq.request.method).toBe('GET');
-    ticketReq.flush(ticketDto);
+    const { sale, ticket } = (await result) as { sale: { id: number; idMetodoPago: number; total: { value: number } }; ticket: { folio: number } };
+    expect(sale.id).toBe(50);
+    expect(sale.idMetodoPago).toBe(2);
+    expect(sale.total.value).toBe(200);
+    expect(ticket.folio).toBe(50);
+    httpMock.expectNone(`${API}/detalleventa/`);
   });
 
-  // Verifica que cada producto del carrito genere su propio POST a detalleventa con su cantidad.
-  it('envía un detalle por producto con su cantidad correspondiente', (done) => {
-    useCase
-      .execute({ idMetodoPago: 2, productos: [{ id: 10, cantidad: 1 }, { id: 20, cantidad: 3 }] })
-      .subscribe({ next: () => done(), error: done.fail });
+  it('Público general: omite id_cliente por completo (nunca null)', () => {
+    useCase.execute({ idMetodoPago: 2, productos }).subscribe();
 
-    httpMock.expectOne(VENTAS).flush(saleDto);
-
-    // forkJoin dispara ambos POST en paralelo: se recuperan juntos y se verifica cada cuerpo.
-    const details = httpMock.match(DETALLE);
-    expect(details).toHaveLength(2);
-    expect(details.map((r) => r.request.body)).toEqual([
-      { id_producto: 10, id_venta: 50, cantidad: 1 },
-      { id_producto: 20, id_venta: 50, cantidad: 3 },
-    ]);
-    details[0].flush(detailDto(11, 10, 1));
-    details[1].flush(detailDto(12, 20, 3));
-
+    const req = httpMock.expectOne(VENTAS);
+    expect(req.request.body).not.toHaveProperty('id_cliente');
+    expect(req.request.body).toHaveProperty('id_metodo_pago', 2);
+    req.flush(ventaDto);
     httpMock.expectOne(`${API}/ventas/50/ticket/`).flush(ticketDto);
   });
 
-  // Verifica que un payload sin productos se rechace sin emitir ninguna petición HTTP.
-  it('rechaza la venta sin productos sin tocar la red', (done) => {
-    useCase.execute({ idMetodoPago: 1, productos: [] }).subscribe({
-      error: (err) => {
-        expect(err.message).toBe('CreateCompleteSale: at least one product is required');
-        done();
-      },
-    });
+  it('si el backend rechaza una línea (400), no hay venta huérfana: no se llama a detalleventa ni a DELETE', async () => {
+    const result = new Promise<unknown>((resolve) => useCase.execute({ idMetodoPago: 2, productos }).subscribe({ error: resolve }));
+
+    httpMock.expectOne(VENTAS).flush(
+      { error: 'Errores en detalles: Línea 1 (producto 20): stock insuficiente: disponible 0, solicitado 1' },
+      { status: 400, statusText: 'Bad Request' },
+    );
+
+    const err = (await result) as Error;
+    expect(err).toBeInstanceOf(SaleCreationError);
+    expect(err.message).toContain('stock insuficiente');
+    httpMock.expectNone(`${API}/detalleventa/`);
+    httpMock.expectNone(`${API}/ventas/50/`);
+  });
+
+  it('un cajero sin permiso recibe el 403 del backend sin intentar anular ninguna venta', async () => {
+    const result = new Promise<unknown>((resolve) => useCase.execute({ idMetodoPago: 2, productos }).subscribe({ error: resolve }));
+
+    httpMock
+      .expectOne(VENTAS)
+      .flush({ detail: "Requiere permiso 'ventas.vender' (rol insuficiente)" }, { status: 403, statusText: 'Forbidden' });
+
+    expect(await result).toBeInstanceOf(SaleCreationError);
+    httpMock.expectNone(`${API}/detalleventa/`);
+  });
+
+  it('H-08: si el ticket falla después de crear la venta devuelve la venta sin ticket y no la anula', async () => {
+    const result = new Promise<{ sale: { id: number }; ticket: unknown }>((resolve) =>
+      useCase.execute({ idMetodoPago: 2, productos }).subscribe({ next: resolve as never }),
+    );
+
+    httpMock.expectOne(VENTAS).flush(ventaDto);
+    httpMock.expectOne(`${API}/ventas/50/ticket/`).flush({}, { status: 500, statusText: 'Server Error' });
+
+    const r = await result;
+    expect(r.sale.id).toBe(50);
+    expect(r.ticket).toBeNull();
+    httpMock.expectNone(`${API}/ventas/50/`);
+  });
+
+  it('rechaza la venta sin productos sin tocar la red', async () => {
+    const err = await new Promise<Error>((resolve) => useCase.execute({ idMetodoPago: 1, productos: [] }).subscribe({ error: resolve }));
+
+    expect(err.message).toBe('CreateCompleteSale: at least one product is required');
     httpMock.expectNone(VENTAS);
   });
 
-  // Verifica que con cliente registrado el POST incluya id_cliente junto a id_metodoPago.
-  it('envía id_cliente en el POST cuando el payload incluye cliente', (done) => {
-    useCase
-      .execute({ idMetodoPago: 1, idCliente: 25, productos: [{ id: 10, cantidad: 2 }] })
-      .subscribe({ next: () => done(), error: done.fail });
-
-    const saleReq = httpMock.expectOne(VENTAS);
-    expect(saleReq.request.method).toBe('POST');
-    expect(saleReq.request.body).toEqual({ id_metodoPago: 1, id_cliente: 25 });
-    saleReq.flush(saleDto);
-
-    httpMock.expectOne(DETALLE).flush(detailDto(11, 10, 2));
-    httpMock.expectOne(`${API}/ventas/50/ticket/`).flush(ticketDto);
-  });
-
-  // Verifica que para Público general el campo id_cliente se omita por completo (nunca null).
-  it('omite id_cliente por completo para Público general', (done) => {
-    useCase
-      .execute({ idMetodoPago: 1, productos: [{ id: 10, cantidad: 2 }] })
-      .subscribe({ next: () => done(), error: done.fail });
-
-    const saleReq = httpMock.expectOne(VENTAS);
-    expect(saleReq.request.body).toEqual({ id_metodoPago: 1 });
-    expect(saleReq.request.body).not.toHaveProperty('id_cliente');
-    saleReq.flush(saleDto);
-
-    httpMock.expectOne(DETALLE).flush(detailDto(11, 10, 2));
-    httpMock.expectOne(`${API}/ventas/50/ticket/`).flush(ticketDto);
-  });
-
-  // Verifica que una cantidad inválida aborte el flujo antes de cualquier petición HTTP.
   it('rechaza cantidad cero sin tocar la red', () => {
-    expect(() =>
-      useCase.execute({ idMetodoPago: 1, productos: [{ id: 10, cantidad: 0 }] }),
-    ).toThrow('CreateCompleteSale.productos.cantidad: quantity must be greater than zero');
+    expect(() => useCase.execute({ idMetodoPago: 1, productos: [{ id: 10, cantidad: 0 }] })).toThrow(
+      'CreateCompleteSale.productos.cantidad: quantity must be greater than zero',
+    );
     httpMock.expectNone(VENTAS);
   });
 
-  // Verifica que un 400 con {"error"} del backend llegue como SaleCreationError con ese mensaje.
-  it('propaga el error 400 del backend al crear la venta', (done) => {
-    useCase.execute({ idMetodoPago: 1, productos: [{ id: 10, cantidad: 2 }] }).subscribe({
-      error: (err) => {
-        expect(err).toBeInstanceOf(SaleCreationError);
-        expect(err.message).toBe('Stock insuficiente para el producto 10.');
-        done();
-      },
-    });
-
-    httpMock.expectOne(VENTAS).flush({ error: 'Stock insuficiente para el producto 10.' }, { status: 400, statusText: 'Bad Request' });
-    httpMock.expectNone(DETALLE);
-  });
-
-  // Verifica que un 500 al crear un detalle dispare rollback (DELETE venta) y propague el error del detalle.
-  it('ante fallo del detalle hace rollback de la venta y propaga el error', (done) => {
-    useCase.execute({ idMetodoPago: 1, productos: [{ id: 10, cantidad: 2 }] }).subscribe({
-      error: (err) => {
-        expect(err).toBeInstanceOf(SaleDetailMutationError);
-        expect(err.message).toBe('Error interno');
-        done();
-      },
-    });
-
-    httpMock.expectOne(VENTAS).flush(saleDto);
-    httpMock.expectOne(DETALLE).flush({ message: 'Error interno' }, { status: 500, statusText: 'Server Error' });
-
-    const rollback = httpMock.expectOne(`${API}/ventas/50/`);
-    expect(rollback.request.method).toBe('DELETE');
-    rollback.flush(null);
-  });
-
-  // H-09: si el rollback también falla la venta queda huérfana: el cajero debe saberlo antes de reintentar.
-  it('H-09: si el rollback falla avisa de la venta huérfana y conserva el error original como causa', (done) => {
-    useCase.execute({ idMetodoPago: 1, productos: [{ id: 10, cantidad: 2 }] }).subscribe({
-      error: (err) => {
-        expect(err.message).toContain('#50');
-        expect(err.message).toMatch(/revertir/i);
-        expect(err.cause).toBeInstanceOf(SaleDetailMutationError);
-        done();
-      },
-    });
-
-    httpMock.expectOne(VENTAS).flush(saleDto);
-    httpMock.expectOne(DETALLE).flush('Fallo', { status: 500, statusText: 'Server Error' });
-    httpMock.expectOne(`${API}/ventas/50/`).flush('Fallo rollback', { status: 500, statusText: 'Server Error' });
-  });
-
-  // Verifica que un error de red (status 0) al crear la venta se convierta en SaleCreationError.
-  it('convierte el error de red al crear la venta en SaleCreationError', (done) => {
-    useCase.execute({ idMetodoPago: 1, productos: [{ id: 10, cantidad: 2 }] }).subscribe({
-      error: (err) => {
-        expect(err).toBeInstanceOf(SaleCreationError);
-        done();
-      },
-    });
+  it('convierte el error de red en SaleCreationError', async () => {
+    const result = new Promise<unknown>((resolve) => useCase.execute({ idMetodoPago: 1, productos }).subscribe({ error: resolve }));
 
     httpMock.expectOne(VENTAS).error(new ProgressEvent('error'));
+
+    expect(await result).toBeInstanceOf(SaleCreationError);
   });
 
-  // Verifica el caso contemplado de respuesta inesperada: objeto sin id/total construye la venta desde el payload.
-  it('tolera una respuesta de venta sin id ni total construyendo desde el payload', (done) => {
-    useCase.execute({ idMetodoPago: 1, productos: [{ id: 10, cantidad: 2 }] }).subscribe({
-      next: (result) => {
-        expect(result.sale.id).toBe(0);
-        expect(result.sale.total.value).toBe(0);
-        done();
-      },
-      error: done.fail,
-    });
+  it('tolera una respuesta sin id ni total construyendo la venta desde el payload', async () => {
+    const result = new Promise<{ sale: { id: number; total: { value: number } } }>((resolve) =>
+      useCase.execute({ idMetodoPago: 1, productos }).subscribe({ next: resolve as never }),
+    );
 
     httpMock.expectOne(VENTAS).flush({});
-    httpMock.expectOne(DETALLE).flush(detailDto(11, 10, 2));
     httpMock.expectOne(`${API}/ventas/0/ticket/`).flush({ ...ticketDto, folio: 0 });
-  });
 
-  // H-08: la venta ya existe en el backend; si el ticket falla NO se debe reportar error
-  // (el cajero cobraría dos veces). Se devuelve la venta con ticket null y sin rollback.
-  it('H-08: si el ticket falla devuelve la venta sin ticket y sin error', (done) => {
-    useCase.execute({ idMetodoPago: 1, productos: [{ id: 10, cantidad: 2 }] }).subscribe({
-      next: (result) => {
-        expect(result.sale.id).toBe(50);
-        expect(result.ticket).toBeNull();
-        done();
-      },
-      error: done.fail,
-    });
-
-    httpMock.expectOne(VENTAS).flush(saleDto);
-    httpMock.expectOne(DETALLE).flush(detailDto(11, 10, 2));
-    httpMock.expectOne(`${API}/ventas/50/ticket/`).flush({ detail: 'Venta no encontrada.' }, { status: 404, statusText: 'Not Found' });
-    httpMock.expectNone(`${API}/ventas/50/`);
+    const { sale } = await result;
+    expect(sale.id).toBe(0);
+    expect(sale.total.value).toBe(0);
   });
 });

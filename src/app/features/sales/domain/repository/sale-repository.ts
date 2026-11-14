@@ -8,6 +8,11 @@ export interface CreateSalePayload {
   idMetodoPago: number;
   /** Cliente registrado. Ausente/null = Público general (no se envía al backend). */
   idCliente?: number;
+  /** Líneas de la venta: el backend las registra junto con la cabecera, todo o nada. */
+  productos?: Array<{
+    id: number;
+    cantidad: number;
+  }>;
 }
 
 export interface CreateCompleteSalePayload extends CreateSalePayload {

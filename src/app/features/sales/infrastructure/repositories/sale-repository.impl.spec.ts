@@ -59,7 +59,7 @@ describe('SaleRepositoryImpl', () => {
       id: 100,
       id_usuario: 1,
       id_inventario: 1,
-      id_metodoPago: 2,
+      id_metodo_pago: 2,
       total: '99.50',
       fecha: '2024-01-01',
     };
@@ -76,7 +76,7 @@ describe('SaleRepositoryImpl', () => {
     const req = httpMock.expectOne(expectedUrl);
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toEqual({
-      id_metodoPago: 2,
+      id_metodo_pago: 2,
     });
     // Público general: el campo id_cliente debe omitirse por completo.
     expect(req.request.body).not.toHaveProperty('id_cliente');
@@ -92,7 +92,7 @@ describe('SaleRepositoryImpl', () => {
       id: 101,
       id_usuario: 1,
       id_inventario: 1,
-      id_metodoPago: 2,
+      id_metodo_pago: 2,
       total: '50.00',
       fecha: '2024-01-01',
     };
@@ -105,7 +105,7 @@ describe('SaleRepositoryImpl', () => {
     const req = httpMock.expectOne(expectedUrl);
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toEqual({
-      id_metodoPago: 2,
+      id_metodo_pago: 2,
       id_cliente: 25,
     });
     req.flush(response);
@@ -138,7 +138,7 @@ describe('SaleRepositoryImpl', () => {
         id: 1,
         id_usuario: 2,
         id_inventario: 1,
-        id_metodoPago: 3,
+        id_metodo_pago: 3,
         total: '150',
         fecha: null,
       },

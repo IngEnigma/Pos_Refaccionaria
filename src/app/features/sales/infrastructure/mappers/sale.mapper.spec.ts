@@ -7,7 +7,7 @@ describe('SaleMapper', () => {
     id: 10,
     id_usuario: 3,
     id_inventario: 7,
-    id_metodoPago: 2,
+    id_metodo_pago: 2,
     total: '139.20',
     fecha: '2025-01-15T10:00:00Z',
   };
@@ -46,7 +46,7 @@ describe('SaleMapper', () => {
         ...dto,
         id_usuario: null,
         id_inventario: null,
-        id_metodoPago: null,
+        id_metodo_pago: null,
         fecha: null,
       });
 
@@ -82,10 +82,10 @@ describe('SaleMapper', () => {
   });
 
   describe('toCreateRequestDto', () => {
-    // Verifica que con cliente registrado se envíen id_metodoPago e id_cliente.
+    // Verifica que con cliente registrado se envíen id_metodo_pago e id_cliente.
     it('incluye id_cliente cuando hay cliente registrado', () => {
       expect(SaleMapper.toCreateRequestDto({ idMetodoPago: 2, idCliente: 15 })).toEqual({
-        id_metodoPago: 2,
+        id_metodo_pago: 2,
         id_cliente: 15,
       });
     });
@@ -94,7 +94,7 @@ describe('SaleMapper', () => {
     it('omite id_cliente cuando no viene (Público general)', () => {
       const result = SaleMapper.toCreateRequestDto({ idMetodoPago: 2 });
 
-      expect(result).toEqual({ id_metodoPago: 2 });
+      expect(result).toEqual({ id_metodo_pago: 2 });
       expect('id_cliente' in result).toBe(false);
     });
 
@@ -125,7 +125,7 @@ describe('SaleMapper', () => {
         }),
       ).toEqual({
         id_usuario: 3,
-        id_metodoPago: 2,
+        id_metodo_pago: 2,
         total: 99.5,
         fecha: '2025-01-15T10:00:00Z',
       });
@@ -142,7 +142,7 @@ describe('SaleMapper', () => {
     it('conserva null explícito en idUsuario e idMetodoPago', () => {
       const json = JSON.parse(JSON.stringify(SaleMapper.toUpdateRequestDto({ idUsuario: null, idMetodoPago: null })));
 
-      expect(json).toEqual({ id_usuario: null, id_metodoPago: null });
+      expect(json).toEqual({ id_usuario: null, id_metodo_pago: null });
     });
 
     // Verifica que total 0 se envíe (no se confunda con ausente).

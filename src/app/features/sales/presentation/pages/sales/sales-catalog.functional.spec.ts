@@ -253,15 +253,13 @@ describe('Catálogo de ventas (funcional)', () => {
 
     page.processTransaction();
 
-    httpMock.expectOne(VENTAS).flush({ id: 60, id_usuario: 1, id_inventario: 7, id_metodoPago: 1, total: '170.00', fecha: '2024-01-01' });
-    const details = httpMock.match(DETALLE);
-    expect(details).toHaveLength(2);
-    expect(details.map((r) => r.request.body)).toEqual([
-      { id_producto: 101, id_venta: 60, cantidad: 1 },
-      { id_producto: 202, id_venta: 60, cantidad: 1 },
+    const saleReq = httpMock.expectOne(VENTAS);
+    expect(saleReq.request.body.detalles).toEqual([
+      { id_producto: 101, cantidad: 1 },
+      { id_producto: 202, cantidad: 1 },
     ]);
-    details[0].flush({ id: 21, id_producto: 101, id_venta: 60, subtotal: '120.00', cantidad: 1 });
-    details[1].flush({ id: 22, id_producto: 202, id_venta: 60, subtotal: '50.00', cantidad: 1 });
+    saleReq.flush({ id: 60, id_usuario: 1, id_metodo_pago: 1, total: '170.00', fecha: '2024-01-01' });
+    httpMock.expectNone(DETALLE);
     httpMock.expectOne(`${API}/ventas/60/ticket/`).flush({
       folio: 60, fecha: '2024-01-01T00:00:00Z', vendedor: 'vendedora', metodo_pago: 'EFECTIVO',
       sucursal: 'Central',
@@ -288,8 +286,7 @@ describe('Catálogo de ventas (funcional)', () => {
 
     page.processTransaction();
 
-    httpMock.expectOne(VENTAS).flush({ id: 61, id_usuario: 1, id_inventario: 7, id_metodoPago: 1, total: '120.00', fecha: '2024-01-01' });
-    httpMock.expectOne(DETALLE).flush({ id: 23, id_producto: 101, id_venta: 61, subtotal: '120.00', cantidad: 1 });
+    httpMock.expectOne(VENTAS).flush({ id: 61, id_usuario: 1, id_inventario: 7, id_metodo_pago: 1, total: '120.00', fecha: '2024-01-01' });
     httpMock.expectOne(`${API}/ventas/61/ticket/`).flush({ detail: 'Ticket no disponible.' }, { status: 404, statusText: 'Not Found' });
     httpMock.match(VENTAS).forEach((r) => r.flush([]));
     httpMock.expectOne(INV).flush(inventoryDto);
@@ -325,7 +322,7 @@ describe('Catálogo de ventas (funcional)', () => {
     page.reloadSales();
 
     httpMock.expectOne(VENTAS).flush([
-      { id: 9, id_usuario: 1, id_inventario: 7, id_metodoPago: 1, total: '139.20', fecha: '2024-01-02' },
+      { id: 9, id_usuario: 1, id_inventario: 7, id_metodo_pago: 1, total: '139.20', fecha: '2024-01-02' },
     ]);
     httpMock.expectOne(INV).flush(inventoryDto);
     fixture.detectChanges();

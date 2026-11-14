@@ -290,10 +290,9 @@ describe('SalesPageComponent (integración)', () => {
 
     page.processTransaction();
 
-    httpMock.expectOne(VENTAS).flush({ id: 50, id_usuario: 1, id_inventario: 7, id_metodoPago: 1, total: '120.00', fecha: '2024-01-01' });
-    const detail = httpMock.expectOne(DETALLE);
-    expect(detail.request.body).toEqual({ id_producto: 101, id_venta: 50, cantidad: 1 });
-    detail.flush({ id: 11, id_producto: 101, id_venta: 50, subtotal: '120.00', cantidad: 1 });
+    const saleReq = httpMock.expectOne(VENTAS);
+    expect(saleReq.request.body.detalles).toEqual([{ id_producto: 101, cantidad: 1 }]);
+    saleReq.flush({ id: 50, id_usuario: 1, id_metodo_pago: 1, total: '120.00', fecha: '2024-01-01' });
     httpMock.expectOne(`${API}/ventas/50/ticket/`).flush(ticketDto);
     httpMock.match(VENTAS).forEach((r) => r.flush([]));
     // processTransaction recarga el inventario tras el éxito (sales.page.ts).
@@ -369,8 +368,7 @@ describe('SalesPageComponent (integración)', () => {
 
     const sale = httpMock.expectOne(VENTAS);
     expect(sale.request.method).toBe('POST');
-    sale.flush({ id: 51, id_usuario: 1, id_inventario: 7, id_metodoPago: 1, total: '240.00', fecha: '2024-01-01' });
-    httpMock.expectOne(DETALLE).flush({ id: 12, id_producto: 101, id_venta: 51, subtotal: '240.00', cantidad: 2 });
+    sale.flush({ id: 51, id_usuario: 1, id_inventario: 7, id_metodo_pago: 1, total: '240.00', fecha: '2024-01-01' });
     httpMock.expectOne(`${API}/ventas/51/ticket/`).flush({ ...ticketDto, folio: 51 });
     httpMock.match(VENTAS).forEach((r) => r.flush([]));
     // processTransaction recarga el inventario tras el éxito (sales.page.ts).
