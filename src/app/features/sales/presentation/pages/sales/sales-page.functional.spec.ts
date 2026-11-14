@@ -619,4 +619,122 @@ describe('SalesPageComponent (funcional)', () => {
     expect(desktop.generateTicket).not.toHaveBeenCalled();
     expect(page.lastTicket()).toBeNull();
   });
+
+  // G1: verifica que cobrar sin método de pago no haga POST, avise y conserve el carrito.
+  it('G1: cobrar sin método de pago no hace POST y avisa', () => {
+    page.onAddToCart(page.productos()[0]);
+
+    page.processTransaction();
+    httpMock.expectNone(VENTAS);
+
+    expect(lastToast()).toMatchObject({ type: 'error', message: 'Selecciona un método de pago.' });
+    expect(page.cartItems()).toHaveLength(1);
+    expect(page.isCreatingSale()).toBe(false);
+  });
+
+  // G2: verifica que cobrar con el carrito vacío no haga POST y avise.
+  it('G2: cobrar con carrito vacío no hace POST y avisa', () => {
+    page.onSelectPayment(PAGO);
+
+    page.processTransaction();
+    httpMock.expectNone(VENTAS);
+
+    expect(lastToast()).toMatchObject({ type: 'error', message: 'El carrito está vacío.' });
+  });
+
+  // G3: verifica que una tecla distinta de Enter no dispare la búsqueda por código de barras.
+  it('G3: una tecla distinta de Enter no busca ni limpia el código', () => {
+    page.barcodeInput.set('7501234567890');
+
+    page.onBarcodeKeyDown(new KeyboardEvent('keydown', { key: 'a' }));
+
+    expect(page.cartItems()).toHaveLength(0);
+    expect(page.barcodeInput()).toBe('7501234567890');
+  });
+
+  // G4: verifica que Enter con código vacío o solo espacios no haga nada.
+  it('G4: Enter con código vacío no avisa ni agrega', () => {
+    const before = toasts.toasts().length;
+    page.barcodeInput.set('   ');
+
+    page.onBarcodeKeyDown(new KeyboardEvent('keydown', { key: 'Enter' }));
+
+    expect(toasts.toasts()).toHaveLength(before);
+    expect(page.cartItems()).toHaveLength(0);
+  });
+
+  // G5: verifica que el código con espacios y distinta capitalización agregue el producto y limpie el campo.
+  it('G5: Enter con código con espacios agrega el producto y limpia el campo', () => {
+    page.barcodeInput.set('  7501234567890 ');
+
+    page.onBarcodeKeyDown(new KeyboardEvent('keydown', { key: 'Enter' }));
+
+    expect(page.cartItems()).toHaveLength(1);
+    expect(page.cartItems()[0].productId).toBe(101);
+    expect(page.barcodeInput()).toBe('');
+    expect(lastToast()).toMatchObject({ type: 'success', message: 'Filtro de aceite agregado al carrito' });
+  });
+
+  // G6: verifica que el filtro en vivo por código acote el catálogo y se restaure al limpiar.
+  it('G6: el campo de código filtra el catálogo en vivo', () => {
+    expect(page.productos()).toHaveLength(1);
+
+    page.barcodeInput.set('no-existe');
+    expect(page.productos()).toHaveLength(0);
+
+    page.barcodeInput.set('flt-12');
+    expect(page.productos()).toHaveLength(1);
+
+    page.barcodeInput.set('');
+    expect(page.productos()).toHaveLength(1);
+  });
+
+  // G7: verifica que cargar más no haga peticiones (el inventario viene completo).
+  it('G7: cargar más no dispara peticiones', () => {
+    page.onLoadMore();
+
+    httpMock.expectNone(INV);
+    httpMock.expectNone(VENTAS);
+  });
+
+  // G8: verifica que elegir categoría solo guarde el id y no filtre el catálogo.
+  it('G8: seleccionar categoría guarda el id sin filtrar productos', () => {
+    page.onSelectCategory({ id: 5, nombre: 'Filtros' });
+
+    expect(page.selectedCategoryId()).toBe(5);
+    expect(page.productos()).toHaveLength(1);
+  });
+
+  // G9: verifica la etiqueta de cliente sin apellido materno (sin espacios sobrantes).
+  it('G9: etiqueta de cliente sin apellido materno no deja espacios sobrantes', () => {
+    page.onSelectClient({
+      id: 30, idSucursal: 3, nombre: 'María', apellidoPaterno: 'Gómez', apellidoMaterno: null,
+      telefono: '5598765432', correo: null, direccion: null, rfc: null,
+    });
+
+    expect(page.clienteLabel()).toBe('María Gómez');
+    expect(page.clientSelectorOpen()).toBe(false);
+  });
+
+  // G10: verifica que el selector de cliente se abra y cierre por sus manejadores.
+  it('G10: abrir y cerrar el selector de cliente', () => {
+    page.onOpenClientSelector();
+    expect(page.clientSelectorOpen()).toBe(true);
+
+    page.onCloseClientSelector();
+    expect(page.clientSelectorOpen()).toBe(false);
+  });
+
+  // G11: verifica que cerrar el modal limpie el último ticket.
+  it('G11: cerrar el modal del ticket lo limpia', () => {
+    page.onAddToCart(page.productos()[0]);
+    page.onSelectPayment(PAGO);
+    page.processTransaction();
+    flushSuccessfulSale(50, 1);
+    expect(page.lastTicket()).not.toBeNull();
+
+    page.onTicketModalClose();
+
+    expect(page.lastTicket()).toBeNull();
+  });
 });
