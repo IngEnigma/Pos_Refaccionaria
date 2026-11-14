@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { catchError, finalize, Observable, of } from 'rxjs';
 
@@ -51,7 +52,10 @@ export class UsersFacade {
   }
 
   private fail(context: string, error: unknown): void {
-    const message = error instanceof Error && error.message ? error.message : 'Ocurrió un error inesperado.';
+    // H-48: el backend responde {"error"} / {"detail"}; HttpErrorResponse no es un Error.
+    const body = error instanceof HttpErrorResponse ? error.error : null;
+    const message =
+      body?.error || body?.detail || body?.message || (error instanceof Error && error.message) || 'Ocurrió un error inesperado.';
     this._errorMessage.set(message);
     // Sin payload en el log: lleva la contraseña.
     this.logger.error(context, { message });

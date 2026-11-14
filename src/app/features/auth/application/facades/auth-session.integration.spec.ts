@@ -118,6 +118,19 @@ describe('Sesión integración (login, perfil, refresh concurrente, logout)', ()
       expect(facade.sucursalId()).toBe(5);
     });
 
+    it('acepta el formato real del backend ({access, refresh, user:{isadmin, isstaff, rol}}) y deriva el rol', async () => {
+      const done = firstValueFrom(facade.login({ username: 'root', password: 'x', remember: false }));
+      httpMock.expectOne(`${API}/login`).flush({
+        access: jwt('a1'),
+        refresh: jwt('r1', 86400),
+        user: { id: 1, username: 'root', isadmin: true, isstaff: true, rol: 'admin' },
+      });
+
+      expect(await done).toBe(true);
+      expect(facade.role()).toBe(UserRole.Admin);
+      expect(sessionState.getSession()?.refreshToken).toContain('.');
+    });
+
     it('quitar la sucursal (null) manda id_sucursal null y limpia la sucursal activa', async () => {
       await loginAs(jwt('a1'), jwt('r1', 86400));
       sessionState.setSucursalId(3);

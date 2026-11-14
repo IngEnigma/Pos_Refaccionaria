@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, inject } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { LucideAngularModule } from 'lucide-angular';
@@ -85,6 +86,10 @@ export class AdminManagementPageComponent implements OnInit {
   }
 
   private messageOf(error: unknown): string | undefined {
+    // H-48: el backend responde {"error"} / {"detail"}; HttpErrorResponse no es un Error.
+    if (error instanceof HttpErrorResponse) {
+      return error.error?.error || error.error?.detail || error.error?.message || undefined;
+    }
     return error instanceof Error && error.message ? error.message : undefined;
   }
 }
