@@ -252,7 +252,7 @@ Revisado sin hallazgo: no hay `[innerHTML]` ni `bypassSecurityTrust*` en `src/ap
 - [x] Lote B — mappers: `sale.mapper`, `sale-detail.mapper`, `detailed-sale.mapper`, `payment-method.mapper`, `sale-ticket.mapper`, `product-types/.../product-type.mapper`
 - [x] Lote C — use cases: `create-sale`, `create-sale-detail`, `create-complete-sale` (unit; ya existe integración), `update-sale`, `update-sale-detail`, `delete-sale`, `delete-sale-detail`, `get-sales`, `get-sale-detail`, `get-sale-details`, `get-sale-ticket`, `get-payment-methods`, `product-types/*` (4), `strategies/sales-search.strategy`
 - [x] Lote D — infraestructura: `payment-method-repository.impl`, `sale-detail-repository.impl`, `product-type-repository.impl`, `utils/http-error-resolver`
-- [ ] Lote E — facades y presentation (sesión principal, depende de A–D):
+- [x] Lote E — facades y presentation (sesión principal, depende de A–D): *(`d02a92b`, `54fc3a3`, `5a6053d`, `a7a57d4`)*
   - `product-types.facade`
   - Componentes nuevos: `cart-item`, `cart-panel`, `product-grid`, `quantity-control`, `sales-summary`
   - Ampliar los `*.functional.spec.ts` existentes: `category-slider`, `payment-method-selector`, `product-card`, `ticket-modal`, `sales.page` (búsqueda por código de barras, cargar más, cliente, cobro sin método de pago, carrito vacío)
