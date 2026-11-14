@@ -25,6 +25,12 @@ export const authTokenInterceptor: HttpInterceptorFn = (req, next) => {
         return throwError(() => error);
       }
 
+      // Sin token adjunto (sin sesión, login incorrecto, host externo) no hay nada que renovar:
+      // el 401 original llega intacto al llamador (H-22).
+      if (!authRequest.headers.has('Authorization')) {
+        return throwError(() => error);
+      }
+
       logger.warn('401 Unauthorized error intercepted, attempting token refresh');
       return refreshOrchestrator.retryRequestAfterRefresh(authRequest, next);
     }),

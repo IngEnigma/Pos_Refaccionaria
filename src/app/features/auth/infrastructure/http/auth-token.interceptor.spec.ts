@@ -106,4 +106,18 @@ describe('authTokenInterceptor', () => {
     expect(loggerMock.warn).toHaveBeenCalledWith('401 Unauthorized error intercepted, attempting token refresh');
     expect(orchestratorMock.retryRequestAfterRefresh).toHaveBeenCalled();
   });
+
+  it('401 en una petición sin token adjunto (sin sesión o host externo) pasa intacto y no intenta refresh', () => {
+    (authUtils.isUnauthorizedError as unknown as jest.Mock).mockReturnValue(true);
+    (authUtils.isRefreshRequest as unknown as jest.Mock).mockReturnValue(false);
+    orchestratorMock.attachAccessToken.mockImplementation((req: HttpRequest<unknown>) => req);
+    let status: number | undefined;
+
+    httpClient.get('/api/login').subscribe({ error: (err) => (status = err.status) });
+
+    httpMock.expectOne('/api/login').flush('No', { status: 401, statusText: 'Unauthorized' });
+
+    expect(status).toBe(401);
+    expect(orchestratorMock.retryRequestAfterRefresh).not.toHaveBeenCalled();
+  });
 });
