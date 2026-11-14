@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal, untracked } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 import { catchError, finalize, of } from 'rxjs';
@@ -29,9 +29,15 @@ export class BranchPricingTableComponent {
     effect(() => {
       const sucursalId = this.sucursalId();
       if (sucursalId) {
-        this.loadProducts(sucursalId);
+        untracked(() => this.loadProducts(sucursalId)); // H-33: loadProducts escribe señales
       }
     });
+  }
+
+  /** Vuelve a consultar los precios de la sucursal actual (H-35: tras fijar un precio). */
+  reload(): void {
+    const sucursalId = this.sucursalId();
+    if (sucursalId) this.loadProducts(sucursalId);
   }
 
   private loadProducts(sucursalId: number): void {

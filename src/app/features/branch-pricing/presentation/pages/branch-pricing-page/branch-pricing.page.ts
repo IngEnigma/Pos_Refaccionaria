@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule } from 'lucide-angular';
 import { Dialog, DialogModule } from '@angular/cdk/dialog';
@@ -30,6 +30,8 @@ export class BranchPricingPageComponent implements OnInit {
   private readonly toastService = inject(ToastService);
   private readonly dialog = inject(Dialog);
 
+  private readonly table = viewChild(BranchPricingTableComponent);
+
   readonly branches = this.branchesFacade.branches;
   readonly selectedSucursalId = this.branchPricingFacade.selectedSucursalId;
 
@@ -51,8 +53,10 @@ export class BranchPricingPageComponent implements OnInit {
         this.branchPricingFacade.setBranchPrice(result as any).subscribe({
           next: () => {
             this.toastService.success('Precio de sucursal actualizado correctamente');
+            this.table()?.reload();
           },
-          error: () => {},
+          error: (err: unknown) =>
+            this.toastService.error(err instanceof Error ? err.message : 'No se pudo actualizar el precio'),
         });
       }
     });
