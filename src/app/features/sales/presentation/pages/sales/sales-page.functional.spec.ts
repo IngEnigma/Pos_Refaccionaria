@@ -6,6 +6,7 @@ import { provideRouter } from '@angular/router';
 import { BanknoteIcon, CreditCard, ArrowLeftRightIcon, LucideAngularModule, Package, Trash2 } from 'lucide-angular';
 
 import { environment } from '@env/environment';
+import { DESKTOP_PORT } from '@core/ports/desktop.port';
 import { APP_ENV } from '@core/tokens/app-env.token';
 import { LOGGER_PORT } from '@core/logging/logger.port';
 import { LoggerService } from '@core/logging/logger.service';
@@ -80,6 +81,7 @@ describe('SalesPageComponent (funcional)', () => {
   let fixture: ComponentFixture<SalesPageComponent>;
   let page: SalesPageComponent;
   let toasts: ToastService;
+  const desktop = { generateTicket: jest.fn() };
 
   const itemDto = {
     id: 1,
@@ -125,6 +127,7 @@ describe('SalesPageComponent (funcional)', () => {
   });
 
   beforeEach(() => {
+    desktop.generateTicket.mockReset().mockResolvedValue({ success: true });
     TestBed.configureTestingModule({
       providers: [
         provideHttpClient(withInterceptors([httpErrorInterceptor, authTokenInterceptor, trailingSlashInterceptor])),
@@ -132,6 +135,7 @@ describe('SalesPageComponent (funcional)', () => {
         provideRouter([]),
         importProvidersFrom(LucideAngularModule.pick({ BanknoteIcon, CreditCard, ArrowLeftRightIcon, Package, Trash2 })),
         { provide: APP_ENV, useValue: environment },
+        { provide: DESKTOP_PORT, useValue: desktop },
         { provide: LOGGER_PORT, useClass: LoggerService },
         { provide: LOGGING_LEVEL_TOKEN, useValue: LogLevel.FATAL },
         { provide: STORAGE_PORT, useClass: InMemoryStorageService },
@@ -564,5 +568,55 @@ describe('SalesPageComponent (funcional)', () => {
     expect(page.cartItems()).toHaveLength(1);
     expect(clienteLabel()).toBe('Juan Pérez López');
     expect(page.isCreatingSale()).toBe(false);
+  });
+
+  // D1: verifica que tras la venta se mande el ticket al puerto de escritorio en snake_case.
+  it('D1: venta exitosa envía el ticket en snake_case al puerto de escritorio', () => {
+    page.onAddToCart(page.productos()[0]);
+    page.onSelectPayment(PAGO);
+
+    page.processTransaction();
+    flushSuccessfulSale(50, 1);
+
+    expect(desktop.generateTicket).toHaveBeenCalledTimes(1);
+    expect(desktop.generateTicket).toHaveBeenCalledWith({
+      folio: 50,
+      fecha: '2024-01-01T00:00:00Z',
+      vendedor: 'vendedora',
+      metodo_pago: 'EFECTIVO',
+      sucursal: 'Central',
+      productos: [{ nombre: 'Filtro de aceite', cantidad: 1, subtotal: '120.00', precio_unitario: '120.00' }],
+      total: '139.20',
+    });
+  });
+
+  // D2: verifica que si el puerto reporta fallo de impresión se muestre su mensaje.
+  it('D2: fallo de impresión muestra el mensaje del puerto', async () => {
+    desktop.generateTicket.mockResolvedValue({ success: false, message: 'Sin papel' });
+    page.onAddToCart(page.productos()[0]);
+    page.onSelectPayment(PAGO);
+
+    page.processTransaction();
+    flushSuccessfulSale(50, 1);
+    await Promise.resolve();
+
+    expect(lastToast().type).toBe('error');
+    expect(lastToast().message).toBe('Sin papel');
+  });
+
+  // D3: verifica que sin ticket (falló getSaleTicket) no se intente imprimir.
+  it('D3: sin ticket no se llama al puerto de escritorio', () => {
+    page.onAddToCart(page.productos()[0]);
+    page.onSelectPayment(PAGO);
+
+    page.processTransaction();
+    httpMock.expectOne(VENTAS).flush({ id: 50, id_usuario: 1, id_inventario: 7, id_metodoPago: 1, total: '120.00', fecha: '2024-01-01' });
+    httpMock.expectOne(DETALLE).flush({ id: 150, id_producto: 101, id_venta: 50, subtotal: '120.00', cantidad: 1 });
+    httpMock.expectOne(`${API}/ventas/50/ticket/`).flush({}, { status: 500, statusText: 'Server Error' });
+    httpMock.match(VENTAS).forEach((r) => r.flush([]));
+    httpMock.match(INV).forEach((r) => r.flush(inventoryDto));
+
+    expect(desktop.generateTicket).not.toHaveBeenCalled();
+    expect(page.lastTicket()).toBeNull();
   });
 });

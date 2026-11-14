@@ -647,4 +647,83 @@ describe('SalesCartService', () => {
       });
     });
   });
+
+  describe('findStockIssue (revalidación contra inventario fresco)', () => {
+    const product = (id: number, nombre: string, stock = 10): SalesProduct => ({
+      id,
+      nombre,
+      descripcion: '',
+      precio: 100,
+      stock,
+      codigoBarras: `750${id}`,
+      hasSucursalPrice: false,
+      imagen: 'x.jpg',
+    });
+
+    // Verifica que con carrito vacío no haya problema de stock.
+    it('devuelve null con carrito vacío', () => {
+      expect(service.findStockIssue(new Map())).toBeNull();
+    });
+
+    // Verifica que pedir exactamente el stock disponible sea válido.
+    it('devuelve null cuando la cantidad iguala al stock fresco', () => {
+      service.addToCart(product(1, 'Filtro'));
+      service.increaseQty(service.cart()[0]);
+
+      expect(service.findStockIssue(new Map([[1, 2]]))).toBeNull();
+    });
+
+    // Verifica que el producto ausente del inventario se reporte como no disponible.
+    it('reporta producto que ya no está en la sucursal', () => {
+      service.addToCart(product(1, 'Filtro'));
+
+      const issue = service.findStockIssue(new Map([[2, 5]]));
+
+      expect(issue).toEqual({
+        kind: 'missing',
+        message: '"Filtro" ya no está disponible en tu sucursal. Recarga el catálogo.',
+      });
+    });
+
+    // Verifica que cantidad mayor al stock fresco se reporte con cifras solicitada/disponible.
+    it('reporta stock insuficiente con solicitado y disponible', () => {
+      service.addToCart(product(1, 'Filtro'));
+      service.increaseQty(service.cart()[0]);
+      service.increaseQty(service.cart()[0]);
+
+      const issue = service.findStockIssue(new Map([[1, 2]]));
+
+      expect(issue).toEqual({
+        kind: 'insufficient',
+        message: 'Stock insuficiente para "Filtro": solicitas 3, disponible 2.',
+      });
+    });
+
+    // Verifica que stock fresco en 0 cuente como insuficiente (no como ausente).
+    it('stock fresco 0 es insuficiente, no ausente', () => {
+      service.addToCart(product(1, 'Filtro'));
+
+      expect(service.findStockIssue(new Map([[1, 0]]))?.kind).toBe('insufficient');
+    });
+
+    // Verifica que se devuelva el primer problema en orden de carrito.
+    it('devuelve el primer problema en orden de carrito', () => {
+      service.addToCart(product(1, 'Filtro'));
+      service.addToCart(product(2, 'Bujía'));
+
+      const issue = service.findStockIssue(new Map());
+
+      expect(issue?.message).toContain('Filtro');
+    });
+
+    // Verifica que no modifique el carrito.
+    it('no modifica el carrito', () => {
+      service.addToCart(product(1, 'Filtro'));
+      const before = service.cart();
+
+      service.findStockIssue(new Map());
+
+      expect(service.cart()).toBe(before);
+    });
+  });
 });

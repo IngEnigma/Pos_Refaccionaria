@@ -11,6 +11,11 @@ import {
   SalesProduct,
 } from '../models/sales-ui.models';
 
+export interface StockIssue {
+  kind: 'missing' | 'insufficient';
+  message: string;
+}
+
 @Injectable()
 export class SalesCartService {
   private readonly facade = inject(SalesFacade);
@@ -114,6 +119,29 @@ export class SalesCartService {
   /** @deprecated idInventario ya no se envía al backend; se mantiene no-op para compatibilidad */
   setVentaInventarioId(_idInventario: number | null): void {
     return;
+  }
+
+  /**
+   * Compara el carrito con el stock fresco de la sucursal (id de producto → cantidad).
+   * Devuelve el primer problema en orden de carrito, o null si todo alcanza.
+   */
+  findStockIssue(freshStockById: ReadonlyMap<number, number>): StockIssue | null {
+    for (const item of this.cart()) {
+      const freshStock = freshStockById.get(item.productId);
+      if (freshStock === undefined) {
+        return {
+          kind: 'missing',
+          message: `"${item.nombre}" ya no está disponible en tu sucursal. Recarga el catálogo.`,
+        };
+      }
+      if (item.qty > freshStock) {
+        return {
+          kind: 'insufficient',
+          message: `Stock insuficiente para "${item.nombre}": solicitas ${item.qty}, disponible ${freshStock}.`,
+        };
+      }
+    }
+    return null;
   }
 
   confirmSale(): Observable<CompleteSaleResult> {

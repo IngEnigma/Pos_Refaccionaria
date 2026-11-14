@@ -31,6 +31,8 @@ import { SalesCartService } from '@features/sales/presentation/state/sales-cart.
 import { InventoryByBranchFacade } from '@features/inventory-by-branch';
 import { ProductType } from '@features/sales/product-types/domain/entities/product-type.entity';
 import { GlobalSearchService } from '@core/search/global-search.service';
+import { DESKTOP_PORT } from '@core/ports/desktop.port';
+import { toTicketPrintPayload } from '@features/sales/application/mappers/ticket-print-payload.mapper';
 import { SaleTicket } from '@features/sales/domain/entities/sale-ticket.entity';
 import { Client } from '@features/clients/domain/entities/client.entity';
 
@@ -51,6 +53,7 @@ export class SalesPageComponent implements OnInit {
   readonly toastService = inject(ToastService);
   readonly cartService = inject(SalesCartService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly desktop = inject(DESKTOP_PORT);
 
   readonly loadingProducts = computed(() => this.inventoryByBranchFacade.loading());
   readonly loadingCategories = computed(() => this.productTypesFacade.loading());
@@ -258,22 +261,13 @@ export class SalesPageComponent implements OnInit {
     if (this.isCreatingSale()) return;
 
     // Validación fresca contra stock actual de mi-sucursal (evita POST si el stock cambió desde que se agregó al carrito)
-    const freshStockById = new Map<number, number>(
-      this.inventoryByBranchFacade.allItems().map((it) => [it.idProducto, it.cantidad]),
+    const issue = this.cartService.findStockIssue(
+      new Map(this.inventoryByBranchFacade.allItems().map((it) => [it.idProducto, it.cantidad])),
     );
-    for (const item of this.cartService.cart()) {
-      const freshStock = freshStockById.get(item.productId);
-      if (freshStock === undefined) {
-        this.toastService.error(`"${item.nombre}" ya no está disponible en tu sucursal. Recarga el catálogo.`);
-        this.inventoryByBranchFacade.loadMyBranchInventory();
-        return;
-      }
-      if (item.qty > freshStock) {
-        this.toastService.error(
-          `Stock insuficiente para "${item.nombre}": solicitas ${item.qty}, disponible ${freshStock}.`,
-        );
-        return;
-      }
+    if (issue) {
+      this.toastService.error(issue.message);
+      if (issue.kind === 'missing') this.inventoryByBranchFacade.loadMyBranchInventory();
+      return;
     }
 
     this.cartService
@@ -289,30 +283,13 @@ export class SalesPageComponent implements OnInit {
           }
           this.lastTicket.set(result.ticket);
 
-          const desktop = (window as unknown as { desktop?: { generateTicket: (d: unknown) => Promise<{ success: boolean; message?: string }> } }).desktop;
-          if (desktop?.generateTicket) {
-            const ticketPayload = {
-              folio: result.ticket.folio,
-              fecha: result.ticket.fecha,
-              vendedor: result.ticket.vendedor,
-              metodo_pago: result.ticket.metodoPago,
-              sucursal: result.ticket.sucursal,
-              productos: result.ticket.productos.map((p) => ({
-                nombre: p.nombre,
-                cantidad: p.cantidad,
-                subtotal: p.subtotal,
-                precio_unitario: p.precioUnitario,
-              })),
-              total: result.ticket.total,
-            };
-            desktop.generateTicket(ticketPayload).then((response) => {
+          this.desktop
+            ?.generateTicket(toTicketPrintPayload(result.ticket))
+            .then((response) => {
               if (!response.success) {
-                this.toastService.error(
-                  response.message ?? 'No fue posible generar el ticket.',
-                );
+                this.toastService.error(response.message ?? 'No fue posible generar el ticket.');
               }
             });
-          }
         },
         error: (error: unknown) => {
           const message =
