@@ -8,9 +8,6 @@ import { GetSalesUseCase } from '@features/sales/application/usecase/get-sales.u
 import { GetPaymentMethodsUseCase } from '@features/sales/application/usecase/get-payment-methods.usecase';
 import { GetSaleDetailUseCase } from '@features/sales/application/usecase/get-sale-detail.usecase';
 import { GetSaleDetailsUseCase } from '@features/sales/application/usecase/get-sale-details.usecase';
-import { CreateSaleDetailUseCase } from '@features/sales/application/usecase/create-sale-detail.usecase';
-import { UpdateSaleDetailUseCase } from '@features/sales/application/usecase/update-sale-detail.usecase';
-import { DeleteSaleDetailUseCase } from '@features/sales/application/usecase/delete-sale-detail.usecase';
 import { GetSaleTicketUseCase } from '@features/sales/application/usecase/get-sale-ticket.usecase';
 import { PaymentMethod } from '@features/sales/domain/entities/payment-method.entity';
 import { Sale } from '@features/sales/domain/entities/sale.entity';
@@ -18,7 +15,6 @@ import { DetailedSale } from '@features/sales/domain/entities/detailed-sale.enti
 import { SaleDetail } from '@features/sales/domain/entities/sale-detail.entity';
 import { SalesDomainError } from '@features/sales/domain/errors/sales.errors';
 import { CreateSalePayload, CreateCompleteSalePayload } from '@features/sales/domain/repository/sale-repository';
-import { CreateSaleDetailPayload, UpdateSaleDetailPayload } from '@features/sales/domain/repository/sale-detail-repository';
 
 @Injectable({ providedIn: 'root' })
 export class SalesFacade {
@@ -28,9 +24,6 @@ export class SalesFacade {
   private readonly getSaleDetailUseCase = inject(GetSaleDetailUseCase);
   private readonly getSaleTicketUseCase = inject(GetSaleTicketUseCase);
   private readonly getSaleDetailsUseCase = inject(GetSaleDetailsUseCase);
-  private readonly createSaleDetailUseCase = inject(CreateSaleDetailUseCase);
-  private readonly updateSaleDetailUseCase = inject(UpdateSaleDetailUseCase);
-  private readonly deleteSaleDetailUseCase = inject(DeleteSaleDetailUseCase);
   private readonly getPaymentMethodsUseCase = inject(GetPaymentMethodsUseCase);
   private readonly logger = inject(LOGGER_PORT).withContext('SalesFacade');
 
@@ -137,18 +130,6 @@ export class SalesFacade {
         finalize(() => this._isLoadingSaleDetails.set(false))
       )
       .subscribe((details: SaleDetail[]) => this._saleDetails.set(details));
-  }
-
-  createSaleDetail(payload: CreateSaleDetailPayload) {
-    return this.createSaleDetailUseCase.execute(payload);
-  }
-
-  updateSaleDetail(id: number, payload: UpdateSaleDetailPayload) {
-    return this.updateSaleDetailUseCase.execute(id, payload);
-  }
-
-  deleteSaleDetail(id: number) {
-    return this.deleteSaleDetailUseCase.execute(id);
   }
 
   private resolveErrorMessage(error: unknown): string {

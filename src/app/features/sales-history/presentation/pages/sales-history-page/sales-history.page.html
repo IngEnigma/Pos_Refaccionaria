@@ -21,19 +21,35 @@
         type="text" 
         placeholder="Buscar por ID o Usuario..." 
         [ngModel]="searchQuery()"
-        (ngModelChange)="searchQuery.set($event)"
+        (ngModelChange)="onSearchChange($event)"
       >
     </div>
 
     <div class="filter-actions">
       <select 
         [ngModel]="filterPaymentMethod()"
-        (ngModelChange)="filterPaymentMethod.set($event)"
+        (ngModelChange)="onPaymentMethodChange($event)"
       >
         <option [ngValue]="null">Todos los métodos</option>
         <option [ngValue]="1">Efectivo</option>
         <option [ngValue]="2">Tarjeta</option>
       </select>
+      <input
+        type="number"
+        class="filter-input"
+        placeholder="Sucursal ID (staff)"
+        [ngModel]="filterSucursalId()"
+        (ngModelChange)="onSucursalChange($event)"
+        min="1"
+      >
+      <input
+        type="number"
+        class="filter-input"
+        placeholder="Inventario ID"
+        [ngModel]="filterInventarioId()"
+        (ngModelChange)="onInventarioChange($event)"
+        min="1"
+      >
     </div>
   </div>
 
@@ -45,10 +61,57 @@
       </div>
     } @else {
       <app-sales-history-table 
-        [sales]="filteredSales()" 
+        [sales]="pagedSales()" 
         [loading]="isLoading()"
         (viewDetail)="handleViewDetail($event)">
       </app-sales-history-table>
+
+      @if (!isLoading() && totalItems() > 0) {
+        <div class="pagination-bar">
+          <span class="pagination-info">
+            Mostrando {{ rangeStart() }}–{{ rangeEnd() }} de {{ totalItems() }}
+          </span>
+
+          <div class="pagination-controls">
+            <button
+              class="page-btn"
+              (click)="prevPage()"
+              [disabled]="currentPage() <= 1"
+              aria-label="Página anterior"
+            >
+              ‹ Anterior
+            </button>
+
+            @for (page of pageNumbers(); track page) {
+              <button
+                class="page-btn page-number"
+                [class.active]="page === currentPage()"
+                (click)="goToPage(page)"
+              >
+                {{ page }}
+              </button>
+            }
+
+            <button
+              class="page-btn"
+              (click)="nextPage()"
+              [disabled]="currentPage() >= totalPages()"
+              aria-label="Página siguiente"
+            >
+              Siguiente ›
+            </button>
+          </div>
+
+          <label class="page-size">
+            Por página:
+            <select [ngModel]="pageSize()" (ngModelChange)="onPageSizeChange($event)">
+              @for (size of pageSizeOptions; track size) {
+                <option [ngValue]="size">{{ size }}</option>
+              }
+            </select>
+          </label>
+        </div>
+      }
     }
   </main>
 

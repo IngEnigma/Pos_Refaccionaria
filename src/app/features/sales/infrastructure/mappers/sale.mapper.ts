@@ -1,5 +1,7 @@
 import { SaleCreateRequestDto } from '@features/sales/infrastructure/dtos/sale-create-request.dto';
 import { SaleResponseDto } from '@features/sales/infrastructure/dtos/sale-response.dto';
+import { SalePaginatedResponseDto } from '@features/sales/infrastructure/dtos/sale-paginated-response.dto';
+import { PaginatedResponse } from '@core/models/pagination.model';
 import { SaleUpdateRequestDto } from '@features/sales/infrastructure/dtos/sale-update-request.dto';
 import { Sale, SaleFactory } from '@features/sales/domain/entities/sale.entity';
 import {
@@ -26,6 +28,10 @@ export class SaleMapper {
   static toCreateRequestDto(payload: CreateSalePayload): SaleCreateRequestDto {
     return {
       id_metodoPago: payload.idMetodoPago,
+      detalles: (payload.productos ?? []).map((p) => ({
+        producto: p.id,
+        cantidad: p.cantidad,
+      })),
     };
   }
 
@@ -35,6 +41,16 @@ export class SaleMapper {
       id_metodoPago: payload.idMetodoPago,
       total: payload.total,
       fecha: payload.fecha,
+    };
+  }
+
+  static mapPaginatedResponse(dto: SalePaginatedResponseDto): PaginatedResponse<Sale> {
+    const data = (dto.results ?? []).map((item) => this.fromResponseDto(item));
+    return {
+      data,
+      total: dto.total ?? data.length,
+      page: dto.page ?? 1,
+      limit: dto.page_size ?? data.length,
     };
   }
 }

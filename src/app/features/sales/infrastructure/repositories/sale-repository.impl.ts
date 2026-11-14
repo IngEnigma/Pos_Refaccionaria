@@ -1,11 +1,13 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { catchError, map, Observable, throwError } from 'rxjs';
 
 import { APP_ENV } from '@core/tokens/app-env.token';
 import { Environment } from '@env/environment.model';
 import { LOGGER_PORT } from '@core/logging/logger.port';
+import { PaginatedResponse } from '@core/models/pagination.model';
 import { SaleResponseDto } from '@features/sales/infrastructure/dtos/sale-response.dto';
+import { SalePaginatedResponseDto } from '@features/sales/infrastructure/dtos/sale-paginated-response.dto';
 import { SaleTicketDto } from '@features/sales/infrastructure/dtos/sale-ticket.dto';
 import { Sale, SaleFactory } from '@features/sales/domain/entities/sale.entity';
 import { SaleTicket } from '@features/sales/domain/entities/sale-ticket.entity';
@@ -19,6 +21,8 @@ import {
 import {
   CreateSalePayload,
   SaleRepository,
+  SalesListFilters,
+  SalesPageParams,
   UpdateSalePayload,
 } from '@features/sales/domain/repository/sale-repository';
 import { SaleMapper } from '@features/sales/infrastructure/mappers/sale.mapper';
@@ -35,11 +39,45 @@ export class SaleRepositoryImpl implements SaleRepository {
   private readonly endpoint = `${this.env.apiUrl}${SALE_ENDPOINTS.BASE}`;
 
 
-  getSales(): Observable<Sale[]> {
-    return this.http.get<SaleResponseDto[]>(this.endpoint).pipe(
+  getSales(filters?: SalesListFilters): Observable<Sale[]> {
+    let httpParams = new HttpParams();
+    if (filters?.sucursalId != null) {
+      httpParams = httpParams.set('sucursal_id', filters.sucursalId.toString());
+    }
+    if (filters?.idInventario != null) {
+      httpParams = httpParams.set('id_inventario', filters.idInventario.toString());
+    }
+
+    return this.http.get<SaleResponseDto[]>(this.endpoint, { params: httpParams }).pipe(
       map((response) => response.map((dto) => SaleMapper.fromResponseDto(dto))),
       catchError((error: unknown) => {
         this.logger.error('Failed to fetch sales', { url: this.endpoint, error });
+        return throwError(
+          () =>
+            new SaleFetchError(
+              resolveHttpErrorMessage(error, 'Failed to fetch sales'),
+              error,
+            ),
+        );
+      }),
+    );
+  }
+
+  getSalesPaginated(params: SalesPageParams): Observable<PaginatedResponse<Sale>> {
+    let httpParams = new HttpParams()
+      .set('page', params.page.toString())
+      .set('page_size', params.pageSize.toString());
+    if (params.sucursalId != null) {
+      httpParams = httpParams.set('sucursal_id', params.sucursalId.toString());
+    }
+    if (params.idInventario != null) {
+      httpParams = httpParams.set('id_inventario', params.idInventario.toString());
+    }
+
+    return this.http.get<SalePaginatedResponseDto>(this.endpoint, { params: httpParams }).pipe(
+      map((response) => SaleMapper.mapPaginatedResponse(response)),
+      catchError((error: unknown) => {
+        this.logger.error('Failed to fetch paginated sales', { url: this.endpoint, params, error });
         return throwError(
           () =>
             new SaleFetchError(

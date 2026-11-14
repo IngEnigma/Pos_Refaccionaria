@@ -14,6 +14,13 @@ export class CreateSaleUseCase {
 
   execute(payload: CreateSalePayload): Observable<Sale> {
     if (!payload.idMetodoPago) throw new Error('CreateSale: idMetodoPago requerido');
+    if (!payload.productos?.length) {
+      throw new Error('CreateSale: al menos un producto es requerido');
+    }
+    payload.productos.forEach((item) => {
+      if (!item.id) throw new Error('CreateSale: producto requerido');
+      Quantity.fromNumber(item.cantidad, 'CreateSale.productos.cantidad');
+    });
     return this.repository.createSale(payload);
   }
 }

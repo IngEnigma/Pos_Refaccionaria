@@ -1,12 +1,10 @@
 import { inject, Injectable } from '@angular/core';
-import { Observable, forkJoin, throwError } from 'rxjs';
-import { catchError, concatMap, map } from 'rxjs/operators';
+import { Observable, throwError } from 'rxjs';
+import { concatMap, map } from 'rxjs/operators';
 
 import { SaleRepository, CreateCompleteSalePayload } from '@features/sales/domain/repository/sale-repository';
-import { SaleDetailRepository } from '@features/sales/domain/repository/sale-detail-repository';
 import { Sale } from '@features/sales/domain/entities/sale.entity';
 import { Quantity } from '@features/sales/domain/value-objects/quantity.value';
-import { LOGGER_PORT } from '@core/logging/logger.port';
 import { SaleTicket } from '@features/sales/domain/entities/sale-ticket.entity';
 
 export interface CompleteSaleResult {
@@ -14,12 +12,13 @@ export interface CompleteSaleResult {
   ticket: SaleTicket;
 }
 
-
+/**
+ * Venta atómica: un solo POST /api/ventas/ con { id_metodoPago, detalles }.
+ * Ya no hace peticiones a /api/detalleventa/ (endpoint deprecado para escritura).
+ */
 @Injectable({ providedIn: 'root' })
 export class CreateCompleteSaleUseCase {
   private readonly saleRepository = inject(SaleRepository);
-  private readonly saleDetailRepository = inject(SaleDetailRepository);
-  private readonly logger = inject(LOGGER_PORT).withContext('CreateCompleteSaleUseCase');
 
   execute(payload: CreateCompleteSalePayload): Observable<CompleteSaleResult> {
     if (!payload.productos.length) {
@@ -29,55 +28,20 @@ export class CreateCompleteSaleUseCase {
       Quantity.fromNumber(item.cantidad, 'CreateCompleteSale.productos.cantidad');
     });
 
-    let createdSaleId: number | null = null;
-
-    return this.saleRepository.createSale({
-      idMetodoPago: payload.idMetodoPago,
-    }).pipe(
-      concatMap((sale: Sale) => {
-        createdSaleId = sale.id;
-
-        const detailCalls = payload.productos.map((p) =>
-          this.saleDetailRepository.createSaleDetail({
-            productId: p.id,
-            saleId: sale.id,
-            cantidad: p.cantidad,
-          })
-        );
-
-        return forkJoin(detailCalls).pipe(
-          catchError((error: unknown) => {
-            this.logger.error('Detalle falló, rollback venta', {
-              saleId: createdSaleId,
-              error,
-            });
-
-            if (createdSaleId != null) {
-              return this.saleRepository.deleteSale(createdSaleId).pipe(
-                catchError((rollbackError: unknown) => {
-                  this.logger.error('Rollback falló', {
-                    saleId: createdSaleId,
-                    rollbackError,
-                  });
-
-                  return throwError(() => error);
-                }),
-                concatMap(() => throwError(() => error))
-              );
-            }
-
-            return throwError(() => error);
-          }),
-          concatMap(() =>
-            this.saleRepository.getSaleTicket(sale.id).pipe(
-              map((ticket) => ({
-                sale,
-                ticket,
-              })),
-            )
-          ),
-        );
+    return this.saleRepository
+      .createSale({
+        idMetodoPago: payload.idMetodoPago,
+        productos: payload.productos,
       })
-    );
+      .pipe(
+        concatMap((sale: Sale) =>
+          this.saleRepository.getSaleTicket(sale.id).pipe(
+            map((ticket) => ({
+              sale,
+              ticket,
+            })),
+          ),
+        ),
+      );
   }
 }

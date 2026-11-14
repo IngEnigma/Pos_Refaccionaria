@@ -54,6 +54,7 @@ describe('SaleRepositoryImpl', () => {
   it('creates sale via POST and maps response', () => {
     const payload: CreateSalePayload = {
       idMetodoPago: 2,
+      productos: [{ id: 10, cantidad: 2 }],
     };
     const response: SaleResponseDto = {
       id: 100,
@@ -77,6 +78,7 @@ describe('SaleRepositoryImpl', () => {
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toEqual({
       id_metodoPago: 2,
+      detalles: [{ producto: 10, cantidad: 2 }],
     });
     req.flush(response);
   });
@@ -121,8 +123,47 @@ describe('SaleRepositoryImpl', () => {
     });
 
     const expectedUrl = `${envStub.apiUrl}${SALE_ENDPOINTS.BASE}`;
-    const req = httpMock.expectOne(expectedUrl);
+    const req = httpMock.expectOne((request) => request.url === expectedUrl && request.method === 'GET');
     expect(req.request.method).toBe('GET');
     req.flush(response);
+  });
+
+  it('gets paginated sales via GET with page/page_size and maps results', () => {
+    repository.getSalesPaginated({ page: 2, pageSize: 10 }).subscribe((paginated) => {
+      expect(paginated.total).toBe(25);
+      expect(paginated.page).toBe(2);
+      expect(paginated.limit).toBe(10);
+      expect(paginated.data).toHaveLength(1);
+      expect(paginated.data[0].id).toBe(11);
+    });
+
+    const req = httpMock.expectOne(
+      (request) =>
+        request.url === `${envStub.apiUrl}${SALE_ENDPOINTS.BASE}` && request.method === 'GET',
+    );
+    expect(req.request.params.get('page')).toBe('2');
+    expect(req.request.params.get('page_size')).toBe('10');
+    req.flush({
+      total: 25,
+      page: 2,
+      page_size: 10,
+      total_pages: 3,
+      sucursal_id: null,
+      results: [
+        { id: 11, id_usuario: 2, id_inventario: 1, id_metodoPago: 1, total: '200', fecha: null },
+      ],
+    });
+  });
+
+  it('sends sucursal_id and id_inventario filters when provided', () => {
+    repository.getSalesPaginated({ page: 1, pageSize: 10, sucursalId: 3, idInventario: 7 }).subscribe();
+
+    const req = httpMock.expectOne(
+      (request) =>
+        request.url === `${envStub.apiUrl}${SALE_ENDPOINTS.BASE}` && request.method === 'GET',
+    );
+    expect(req.request.params.get('sucursal_id')).toBe('3');
+    expect(req.request.params.get('id_inventario')).toBe('7');
+    req.flush({ total: 0, page: 1, page_size: 10, total_pages: 0, sucursal_id: 3, results: [] });
   });
 });

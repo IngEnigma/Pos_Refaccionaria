@@ -8,9 +8,7 @@ import { GetSalesUseCase } from '@features/sales/application/usecase/get-sales.u
 import { GetPaymentMethodsUseCase } from '@features/sales/application/usecase/get-payment-methods.usecase';
 import { GetSaleDetailUseCase } from '@features/sales/application/usecase/get-sale-detail.usecase';
 import { GetSaleDetailsUseCase } from '@features/sales/application/usecase/get-sale-details.usecase';
-import { CreateSaleDetailUseCase } from '@features/sales/application/usecase/create-sale-detail.usecase';
-import { UpdateSaleDetailUseCase } from '@features/sales/application/usecase/update-sale-detail.usecase';
-import { DeleteSaleDetailUseCase } from '@features/sales/application/usecase/delete-sale-detail.usecase';
+import { GetSaleTicketUseCase } from '@features/sales/application/usecase/get-sale-ticket.usecase';
 import { LOGGER_PORT, LoggerPort } from '@core/logging/logger.port';
 import { Sale, SaleFactory } from '@features/sales/domain/entities/sale.entity';
 import { CreateSalePayload, CreateCompleteSalePayload } from '@features/sales/domain/repository/sale-repository';
@@ -51,10 +49,8 @@ describe('SalesFacade', () => {
         { provide: CreateSaleUseCase, useValue: createSaleUseCase },
         { provide: CreateCompleteSaleUseCase, useValue: createCompleteSaleUseCase },
         { provide: GetSaleDetailUseCase, useValue: { execute: jest.fn() } },
+        { provide: GetSaleTicketUseCase, useValue: { execute: jest.fn() } },
         { provide: GetSaleDetailsUseCase, useValue: { execute: jest.fn() } },
-        { provide: CreateSaleDetailUseCase, useValue: { execute: jest.fn() } },
-        { provide: UpdateSaleDetailUseCase, useValue: { execute: jest.fn() } },
-        { provide: DeleteSaleDetailUseCase, useValue: { execute: jest.fn() } },
         { provide: GetSalesUseCase, useValue: getSalesUseCase },
         { provide: GetPaymentMethodsUseCase, useValue: getPaymentMethodsUseCase },
         { provide: LOGGER_PORT, useValue: loggerPort },
@@ -68,6 +64,7 @@ describe('SalesFacade', () => {
   it('creates a sale successfully', () => {
     const payload: CreateSalePayload = {
       idMetodoPago: 2,
+      productos: [{ id: 10, cantidad: 1 }],
     };
     const sale: Sale = SaleFactory.fromPrimitives({
       id: 99,
@@ -88,7 +85,7 @@ describe('SalesFacade', () => {
     expect(createSaleUseCase.execute).toHaveBeenCalled();
   });
 
-  it('creates a complete sale (venta + detalles) with rollback support', () => {
+  it('creates a complete sale (venta atómica con detalles) in one call', () => {
     const payload: CreateCompleteSalePayload = {
       idMetodoPago: 1,
       productos: [{ id: 10, cantidad: 2 }],

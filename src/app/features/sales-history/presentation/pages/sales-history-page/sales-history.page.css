@@ -95,6 +95,13 @@
   box-shadow: 0 0 0 3px var(--ds-color-primary-ghost);
 }
 
+.filter-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
 .filter-actions select {
   padding: 10px 16px;
   border: 1px solid var(--ds-border-base);
@@ -104,6 +111,22 @@
   color: var(--ds-text-base);
   outline: none;
   cursor: pointer;
+}
+
+.filter-actions .filter-input {
+  width: 150px;
+  padding: 10px 12px;
+  border: 1px solid var(--ds-border-base);
+  border-radius: var(--pr-radius-md);
+  font-size: var(--pr-font-size-sm);
+  background: var(--ds-bg-surface);
+  color: var(--ds-text-base);
+  outline: none;
+}
+
+.filter-actions .filter-input:focus {
+  border-color: var(--ds-color-primary);
+  box-shadow: 0 0 0 3px var(--ds-color-primary-ghost);
 }
 
 /* States */
@@ -140,6 +163,75 @@
 
 /* Animation */
 /* Using global .animate-fade-in and .animate-slide-up from animations.css */
+
+/* Pagination */
+.pagination-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--pr-space-4);
+  flex-wrap: wrap;
+  background: var(--ds-bg-surface);
+  padding: var(--pr-space-3) var(--pr-space-4);
+  border-radius: var(--pr-radius-lg);
+  border: 1px solid var(--ds-border-subtle);
+}
+
+.pagination-info {
+  color: var(--ds-text-muted);
+  font-size: var(--pr-font-size-sm);
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.page-btn {
+  padding: 8px 14px;
+  border: 1px solid var(--ds-border-base);
+  border-radius: var(--pr-radius-md);
+  background: var(--ds-bg-surface);
+  color: var(--ds-text-base);
+  font-size: var(--pr-font-size-sm);
+  font-weight: var(--pr-weight-medium);
+  cursor: pointer;
+  transition: var(--comp-transition);
+}
+
+.page-btn:hover:not(:disabled) {
+  border-color: var(--ds-color-primary);
+  color: var(--ds-color-primary);
+}
+
+.page-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.page-btn.page-number.active {
+  background: var(--ds-color-primary);
+  border-color: var(--ds-color-primary);
+  color: white;
+}
+
+.page-size {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ds-text-muted);
+  font-size: var(--pr-font-size-sm);
+}
+
+.page-size select {
+  padding: 8px 12px;
+  border: 1px solid var(--ds-border-base);
+  border-radius: var(--pr-radius-md);
+  background: var(--ds-bg-surface);
+  color: var(--ds-text-base);
+  cursor: pointer;
+}
 
 @media (max-width: 768px) {
   .filter-bar {
