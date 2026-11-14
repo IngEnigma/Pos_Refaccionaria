@@ -194,6 +194,19 @@ describe('SalesPageComponent (integración)', () => {
     return all[all.length - 1];
   }
 
+  // H-43: el effect que muestra el error de las facades escribía una señal (NG0600) y el cajero no veía el aviso.
+  it('H-43: un error del backend al cargar métodos de pago o inventario se muestra en un toast', () => {
+    httpMock.match(VENTAS).forEach((r) => r.flush([]));
+    httpMock.match(TIPOS).forEach((r) => r.flush([]));
+    httpMock.match(METODOS).forEach((r) => r.flush({ detail: 'Sin permiso para métodos de pago.' }, { status: 403, statusText: 'Forbidden' }));
+    httpMock.match(INV).forEach((r) => r.flush({ error: 'El usuario no tiene una sucursal asignada' }, { status: 400, statusText: 'Bad Request' }));
+    fixture.detectChanges();
+    TestBed.flushEffects();
+
+    const errors = toasts.toasts().filter((t) => t.type === 'error').map((t) => t.message);
+    expect(errors).toEqual(expect.arrayContaining([expect.stringContaining('sucursal asignada')]));
+  });
+
   // Verifica que el inventario HTTP llegue al catálogo con id, nombre, precio de sucursal, stock y código intactos.
   it('el inventario del backend aparece en el catálogo con datos íntegros', () => {
     flushStartup(inventoryDto([itemDto()]));

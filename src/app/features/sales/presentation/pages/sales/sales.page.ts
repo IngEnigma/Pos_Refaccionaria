@@ -83,21 +83,24 @@ export class SalesPageComponent implements OnInit {
       if (errorMsg) {
         this.toastService.error(errorMsg);
       }
-    });
+      // H-43: el toast escribe una señal; sin esto Angular lanza NG0600 y el error no se mostraba.
+    }, { allowSignalWrites: true });
 
     effect(() => {
       const errorMsg = this.inventoryByBranchFacade.errorMessage();
       if (errorMsg) {
         this.toastService.error(errorMsg);
       }
-    });
+      // H-43: el toast escribe una señal; sin esto Angular lanza NG0600 y el error no se mostraba.
+    }, { allowSignalWrites: true });
 
     effect(() => {
       const errorMsg = this.productTypesFacade.errorMessage();
       if (errorMsg) {
         this.toastService.error(errorMsg);
       }
-    });
+      // H-43: el toast escribe una señal; sin esto Angular lanza NG0600 y el error no se mostraba.
+    }, { allowSignalWrites: true });
 
     // Carga reactiva: si sucursalId llega después (refreshProfile async en MainLayout)
     effect(

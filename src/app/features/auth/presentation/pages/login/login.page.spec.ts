@@ -237,6 +237,18 @@ describe('LoginPageComponent', () => {
     });
   });
 
+  // H-43: con el ToastService real (sin mock) el effect no debe lanzar NG0600 y el aviso debe llegar a la pantalla.
+  describe('toast real del error de autenticación', () => {
+    it('credenciales inválidas: el toast de error queda visible en el ToastService', () => {
+      errorState.set('Credenciales inválidas');
+      fixture.detectChanges();
+      TestBed.flushEffects();
+
+      const toasts = TestBed.inject(ToastService).toasts();
+      expect(toasts.map((t) => [t.type, t.message])).toEqual([['error', 'Credenciales inválidas']]);
+    });
+  });
+
   describe('accesibilidad y mensajes de validación', () => {
     it('muestra "El usuario es requerido" y "La contraseña es requerida" tras intentar enviar vacío', () => {
       component.onSubmit();

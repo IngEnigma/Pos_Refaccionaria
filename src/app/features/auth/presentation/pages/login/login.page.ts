@@ -35,7 +35,8 @@ export class LoginPageComponent {
       if (errorMsg) {
         this.toastService.error(errorMsg);
       }
-    });
+      // H-43: el toast escribe una señal; sin esto Angular lanza NG0600 y el error no se mostraba.
+    }, { allowSignalWrites: true });
   }
 
   readonly loginForm = this.fb.nonNullable.group({
