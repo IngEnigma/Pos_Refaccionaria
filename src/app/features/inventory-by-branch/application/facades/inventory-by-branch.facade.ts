@@ -42,6 +42,12 @@ export class InventoryByBranchFacade {
           const message = this.resolveErrorMessage(error);
           this._errorMessage.set(message);
           this.logger.error('Failed to load branch inventory', { message });
+          // TODO(inventario): Ante un fallo de carga, selectedInventory no se limpia
+          // (solo se vacían inventory/allItems). Si la recarga falla, la selección puede
+          // quedar apuntando a un inventario que ya no forma parte del estado actual
+          // (estado obsoleto). Revisar con el encargado del frontend si debe restablecerse
+          // a null o si conservarla es intencional. Hallazgo pendiente de revisión,
+          // no confirmado como bug definitivo.
           return of([]);
         }),
         finalize(() => this._loading.set(false)),
@@ -67,6 +73,11 @@ export class InventoryByBranchFacade {
         catchError((error: unknown) => {
           const message = this.resolveErrorMessage(error);
           this.logger.warn('Failed to load movements', { message });
+          // TODO(inventario): Ante un fallo solo se limpia la lista y se registra un warn;
+          // errorMessage no se expone, así que la página no muestra ningún aviso al usuario
+          // (a diferencia de loadMyBranchInventory). Revisar con el encargado del frontend
+          // si debe exponerse el mensaje. Hallazgo pendiente de revisión,
+          // no confirmado como bug definitivo.
           return of([]);
         }),
       )
