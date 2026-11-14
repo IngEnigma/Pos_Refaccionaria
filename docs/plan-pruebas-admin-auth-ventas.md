@@ -130,16 +130,16 @@ Preliminares (exploración del 2026-11-13). La Fase 0 los confirma y agrega los 
 
 | ID | Sev. | Hallazgo | Dónde | Fase | Estado |
 |---|---|---|---|---|---|
-| H-01 | 🔴 | `authGuard` solo valida sesión, no rol: un cajero entra a `/admin`, `/branches`, `/branch-pricing`, `/inventory-by-branch` o `/manager` escribiendo la URL. F0 confirma: ninguna ruta de `app.routes.ts` declara `data.roles` | `auth/presentation/guards/auth.guard.ts`, `app.routes.ts` | F1 | Confirmado |
-| H-02 | 🟠 | El sidebar muestra "Administración" y "Cajeros" al rol `seller` (F0 confirma: `roles: ['admin', 'seller', 'manager']` en ambos) | `shell/config/sidebar-menu.defaults.ts:73,87` | F1 | Confirmado |
-| H-03 | 🟠 | `admin-management.page` usa datos hardcodeados (`branches`, `users`, `managerOptions` en líneas 32, 59, 86), sin facade ni use case; la feature `users` solo tiene domain/application/infrastructure, sin facade ni UI. **Decisión F0 (usuario): opción (a)**, conectar la página a facades de `users` (crear `users.facade`) y `branches` | `features/admin`, `features/users` | F1 | Decidido (a) |
+| H-01 | 🔴 | `authGuard` solo valida sesión, no rol: un cajero entra a `/admin`, `/branches`, `/branch-pricing`, `/inventory-by-branch` o `/manager` escribiendo la URL. F0 confirma: ninguna ruta de `app.routes.ts` declara `data.roles` | `auth/presentation/guards/auth.guard.ts`, `app.routes.ts` | F1 | Corregido (`f01f164`): `roleGuard` + `data.roles` en las 5 rutas; spec del guard y de `app.routes` |
+| H-02 | 🟠 | El sidebar muestra "Administración" y "Cajeros" al rol `seller` (F0 confirma: `roles: ['admin', 'seller', 'manager']` en ambos) | `shell/config/sidebar-menu.defaults.ts:73,87` | F1 | Corregido (`d3dc434`): `/admin` solo admin, `/manager/cashiers` admin+manager; test en `sidebar-filter.utils.spec.ts` |
+| H-03 | 🟠 | `admin-management.page` usa datos hardcodeados (`branches`, `users`, `managerOptions` en líneas 32, 59, 86), sin facade ni use case; la feature `users` solo tiene domain/application/infrastructure, sin facade ni UI. **Decisión F0 (usuario): opción (a)**, conectar la página a facades de `users` (crear `users.facade`) y `branches` | `features/admin`, `features/users` | F1 | Corregido (`fd879e5`) con limitación: `users.facade` creado y página conectada a `users` y `branches`. El backend no modela rol, sucursal inicial, gerentes ni cajeros por sucursal, así que se retiraron de la maqueta (asignación de gerentes, columnas rol/sucursal/gerentes/cajeros, tarjetas Gerentes/Cajeros); queda alta y lista de sucursales y de usuarios (username, correo, estado). Si el equipo quiere roles/asignación hay que ampliar primero el backend |
 | H-04 | 🟡 | Sesión con "recordar" se guarda en localStorage (expuesta ante XSS). Electron mitiga; documentar | `auth/application/services/session-state.service.ts` | — | Registrado |
 | H-05 | 🟡 | Contraseñas de cuentas de prueba versionadas en el repo | `e2e/fixtures/test-users.ts` | F0 | Cerrado: el usuario confirma que son solo de la BD de pruebas |
 | H-06 | 🟡 | `refounds.page` es un stub y el nombre tiene typo (refunds) | `sales/presentation/pages/refounds` | — | Fuera de alcance |
 | H-07 | ⚪ | `jest.config.js` reporta 8 suites rojas preexistentes | `jest.config.js` | F0 | Cerrado: hoy 88/88 suites en verde (626 tests + 1 todo); ninguna roja en auth/sales. El comentario del config está desactualizado |
-| H-08 | 🔴 | **Doble venta.** Si `getSaleTicket` falla después de crear venta y detalles, el error llega a la página como "No fue posible registrar la venta", el carrito no se limpia (`tap` solo en éxito) y el cajero puede cobrar otra vez → venta duplicada | `sales/application/usecase/create-complete-sale.usecase.ts` (`concatMap` → `getSaleTicket`), `sales/presentation/state/sales-cart.service.ts:144` | F1 | Pendiente |
-| H-09 | 🟠 | Rollback parcial de venta: los detalles se crean en paralelo (`forkJoin`); si uno falla se borra la venta, pero los detalles ya creados y el stock descontado dependen de que el backend haga cascada. Si `deleteSale` falla, la venta queda huérfana y solo se registra en log. Candidato a 🔴 | `create-complete-sale.usecase.ts` (`catchError` del `forkJoin`) | F5 (INT-05) confirma | Pendiente |
-| H-10 | 🟠 | Lógica de negocio en el componente: `processTransaction` revalida stock contra inventario, arma el payload del ticket en snake_case para Electron y lee `window.desktop` directamente | `sales/presentation/pages/sales/sales.page.ts:256-326` | F1 si ≤ 50 líneas, si no se decide con el equipo | Pendiente |
+| H-08 | 🔴 | **Doble venta.** Si `getSaleTicket` falla después de crear venta y detalles, el error llega a la página como "No fue posible registrar la venta", el carrito no se limpia (`tap` solo en éxito) y el cajero puede cobrar otra vez → venta duplicada | `sales/application/usecase/create-complete-sale.usecase.ts` (`concatMap` → `getSaleTicket`), `sales/presentation/state/sales-cart.service.ts:144` | F1 | Corregido (`ff5a3ed`): si `getSaleTicket` falla, el use case devuelve `ticket: null` (sin error ni rollback), el carrito se limpia y la página avisa con warning |
+| H-09 | 🟠 | Rollback parcial de venta: los detalles se crean en paralelo (`forkJoin`); si uno falla se borra la venta, pero los detalles ya creados y el stock descontado dependen de que el backend haga cascada. Si `deleteSale` falla, la venta queda huérfana y solo se registra en log. Candidato a 🔴 | `create-complete-sale.usecase.ts` (`catchError` del `forkJoin`) | F1 parcial, F5 (INT-05) confirma | Parcial (`62e5e73`): si `deleteSale` falla, el error ahora avisa de la venta huérfana (`#id`) con el error original como `cause`. Sigue pendiente confirmar con el backend si el borrado de la venta hace cascada de detalles y restaura stock (INT-05); el rollback atómico real requiere un endpoint transaccional |
+| H-10 | 🟠 | Lógica de negocio en el componente: `processTransaction` revalida stock contra inventario, arma el payload del ticket en snake_case para Electron y lee `window.desktop` directamente | `sales/presentation/pages/sales/sales.page.ts:256-326` | F1 si ≤ 50 líneas, si no se decide con el equipo | **Sin tocar, requiere decisión**: mover la revalidación de stock a `SalesCartService`, el armado del payload a un mapper y `window.desktop` a un puerto toca ≈ 70 líneas de producción más specs de `sales.page`, por encima del límite de 50 |
 | H-11 | 🟡 | `desktop.generateTicket(...).then(...)` sin `.catch`: si el IPC rechaza, queda una promesa rechazada sin manejar y el cajero no ve error | `sales.page.ts` (`processTransaction`) | — | Registrado |
 | H-12 | 🟡 | Redondeo de dinero con `toFixed(2)` sobre `number` (p. ej. `1.005.toFixed(2)` → `1.00`) | `sales/domain/entities/order.entity.ts:22,41,46,51` | F3 (tests de decimales) | Registrado |
 | H-13 | ⚪ | El front suma IVA 16 % sobre `precio` (`order.entity.ts:28`); verificar que el total mostrado en el carrito coincide con el total del ticket del backend | `order.entity.ts`, `sales-cart.service.ts:37-39` | F5 (INT-06) | Por verificar |
@@ -178,14 +178,14 @@ Revisado sin hallazgo: no hay `[innerHTML]` ni `bypassSecurityTrust*` en `src/ap
 ### Fase 1 — Correcciones críticas (TDD)
 **Sesión:** 1 · **Modelo:** Sonnet · **Subagentes:** no
 
-- [ ] **H-01:** test que falla → `roleGuard` funcional en `auth/presentation/guards/role.guard.ts` que lee `route.data['roles']` y compara con `SessionStateService.role()`; si no autoriza, redirige a `/sales`.
+- [x] **H-01:** test que falla → `roleGuard` funcional en `auth/presentation/guards/role.guard.ts` que lee `route.data['roles']` y compara con `SessionStateService.role()`; si no autoriza, redirige a `/sales`.
   - `app.routes.ts`: `data: { roles: [...] }` → `/admin`, `/branches`, `/branch-pricing`: admin · `/inventory-by-branch`, `/manager`: admin, manager.
   - Spec del guard: sin sesión, rol permitido, rol no permitido, ruta sin `data.roles`.
-- [ ] **H-02:** corregir roles de `/admin` y `/manager/cashiers` en el sidebar + test de `shell/utils/sidebar-filter.utils.ts`.
-- [ ] **H-03:** aplicar la opción decidida en F0.
-- [ ] Resto de 🔴 y 🟠 de la Fase 0, cada uno con su test primero.
-- [ ] Suites de auth, sales y shell en verde.
-- [ ] Un commit por hallazgo (`fix(auth): restringe rutas por rol (H-01)`).
+- [x] **H-02:** corregir roles de `/admin` y `/manager/cashiers` en el sidebar + test de `shell/utils/sidebar-filter.utils.ts`.
+- [x] **H-03:** aplicar la opción decidida en F0. *(Opción (a) con la limitación registrada en §5.)*
+- [x] Resto de 🔴 y 🟠 de la Fase 0, cada uno con su test primero. *(H-08 corregido; H-09 parcial; H-10 pendiente de decisión, ver §5.)*
+- [x] Suites de auth, sales y shell en verde.
+- [x] Un commit por hallazgo (`fix(auth): restringe rutas por rol (H-01)`).
 
 ### Fase 2 — Unitarias Auth
 **Sesión:** 1 · **Modelo:** Sonnet · **Subagentes:** no (módulo chico)
@@ -300,6 +300,7 @@ E2E base: `npx playwright test e2e/auth.login.spec.ts --project=chromium` → 4/
 | Fecha | Fase | Modelo | Hecho | Hallazgos nuevos | Pendiente |
 |---|---|---|---|---|---|
 | 2026-11-13 | F0 | Opus | Rama `test/admin-auth-ventas` creada (cambios previos de `master` fuera, sin commit); línea base Jest + cobertura + E2E; auditoría seguridad/arquitectura/bugs; H-03 = (a); H-05 y H-07 cerrados | H-08 🔴 doble venta si falla el ticket · H-09 🟠 rollback parcial · H-10 🟠 lógica en `sales.page` · H-11 a H-18 🟡/⚪ | F1: H-01, H-02, H-03 (a), H-08, H-10 (si ≤ 50 líneas) |
+| 2026-11-13 | F1 | Sonnet | H-08 `ff5a3ed` · H-01 `f01f164` · H-02 `d3dc434` · H-03 `fd879e5` · H-09 parcial `62e5e73`. Cada uno con su test rojo primero. Suites auth + sales + shell + admin + users en verde (`37 suites, 265 tests + 1 todo`) | Ninguno | H-10 (decisión del usuario, >50 líneas); H-09 cascada/stock con el backend (F5 INT-05); F2 |
 
 ### Resultado final (Fase 7)
 
