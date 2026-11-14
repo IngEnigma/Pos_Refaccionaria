@@ -23,9 +23,10 @@ export const INVENTARIO_MI_SUCURSAL = [
     id_sucursal: SUCURSAL_ID,
     detalles: [
       inventoryItem(1, 'Balata delantera', 'BAL-001', '7501', '100.00', null, 10),
-      inventoryItem(2, 'Filtro de aceite', 'FIL-002', '7502', '50.50', null, 1),
+      inventoryItem(2, 'Filtro de aceite', 'FIL-002', '7502', '50.00', null, 5),
       inventoryItem(3, 'Bujía NGK', 'BUJ-003', '7503', '30.00', null, 0),
       inventoryItem(4, 'Amortiguador', 'AMO-004', '7504', '400.00', '350.00', 5),
+      inventoryItem(5, 'Faro delantero', 'FAR-005', '7505', '80.00', null, 3),
     ],
   },
 ];
