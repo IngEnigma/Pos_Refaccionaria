@@ -34,7 +34,8 @@ export class BranchesPageComponent implements OnInit {
       if (errorMsg) {
         this.toastService.error(errorMsg);
       }
-    });
+      // H-43: el toast escribe una señal; sin esto Angular lanza NG0600 y el error no se mostraba.
+    }, { allowSignalWrites: true });
   }
 
   ngOnInit(): void {

@@ -123,8 +123,17 @@ describe('BranchesFacade', () => {
       expect(facade.errorMessage()).toBe('Correo inválido');
     });
 
-    it('cae al message del HttpErrorResponse si el cuerpo no trae message', () => {
-      const httpError = new HttpErrorResponse({ status: 500, statusText: 'Server Error', error: { detail: 'x' } });
+    it.each([
+      ['error', { error: 'Ya existe la sucursal' }, 'Ya existe la sucursal'],
+      ['detail', { detail: 'Requiere permiso' }, 'Requiere permiso'],
+    ])('lee el texto de la clave "%s" del cuerpo del backend (H-42)', (_clave, body, esperado) => {
+      failLoad(new HttpErrorResponse({ status: 400, statusText: 'Bad Request', error: body }));
+
+      expect(facade.errorMessage()).toBe(esperado);
+    });
+
+    it('cae al message del HttpErrorResponse si el cuerpo no trae mensaje', () => {
+      const httpError = new HttpErrorResponse({ status: 500, statusText: 'Server Error', error: { otro: 'x' } });
 
       failLoad(httpError);
 

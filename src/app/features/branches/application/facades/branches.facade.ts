@@ -104,7 +104,7 @@ export class BranchesFacade {
 
   private resolveErrorMessage(error: unknown): string {
     if (error instanceof HttpErrorResponse) {
-      return error.error?.message || error.message || 'No fue posible completar la operación.';
+      return error.error?.message || error.error?.error || error.error?.detail || error.message || 'No fue posible completar la operación.';
     }
 
     if (error instanceof Error && error.message) {
