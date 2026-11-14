@@ -149,7 +149,7 @@ Preliminares (exploración del 2026-11-13). La Fase 0 los confirma y agrega los 
 | H-11 | 🟡 | `desktop.generateTicket(...).then(...)` sin `.catch`: si el IPC rechaza, queda una promesa rechazada sin manejar y el cajero no ve error | `sales.page.ts` (`processTransaction`) | — | Registrado |
 | H-12 | 🟡 | Redondeo de dinero con `toFixed(2)` sobre `number` (p. ej. `1.005.toFixed(2)` → `1.00`) | `sales/domain/entities/order.entity.ts:22,41,46,51` | F3 (tests de decimales) | Registrado. F3: solo falla con cantidad fraccionaria (0.15 × 1.5 → 0.22, esperado 0.23); con cantidades enteras subtotal, IVA y total salen exactos al centavo. La UI solo usa enteros. `it.todo('H-12: …')` ×2 en `order.entity.money.spec.ts` |
 | H-13 | ⚪ | El front suma IVA 16 % sobre `precio` (`order.entity.ts:28`); verificar que el total mostrado en el carrito coincide con el total del ticket del backend | `order.entity.ts`, `sales-cart.service.ts:37-39` | F5 (INT-06) | Por verificar |
-| H-14 | 🟡 | Precio por sucursal validado solo en la UI (`Validators.min(0.01)`), sin límite de 2 decimales; ni use case ni entidad validan | `branch-pricing/presentation/components/set-price-dialog/set-price-dialog.component.ts:33` | F4 | Registrado |
+| H-14 | 🟡 | Precio por sucursal validado solo en la UI (`Validators.min(0.01)`): sin límite de 2 decimales (acepta 10.999 y lo envía sin redondear), sin tope (`DecimalField(10,2)` del backend, máx 99999999.99) y `setValue('abc')` por código pasa `min` (la UI no lo permite, input number); ni use case ni entidad validan | `branch-pricing/presentation/components/set-price-dialog/set-price-dialog.component.ts:33` | F4 | Registrado (`it.todo('H-14')`, `H-14b`, `H-14c` en `set-price-dialog.component.spec.ts`; los demás casos de precio —negativo, cero, vacío, mínimo 0.01— tienen test) |
 | H-15 | 🟡 | `result as any` al pasar el resultado del diálogo a la facade y `subscribe` anidados | `branches/presentation/pages/branches-page/branches.page.ts:51,71`, `branch-pricing/presentation/pages/branch-pricing-page/branch-pricing.page.ts:51` | — | Registrado |
 | H-16 | 🟡 | Violación de capas leve: application importa de infrastructure (`withBearerToken`) | `auth/application/services/auth-token-refresh-orchestrator.service.ts:16` | — | Registrado |
 | H-17 | 🟡 | Electron: `console.log(preview)` imprime el ticket completo en el log del proceso principal; el texto ESC/POS no filtra caracteres de control (datos vienen del backend) | `electron/ipc/printer.ipc.js:36`, `electron/printer/ticket-escpos.js:4` | — | Registrado |
@@ -165,6 +165,16 @@ Preliminares (exploración del 2026-11-13). La Fase 0 los confirma y agrega los 
 | H-27 | 🟡 | Las mutaciones de métodos de pago y tipos de producto lanzan un mensaje fijo "Failed to …" y pierden el mensaje del backend; `sale-detail` y `getPaymentMethods` sí usan `resolveHttpErrorMessage` | `sales/infrastructure/repositories/payment-method-repository.impl.ts:49,60,69`, `sales/product-types/infrastructure/repositories/product-type-repository.impl.ts:42,53,62` | F3 | Registrado |
 | H-28 | 🟡 | Si la respuesta de crear detalle no trae `subtotal`, `resolveSaleDetailResponse` cae al fallback y devuelve `id: 0` (p. ej. `{id: 3}` → id 0); el id real se pierde | `sales/infrastructure/repositories/sale-detail-repository.impl.ts:101` | F3 | Registrado (solo si el backend omite campos; hoy los envía) |
 | H-29 | 🟡 | Contrato de errores mezclado: `CreateSaleUseCase` lanza síncrono con datos inválidos, mientras `create-complete-sale` con carrito vacío emite el error por el observable | `sales/application/usecase/create-sale.usecase.ts:16` | F3 | Registrado |
+| H-30 | 🟡 | `codigoPostal` solo tiene `required`: "12345678901" pasa; el backend (`sucursales/models.py`) tiene `max_length=10` y responde 400 | `branches/presentation/components/branch-form-dialog/branch-form-dialog.component.ts:43-46` | F4 | Registrado (`it.todo('H-30')`) |
+| H-31 | 🟡 | `numeroTelefono` valida `^[0-9]+$` sin tope: 16 dígitos pasan; el backend tiene `max_length=15` | idem | F4 | Registrado (`it.todo('H-31')`) |
+| H-32 | 🟡 | `nombreSucursal` y `ubicacion` de solo espacios pasan `Validators.required`; el backend los recorta y responde 400 por campo vacío | idem | F4 | Registrado (`it.todo('H-32')`) |
+| H-33 | 🔴 | **Tabla de precios por sucursal no carga.** `loadProducts` hacía `loading.set(true)` dentro de `effect()` sin `allowSignalWrites`: en Angular 18 lanza NG0600, `getProducts` nunca se llamaba y la tabla quedaba vacía/sin datos. Confirmado en la salida de Jest; no se re-ejecutó en el navegador | `branch-pricing/presentation/components/branch-pricing-table/branch-pricing-table.component.ts:29-38` | F4 | Corregido (`baa5b61`): `untracked(() => loadProducts(...))`; tests de carga, cambio de sucursal y esqueleto (rojo primero) |
+| H-34 | 🟠 | **Error silenciado.** Si fallaba el guardado del precio, la página no avisaba (`error: () => {}`) | `branch-pricing/presentation/pages/branch-pricing-page/branch-pricing.page.ts:55` | F4 | Corregido (`baa5b61`): toast de error con el mensaje |
+| H-35 | 🟠 | Tras fijar el precio con éxito la tabla no se recargaba y seguía mostrando el precio anterior (el cajero/admin podía volver a fijarlo creyendo que no se guardó) | `branch-pricing.page.ts:51` | F4 | Corregido (`baa5b61`): `BranchPricingTableComponent.reload()` desde la página con `viewChild` |
+| H-36 | 🟡 | `branch-price.mapper` usa `parseFloat` sin validar: `precio_venta` `""`, `null` o `"abc"` produce `NaN`, y la tabla pinta "$NaN" con badge "Activo" | `branch-pricing/infrastructure/mappers/branch-price.mapper.ts:14,25`, `branch-pricing-table.component.ts` (`formatPrice`) | F4 | Registrado (`it.todo('H-36')` ×2; solo si el backend omite el campo) |
+| H-37 | 🟡 | Casos de uso sin consumidor: `BranchPricingFacade` no expone `deactivatePrice` (existen `DeactivatePriceUseCase` y el repo) y `UsersFacade` solo expone `loadUsers`/`createUser` (existen `update`/`delete` user). Código muerto o función faltante; decidir con el equipo | `branch-pricing.facade.ts`, `users.facade.ts` | F4 | Registrado (`it.todo('H-37')`) |
+
+Observaciones F4 (sin ID): `getActivePrice` recibe 404 del backend cuando no hay precio y lo trata como error aunque el tipo promete `null`; la facade de branch-pricing no actualiza `prices` tras `setBranchPrice`; typo "Fixar" (debe ser "Fijar") en `branch-pricing-table.component.html:61`, no tocado porque ese archivo trae cambios sin commit de `master`.
 
 Revisado sin hallazgo: no hay `[innerHTML]` ni `bypassSecurityTrust*` en `src/app`; los logs de auth no imprimen valores de tokens ni contraseñas; `buildHttpErrorLog` usa URL sanitizada y no incluye el body de la petición; Electron con `contextIsolation: true` y `nodeIntegration: false`; presentation no importa infrastructure en estos módulos; `domain/repository/*` usa `Observable` de rxjs (convención aceptada); el carrito respeta el stock al agregar/incrementar; `processTransaction` tiene guarda contra doble clic (`isCreatingSale`); los `subscribe` sin `takeUntilDestroyed` en branches/branch-pricing son de HTTP o `dialogRef.closed` (completan solos, no hay fuga).
 
@@ -234,11 +244,11 @@ Revisado sin hallazgo: no hay `[innerHTML]` ni `bypassSecurityTrust*` en `src/ap
 ### Fase 4 — Unitarias Rol Admin
 **Sesiones:** 1–2 · **Modelo:** Sonnet · **Subagentes:** sí, 2 en paralelo (branches + users | branch-pricing + admin)
 
-- [ ] **branches:** `branch.entity`, `branch.mapper`, `branch-repository.impl`, 5 use cases (`create`, `update`, `delete`, `get-branches`, `get-branch-by-id`), `branches.facade`, `branch-card`, `branch-form-dialog` (validaciones), `branches.page`
-- [ ] **branch-pricing:** `branch-price.entity`, `price-history-item.entity`, `branch-price.mapper`, `branch-price-repository.impl`, 4 use cases (`set-branch-price`, `get-active-price`, `get-price-history`, `deactivate-price`), `branch-pricing.facade`, `branch-pricing-table`, `set-price-dialog` (precio negativo, cero, decimales, vacío), `branch-pricing.page`
-- [ ] **users:** `user.entity`, `user.mapper`, `user-repository.impl`, 4 use cases (`create`, `update`, `delete`, `get-users`)
-- [ ] **admin:** `admin-management.page` según la decisión H-03
-- [ ] Cobertura por módulo → §8 (metas de §1).
+- [x] **branches:** `branch.entity`, `branch.mapper`, `branch-repository.impl`, 5 use cases (`create`, `update`, `delete`, `get-branches`, `get-branch-by-id`), `branches.facade`, `branch-card`, `branch-form-dialog` (validaciones), `branches.page`
+- [x] **branch-pricing:** `branch-price.entity`, `price-history-item.entity`, `branch-price.mapper`, `branch-price-repository.impl`, 4 use cases (`set-branch-price`, `get-active-price`, `get-price-history`, `deactivate-price`), `branch-pricing.facade`, `branch-pricing-table`, `set-price-dialog` (precio negativo, cero, decimales, vacío), `branch-pricing.page`
+- [x] **users:** `user.entity`, `user.mapper`, `user-repository.impl`, 4 use cases (`create`, `update`, `delete`, `get-users`)
+- [x] **admin:** `admin-management.page` según la decisión H-03 *(spec de F1 ampliado de 7 a 27 tests)*
+- [x] Cobertura por módulo → §8 (metas de §1). *(100 % líneas en los 4)*
 
 ### Fase 5 — Integración
 **Sesiones:** 1–2 · **Modelo:** Sonnet · **Subagentes:** no (necesita contexto entre módulos)
@@ -329,6 +339,17 @@ Antes (F0): 84.2 % líneas, 63.7 % ramas, 70.0 % funciones, 11 suites. El 2.1 % 
 
 Antes (F0): 78.8 % líneas, 58.2 % ramas, 66.2 % funciones, 17 suites. Mismo comando de §3.1 cambiando la ruta a `features/sales` y excluyendo también `index.ts` y `*.routes.ts`. Proyecto completo: 143/143 suites, 1154 tests + 11 `todo`. Lo único bajo la meta es `sales.facade.ts` (80 % líneas, líneas 118-151 y 159-163: update/delete de ventas y detalles, no usados por la UI) y el stub `refounds.page.ts` (0 %, excluido por §1).
 
+### Cobertura de los módulos admin tras la Fase 4
+
+| Módulo | Líneas | Ramas | Funciones | Meta líneas |
+|---|---|---|---|---|
+| admin | 100 % (39/39) | 100 % (6/6) | 100 % (10/10) | ≥ 80 % ✅ |
+| branches | 100 % (172/172) | 100 % (38/38) | 100 % (53/53) | ≥ 80 % ✅ |
+| branch-pricing | 100 % (176/176) | 92.9 % (26/28) | 100 % (51/51) | ≥ 85 % ✅ |
+| users | 100 % (73/73) | 100 % (4/4) | 100 % (23/23) | ≥ 80 % ✅ |
+
+Antes (F0): 0 % en branches, branch-pricing y users; admin 0 % (la página era maqueta, hoy 39 líneas tras H-03). Los 4 módulos juntos: 29 suites, 298 tests + 9 `todo`. Proyecto completo: 170/170 suites, 1441 tests + 20 `todo`. Mismo comando de §3.1 con `{branches,branch-pricing,users,admin}` y excluyendo `index.ts` y `*.routes.ts`. Las entidades de los 4 módulos son solo interfaces (sin spec). Solo 2 ramas de `branch-pricing` quedan sin cubrir.
+
 ### Sesiones
 
 | Fecha | Fase | Modelo | Hecho | Hallazgos nuevos | Pendiente |
@@ -337,6 +358,7 @@ Antes (F0): 78.8 % líneas, 58.2 % ramas, 66.2 % funciones, 17 suites. Mismo com
 | 2026-11-13 | F1 | Sonnet | H-08 `ff5a3ed` · H-01 `f01f164` · H-02 `d3dc434` · H-03 `fd879e5` · H-09 parcial `62e5e73`. Cada uno con su test rojo primero. Suites auth + sales + shell + admin + users en verde (`37 suites, 265 tests + 1 todo`) | Ninguno | H-10 (decisión del usuario, >50 líneas); H-09 cascada/stock con el backend (F5 INT-05); F2 |
 | 2026-11-13 | F2 | Sonnet | Lotes A `cfd4ac8`, B `0e3eae2`, C `c870f20`; ampliaciones `eac3cf6` (session-state, facade, auth-repository, auth.errors), `7cf66f5` (login.page); fixes H-21 `b90bc41` y H-22 `57c664c` (test rojo primero). auth: 11 → 21 suites, 84.2 % → 97.9 % líneas. Proyecto: 102/102 suites en verde | H-19 🟡 sin casilla "recordar" · H-20 🟡 `onSubmit` sin guarda de `loading` · H-21 🔴 fuga del access token (corregido) · H-22 🟠 login incorrecto enmascarado (corregido) | F3: ventas. Pendiente decidir H-18/H-19/H-20 (🟡, `it.todo`) y H-10 |
 | 2026-11-13 | F3 | Sonnet (+2 subagentes Sonnet) | H-10 `84225fb` (revalidación de stock → `SalesCartService.findStockIssue`, payload → `application/mappers/ticket-print-payload.mapper`, `window.desktop` → `DESKTOP_PORT`; tests primero). Lote A `3c17ea4` (domain + `order.entity.money.spec`), B `0f72fc5` (mappers), C `481a16b` (use cases + estrategia), D `62c0d20` (repos HTTP + `http-error-resolver`), E `d02a92b`, `54fc3a3`, `5a6053d`, `a7a57d4` (facade de tipos, 5 componentes nuevos, ampliación de ticket-modal / category-slider / payment-method-selector / product-card / sales.page / sales-cart). sales: 17 → 57 suites, 78.8 % → 96.2 % líneas | H-23 a H-29 🟡 (descuento NaN, tope 999, `Date.parse` laxo, total `""`→0, mensajes fijos en mutaciones, id 0 en fallback, contrato sync/async); H-12 acotado a cantidades fraccionarias; H-10 corregido | F4: roles admin. Pendiente: reusar mapper y `DESKTOP_PORT` en `ticket-modal.component.ts` (tiene cambios sin commit de `master`); `sales.facade.ts` 80 % líneas |
+| 2026-11-13 | F4 | Sonnet (+2 subagentes Sonnet) | Specs de `branches` `52c688c` (11 suites), `users` `9f8e6f4` (6 specs + `users.facade` ampliado), `branch-pricing` + `admin` `ee15cca` (admin 7 → 27 tests); fix H-33/H-34/H-35 `baa5b61` (rojo primero). Los 4 módulos 0 % → 100 % líneas; proyecto 170/170 suites en verde | H-30 a H-32 🟡 (form de sucursal sin topes ni trim) · H-33 🔴 tabla de precios no cargaba (NG0600, corregido) · H-34 🟠 error silenciado (corregido) · H-35 🟠 tabla no recargaba (corregido) · H-36 🟡 `NaN` en mapper · H-37 🟡 `deactivatePrice`/`update`/`delete` sin consumidor · H-14 ampliado (tope y NaN) | F5: integración. Pendiente decidir H-14, H-30 a H-32, H-36, H-37 (🟡, `it.todo`). Typo "Fixar" y reuso de mapper en `ticket-modal` siguen fuera por cambios de `master` |
 
 ### Resultado final (Fase 7)
 
