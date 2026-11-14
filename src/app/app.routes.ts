@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 
 import { AppRoutes } from '@app/app-routes';
 import { authGuard } from '@features/auth/presentation/guards/auth.guard';
+import { roleGuard } from '@features/auth/presentation/guards/role.guard';
 import { MainLayoutComponent } from '@app/shell/layouts/main-layout/main-layout.component';
 
 export const routes: Routes = [
@@ -49,7 +50,8 @@ export const routes: Routes = [
   },
   {
     path: AppRoutes.branches,
-    canActivate: [authGuard],
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['admin'] },
     component: MainLayoutComponent,
     loadChildren: () =>
       import('@features/branches/branches.routes').then((m) => m.BRANCHES_ROUTES),
@@ -63,14 +65,16 @@ export const routes: Routes = [
   },
   {
     path: AppRoutes.admin,
-    canActivate: [authGuard],
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['admin'] },
     component: MainLayoutComponent,
     loadChildren: () =>
       import('@features/admin/admin.routes').then((m) => m.ADMIN_ROUTES),
   },
   {
     path: AppRoutes.manager,
-    canActivate: [authGuard],
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['admin', 'manager'] },
     component: MainLayoutComponent,
     loadChildren: () =>
       import('@features/manager/manager.routes').then((m) => m.MANAGER_ROUTES),
@@ -84,7 +88,8 @@ export const routes: Routes = [
   },
   {
     path: AppRoutes.branchPricing,
-    canActivate: [authGuard],
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['admin'] },
     component: MainLayoutComponent,
     loadChildren: () =>
       import('@features/branch-pricing/branch-pricing.routes').then(
@@ -93,7 +98,8 @@ export const routes: Routes = [
   },
   {
     path: AppRoutes.inventoryByBranch,
-    canActivate: [authGuard],
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['admin', 'manager'] },
     component: MainLayoutComponent,
     loadChildren: () =>
       import('@features/inventory-by-branch/inventory-by-branch.routes').then(
