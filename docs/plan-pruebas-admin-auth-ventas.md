@@ -184,6 +184,13 @@ Preliminares (exploración del 2026-11-13). La Fase 0 los confirma y agrega los 
 | H-46 | 🟡 | El login del backend trae `user.rol` (`cajero`/`encargado`/`admin`), que define los permisos, pero el front deduce el rol de `isadmin`/`isstaff`: un staff sin superuser es `manager` en el front y admin para el backend (`es_staff`); un `encargado` sin `is_staff` es `seller` | `auth/infrastructure/mappers/auth-role.mapper.ts` | F5 (INT-01) | Registrado (`it.todo('H-46')` en `auth-session.integration.spec.ts`) |
 | H-47 | 🟠 | El alta de usuario no envía `id_sucursal` ni `rol`: el backend crea el usuario sin perfil y ese usuario no puede operar (`El usuario no tiene una sucursal asignada`). Corregirlo implica ampliar formulario, payload y tests (> 50 líneas) | `admin/.../admin-management.page.*`, `users/infrastructure/mappers/user.mapper.ts` | F5 (INT-09) | Registrado, a decidir con el equipo (`it.todo('H-47')`). Relacionado con H-03 |
 | H-48 | 🟠 | `UsersFacade` y la página de administración solo reconocían `Error`: el `HttpErrorResponse` del backend (`{"error": "El nombre de usuario ya existe"}`) se mostraba como "Ocurrió un error inesperado" / "Error, por favor intente de nuevo" | `users/application/facades/users.facade.ts`, `admin-management.page.ts` | F5 (INT-09) | Corregido (`8487b8e`): lee `error`, `detail` y `message` del cuerpo; test de integración en rojo primero |
+| H-49 | 🟠 | La app no provee animaciones (`provideAnimations`) pero el toast usa `@toastAnimation`: cada toast lanzaba `NG05105` en consola y el toast de error de una venta rechazada salía **sin texto** en el navegador real (Jest no lo detectaba) | `app.config.ts`, `shared/ui/components/toast/toast-container.component.ts` | F6 (`sales.pos`) | Corregido (`00ff06c`): `provideAnimations()`; E2E en rojo primero |
+| H-50 | 🟡 | Faltan nombres accesibles: la tarjeta de sucursal no tiene rol ni nombre (sus botones «Editar»/«Eliminar» se repiten sin contexto), el botón de quitar del carrito es solo un icono sin `aria-label`, y el botón de la tabla de precios dice «Fixar» (typo) | `branch-card.component.html`, `cart-item.component.html`, `branch-pricing-table.component.html` | F6 | Registrado (los E2E acotan por `<app-branch-card>` y por regex `/Fi[jx]ar/`) |
+| H-51 | 🟠 | El icono `Mail` no está en `LucideAngularModule.pick`: la tarjeta de sucursal (con correo) y el formulario de sucursal lanzaban «icon has not been provided» y dejaban de renderizar (tarjetas, título y etiquetas vacías) | `app.config.ts` | F6 (`admin.branches`) | Corregido (`19c8bf9`): E2E en rojo primero |
+| H-52 | 🟡 | La tarjeta de producto del POS imprime el precio sin decimales fijos (`$110`, `$50.5`), el carrito y el ticket sí (`$110.00`) | `product-card.component.html` | F6 (`admin.pricing`) | Registrado |
+| H-53 | 🟡 | Los formularios de `/admin` (usuario y sucursal) no muestran mensajes de validación: con datos inválidos el envío simplemente no hace nada | `admin-management.page.html` | F6 (`admin.users`) | Registrado |
+| H-54 | 🟠 | `/sales` tenía una violación **critical** de axe (`aria-required-children`): el slider de categorías declaraba `role="list"` con botones. Además el smoke a11y de `/sales` no tenía sesión y auditaba el login | `category-slider.component.html`, `e2e/a11y.smoke.spec.ts` | F6 (a11y) | Corregido (`7958963`): `role="group"` + `aria-label` |
+| H-55 | 🟡 | Restos de a11y (serious/moderate) en las páginas privadas: `aria-prohibited-attr` del toast (`aria-label` en un `div` sin rol), `color-contrast` en `/sales` y `<main>` anidado (layout + página) | `toast-container.component.ts`, `main-layout.component.html` y páginas | F6 (a11y) | Registrado (el smoke solo falla con critical) |
 
 Observaciones F4 (sin ID): `getActivePrice` recibe 404 del backend cuando no hay precio y lo trata como error aunque el tipo promete `null`; la facade de branch-pricing no actualiza `prices` tras `setBranchPrice`; typo "Fixar" (debe ser "Fijar") en `branch-pricing-table.component.html:61`, no tocado porque ese archivo trae cambios sin commit de `master`.
 
@@ -279,15 +286,15 @@ Ya existen: `auth-flow`, `sale-auth`, `create-complete-sale`, `sales-facade`, `s
 ### Fase 6 — E2E (Playwright con mocks)
 **Sesiones:** 2 · **Modelo:** Sonnet · **Subagentes:** no (comparten `ng serve`)
 
-- [ ] Helpers en `e2e/helpers/backend.ts`: `mockLoginAs(page, role)` y `mockApi(page, ruta, body, status?)`; fixtures de productos, sucursales, precios y usuarios en `e2e/fixtures/`.
-- [ ] `e2e/auth.session.spec.ts`: SIS-004, SIS-005, SIS-006.
-- [ ] `e2e/sales.pos.spec.ts`: SIS-010 a SIS-016.
-- [ ] `e2e/admin.access.spec.ts` — **SIS-053 (nuevo)**: seller no ve ni entra a `/admin`, `/branches`, `/branch-pricing`; admin sí; manager solo a lo suyo.
-- [ ] `e2e/admin.branches.spec.ts`: SIS-030.
-- [ ] `e2e/admin.pricing.spec.ts`: SIS-023.
-- [ ] SIS-050 usuarios y roles (según H-03).
-- [ ] Agregar `/sales`, `/branches` y `/branch-pricing` a `e2e/a11y.smoke.spec.ts` (SIS-061).
-- [ ] Opcional: 1 smoke contra el backend real (`*.real.spec.ts` + `wakeBackend()`).
+- [x] Helpers en `e2e/helpers/backend.ts`: `mockLoginAs(page, role)` y `mockApi(page, ruta, body, status?)`; fixtures de productos, sucursales, precios y usuarios en `e2e/fixtures/`.
+- [x] `e2e/auth.session.spec.ts`: SIS-004, SIS-005, SIS-006.
+- [x] `e2e/sales.pos.spec.ts`: SIS-010 a SIS-016.
+- [x] `e2e/admin.access.spec.ts` — **SIS-053 (nuevo)**: seller no ve ni entra a `/admin`, `/branches`, `/branch-pricing`; admin sí; manager solo a lo suyo.
+- [x] `e2e/admin.branches.spec.ts`: SIS-030.
+- [x] `e2e/admin.pricing.spec.ts`: SIS-023.
+- [x] SIS-050 usuarios (`e2e/admin.users.spec.ts`, según H-03; el caso de «quitar permiso de reportes» no existe en la UI, H-47).
+- [x] Agregar `/sales`, `/branches` y `/branch-pricing` a `e2e/a11y.smoke.spec.ts` (SIS-061).
+- [ ] Opcional (no hecho; `auth.real.spec.ts` ya existe y se omite sin `E2E_REAL`): 1 smoke contra el backend real (`*.real.spec.ts` + `wakeBackend()`).
 
 ### Fase 7 — Cierre y evidencia
 **Sesión:** 1 · **Modelo:** Sonnet · **Subagentes:** no
@@ -312,7 +319,7 @@ Ya existen: `auth-flow`, `sale-auth`, `create-complete-sale`, `sales-facade`, `s
 | SIS-010–016 | POS: venta, vacío, pago, inventario, stock, totales, búsqueda | INT-05, INT-06, `sales-page` | `sales.pos` |
 | SIS-023 | Precio por sucursal | INT-08 | `admin.pricing` |
 | SIS-030 | CRUD sucursales | INT-07 | `admin.branches` |
-| SIS-050 | Usuarios y roles | INT-09 | según H-03 |
+| SIS-050 | Usuarios y roles | INT-09 | `admin.users` |
 | SIS-053 | Acceso por rol (nuevo) | INT-04 | `admin.access` |
 | SIS-061 | Accesibilidad | — | `a11y.smoke` |
 
@@ -375,6 +382,21 @@ Antes (F0): 0 % en branches, branch-pricing y users; admin 0 % (la página era m
 
 85 tests de integración nuevos (más 1 de H-43 en `sales-page.integration.spec.ts` y 1 en `login.page.spec.ts`). `npm run test:integration` equivalente (`--testPathPattern integration.spec`): 16 suites, 147 tests + 5 todo. Proyecto completo: 176/176 suites, 1516 tests + 25 `todo`. Contratos verificados contra `RefaccionariaBack` (Develop, `pull --ff-only` al día): ventas (`crear_venta_completa`, `ventas.anular`, rename `id_metodo_pago`), sucursales, `precios-sucursal`, `users`, login.
 
+### E2E tras la Fase 6
+
+| Archivo | Casos | Tests |
+|---|---|---|
+| `e2e/auth.session.spec.ts` | SIS-004, SIS-005, SIS-006 | 7 |
+| `e2e/sales.pos.spec.ts` | SIS-010 a SIS-016 | 10 + 1 `fixme` (H-40) |
+| `e2e/admin.access.spec.ts` | SIS-053 (nuevo) | 20 |
+| `e2e/admin.branches.spec.ts` | SIS-030 | 5 |
+| `e2e/admin.pricing.spec.ts` | SIS-023 | 4 |
+| `e2e/admin.users.spec.ts` | SIS-050 | 5 |
+| `e2e/a11y.smoke.spec.ts` | SIS-061 (`/sales`, `/branches`, `/branch-pricing` añadidas) | +3 |
+
+54 tests E2E nuevos con mocks (`page.route` contra el host de la API, sin Render) + 1 `fixme`. Proyecto completo `npx playwright test --project=chromium`: 60 pasan, 3 omitidos (el `fixme` y los 2 de `auth.real`, que requieren `E2E_REAL`). Adaptaciones: la UI no ofrece «recordar sesión» (H-19), así que las rutas privadas se cargan sembrando `localStorage` con `seedSession`; «Efectivo» se preselecciona en el POS (SIS-012 usa un catálogo de pagos sin efectivo); sin sucursal asignada no hay catálogo (SIS-013).
+
+
 ### Sesiones
 
 | Fecha | Fase | Modelo | Hecho | Hallazgos nuevos | Pendiente |
@@ -385,6 +407,7 @@ Antes (F0): 0 % en branches, branch-pricing y users; admin 0 % (la página era m
 | 2026-11-13 | F3 | Sonnet (+2 subagentes Sonnet) | H-10 `84225fb` (revalidación de stock → `SalesCartService.findStockIssue`, payload → `application/mappers/ticket-print-payload.mapper`, `window.desktop` → `DESKTOP_PORT`; tests primero). Lote A `3c17ea4` (domain + `order.entity.money.spec`), B `0f72fc5` (mappers), C `481a16b` (use cases + estrategia), D `62c0d20` (repos HTTP + `http-error-resolver`), E `d02a92b`, `54fc3a3`, `5a6053d`, `a7a57d4` (facade de tipos, 5 componentes nuevos, ampliación de ticket-modal / category-slider / payment-method-selector / product-card / sales.page / sales-cart). sales: 17 → 57 suites, 78.8 % → 96.2 % líneas | H-23 a H-29 🟡 (descuento NaN, tope 999, `Date.parse` laxo, total `""`→0, mensajes fijos en mutaciones, id 0 en fallback, contrato sync/async); H-12 acotado a cantidades fraccionarias; H-10 corregido | F4: roles admin. Pendiente: reusar mapper y `DESKTOP_PORT` en `ticket-modal.component.ts` (tiene cambios sin commit de `master`); `sales.facade.ts` 80 % líneas |
 | 2026-11-13 | F4 | Sonnet (+2 subagentes Sonnet) | Specs de `branches` `52c688c` (11 suites), `users` `9f8e6f4` (6 specs + `users.facade` ampliado), `branch-pricing` + `admin` `ee15cca` (admin 7 → 27 tests); fix H-33/H-34/H-35 `baa5b61` (rojo primero). Los 4 módulos 0 % → 100 % líneas; proyecto 170/170 suites en verde | H-30 a H-32 🟡 (form de sucursal sin topes ni trim) · H-33 🔴 tabla de precios no cargaba (NG0600, corregido) · H-34 🟠 error silenciado (corregido) · H-35 🟠 tabla no recargaba (corregido) · H-36 🟡 `NaN` en mapper · H-37 🟡 `deactivatePrice`/`update`/`delete` sin consumidor · H-14 ampliado (tope y NaN) | F5: integración. Pendiente decidir H-14, H-30 a H-32, H-36, H-37 (🟡, `it.todo`). Typo "Fixar" y reuso de mapper en `ticket-modal` siguen fuera por cambios de `master` |
 | 2026-11-13 | F5 | Sonnet | INT-01 a INT-03 `be03f70`, INT-04 `2702dfd`, INT-05 + fix H-38/H-39 `e6a86eb`, INT-06 `7a11383`, INT-07 + fix H-42/H-43 `ea9eb54`, INT-08 `292eecf`, INT-09 + fix H-48 `8487b8e`, fix H-43 login y POS `429a0bc`. Cada fix con su test en rojo primero. 176/176 suites en verde | H-38 🔴 `id_metodoPago` vs `id_metodo_pago` (corregido) · H-39 🔴 rollback imposible para el cajero, venta huérfana (corregido, POST atómico; resuelve H-09) · H-40 🔴 total con IVA ≠ total del ticket (sin corregir: decisión de negocio; cierra H-13) · H-41 🟠 backend devuelve sucursales sin nombre/teléfono · H-42 🟠 y H-48 🟠 mensajes del backend ignorados (corregidos) · H-43 🟠 toasts de error nunca visibles por NG0600 (corregido en login, POS y sucursales) · H-44 a H-46 🟡 · H-47 🟠 alta de usuario sin sucursal/rol | Decidir H-40 (¿precio con IVA?), H-41 y H-47 (backend/UX), H-43 en clients, suppliers e inventory-by-branch, confirmar versión del backend desplegada (H-38); H-14, H-30 a H-32, H-36, H-37, H-44 a H-46 (🟡, `it.todo`). F6: E2E |
+| 2026-11-13 | F6 | Sonnet | Helpers `mockLoginAs`/`mockApi`/`loginAs`/`seedSession` + fixtures `api-data.ts`; `auth.session` (7) `7e3527e`, `sales.pos` (10 + 1 fixme) + fix H-49 `00ff06c`, `admin.access` (20) `0e3086d`, `admin.branches` (5) + fix H-51 `19c8bf9`, `admin.pricing` (4) `9f3a282`, `admin.users` (5) `0648cef`, a11y +3 rutas + fix H-54 `7958963`. Suite completa `playwright --project=chromium`: 60 pasan, 3 omitidos. Jest 176/176 | H-49 🟠 sin `provideAnimations` (corregido) · H-50 🟡 nombres accesibles · H-51 🟠 icono `Mail` (corregido) · H-52 🟡 · H-53 🟡 · H-54 🟠 `role=list` critical (corregido) · H-55 🟡 | `test.fixme` H-40 (decisión de negocio); smoke real opcional sin hacer; decidir H-50, H-52, H-53, H-55 (🟡). F7: cierre |
 
 ### Resultado final (Fase 7)
 
