@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { Observable, forkJoin, throwError } from 'rxjs';
+import { Observable, forkJoin, of, throwError } from 'rxjs';
 import { catchError, concatMap, map } from 'rxjs/operators';
 
 import { SaleRepository, CreateCompleteSalePayload } from '@features/sales/domain/repository/sale-repository';
@@ -11,7 +11,8 @@ import { SaleTicket } from '@features/sales/domain/entities/sale-ticket.entity';
 
 export interface CompleteSaleResult {
   sale: Sale;
-  ticket: SaleTicket;
+  /** `null` si la venta se registró pero el ticket no pudo obtenerse (H-08). */
+  ticket: SaleTicket | null;
 }
 
 
@@ -71,10 +72,12 @@ export class CreateCompleteSaleUseCase {
           }),
           concatMap(() =>
             this.saleRepository.getSaleTicket(sale.id).pipe(
-              map((ticket) => ({
-                sale,
-                ticket,
-              })),
+              map((ticket): CompleteSaleResult => ({ sale, ticket })),
+              // H-08: la venta ya existe; fallar aquí haría que el cajero cobre dos veces.
+              catchError((error: unknown) => {
+                this.logger.error('Venta creada pero el ticket falló', { saleId: sale.id, error });
+                return of<CompleteSaleResult>({ sale, ticket: null });
+              }),
             )
           ),
         );

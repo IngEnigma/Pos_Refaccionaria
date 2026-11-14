@@ -283,6 +283,10 @@ export class SalesPageComponent implements OnInit {
         next: (result) => {
           this.toastService.success('Venta registrada correctamente.');
           this.inventoryByBranchFacade.loadMyBranchInventory();
+          if (!result.ticket) {
+            this.toastService.warning('Venta registrada, pero no se pudo obtener el ticket. Consúltalo en el historial de ventas.');
+            return;
+          }
           this.lastTicket.set(result.ticket);
 
           const desktop = (window as unknown as { desktop?: { generateTicket: (d: unknown) => Promise<{ success: boolean; message?: string }> } }).desktop;

@@ -16,7 +16,6 @@ import { SaleDetailRepositoryImpl } from '@features/sales/infrastructure/reposit
 import {
   SaleCreationError,
   SaleDetailMutationError,
-  SaleFetchError,
 } from '@features/sales/domain/errors/sales.errors';
 
 // Integración real: UseCase -> Repositorios reales -> HttpClient (falso transporte).
@@ -248,18 +247,21 @@ describe('CreateCompleteSaleUseCase (integración)', () => {
     httpMock.expectOne(`${API}/ventas/0/ticket/`).flush({ ...ticketDto, folio: 0 });
   });
 
-  // Verifica que un 404 con {"detail"} al pedir el ticket llegue como SaleFetchError con ese mensaje.
-  it('propaga el 404 del ticket con el mensaje del backend', (done) => {
+  // H-08: la venta ya existe en el backend; si el ticket falla NO se debe reportar error
+  // (el cajero cobraría dos veces). Se devuelve la venta con ticket null y sin rollback.
+  it('H-08: si el ticket falla devuelve la venta sin ticket y sin error', (done) => {
     useCase.execute({ idMetodoPago: 1, productos: [{ id: 10, cantidad: 2 }] }).subscribe({
-      error: (err) => {
-        expect(err).toBeInstanceOf(SaleFetchError);
-        expect(err.message).toBe('Venta no encontrada.');
+      next: (result) => {
+        expect(result.sale.id).toBe(50);
+        expect(result.ticket).toBeNull();
         done();
       },
+      error: done.fail,
     });
 
     httpMock.expectOne(VENTAS).flush(saleDto);
     httpMock.expectOne(DETALLE).flush(detailDto(11, 10, 2));
     httpMock.expectOne(`${API}/ventas/50/ticket/`).flush({ detail: 'Venta no encontrada.' }, { status: 404, statusText: 'Not Found' });
+    httpMock.expectNone(`${API}/ventas/50/`);
   });
 });

@@ -280,10 +280,9 @@ describe('Catálogo de ventas (funcional)', () => {
     expect(fixture.nativeElement.textContent).toContain('Ticket #60');
   });
 
-  // P2.6: verifica que si el ticket falla con 404 NO se recargue inventario (BUG3) y el carrito se conserve.
-  it('P2.6: fallo 404 del ticket no recarga inventario y conserva el carrito', () => {
-    // Conducta corregida (BUG3): el 404 no es error de stock aunque el texto coincida con la regex.
-    // El tap de limpieza solo corre en éxito: el carrito local se conserva (ver BUG2 pendiente).
+  // P2.6 (H-08): si el ticket falla con 404 la venta YA existe: se limpia el carrito (evita doble cobro),
+  // se recarga el inventario y se avisa con warning (no error).
+  it('P2.6: fallo 404 del ticket limpia el carrito, recarga inventario y avisa sin error', () => {
     page.onAddToCart(page.productos()[0]);
     page.onSelectPayment({ id: 1, tipo: 'EFECTIVO', descripcion: 'Efectivo' });
 
@@ -292,14 +291,16 @@ describe('Catálogo de ventas (funcional)', () => {
     httpMock.expectOne(VENTAS).flush({ id: 61, id_usuario: 1, id_inventario: 7, id_metodoPago: 1, total: '120.00', fecha: '2024-01-01' });
     httpMock.expectOne(DETALLE).flush({ id: 23, id_producto: 101, id_venta: 61, subtotal: '120.00', cantidad: 1 });
     httpMock.expectOne(`${API}/ventas/61/ticket/`).flush({ detail: 'Ticket no disponible.' }, { status: 404, statusText: 'Not Found' });
-    httpMock.expectNone(INV);
+    httpMock.match(VENTAS).forEach((r) => r.flush([]));
+    httpMock.expectOne(INV).flush(inventoryDto);
     fixture.detectChanges();
 
     expect(page.lastTicket()).toBeNull();
-    expect(page.cartItems()).toHaveLength(1);
+    expect(page.cartItems()).toHaveLength(0);
     const all = toasts.toasts();
-    expect(all[all.length - 1].type).toBe('error');
-    expect(all[all.length - 1].message).toContain('Ticket no disponible.');
+    expect(all.some((t) => t.type === 'error')).toBe(false);
+    expect(all[all.length - 1].type).toBe('warning');
+    expect(all[all.length - 1].message).toContain('ticket');
   });
 
   // P2.6b (regresión BUG3): verifica que un error real de stock (400) sí recargue el inventario.
