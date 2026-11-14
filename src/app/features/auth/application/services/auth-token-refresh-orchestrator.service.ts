@@ -11,14 +11,20 @@ import {
 } from 'rxjs';
 
 import { LOGGER_PORT } from '@core/logging/logger.port';
+import { APP_ENV } from '@core/tokens/app-env.token';
+import { Environment } from '@env/environment.model';
 import { SessionStateService } from '@features/auth/application/services/session-state.service';
 import { RefreshTokenUseCase } from '@features/auth/application/usecase/refresh.usecase';
-import { withBearerToken } from '@features/auth/infrastructure/http/auth-token-http.utils';
+import {
+  isRefreshRequest,
+  withBearerToken,
+} from '@features/auth/infrastructure/http/auth-token-http.utils';
 
 @Injectable({ providedIn: 'root' })
 export class AuthTokenRefreshOrchestrator {
   private readonly sessionService = inject(SessionStateService);
   private readonly refreshTokenUseCase = inject(RefreshTokenUseCase);
+  private readonly apiOrigin = new URL(inject<Environment>(APP_ENV).apiUrl).origin;
   private readonly logger = inject(LOGGER_PORT).withContext(
     'AuthTokenRefreshOrchestrator',
   );
@@ -27,11 +33,25 @@ export class AuthTokenRefreshOrchestrator {
 
   attachAccessToken(request: HttpRequest<unknown>): HttpRequest<unknown> {
     const accessToken = this.sessionService.getSession()?.accessToken;
-    if (!accessToken) {
+    // El token solo viaja a la API propia y nunca en el refresh (H-21).
+    if (!accessToken || isRefreshRequest(request) || !this.isOwnApiUrl(request.url)) {
       return request;
     }
 
     return withBearerToken(request, accessToken);
+  }
+
+  private isOwnApiUrl(url: string): boolean {
+    const isRelative = !/^([a-z][a-z\d+.-]*:)?\/\//i.test(url);
+    if (isRelative) {
+      return true;
+    }
+
+    try {
+      return new URL(url, this.apiOrigin).origin === this.apiOrigin;
+    } catch {
+      return false;
+    }
   }
 
   retryRequestAfterRefresh(
