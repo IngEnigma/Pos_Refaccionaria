@@ -116,6 +116,7 @@ import {
   ArrowUpRight,
   Hash,
   Activity,
+  Mail, // H-51: lo usan la tarjeta y el formulario de sucursales
 } from 'lucide-angular';
 
 export const appConfig: ApplicationConfig = {
@@ -177,6 +178,7 @@ export const appConfig: ApplicationConfig = {
         ArrowUpRight,
         Hash,
         Activity,
+        Mail,
       }),
     ),
     {
