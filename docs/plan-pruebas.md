@@ -9,6 +9,8 @@
 > (cold-start). Los E2E P0 usan mocks y no dependen de Render (ver `e2e/helpers/backend.ts`).
 > Las suites contra backend real deben usar `wakeBackend()` + timeouts 60-90s + `retries: 2` en CI.
 
+> Plan detallado de auth, ventas y rol admin (hallazgos, fases y resultado final): [plan-pruebas-admin-auth-ventas.md](plan-pruebas-admin-auth-ventas.md).
+
 ---
 
 ## 1. Objetivos

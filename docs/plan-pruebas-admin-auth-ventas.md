@@ -299,12 +299,12 @@ Ya existen: `auth-flow`, `sale-auth`, `create-complete-sale`, `sales-facade`, `s
 ### Fase 7 — Cierre y evidencia
 **Sesión:** 1 · **Modelo:** Sonnet · **Subagentes:** no
 
-- [ ] `coverageThreshold` por carpeta en `jest.config.js` con las metas de §1 (`'./src/app/features/auth/': { lines: 90, … }`).
-- [ ] `npm run test:coverage` y `npm run e2e` en verde.
-- [ ] Análisis Sonar (`sonar-project.properties`) sin issues bloqueantes en estos módulos.
-- [ ] Agregar SIS-053 a `docs/casos-sistema.md` y enlazar este plan desde `docs/plan-pruebas.md`.
-- [ ] Tabla final para la tesis en §8: tests por nivel y módulo, cobertura antes/después, hallazgos corregidos.
-- [ ] `graphify update .`
+- [x] `coverageThreshold` por carpeta en `jest.config.js` con las metas de §1 (`'./src/app/features/auth/': { lines: 90, … }`).
+- [x] `npm run test:coverage` y `npm run e2e` en verde.
+- [x] Análisis Sonar: **no ejecutado** (ver §8, «Resultado final»).
+- [x] Agregar SIS-053 a `docs/casos-sistema.md` y enlazar este plan desde `docs/plan-pruebas.md`.
+- [x] Tabla final para la tesis en §8: tests por nivel y módulo, cobertura antes/después, hallazgos corregidos.
+- [x] `graphify update .`
 
 ---
 
@@ -413,6 +413,33 @@ Antes (F0): 0 % en branches, branch-pricing y users; admin 0 % (la página era m
 
 | Módulo | Unit | Integración | E2E | Líneas antes → después | Hallazgos corregidos |
 |---|---|---|---|---|---|
-| auth | | | | | |
-| sales | | | | | |
-| rol admin | | | | | |
+| auth | 118 | 13 (INT-01 a 03) | 7 (`auth.session`) + 4 (`auth.login`) | 84.2 % → 99.8 % (435/436) | H-21 🔴, H-22 🟠, H-43 🟠 (login) |
+| sales | 518 | 17 (INT-05, INT-06, `sales-page`) | 10 (`sales.pos`) + 1 `fixme` (H-40) | 78.8 % → 95.6 % (907/949) | H-08 🔴, H-38 🔴, H-39 🔴 (resuelve H-09), H-10 🟠, H-43 🟠 (POS), H-49 🟠 |
+| rol admin (admin, branches, branch-pricing, users + acceso) | 294 | 56 (INT-04 = 30, INT-07 a 09 = 26) | 34 (`admin.access` 20, `.branches` 5, `.pricing` 4, `.users` 5) + 3 en `a11y.smoke` | 0 % → 95.3 % (465/488) | H-01 🔴, H-02 🟠, H-03 🟠, H-33 🔴, H-34 🟠, H-35 🟠, H-42 🟠, H-43 🟠 (sucursales), H-48 🟠, H-51 🟠, H-54 🟠 |
+
+Jest completo con cobertura (`npm run test:coverage`, 2026-11-13): **176/176 suites, 1516 tests en verde + 25 `todo`**; global 83.7 % líneas, 85.2 % ramas, 79.5 % funciones, 83.8 % statements. Los conteos de tests por módulo son `it(` de los specs de cada carpeta (aprox.; `unit` = total − integración). Playwright `--project=chromium`: **60 pasan, 3 omitidos** (el `fixme` de H-40 y 2 de `auth.real`, que requieren `E2E_REAL`). Total: 19 hallazgos 🔴/🟠 corregidos, cada uno con su test en rojo primero.
+
+Cobertura por módulo contra `coverageThreshold` (`jest.config.js`, commit `a275ef1`; líneas = meta de §1, resto = logrado redondeado hacia abajo):
+
+| Módulo | Líneas (meta) | Statements | Ramas | Funciones |
+|---|---|---|---|---|
+| auth | 99.8 % (≥ 90) | 99.6 % | 94.9 % | 95.0 % |
+| sales | 95.6 % (≥ 85) | 95.7 % | 94.6 % | 91.7 % |
+| admin | 100 % (≥ 80) | 100 % | 81.8 % | 100 % |
+| branches | 95.0 % (≥ 80) | 95.5 % | 100 % | 100 % |
+| branch-pricing | 95.7 % (≥ 85) | 96.1 % | 96.4 % | 100 % |
+| users | 92.6 % (≥ 80) | 93.6 % | 100 % | 100 % |
+
+Estas cifras incluyen `index.ts` y `*.routes.ts` (la base de F0 los excluía), por eso difieren unas décimas de las tablas de fases.
+
+**Sonar: no ejecutado.** No hay `sonar-scanner` instalado (`which sonar-scanner` vacío) ni servidor configurado en `sonar-project.properties` (solo `projectKey`, sin `sonar.host.url`). No se instaló nada. El reporte `coverage/lcov.info` queda listo para `sonar.javascript.lcov.reportPaths`. Pendiente: correr el análisis donde esté el servidor y anotar los issues bloqueantes de estos módulos.
+
+### Decisiones pendientes para el usuario
+
+- **H-40** 🔴: ¿el precio de catálogo ya incluye IVA? El carrito suma 16 % y el ticket del backend no (`test.fixme` en `sales.pos`; cierra H-13).
+- **H-41** 🟠 (backend): `GET /sucursales/` devuelve solo `{id, ubicacion}`, sin nombre ni teléfono.
+- **H-47** 🟠: el alta de usuario no envía sucursal ni rol (backend/UX).
+- **H-43** 🟠 en módulos de otros integrantes: `clients`, `suppliers` e `inventory-by-branch` (toasts de error dentro de `effect()` que nunca se muestran, NG0600). Corregido solo en login, POS y sucursales.
+- **H-38**: confirmar que Render tenga desplegada la versión del backend con `id_metodo_pago` y `crear_venta_completa`.
+- **Sonar**: ejecutarlo donde haya servidor y revisar bloqueantes.
+- **🟡 abiertos** (`it.todo` o solo registrados): H-11, H-12, H-14 a H-20, H-23 a H-32, H-36, H-37, H-44 a H-46, H-50, H-52, H-53, H-55.

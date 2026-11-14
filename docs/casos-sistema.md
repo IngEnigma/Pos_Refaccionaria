@@ -248,6 +248,16 @@ Then cada ruta carga sin error de consola crítico
 And navbar/sidebar responden en desktop y móvil (360px)
 ```
 
+### SIS-053 Acceso por rol
+**Prioridad:** P3 — **Auto:** `e2e/admin.access.spec.ts`, `app.routes.integration.spec.ts`
+```gherkin
+Given usuario autenticado con rol vendedor (seller)
+When abre el sidebar o escribe "/admin", "/branches" o "/branch-pricing" en la URL
+Then no ve esas opciones y es redirigido fuera de la ruta
+And con rol admin sí entra a las tres
+And con rol manager solo entra a las rutas de gestión que le corresponden
+```
+
 ## TRANSVERSALES
 
 ### SIS-060 Manejo de error de red con retry
