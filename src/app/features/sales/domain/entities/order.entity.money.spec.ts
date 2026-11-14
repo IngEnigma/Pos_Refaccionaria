@@ -172,8 +172,8 @@ describe('Order - descuento con decimales', () => {
   });
 
   // setDiscount solo valida < 0: NaN e Infinity pasan y luego revientan los getters (discount/iva/total).
-  it.todo('BUG: Order.setDiscount(NaN) no lanza (order.entity.ts:54-57); después order.discount/iva/total lanzan "money must be a non-negative number"');
-  it.todo('BUG: Order.setDiscount(Infinity) no lanza (order.entity.ts:54-57); después order.discount lanza "money must be a non-negative number"');
+  it.todo('H-23: Order.setDiscount(NaN) no lanza (order.entity.ts:54-57); después order.discount/iva/total lanzan "money must be a non-negative number"');
+  it.todo('H-23: Order.setDiscount(Infinity) no lanza (order.entity.ts:54-57); después order.discount lanza "money must be a non-negative number"');
 });
 
 describe('Order - addItem (casos límite)', () => {
@@ -226,5 +226,5 @@ describe('Order - addItem (casos límite)', () => {
   });
 
   // El tope de 999 solo se aplica al acumular; una línea nueva con quantity > 999 pasa sin topar.
-  it.todo('BUG?: Order.addItem({ quantity: 1500 }) en producto nuevo no se topa en 999 (order.entity.ts:62-66, el tope solo aplica al acumular)');
+  it.todo('H-24: Order.addItem({ quantity: 1500 }) en producto nuevo no se topa en 999 (order.entity.ts:62-66, el tope solo aplica al acumular)');
 });

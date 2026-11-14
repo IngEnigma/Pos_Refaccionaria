@@ -55,8 +55,8 @@ describe('SaleDate', () => {
     });
 
     // Date.parse usa el parser legacy de V8: acepta basura con números y fechas calendario imposibles.
-    it.todo('BUG: SaleDate.fromPrimitive acepta "abc 1" y "12" (Date.parse legacy) aunque el mensaje promete ISO');
-    it.todo('BUG: SaleDate.fromPrimitive acepta "2024-02-30" (día inexistente; Date.parse lo desborda a 1-mar)');
+    it.todo('H-25: SaleDate.fromPrimitive acepta "abc 1" y "12" (Date.parse legacy) aunque el mensaje promete ISO');
+    it.todo('H-25: SaleDate.fromPrimitive acepta "2024-02-30" (día inexistente; Date.parse lo desborda a 1-mar)');
   });
 
   describe('fromNullable', () => {
