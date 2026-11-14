@@ -39,6 +39,11 @@ De `inventory-by-branch` y `manager` solo se prueba **que el rol correcto pueda 
 3. **graphify antes de leer código**: `graphify query "<pregunta>"`, `graphify explain "<Símbolo>"`, `graphify path "A" "B"`. Leer archivos completos solo para el archivo que se está probando y su spec de referencia.
 4. **Subagentes solo donde hay lotes independientes** (Fases 3 y 4), máximo **2 en paralelo**, tipo `general-purpose` con `model: sonnet`. Cada subagente arranca en frío y relee archivos, así que más subagentes = más tokens totales. Si la cuota de la ventana de 5 h va baja, ejecutar los lotes en secuencia en la sesión principal.
 5. Al cerrar cada fase: `graphify update .` y commit en `test/admin-auth-ventas`.
+6. **Código del backend (solo lectura).** Para contratos de API, validaciones, cascadas o reglas de negocio, consultar:
+   - Local: `/home/enigma/Documentos/Refaccionaria/RefaccionariaBack` (rama de trabajo actual: `Develop`).
+   - Remoto: <https://github.com/cuboalcub/RefaccionariaBack/>.
+
+   Antes de leer, actualizar siempre: `git -C /home/enigma/Documentos/Refaccionaria/RefaccionariaBack pull --ff-only`. Si falla porque hay cambios locales o ramas divergentes, no forzar nada: `git fetch` y leer la versión remota con `git show origin/<rama>:<ruta>`. Nunca editar, hacer commit ni push en el backend; si algo se debe cambiar ahí, registrarlo como hallazgo en §5.
 
 ### 2.2 Prompt para abrir cada sesión
 
@@ -46,6 +51,7 @@ De `inventory-by-branch` y `manager` solo se prueba **que el rol correcto pueda 
 /caveman ultra
 Lee docs/plan-pruebas-admin-auth-ventas.md y ejecuta SOLO la Fase N.
 Trabaja en la rama test/admin-auth-ventas (nunca en master) y haz commit por lote o hallazgo.
+Si necesitas el backend, sigue la regla 6 de §2.1 (pull primero, solo lectura).
 Usa graphify query/explain antes de abrir código. Marca los checkboxes al terminar
 cada tarea, registra hallazgos en §5 y llena el Registro de avance (§8).
 Al final corre `graphify update .` y no avances a la siguiente fase.
