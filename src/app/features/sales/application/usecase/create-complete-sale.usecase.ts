@@ -62,7 +62,14 @@ export class CreateCompleteSaleUseCase {
                     rollbackError,
                   });
 
-                  return throwError(() => error);
+                  // H-09: la venta quedó huérfana; sin este aviso el cajero reintenta a ciegas.
+                  return throwError(
+                    () =>
+                      new Error(
+                        `No se pudo registrar la venta #${createdSaleId} ni revertirla. Avisa a un administrador antes de reintentar.`,
+                        { cause: error },
+                      ),
+                  );
                 }),
                 concatMap(() => throwError(() => error))
               );

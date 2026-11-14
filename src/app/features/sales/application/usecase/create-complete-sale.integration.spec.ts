@@ -205,11 +205,13 @@ describe('CreateCompleteSaleUseCase (integración)', () => {
     rollback.flush(null);
   });
 
-  // Verifica que si el rollback también falla, se propague el error original del detalle.
-  it('si el rollback falla se propaga el error original del detalle', (done) => {
+  // H-09: si el rollback también falla la venta queda huérfana: el cajero debe saberlo antes de reintentar.
+  it('H-09: si el rollback falla avisa de la venta huérfana y conserva el error original como causa', (done) => {
     useCase.execute({ idMetodoPago: 1, productos: [{ id: 10, cantidad: 2 }] }).subscribe({
       error: (err) => {
-        expect(err).toBeInstanceOf(SaleDetailMutationError);
+        expect(err.message).toContain('#50');
+        expect(err.message).toMatch(/revertir/i);
+        expect(err.cause).toBeInstanceOf(SaleDetailMutationError);
         done();
       },
     });
