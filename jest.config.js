@@ -30,6 +30,13 @@ module.exports = {
       functions: 20,
       lines: 28,
       statements: 28
-    }
+    },
+    // Metas por módulo (plan-pruebas-admin-auth-ventas.md §1): líneas = meta del plan; el resto = logrado 2026-11-13, redondeado hacia abajo.
+    './src/app/features/auth/': { statements: 99, branches: 94, functions: 95, lines: 90 },
+    './src/app/features/sales/': { statements: 95, branches: 94, functions: 91, lines: 85 },
+    './src/app/features/admin/': { statements: 100, branches: 81, functions: 100, lines: 80 },
+    './src/app/features/branches/': { statements: 95, branches: 100, functions: 100, lines: 80 },
+    './src/app/features/branch-pricing/': { statements: 96, branches: 96, functions: 100, lines: 85 },
+    './src/app/features/users/': { statements: 93, branches: 100, functions: 100, lines: 80 }
   }
 };
