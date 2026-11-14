@@ -312,4 +312,8 @@ describe('Sesión integración (login, perfil, refresh concurrente, logout)', ()
       expect(TestBed.inject(PERSISTENT_STORAGE_PORT).getItem('session')).toBeNull();
     });
   });
+
+  // El backend manda `user.rol` ('cajero' | 'encargado' | 'admin'), que define sus permisos, pero el front deriva el rol
+  // solo de isadmin/isstaff y trata a un staff sin superuser como manager aunque el backend lo trata como admin.
+  it.todo('H-46: usar user.rol del login (o documentar la equivalencia) en lugar de deducir el rol de isadmin/isstaff');
 });
