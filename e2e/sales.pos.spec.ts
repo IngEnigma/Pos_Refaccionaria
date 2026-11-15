@@ -153,7 +153,7 @@ test.describe('POS — ventas', () => {
     await cartPanel(page).getByRole('button', { name: 'Efectivo' }).click();
     await processBtn(page).click();
 
-    await expect(page.locator('.total-value')).toHaveText(totalCarrito);
+    await expect(page.locator('.total-value')).toHaveText(`MX${totalCarrito}`); // el modal usa el símbolo MX$ (currency MXN)
   });
 
   test('SIS-016 el buscador filtra el catálogo y el producto se agrega al carrito', async ({ page }) => {
