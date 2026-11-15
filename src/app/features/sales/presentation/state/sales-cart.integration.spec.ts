@@ -84,14 +84,14 @@ describe('INT-06 carrito vs payload enviado al backend', () => {
   afterEach(() => httpMock.verify());
 
   describe('totales del carrito', () => {
-    it('total = suma de líneas; subtotal e IVA 16 % se desglosan como incluidos', () => {
+    it('subtotal = suma de líneas; IVA 16 % se suma encima (igual que el backend)', () => {
       cart.addToCart(product(1, 33.33));
       cart.increaseQty(cart.cart()[0]);
       cart.increaseQty(cart.cart()[0]);
 
-      expect(cart.total()).toBe(99.99);
-      expect(cart.subtotal()).toBe(86.2);
-      expect(cart.iva()).toBe(13.79);
+      expect(cart.subtotal()).toBe(99.99);
+      expect(cart.iva()).toBe(16);
+      expect(cart.total()).toBe(115.99);
     });
 
     it('suma varias líneas y subtotal + IVA siempre es el total', () => {
@@ -99,9 +99,9 @@ describe('INT-06 carrito vs payload enviado al backend', () => {
       cart.increaseQty(cart.cart()[0]);
       cart.addToCart(product(2, 49.99));
 
-      expect(cart.total()).toBe(250.99);
-      expect(cart.subtotal()).toBe(216.37);
-      expect(cart.iva()).toBe(34.62);
+      expect(cart.subtotal()).toBe(250.99);
+      expect(cart.iva()).toBe(40.16);
+      expect(cart.total()).toBe(291.15);
       expect(+(cart.subtotal() + cart.iva()).toFixed(2)).toBe(cart.total());
     });
 
@@ -136,12 +136,12 @@ describe('INT-06 carrito vs payload enviado al backend', () => {
       for (const key of ['total', 'subtotal', 'iva', 'descuento', 'precio']) {
         expect(req.request.body).not.toHaveProperty(key);
       }
-      // H-40: el precio ya incluye IVA; el total del carrito es el que calcula y guarda el backend.
-      expect(cart.total()).toBe(250.99);
-      req.flush({ id: 70, id_usuario: 1, id_metodo_pago: 1, total: '250.99', fecha: '2024-01-01T00:00:00Z' });
+      // El total del carrito (subtotal + IVA) es el que calcula y guarda el backend.
+      expect(cart.total()).toBe(291.15);
+      req.flush({ id: 70, id_usuario: 1, id_metodo_pago: 1, subtotal: '250.99', iva: '40.16', total: '291.15', fecha: '2024-01-01T00:00:00Z' });
       httpMock.expectOne(`${API}/ventas/70/ticket/`).flush({
         folio: 70, fecha: '2024-01-01T00:00:00Z', vendedor: 'v', metodo_pago: 'EFECTIVO', sucursal: 'S1',
-        productos: [], total: '250.99',
+        productos: [], subtotal: '250.99', iva: '40.16', total: '291.15',
       });
 
       const result = await done;

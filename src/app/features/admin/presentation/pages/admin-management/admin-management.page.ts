@@ -34,6 +34,7 @@ export class AdminManagementPageComponent implements OnInit {
   readonly branchesLoading = this.branchesFacade.loading;
   readonly usersLoading = this.usersFacade.loading;
   readonly activeUsers = computed(() => this.users().filter((u) => u.isActive).length);
+  readonly branchNames = computed(() => new Map(this.branches().map((b) => [b.id, b.nombreSucursal])));
 
   readonly branchForm = this.fb.group({
     nombreSucursal: ['', branchFieldValidators.nombreSucursal],

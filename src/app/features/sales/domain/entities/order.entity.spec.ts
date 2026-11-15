@@ -105,23 +105,23 @@ describe('Order - addItem', () => {
 });
 
 describe('Order - cálculos', () => {
-  // H-40: el precio ya incluye IVA; el total es la suma de líneas y el IVA se desglosa como incluido.
-  it('el total es la suma de líneas (precio 120 -> total 120, subtotal 103.45, IVA 16.55)', () => {
+  // El precio no incluye IVA: subtotal = suma de líneas, IVA 16 % encima, igual que el backend.
+  it('el IVA se suma al subtotal (precio 120 -> subtotal 120, IVA 19.20, total 139.20)', () => {
     const order = new Order();
     order.addItem({ productId: 1, price: 120, quantity: 1 });
-    expect(order.total.value).toBe(120);
-    expect(order.subtotal.value).toBe(103.45);
-    expect(order.iva.value).toBe(16.55);
+    expect(order.subtotal.value).toBe(120);
+    expect(order.iva.value).toBe(19.2);
+    expect(order.total.value).toBe(139.2);
   });
 
   // Verifica el total sumando varias líneas con distintas cantidades.
-  it('calcula total con múltiples productos (250 -> subtotal 215.52, IVA 34.48)', () => {
+  it('calcula total con múltiples productos (subtotal 250, IVA 40, total 290)', () => {
     const order = new Order();
     order.addItem({ productId: 1, price: 100, quantity: 2 });
     order.addItem({ productId: 2, price: 50, quantity: 1 });
-    expect(order.total.value).toBe(250);
-    expect(order.subtotal.value).toBe(215.52);
-    expect(order.iva.value).toBe(34.48);
+    expect(order.subtotal.value).toBe(250);
+    expect(order.iva.value).toBe(40);
+    expect(order.total.value).toBe(290);
   });
 
   // Verifica el total exacto con precios con centavos (redondeo a 2 decimales).
@@ -129,15 +129,17 @@ describe('Order - cálculos', () => {
     const order = new Order();
     order.addItem({ productId: 1, price: 19.99, quantity: 2 });
     order.addItem({ productId: 2, price: 5.5, quantity: 1 });
-    expect(order.total.value).toBe(45.48);
+    expect(order.subtotal.value).toBe(45.48);
+    expect(order.total.value).toBe(52.76);
   });
 
   // Verifica que el total se redondee a centavos exactos (sin artefactos float como 59.9699...).
-  it('total redondea a centavos exactos (19.99 x 3 = 59.97)', () => {
+  it('total redondea a centavos exactos (19.99 x 3 = 59.97 + 9.60 = 69.57)', () => {
     const order = new Order();
     order.addItem({ productId: 1, price: 19.99, quantity: 3 });
-    expect(order.total.value).toBe(59.97);
-    expect(Number.isInteger(order.total.value * 100)).toBe(true);
+    expect(order.subtotal.value).toBe(59.97);
+    expect(order.iva.value).toBe(9.6);
+    expect(order.total.value).toBe(69.57);
   });
 
   // Verifica que una orden vacía produzca todos los totales en cero.
@@ -149,26 +151,26 @@ describe('Order - cálculos', () => {
   });
 
   // Verifica que el caso clásico 0.1 + 0.2 produzca valores exactos a nivel centavos.
-  it('caso clásico 0.1 + 0.2: total 0.3 y desglose exacto', () => {
+  it('caso clásico 0.1 + 0.2: subtotal 0.3 y desglose exacto', () => {
     const order = new Order();
     order.addItem({ productId: 1, price: 0.1, quantity: 1 });
     order.addItem({ productId: 2, price: 0.2, quantity: 1 });
-    expect(order.total.value).toBe(0.3);
-    expect(order.subtotal.value).toBe(0.26);
-    expect(order.iva.value).toBe(0.04);
+    expect(order.subtotal.value).toBe(0.3);
+    expect(order.iva.value).toBe(0.05);
+    expect(order.total.value).toBe(0.35);
   });
 });
 
 describe('Order - descuento', () => {
-  // Verifica que el descuento se reste del total y que el IVA incluido se desglose del total ya descontado.
-  it('descuento se resta del total (100 - 10 = 90, subtotal 77.59, IVA 12.41)', () => {
+  // Verifica que el descuento se reste antes del IVA.
+  it('descuento se resta antes del IVA (100 - 10 = 90, IVA 14.40, total 104.40)', () => {
     const order = new Order();
     order.addItem({ productId: 1, price: 100, quantity: 1 });
     order.setDiscount(10);
     expect(order.discount.value).toBe(10);
-    expect(order.total.value).toBe(90);
-    expect(order.subtotal.value).toBe(77.59);
-    expect(order.iva.value).toBe(12.41);
+    expect(order.subtotal.value).toBe(90);
+    expect(order.iva.value).toBe(14.4);
+    expect(order.total.value).toBe(104.4);
   });
 
   // Verifica que un descuento mayor al total no genere totales negativos (base en cero).

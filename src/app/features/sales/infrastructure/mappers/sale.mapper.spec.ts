@@ -6,7 +6,7 @@ describe('SaleMapper', () => {
   const dto: SaleResponseDto = {
     id: 10,
     id_usuario: 3,
-    id_inventario: 7,
+    id_sucursal: 7,
     id_metodo_pago: 2,
     total: '139.20',
     fecha: '2025-01-15T10:00:00Z',
@@ -20,7 +20,7 @@ describe('SaleMapper', () => {
       expect(sale).toBeInstanceOf(Sale);
       expect(sale.id).toBe(10);
       expect(sale.idUsuario).toBe(3);
-      expect(sale.idInventario).toBe(7);
+      expect(sale.idSucursal).toBe(7);
       expect(sale.idMetodoPago).toBe(2);
       expect(sale.fecha?.value).toBe('2025-01-15T10:00:00Z');
     });
@@ -41,17 +41,17 @@ describe('SaleMapper', () => {
     });
 
     // Verifica que los campos nulos del backend se conserven como null.
-    it('conserva usuario, inventario, método de pago y fecha nulos', () => {
+    it('conserva usuario, sucursal, método de pago y fecha nulos', () => {
       const sale = SaleMapper.fromResponseDto({
         ...dto,
         id_usuario: null,
-        id_inventario: null,
+        id_sucursal: null,
         id_metodo_pago: null,
         fecha: null,
       });
 
       expect(sale.idUsuario).toBeNull();
-      expect(sale.idInventario).toBeNull();
+      expect(sale.idSucursal).toBeNull();
       expect(sale.idMetodoPago).toBeNull();
       expect(sale.fecha).toBeNull();
     });

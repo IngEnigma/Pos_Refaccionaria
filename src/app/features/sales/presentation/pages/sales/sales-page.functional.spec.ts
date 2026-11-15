@@ -285,10 +285,10 @@ describe('SalesPageComponent (funcional)', () => {
     page.onAddToCart(page.productos()[0]);
     fixture.detectChanges();
 
-    expect(summaryRow('Subtotal')).toContain('$103.45');
+    expect(summaryRow('Subtotal')).toContain('$120.00');
     expect(summaryRow('Descuento')).toContain('$0');
-    expect(summaryRow('IVA')).toContain('$16.55');
-    expect((fixture.nativeElement.querySelector('.total-amount') as HTMLElement).textContent).toContain('$120');
+    expect(summaryRow('IVA')).toContain('$19.20');
+    expect((fixture.nativeElement.querySelector('.total-amount') as HTMLElement).textContent).toContain('$139.20');
   });
 
   // F7: verifica que la UI muestre $120 y el payload conserve el contrato (sin precios calculados por frontend).

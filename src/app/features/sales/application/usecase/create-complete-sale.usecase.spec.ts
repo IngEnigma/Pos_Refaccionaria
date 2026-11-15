@@ -29,6 +29,8 @@ describe('CreateCompleteSaleUseCase', () => {
     metodoPago: 'EFECTIVO',
     sucursal: 'Sucursal 1',
     productos: [],
+    subtotal: '200.00',
+    iva: '32.00',
     total: '232.00',
   });
 

@@ -14,6 +14,8 @@ export function toTicketPrintPayload(ticket: SaleTicket) {
       subtotal: p.subtotal,
       precio_unitario: p.precioUnitario,
     })),
+    subtotal: ticket.subtotal,
+    iva: ticket.iva,
     total: ticket.total,
   };
 }

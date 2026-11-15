@@ -36,20 +36,20 @@ export class Order {
     return Money.fromNumber(this._discount, 'Order.discount');
   }
 
-  /** El precio de catálogo ya incluye IVA: total = Σ(precio × cantidad) − descuento, igual que el backend. */
-  get total(): Money {
-    const sum = this._items.reduce((acc, item) => acc + item.subtotal.value, 0);
-    return Money.fromNumber(Money.round2(Math.max(0, sum - this._discount)), 'Order.total');
-  }
-
-  /** Base sin IVA: total / 1.16. */
+  /** Base sin IVA: Σ(precio × cantidad) − descuento. El precio de catálogo no incluye IVA. */
   get subtotal(): Money {
-    return Money.fromNumber(Money.round2(this.total.value / (1 + this._ivaRate)), 'Order.subtotal');
+    const sum = this._items.reduce((acc, item) => acc + item.subtotal.value, 0);
+    return Money.fromNumber(Money.round2(Math.max(0, sum - this._discount)), 'Order.subtotal');
   }
 
-  /** IVA incluido en el total. */
+  /** IVA 16 % sobre el subtotal, igual que el backend. */
   get iva(): Money {
-    return Money.fromNumber(Money.round2(this.total.value - this.subtotal.value), 'Order.iva');
+    return Money.fromNumber(Money.round2(this.subtotal.value * this._ivaRate), 'Order.iva');
+  }
+
+  /** total = subtotal + IVA, igual que el backend. */
+  get total(): Money {
+    return Money.fromNumber(Money.round2(this.subtotal.value + this.iva.value), 'Order.total');
   }
 
   setDiscount(amount: number): void {

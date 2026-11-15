@@ -18,7 +18,7 @@ import { wakeBackend } from './helpers/backend';
 const REAL = process.env['E2E_REAL'] === '1';
 const DB = process.env['E2E_DB'];
 const PRODUCTO = 'Balata E2E';
-const PRECIO = 120;
+const TOTAL = '139.20'; // precio 120 + IVA 16 % (lo suma el backend)
 
 const sql = (q: string) => execFileSync('sqlite3', [DB!, q], { encoding: 'utf8' }).trim();
 const stockSql =
@@ -41,7 +41,7 @@ test.describe('Ventas REAL (backend local)', () => {
     const panel = page.getByRole('complementary', { name: 'Detalle de venta' });
     const card = page.getByRole('article').filter({ has: page.getByRole('heading', { name: PRODUCTO }) });
     await card.getByRole('button', { name: 'Añadir' }).click();
-    await expect(panel.locator('.total-amount')).toHaveText(`$${PRECIO}.00`); // H-40: sin IVA extra
+    await expect(panel.locator('.total-amount')).toHaveText(`$${TOTAL}`);
     await panel.getByRole('button', { name: 'Efectivo' }).click();
 
     const posted = page.waitForResponse((r) => r.request().method() === 'POST' && /\/api\/ventas\/?$/.test(r.url()));
@@ -52,10 +52,10 @@ test.describe('Ventas REAL (backend local)', () => {
     const venta = await res.json();
 
     await expect(page.getByRole('heading', { name: new RegExp(`Ticket #${venta.id}`) })).toBeVisible();
-    await expect(page.locator('.total-value')).toHaveText(`MX$${PRECIO}.00`);
+    await expect(page.locator('.total-value')).toHaveText(`MX$${TOTAL}`);
 
     if (DB) {
-      expect(Number(sql(`select total from ventas_venta where id=${venta.id}`))).toBe(PRECIO);
+      expect(sql(`select total from ventas_venta where id=${venta.id}`)).toBe(TOTAL);
       expect(sql(`select estado from ventas_venta where id=${venta.id}`)).toBe('completada');
       expect(sql(`select cantidad from ventas_detalleventa where id_venta_id=${venta.id}`)).toBe('1');
       expect(Number(sql(stockSql))).toBe(stockAntes! - 1);

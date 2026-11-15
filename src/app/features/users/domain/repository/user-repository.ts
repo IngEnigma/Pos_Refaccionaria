@@ -18,6 +18,9 @@ export interface UpdateUserPayload {
   password?: string;
   email?: string;
   isActive?: boolean;
+  /** Solo staff puede reasignar sucursal y rol. */
+  branchId?: number;
+  role?: UserRole;
 }
 
 export abstract class UserRepository {

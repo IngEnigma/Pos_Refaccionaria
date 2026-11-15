@@ -190,11 +190,13 @@
 
         <div class="table-scroll">
           <table>
-            <caption class="sr-only">Usuarios con su correo y estado</caption>
+            <caption class="sr-only">Usuarios con su correo, rol, sucursal y estado</caption>
             <thead>
               <tr>
                 <th>Usuario</th>
                 <th>Correo</th>
+                <th>Rol</th>
+                <th>Sucursal</th>
                 <th>Estado</th>
                 <th>Acciones</th>
               </tr>
@@ -204,6 +206,8 @@
                 <tr>
                   <td><strong>{{ user.username }}</strong></td>
                   <td>{{ user.email }}</td>
+                  <td>{{ user.role }}</td>
+                  <td>{{ (user.branchId && branchNames().get(user.branchId)) || '—' }}</td>
                   <td><span class="status" [class.pending]="!user.isActive">{{ user.isActive ? 'Activo' : 'Inactivo' }}</span></td>
                   <td>
                     <button class="btn-secondary toggle-user" type="button" [attr.aria-label]="(user.isActive ? 'Desactivar usuario ' : 'Activar usuario ') + user.username" (click)="toggleUser(user)">

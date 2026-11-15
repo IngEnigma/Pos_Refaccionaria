@@ -17,7 +17,7 @@ export class SaleMapper {
     return SaleFactory.fromPrimitives({
       id: dto.id,
       idUsuario: dto.id_usuario,
-      idInventario: dto.id_inventario,
+      idSucursal: dto.id_sucursal,
       idMetodoPago: dto.id_metodo_pago,
       total,
       fecha: dto.fecha,

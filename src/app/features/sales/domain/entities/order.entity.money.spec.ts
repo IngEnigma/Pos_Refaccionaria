@@ -39,63 +39,61 @@ describe('OrderItem - redondeo del subtotal', () => {
   });
 });
 
-describe('Order - IVA 16 % incluido y redondeo', () => {
-  // Verifica el desglose de un precio bajo: 0.04 -> subtotal 0.03 e IVA 0.01.
-  it('desglosa el IVA incluido de 0.04 (subtotal 0.03, IVA 0.01)', () => {
+describe('Order - IVA 16 % sobre el subtotal y redondeo', () => {
+  // El backend suma el IVA (half-up a centavos) al subtotal: total = subtotal + iva.
+  it('0.04 -> subtotal 0.04, IVA 0.01, total 0.05', () => {
     const order = new Order();
     order.addItem({ productId: 1, price: 0.04, quantity: 1 });
-    expect(order.total.value).toBe(0.04);
-    expect(order.subtotal.value).toBe(0.03);
+    expect(order.subtotal.value).toBe(0.04);
     expect(order.iva.value).toBe(0.01);
+    expect(order.total.value).toBe(0.05);
   });
 
-  // Verifica que el IVA incluido de 0.03 se redondee a cero.
-  it('0.03 -> subtotal 0.03 e IVA 0.00', () => {
+  // Verifica que el IVA de 0.03 (0.0048) se redondee a cero.
+  it('0.03 -> IVA 0.00 y total 0.03', () => {
     const order = new Order();
     order.addItem({ productId: 1, price: 0.03, quantity: 1 });
-    expect(order.total.value).toBe(0.03);
     expect(order.subtotal.value).toBe(0.03);
     expect(order.iva.value).toBe(0);
+    expect(order.total.value).toBe(0.03);
   });
 
-  // Verifica que 99.99 conserve el total y se desglose en 86.20 + 13.79.
-  it('99.99 -> total 99.99, subtotal 86.20 e IVA 13.79', () => {
+  it('99.99 -> IVA 16.00 y total 115.99', () => {
     const order = new Order();
     order.addItem({ productId: 1, price: 99.99, quantity: 1 });
-    expect(order.total.value).toBe(99.99);
-    expect(order.subtotal.value).toBe(86.2);
-    expect(order.iva.value).toBe(13.79);
+    expect(order.subtotal.value).toBe(99.99);
+    expect(order.iva.value).toBe(16);
+    expect(order.total.value).toBe(115.99);
   });
 
-  // Verifica la terna completa con el caso 19.99 x 3: total 59.97, subtotal 51.70, IVA 8.27.
-  it('19.99 x 3 -> total 59.97, subtotal 51.70, IVA 8.27', () => {
+  it('19.99 x 3 -> subtotal 59.97, IVA 9.60, total 69.57', () => {
     const order = new Order();
     order.addItem({ productId: 1, price: 19.99, quantity: 3 });
-    expect(order.total.value).toBe(59.97);
-    expect(order.subtotal.value).toBe(51.7);
-    expect(order.iva.value).toBe(8.27);
+    expect(order.subtotal.value).toBe(59.97);
+    expect(order.iva.value).toBe(9.6);
+    expect(order.total.value).toBe(69.57);
   });
 
-  // Verifica que, para cualquier total en centavos, subtotal + IVA sumen exactamente el total.
-  it('subtotal + IVA = total exacto en centavos para totales de 0.00 a 50.00', () => {
+  // Verifica, centavo por centavo, el IVA half-up del backend y que subtotal + IVA = total.
+  it('IVA half-up y total exacto en centavos para subtotales de 0.00 a 50.00', () => {
     for (let cents = 0; cents <= 5000; cents++) {
       const order = new Order();
       if (cents > 0) order.addItem({ productId: 1, price: cents / 100, quantity: 1 });
 
-      const subtotalCents = Math.round(cents / 1.16);
-      expect(order.total.value).toBe(cents / 100);
-      expect(order.subtotal.value).toBe(subtotalCents / 100);
-      expect(order.iva.value).toBe((cents - subtotalCents) / 100);
+      const ivaCents = Math.floor((cents * 16 + 50) / 100); // half-up exacto en enteros
+      expect(order.subtotal.value).toBe(cents / 100);
+      expect(order.iva.value).toBe(ivaCents / 100);
+      expect(order.total.value).toBe((cents + ivaCents) / 100);
     }
   });
 
-  // Verifica que el desglose con montos grandes (999 x 999999.99) siga siendo exacto al centavo.
-  it('calcula el desglose con montos muy grandes', () => {
+  // Verifica que el cálculo con montos grandes (999 x 999999.99) siga siendo exacto al centavo.
+  it('calcula el IVA con montos muy grandes', () => {
     const order = new Order();
     order.addItem({ productId: 1, price: 999999.99, quantity: 999 });
-    expect(order.total.value).toBe(998999990.01);
-    expect(order.subtotal.value).toBe(861206887.94);
-    expect(order.iva.value).toBe(137793102.07);
+    expect(order.subtotal.value).toBe(998999990.01);
+    expect(order.iva.value).toBe(159839998.4);
+    expect(order.total.value).toBe(1158839988.41);
   });
 
   // Verifica que consultar los getters varias veces no cambie el resultado (sin estado oculto).
@@ -109,25 +107,25 @@ describe('Order - IVA 16 % incluido y redondeo', () => {
 });
 
 describe('Order - descuento con decimales', () => {
-  // Verifica que un descuento con centavos se reste del total (100 - 10.50 = 89.50).
-  it('descuento de 10.50 sobre 100 -> total 89.50, subtotal 77.16 e IVA 12.34', () => {
+  // Verifica que un descuento con centavos se reste antes del IVA (100 - 10.50 = 89.50).
+  it('descuento de 10.50 sobre 100 -> subtotal 89.50, IVA 14.32, total 103.82', () => {
     const order = new Order();
     order.addItem({ productId: 1, price: 100, quantity: 1 });
     order.setDiscount(10.5);
     expect(order.discount.value).toBe(10.5);
-    expect(order.total.value).toBe(89.5);
-    expect(order.subtotal.value).toBe(77.16);
-    expect(order.iva.value).toBe(12.34);
+    expect(order.subtotal.value).toBe(89.5);
+    expect(order.iva.value).toBe(14.32);
+    expect(order.total.value).toBe(103.82);
   });
 
-  // Verifica que el resultado con descuento 33.33 sea exacto al centavo (total 66.67).
-  it('descuento de 33.33 sobre 100 -> total 66.67, subtotal 57.47 e IVA 9.20', () => {
+  // Verifica que el resultado con descuento 33.33 sea exacto al centavo.
+  it('descuento de 33.33 sobre 100 -> subtotal 66.67, IVA 10.67, total 77.34', () => {
     const order = new Order();
     order.addItem({ productId: 1, price: 100, quantity: 1 });
     order.setDiscount(33.33);
-    expect(order.total.value).toBe(66.67);
-    expect(order.subtotal.value).toBe(57.47);
-    expect(order.iva.value).toBe(9.2);
+    expect(order.subtotal.value).toBe(66.67);
+    expect(order.iva.value).toBe(10.67);
+    expect(order.total.value).toBe(77.34);
   });
 
   // Verifica que un descuento igual al total deje subtotal, IVA y total en cero.
@@ -140,14 +138,14 @@ describe('Order - descuento con decimales', () => {
     expect(order.total.value).toBe(0);
   });
 
-  // Verifica que el descuento reduzca el total (100 - 40 = 60, subtotal 51.72, IVA 8.28).
+  // Verifica que el descuento reduzca la base del IVA (100 - 40 = 60, IVA 9.60, total 69.60).
   it('el descuento reduce el total y su desglose', () => {
     const order = new Order();
     order.addItem({ productId: 1, price: 100, quantity: 1 });
     order.setDiscount(40);
-    expect(order.total.value).toBe(60);
-    expect(order.subtotal.value).toBe(51.72);
-    expect(order.iva.value).toBe(8.28);
+    expect(order.subtotal.value).toBe(60);
+    expect(order.iva.value).toBe(9.6);
+    expect(order.total.value).toBe(69.6);
   });
 
   // Verifica que el getter discount devuelva el monto tal cual aunque supere el subtotal (sin tope).
@@ -165,7 +163,8 @@ describe('Order - descuento con decimales', () => {
     order.setDiscount(10);
     order.setDiscount(20);
     expect(order.discount.value).toBe(20);
-    expect(order.total.value).toBe(80);
+    expect(order.subtotal.value).toBe(80);
+    expect(order.total.value).toBe(92.8);
   });
 
   // Verifica que aplicar descuento a un carrito vacío no genere totales negativos.
@@ -182,7 +181,8 @@ describe('Order - descuento con decimales', () => {
     const order = new Order();
     order.setDiscount(10);
     order.addItem({ productId: 1, price: 100, quantity: 1 });
-    expect(order.total.value).toBe(90);
+    expect(order.subtotal.value).toBe(90);
+    expect(order.total.value).toBe(104.4);
   });
 
   // setDiscount solo valida < 0: NaN e Infinity pasan y luego revientan los getters (discount/iva/total).
@@ -208,7 +208,8 @@ describe('Order - addItem (casos límite)', () => {
     expect(order.items).toHaveLength(1);
     expect(order.items[0].price.value).toBe(12);
     expect(order.items[0].quantity.value).toBe(2);
-    expect(order.total.value).toBe(24);
+    expect(order.subtotal.value).toBe(24);
+    expect(order.total.value).toBe(27.84);
   });
 
   // Verifica que una línea ya en 999 se mantenga en 999 al agregar una unidad más.

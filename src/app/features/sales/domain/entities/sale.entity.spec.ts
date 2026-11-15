@@ -6,7 +6,7 @@ describe('Sale', () => {
   const baseProps: SaleProps = {
     id: 10,
     idUsuario: 3,
-    idInventario: 7,
+    idSucursal: 7,
     idMetodoPago: 2,
     total: 139.2,
     fecha: '2025-01-15T10:00:00Z',
@@ -18,7 +18,7 @@ describe('Sale', () => {
 
     expect(sale.id).toBe(10);
     expect(sale.idUsuario).toBe(3);
-    expect(sale.idInventario).toBe(7);
+    expect(sale.idSucursal).toBe(7);
     expect(sale.idMetodoPago).toBe(2);
     expect(sale.total).toBeInstanceOf(Money);
     expect(sale.total.value).toBe(139.2);
@@ -26,12 +26,12 @@ describe('Sale', () => {
     expect(sale.fecha?.value).toBe('2025-01-15T10:00:00Z');
   });
 
-  // Verifica que los ids opcionales (usuario, inventario, método de pago) acepten null.
+  // Verifica que los ids opcionales (usuario, sucursal, método de pago) acepten null.
   it('acepta ids nulos', () => {
-    const sale = new Sale({ ...baseProps, idUsuario: null, idInventario: null, idMetodoPago: null });
+    const sale = new Sale({ ...baseProps, idUsuario: null, idSucursal: null, idMetodoPago: null });
 
     expect(sale.idUsuario).toBeNull();
-    expect(sale.idInventario).toBeNull();
+    expect(sale.idSucursal).toBeNull();
     expect(sale.idMetodoPago).toBeNull();
   });
 
@@ -83,7 +83,7 @@ describe('SaleFactory', () => {
     const sale = SaleFactory.fromPrimitives({
       id: 1,
       idUsuario: null,
-      idInventario: null,
+      idSucursal: null,
       idMetodoPago: 5,
       total: 50,
       fecha: null,
@@ -102,7 +102,7 @@ describe('SaleFactory', () => {
       SaleFactory.fromPrimitives({
         id: 1,
         idUsuario: null,
-        idInventario: null,
+        idSucursal: null,
         idMetodoPago: null,
         total: -5,
         fecha: null,

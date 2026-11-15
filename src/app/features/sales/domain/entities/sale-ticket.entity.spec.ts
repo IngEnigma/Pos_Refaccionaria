@@ -11,6 +11,8 @@ describe('SaleTicket', () => {
       { nombre: 'Balata', cantidad: 2, precioUnitario: '120.00', subtotal: '240.00' },
       { nombre: 'Filtro', cantidad: 1, precioUnitario: '35.50', subtotal: '35.50' },
     ],
+    subtotal: '237.50',
+    iva: '38.00',
     total: '275.50',
   };
 
@@ -23,6 +25,8 @@ describe('SaleTicket', () => {
     expect(ticket.vendedor).toBe('cajero1');
     expect(ticket.metodoPago).toBe('Efectivo');
     expect(ticket.sucursal).toBe('Centro');
+    expect(ticket.subtotal).toBe('237.50');
+    expect(ticket.iva).toBe('38.00');
     expect(ticket.total).toBe('275.50');
   });
 

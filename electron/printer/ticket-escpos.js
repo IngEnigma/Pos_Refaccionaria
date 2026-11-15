@@ -64,13 +64,9 @@ function money(value) {
     return `$${Number(value || 0).toFixed(2)}`;
 }
 
-// El precio ya incluye IVA 16 %: se desglosa del total (subtotal = total / 1.16).
-function breakdown(total) {
-    const totalNumber = Number(total || 0);
-    const subtotal = Math.round((totalNumber / 1.16) * 100) / 100;
-    const iva = Math.round((totalNumber - subtotal) * 100) / 100;
-
-    return { subtotal, iva };
+// El backend suma el IVA 16 % al subtotal (total = subtotal + iva) y manda el desglose.
+function breakdown(ticket) {
+    return { subtotal: ticket.subtotal, iva: ticket.iva };
 }
 
 function formatProduct(product) {
@@ -160,11 +156,11 @@ function generateTicket(ticket) {
 
     chunks.push(separator());
 
-    // Desglose de IVA incluido
-    const { subtotal, iva } = breakdown(ticket.total);
+    // Desglose de IVA
+    const { subtotal, iva } = breakdown(ticket);
     chunks.push(left());
     chunks.push(line(`Subtotal: ${money(subtotal)}`));
-    chunks.push(line(`IVA 16% incluido: ${money(iva)}`));
+    chunks.push(line(`IVA 16%: ${money(iva)}`));
 
     // Total
     chunks.push(center());
@@ -227,9 +223,9 @@ function generatePreview(ticket) {
     }
 
     lines.push('------------------------------------------');
-    const { subtotal, iva } = breakdown(ticket.total);
+    const { subtotal, iva } = breakdown(ticket);
     lines.push(`Subtotal: ${money(subtotal)}`);
-    lines.push(`IVA 16% incluido: ${money(iva)}`);
+    lines.push(`IVA 16%: ${money(iva)}`);
     lines.push('');
     lines.push(`TOTAL: ${money(ticket.total)}`);
     lines.push('');

@@ -12,7 +12,9 @@ describe('toTicketPrintPayload', () => {
       { nombre: 'Filtro', cantidad: 2, precioUnitario: '120.00', subtotal: '240.00' },
       { nombre: 'Bujía', cantidad: 1, precioUnitario: '35.50', subtotal: '35.50' },
     ],
-    total: '319.90',
+    subtotal: '275.50',
+    iva: '44.08',
+    total: '319.58',
   });
 
   // Verifica que el payload use las claves snake_case que espera Electron.
@@ -25,7 +27,9 @@ describe('toTicketPrintPayload', () => {
       vendedor: 'vendedora',
       metodo_pago: 'EFECTIVO',
       sucursal: 'Central',
-      total: '319.90',
+      subtotal: '275.50',
+      iva: '44.08',
+      total: '319.58',
     });
     expect(payload).not.toHaveProperty('metodoPago');
   });
@@ -43,7 +47,7 @@ describe('toTicketPrintPayload', () => {
   // Verifica que los campos nulos del ticket pasen tal cual (sin inventar valores).
   it('conserva nulos de fecha, vendedor, método de pago y sucursal', () => {
     const empty = new SaleTicket({
-      folio: 1, fecha: null, vendedor: null, metodoPago: null, sucursal: null, productos: [], total: '0.00',
+      folio: 1, fecha: null, vendedor: null, metodoPago: null, sucursal: null, productos: [], subtotal: '0.00', iva: '0.00', total: '0.00',
     });
 
     const payload = toTicketPrintPayload(empty);

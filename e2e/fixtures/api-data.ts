@@ -119,9 +119,13 @@ export const USERS = [
 export const VENTA_CREADA = {
   id: 77,
   id_usuario: 1,
-  id_inventario: 1,
   id_metodo_pago: 1,
-  total: '100.00',
+  id_sucursal: 1,
+  id_cliente: null,
+  estado: 'completada',
+  subtotal: '100.00',
+  iva: '16.00',
+  total: '116.00',
   fecha: '2026-11-13T10:00:00Z',
 };
 
@@ -134,5 +138,7 @@ export const TICKET_77 = {
   productos: [
     { nombre: 'Balata delantera', cantidad: 1, precio_unitario: '100.00', subtotal: '100.00' },
   ],
-  total: '100.00',
+  subtotal: '100.00',
+  iva: '16.00',
+  total: '116.00',
 };

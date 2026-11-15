@@ -78,7 +78,7 @@ import { ToastService } from '@app/shared/ui/components/toast/toast.service';
             <div class="ticket-divider-solid"></div>
 
             <div class="ticket-tax"><span>Subtotal:</span><span>{{ subtotal() | currency:'MXN':'symbol':'1.2-2' }}</span></div>
-            <div class="ticket-tax"><span>IVA 16% incluido:</span><span>{{ iva() | currency:'MXN':'symbol':'1.2-2' }}</span></div>
+            <div class="ticket-tax"><span>IVA 16%:</span><span>{{ iva() | currency:'MXN':'symbol':'1.2-2' }}</span></div>
 
             <!-- Total -->
             <div class="ticket-total">
@@ -166,9 +166,9 @@ export class TicketModalComponent {
   private readonly toast = inject(ToastService);
   private readonly desktop = inject(DESKTOP_PORT);
 
-  // H-40: el precio ya incluye IVA 16 %; se desglosa del total (igual que el ticket de Electron).
-  readonly subtotal = computed(() => Math.round((Number(this.ticket().total) / 1.16) * 100) / 100);
-  readonly iva = computed(() => Math.round((Number(this.ticket().total) - this.subtotal()) * 100) / 100);
+  // El backend suma el IVA 16 % al subtotal y manda el desglose en el ticket.
+  readonly subtotal = computed(() => Number(this.ticket().subtotal));
+  readonly iva = computed(() => Number(this.ticket().iva));
   readonly isReprinting = signal(false);
 
   onBackdropClick(event: MouseEvent): void {

@@ -15,6 +15,8 @@ export class SaleTicketMapper {
                 precioUnitario: producto.precio_unitario,
                 subtotal: producto.subtotal,
             })),
+            subtotal: dto.subtotal,
+            iva: dto.iva,
             total: dto.total,
         });
     }

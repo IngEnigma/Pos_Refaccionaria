@@ -19,6 +19,8 @@ describe('TicketModalComponent (funcional)', () => {
     metodoPago: 'EFECTIVO',
     sucursal: 'Central',
     productos: [{ nombre: 'Filtro de aceite', cantidad: 2, precioUnitario: '120.00', subtotal: '240.00' }],
+    subtotal: '240.00',
+    iva: '38.40',
     total: '278.40',
   });
 
@@ -89,11 +91,11 @@ describe('TicketModalComponent (funcional)', () => {
     expect((fixture.nativeElement.querySelector('.btn-primary') as HTMLButtonElement).disabled).toBe(false);
   });
 
-  // H-40: el precio ya incluye IVA; se desglosa del total (278.40 / 1.16 = 240.00).
-  it('desglosa subtotal e IVA incluido a partir del total', () => {
+  // El desglose viene del backend (subtotal + IVA = total).
+  it('muestra el subtotal y el IVA que manda el backend', () => {
     const text = fixture.nativeElement.textContent as string;
     expect(text).toMatch(/Subtotal:\s*(MX)?\$240\.00/);
-    expect(text).toMatch(/IVA 16% incluido:\s*(MX)?\$38\.40/);
+    expect(text).toMatch(/IVA 16%:\s*(MX)?\$38\.40/);
   });
 
   // H-17: el modo web no debe filtrar el payload del ticket a la consola.
@@ -181,7 +183,7 @@ describe('TicketModalComponent (funcional)', () => {
   it('oculta sucursal, fecha, vendedor y pago cuando son nulos', () => {
     fixture.componentRef.setInput(
       'ticket',
-      new SaleTicket({ folio: 7, fecha: null, vendedor: null, metodoPago: null, sucursal: null, productos: [], total: '0.00' }),
+      new SaleTicket({ folio: 7, fecha: null, vendedor: null, metodoPago: null, sucursal: null, productos: [], subtotal: '0.00', iva: '0.00', total: '0.00' }),
     );
     fixture.detectChanges();
 
