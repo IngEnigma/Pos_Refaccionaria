@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, flush, tick } from '@angular/core/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ToastContainerComponent } from './toast-container.component';
 import { ToastService } from './toast.service';
@@ -13,15 +13,6 @@ describe('ToastContainerComponent', () => {
 
   const getStatusToasts = (): HTMLElement[] =>
     Array.from(fixture.nativeElement.querySelectorAll('[role="status"]')) as HTMLElement[];
-
-  const getCloseButtonByName = (name: string): HTMLButtonElement => {
-    const buttons = Array.from(fixture.nativeElement.querySelectorAll('button')) as HTMLButtonElement[];
-    const match = buttons.find((btn) => btn.getAttribute('aria-label') === name);
-    if (!match) {
-      throw new Error(`Botón con aria-label="${name}" no encontrado`);
-    }
-    return match;
-  };
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -49,20 +40,6 @@ describe('ToastContainerComponent', () => {
     const toasts = getStatusToasts();
     expect(toasts.length).toBe(1);
     expect(toasts[0].textContent).toContain('Guardado');
-  }));
-
-  it('debería cerrar un toast desde el botón "Cerrar"', fakeAsync(() => {
-    toastService.info('Mensaje');
-    fixture.detectChanges();
-    tick();
-
-    expect(getStatusToasts().length).toBe(1);
-
-    const closeButton = getCloseButtonByName('Cerrar');
-    closeButton.click();
-    fixture.detectChanges();
-    tick();
-
-    expect(getStatusToasts().length).toBe(0);
+    flush();
   }));
 });

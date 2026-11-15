@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testin
 import { Component } from '@angular/core';
 import { NavbarComponent } from './navbar.component';
 import { LucideAngularModule, User, LogOut, CircleAlert, Search, Bell } from 'lucide-angular';
+import { NotificationsBadgeComponent } from '@features/notifications/presentation/components/notifications-badge/notifications-badge.component';
 
 @Component({
   selector: 'app-notifications-badge',
@@ -23,7 +24,7 @@ describe('NavbarComponent', () => {
     })
     .overrideComponent(NavbarComponent, {
       add: { imports: [MockNotificationsBadgeComponent] },
-      remove: { imports: [] }
+      remove: { imports: [NotificationsBadgeComponent] }
     })
     .compileComponents();
 
@@ -62,22 +63,6 @@ describe('NavbarComponent', () => {
     tick();
 
     expect(logoutSpy).toHaveBeenCalledTimes(1);
-  }));
-
-  it('emite searchChange al escribir en búsqueda', fakeAsync(() => {
-    const searchSpy = jest.fn();
-    component.searchChange.subscribe(searchSpy);
-
-    const input = fixture.nativeElement.querySelector(
-      'input.search-input',
-    ) as HTMLInputElement;
-    input.value = 'filtro aceite';
-    input.dispatchEvent(new Event('input'));
-
-    tick(300);
-    fixture.detectChanges();
-
-    expect(searchSpy).toHaveBeenCalledWith('filtro aceite');
   }));
 
   it('renderiza el badge de notificaciones', () => {

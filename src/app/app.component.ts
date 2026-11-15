@@ -7,7 +7,6 @@ import { ToastContainerComponent } from '@app/shared/ui/components/toast/toast-c
   standalone: true,
   imports: [RouterOutlet, ToastContainerComponent],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
