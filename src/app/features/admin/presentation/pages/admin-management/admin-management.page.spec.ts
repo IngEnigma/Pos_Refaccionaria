@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { importProvidersFrom, signal } from '@angular/core';
 import { LucideAngularModule, Plus, Save, ShieldCheck, Truck, Users } from 'lucide-angular';
+import { Dialog } from '@angular/cdk/dialog';
 import { of, throwError } from 'rxjs';
 
 import { BranchesFacade } from '@features/branches/application/facades/branches.facade';
@@ -28,7 +29,7 @@ describe('AdminManagementPageComponent', () => {
   };
   const usersFacade = {
     users, loading: usersLoading.asReadonly(), errorMessage: signal<string | null>(null).asReadonly(),
-    loadUsers: jest.fn(), createUser: jest.fn(),
+    loadUsers: jest.fn(), createUser: jest.fn(), updateUser: jest.fn(), deleteUser: jest.fn(),
   };
 
   let fixture: ComponentFixture<AdminManagementPageComponent>;
@@ -284,6 +285,49 @@ describe('AdminManagementPageComponent', () => {
 
       expect(page.userForm.getRawValue().username).toBe('');
       expect(page.userForm.getRawValue().isActive).toBe(true);
+    });
+  });
+
+  describe('acciones por fila de usuario (H-37)', () => {
+    const confirm = (value: boolean) =>
+      jest.spyOn(Dialog.prototype, 'open').mockReturnValue({ closed: of(value) } as never);
+
+    afterEach(() => jest.restoreAllMocks());
+
+    it('el botón Desactivar actualiza isActive, avisa y recarga la lista', () => {
+      usersFacade.updateUser.mockReturnValue(of({ ...user, isActive: false }));
+
+      fixture.nativeElement.querySelector('button.toggle-user').click();
+
+      expect(usersFacade.updateUser).toHaveBeenCalledWith(3, { isActive: false });
+      expect(toast.success).toHaveBeenCalled();
+      expect(usersFacade.loadUsers).toHaveBeenCalledTimes(2);
+    });
+
+    it('eliminar pide confirmación y, si se acepta, borra el usuario y recarga', () => {
+      confirm(true);
+      usersFacade.deleteUser.mockReturnValue(of(undefined));
+
+      fixture.nativeElement.querySelector('button.delete-user').click();
+
+      expect(usersFacade.deleteUser).toHaveBeenCalledWith(3);
+      expect(usersFacade.loadUsers).toHaveBeenCalledTimes(2);
+    });
+
+    it('eliminar cancelado no borra nada', () => {
+      confirm(false);
+
+      fixture.nativeElement.querySelector('button.delete-user').click();
+
+      expect(usersFacade.deleteUser).not.toHaveBeenCalled();
+    });
+
+    it('si falla muestra el error', () => {
+      usersFacade.updateUser.mockReturnValue(throwError(() => new Error('sin permiso')));
+
+      fixture.nativeElement.querySelector('button.toggle-user').click();
+
+      expect(toast.error).toHaveBeenCalledWith('sin permiso');
     });
   });
 });

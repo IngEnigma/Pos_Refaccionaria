@@ -2,10 +2,13 @@ import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, injec
 import { HttpErrorResponse } from '@angular/common/http';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Dialog } from '@angular/cdk/dialog';
 import { LucideAngularModule } from 'lucide-angular';
 
 import { ToastService } from '@app/shared/ui/components/toast/toast.service';
 import { BranchesFacade } from '@features/branches/application/facades/branches.facade';
+import { ConfirmDialogComponent } from '@app/shared/ui/components/confirm-dialog/confirm-dialog.component';
+import { User } from '@features/users/domain/entities/user.entity';
 import { UsersFacade } from '@features/users/application/facades/users.facade';
 
 @Component({
@@ -21,6 +24,7 @@ export class AdminManagementPageComponent implements OnInit {
   private readonly branchesFacade = inject(BranchesFacade);
   private readonly usersFacade = inject(UsersFacade);
   private readonly toast = inject(ToastService);
+  private readonly dialog = inject(Dialog);
   private readonly destroyRef = inject(DestroyRef);
 
   readonly branches = this.branchesFacade.branches;
@@ -83,6 +87,42 @@ export class AdminManagementPageComponent implements OnInit {
         },
         error: (error: unknown) => this.toast.error(this.messageOf(error)),
       });
+  }
+
+  toggleUser(user: User): void {
+    this.usersFacade
+      .updateUser(user.id, { isActive: !user.isActive })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => this.afterUserChange(user.isActive ? 'Usuario desactivado.' : 'Usuario activado.'),
+        error: (error: unknown) => this.toast.error(this.messageOf(error)),
+      });
+  }
+
+  deleteUser(user: User): void {
+    this.dialog
+      .open<boolean>(ConfirmDialogComponent, {
+        data: {
+          title: 'Eliminar usuario',
+          message: `¿Eliminar al usuario "${user.username}"? Esta acción no se puede deshacer.`,
+          confirmText: 'Eliminar',
+          cancelText: 'Cancelar',
+          variant: 'danger',
+        },
+      })
+      .closed.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((confirmed) => {
+        if (!confirmed) return;
+        this.usersFacade.deleteUser(user.id).subscribe({
+          next: () => this.afterUserChange('Usuario eliminado.'),
+          error: (error: unknown) => this.toast.error(this.messageOf(error)),
+        });
+      });
+  }
+
+  private afterUserChange(message: string): void {
+    this.toast.success(message);
+    this.usersFacade.loadUsers();
   }
 
   private messageOf(error: unknown): string | undefined {

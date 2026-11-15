@@ -168,6 +168,7 @@
                 <th>Usuario</th>
                 <th>Correo</th>
                 <th>Estado</th>
+                <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -176,6 +177,12 @@
                   <td><strong>{{ user.username }}</strong></td>
                   <td>{{ user.email }}</td>
                   <td><span class="status" [class.pending]="!user.isActive">{{ user.isActive ? 'Activo' : 'Inactivo' }}</span></td>
+                  <td>
+                    <button class="btn-secondary toggle-user" type="button" [attr.aria-label]="(user.isActive ? 'Desactivar usuario ' : 'Activar usuario ') + user.username" (click)="toggleUser(user)">
+                      {{ user.isActive ? 'Desactivar' : 'Activar' }}
+                    </button>
+                    <button class="btn-secondary delete-user" type="button" [attr.aria-label]="'Eliminar usuario ' + user.username" (click)="deleteUser(user)">Eliminar</button>
+                  </td>
                 </tr>
               }
             </tbody>

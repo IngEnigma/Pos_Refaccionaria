@@ -3,6 +3,8 @@ import { of, Subject, throwError } from 'rxjs';
 
 import { LoggerService } from '@core/logging/logger.service';
 import { CreateUserUseCase } from '@features/users/application/usecase/create-user.usecase';
+import { DeleteUserUseCase } from '@features/users/application/usecase/delete-user.usecase';
+import { UpdateUserUseCase } from '@features/users/application/usecase/update-user.usecase';
 import { GetUsersUseCase } from '@features/users/application/usecase/get-users.usecase';
 import { User } from '@features/users/domain/entities/user.entity';
 import { UsersFacade } from './users.facade';
@@ -12,17 +14,23 @@ describe('UsersFacade', () => {
   const payload = { username: 'ana', password: 'x', email: 'ana@trt.com', isActive: true };
   let getUsers: jest.Mock;
   let createUser: jest.Mock;
+  let updateUser: jest.Mock;
+  let deleteUser: jest.Mock;
   let logger: { error: jest.Mock };
   let facade: UsersFacade;
 
   beforeEach(() => {
     getUsers = jest.fn();
     createUser = jest.fn();
+    updateUser = jest.fn();
+    deleteUser = jest.fn();
     logger = { error: jest.fn() };
     TestBed.configureTestingModule({
       providers: [
         { provide: GetUsersUseCase, useValue: { execute: getUsers } },
         { provide: CreateUserUseCase, useValue: { execute: createUser } },
+        { provide: UpdateUserUseCase, useValue: { execute: updateUser } },
+        { provide: DeleteUserUseCase, useValue: { execute: deleteUser } },
         { provide: LoggerService, useValue: { withContext: () => logger } },
       ],
     });
@@ -152,5 +160,39 @@ describe('UsersFacade', () => {
 
     expect(logger.error).toHaveBeenCalledWith('Failed to create user', { message: 'usuario duplicado' });
     expect(JSON.stringify(logger.error.mock.calls)).not.toContain(secret.password);
+  });
+
+  describe('updateUser / deleteUser (H-37)', () => {
+    it('updateUser delega en el use case con id y payload parcial', () => {
+      updateUser.mockReturnValue(of({ ...user, isActive: false }));
+      let result: User | undefined;
+
+      facade.updateUser(1, { isActive: false }).subscribe((u) => (result = u));
+
+      expect(updateUser).toHaveBeenCalledWith(1, { isActive: false });
+      expect(result?.isActive).toBe(false);
+      expect(facade.loading()).toBe(false);
+    });
+
+    it('deleteUser delega en el use case por id', () => {
+      deleteUser.mockReturnValue(of(undefined));
+      let done = false;
+
+      facade.deleteUser(1).subscribe({ complete: () => (done = true) });
+
+      expect(deleteUser).toHaveBeenCalledWith(1);
+      expect(done).toBe(true);
+    });
+
+    it('si falla expone el error, lo relanza y apaga loading', () => {
+      deleteUser.mockReturnValue(throwError(() => new Error('sin permiso')));
+      let failed = false;
+
+      facade.deleteUser(1).subscribe({ error: () => (failed = true) });
+
+      expect(failed).toBe(true);
+      expect(facade.errorMessage()).toBe('sin permiso');
+      expect(facade.loading()).toBe(false);
+    });
   });
 });
