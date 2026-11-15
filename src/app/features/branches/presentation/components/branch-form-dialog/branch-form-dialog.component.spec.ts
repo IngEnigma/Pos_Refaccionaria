@@ -168,7 +168,7 @@ describe('BranchFormDialogComponent', () => {
       expect(screen.getByText('El nombre es requerido (mín. 3 caracteres)')).toBeInTheDocument();
       expect(screen.getByText('La ubicación es requerida')).toBeInTheDocument();
       expect(screen.getByText('El código postal es requerido')).toBeInTheDocument();
-      expect(screen.getByText('Teléfono inválido (solo números)')).toBeInTheDocument();
+      expect(screen.getByText('Teléfono inválido (solo números, máx. 15)')).toBeInTheDocument();
       expect(screen.getByText('Ingrese un correo electrónico válido')).toBeInTheDocument();
     });
 
@@ -203,11 +203,11 @@ describe('BranchFormDialogComponent', () => {
 
       await user.type(telefono, '961-123-45');
       await fireEvent.blur(telefono);
-      expect(screen.getByText('Teléfono inválido (solo números)')).toBeInTheDocument();
+      expect(screen.getByText('Teléfono inválido (solo números, máx. 15)')).toBeInTheDocument();
 
       await user.clear(telefono);
       await user.type(telefono, '9611234567');
-      expect(screen.queryByText('Teléfono inválido (solo números)')).not.toBeInTheDocument();
+      expect(screen.queryByText('Teléfono inválido (solo números, máx. 15)')).not.toBeInTheDocument();
     });
 
     it('exige código postal y lo acepta al capturarlo', async () => {
@@ -240,9 +240,37 @@ describe('BranchFormDialogComponent', () => {
     });
 
     // El backend limita codigo_postal a 10 y numero_telefono a 15 caracteres (sucursales/models.py).
-    it.todo('H-30: codigoPostal acepta más de 10 caracteres (el backend responde 400/DataError)');
-    it.todo('H-31: numeroTelefono acepta más de 15 dígitos (el backend responde 400/DataError)');
-    it.todo('H-32: nombre y ubicación compuestos solo por espacios pasan Validators.required');
+    it('H-30: rechaza un código postal de más de 10 caracteres', async () => {
+      const { user } = await setup();
+      await fillValidForm(user);
+      await user.clear(field('Código Postal'));
+      await user.type(field('Código Postal'), '12345678901');
+
+      expect(screen.getByRole('button', { name: /Registrar Sucursal/ })).toBeDisabled();
+    });
+
+    it('H-31: rechaza un teléfono de más de 15 dígitos', async () => {
+      const { user } = await setup();
+      await fillValidForm(user);
+      await user.clear(field('Teléfono'));
+      await user.type(field('Teléfono'), '1234567890123456');
+
+      expect(screen.getByRole('button', { name: /Registrar Sucursal/ })).toBeDisabled();
+    });
+
+    it('H-32: nombre y ubicación de solo espacios no son válidos', async () => {
+      const { user } = await setup();
+      await fillValidForm(user);
+      await user.clear(field('Nombre de la Sucursal'));
+      await user.type(field('Nombre de la Sucursal'), '     ');
+      expect(screen.getByRole('button', { name: /Registrar Sucursal/ })).toBeDisabled();
+
+      await user.clear(field('Nombre de la Sucursal'));
+      await user.type(field('Nombre de la Sucursal'), 'Sucursal Norte');
+      await user.clear(field('Ubicación'));
+      await user.type(field('Ubicación'), '   ');
+      expect(screen.getByRole('button', { name: /Registrar Sucursal/ })).toBeDisabled();
+    });
   });
 
   describe('envío y cierre', () => {
@@ -265,7 +293,7 @@ describe('BranchFormDialogComponent', () => {
       expect(screen.getByText('El nombre es requerido (mín. 3 caracteres)')).toBeInTheDocument();
       expect(screen.getByText('La ubicación es requerida')).toBeInTheDocument();
       expect(screen.getByText('El código postal es requerido')).toBeInTheDocument();
-      expect(screen.getByText('Teléfono inválido (solo números)')).toBeInTheDocument();
+      expect(screen.getByText('Teléfono inválido (solo números, máx. 15)')).toBeInTheDocument();
       expect(screen.getByText('Ingrese un correo electrónico válido')).toBeInTheDocument();
     });
 
