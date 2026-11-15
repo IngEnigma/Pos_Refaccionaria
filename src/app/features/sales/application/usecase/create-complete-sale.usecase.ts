@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { Observable, of, throwError } from 'rxjs';
+import { defer, Observable, of, throwError } from 'rxjs';
 import { catchError, concatMap, map } from 'rxjs/operators';
 
 import { SaleRepository, CreateCompleteSalePayload } from '@features/sales/domain/repository/sale-repository';
@@ -24,13 +24,16 @@ export class CreateCompleteSaleUseCase {
     if (!payload.productos.length) {
       return throwError(() => new Error('CreateCompleteSale: at least one product is required'));
     }
-    payload.productos.forEach((item) => {
-      Quantity.fromNumber(item.cantidad, 'CreateCompleteSale.productos.cantidad');
-    });
 
     // H-09/H-38: una sola petición atómica (cabecera + detalles + stock, todo o nada).
     // Antes: venta + N detalles + DELETE de rollback, que el cajero no puede ejecutar (403 `ventas.anular`).
-    return this.saleRepository.createSale(payload).pipe(
+    // H-29: defer lleva el error de Quantity.fromNumber por el observable, como CreateSaleUseCase.
+    return defer(() => {
+      payload.productos.forEach((item) => {
+        Quantity.fromNumber(item.cantidad, 'CreateCompleteSale.productos.cantidad');
+      });
+      return this.saleRepository.createSale(payload);
+    }).pipe(
       concatMap((sale: Sale) =>
         this.saleRepository.getSaleTicket(sale.id).pipe(
           map((ticket): CompleteSaleResult => ({ sale, ticket })),

@@ -1,3 +1,4 @@
+import { firstValueFrom } from 'rxjs';
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
@@ -156,10 +157,10 @@ describe('INT-05 venta completa atómica (UseCase -> repos reales -> HttpClient)
     httpMock.expectNone(VENTAS);
   });
 
-  it('rechaza cantidad cero sin tocar la red', () => {
-    expect(() => useCase.execute({ idMetodoPago: 1, productos: [{ id: 10, cantidad: 0 }] })).toThrow(
-      'CreateCompleteSale.productos.cantidad: quantity must be greater than zero',
-    );
+  it('rechaza cantidad cero por el observable sin tocar la red (H-29)', async () => {
+    await expect(
+      firstValueFrom(useCase.execute({ idMetodoPago: 1, productos: [{ id: 10, cantidad: 0 }] })),
+    ).rejects.toThrow('CreateCompleteSale.productos.cantidad: quantity must be greater than zero');
     httpMock.expectNone(VENTAS);
   });
 

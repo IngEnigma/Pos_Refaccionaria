@@ -93,20 +93,21 @@ describe('CreateCompleteSaleUseCase', () => {
     expect(saleRepo.createSale).not.toHaveBeenCalled();
   });
 
-  // Validación: una cantidad inválida lanza síncrono antes de crear la venta.
+  // H-29: una cantidad inválida viaja por el observable (no se lanza síncrona) y no crea la venta.
   it.each([[0], [-2], [NaN]])(
-    'lanza error síncrono si algún producto tiene cantidad %p y no crea la venta',
-    (cantidad) => {
-      expect(() =>
-        useCase.execute({
-          idMetodoPago: 1,
-          productos: [
-            { id: 10, cantidad: 1 },
-            { id: 20, cantidad },
-          ],
-        }),
-      ).toThrow('CreateCompleteSale.productos.cantidad: quantity must be greater than zero');
+    'emite error por el observable si algún producto tiene cantidad %p y no crea la venta',
+    async (cantidad) => {
+      const result$ = useCase.execute({
+        idMetodoPago: 1,
+        productos: [
+          { id: 10, cantidad: 1 },
+          { id: 20, cantidad },
+        ],
+      });
 
+      await expect(firstValueFrom(result$)).rejects.toThrow(
+        'CreateCompleteSale.productos.cantidad: quantity must be greater than zero',
+      );
       expect(saleRepo.createSale).not.toHaveBeenCalled();
     },
   );
