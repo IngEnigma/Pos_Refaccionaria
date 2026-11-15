@@ -21,8 +21,8 @@ module.exports = {
   ],
   coverageDirectory: '<rootDir>/coverage',
   coverageReporters: ['html', 'lcov', 'text-summary', 'clover'],
-  // Baseline real 2026-09-14: statements ~31%, branches ~25%, lines ~31%, functions ~24%
-  // con 8 suites en rojo pre-existente (deriva de contrato tras sync backend).
+  // Baseline inicial 2026-09-14: statements ~31%, branches ~25%, lines ~31%, functions ~24%.
+  // Hoy todas las suites están en verde (H-07: las 8 rojas de entonces ya se corrigieron).
   // Subir por fases según docs/plan-pruebas.md §4: Fase 2 → 50/40/50/40, Fase 3 → 70/60/70/65.
   coverageThreshold: {
     global: {
