@@ -120,7 +120,7 @@ describe('PaymentMethodRepositoryImpl', () => {
       expect(result).toEqual({ id: 0, tipo: 'CHEQUE', descripcion: 'Pago con cheque' });
     });
 
-    // Error: mensaje fijo y causa original.
+    // H-27: el mensaje del backend se propaga y la causa original se conserva.
     it('convierte un error HTTP en PaymentMethodMutationError conservando la causa', () => {
       let error: PaymentMethodMutationError | undefined;
       repository.createPaymentMethod({ tipo: 'X', descripcion: 'Y' }).subscribe({ error: (e) => (error = e) });
@@ -128,7 +128,7 @@ describe('PaymentMethodRepositoryImpl', () => {
       httpMock.expectOne(URL).flush({ error: 'Duplicado' }, { status: 400, statusText: 'Bad Request' });
 
       expect(error).toBeInstanceOf(PaymentMethodMutationError);
-      expect(error?.message).toBe('Failed to create payment method');
+      expect(error?.message).toBe('Duplicado');
       expect((error?.cause as { status: number }).status).toBe(400);
     });
   });
@@ -157,15 +157,15 @@ describe('PaymentMethodRepositoryImpl', () => {
       expect(result).toEqual({ id: 5, tipo: 'TARJETA', descripcion: '' });
     });
 
-    // Error: mensaje fijo y causa original.
+    // H-27: el mensaje del backend se propaga y la causa original se conserva.
     it('convierte un error HTTP en PaymentMethodMutationError', () => {
       let error: PaymentMethodMutationError | undefined;
       repository.updatePaymentMethod(5, { tipo: 'X' }).subscribe({ error: (e) => (error = e) });
 
-      httpMock.expectOne(`${URL}/5`).flush('x', { status: 404, statusText: 'Not Found' });
+      httpMock.expectOne(`${URL}/5`).flush({ detail: 'No encontrado' }, { status: 404, statusText: 'Not Found' });
 
       expect(error).toBeInstanceOf(PaymentMethodMutationError);
-      expect(error?.message).toBe('Failed to update payment method');
+      expect(error?.message).toBe('No encontrado');
     });
   });
 
@@ -182,15 +182,15 @@ describe('PaymentMethodRepositoryImpl', () => {
       expect(result).toBe(true);
     });
 
-    // Error: mensaje fijo y causa original.
+    // H-27: el mensaje del backend se propaga y la causa original se conserva.
     it('convierte un error HTTP en PaymentMethodMutationError', () => {
       let error: PaymentMethodMutationError | undefined;
       repository.deletePaymentMethod(5).subscribe({ error: (e) => (error = e) });
 
-      httpMock.expectOne(`${URL}/5`).flush('x', { status: 409, statusText: 'Conflict' });
+      httpMock.expectOne(`${URL}/5`).flush({ error: 'En uso por ventas' }, { status: 409, statusText: 'Conflict' });
 
       expect(error).toBeInstanceOf(PaymentMethodMutationError);
-      expect(error?.message).toBe('Failed to delete payment method');
+      expect(error?.message).toBe('En uso por ventas');
       expect((error?.cause as { status: number }).status).toBe(409);
     });
   });

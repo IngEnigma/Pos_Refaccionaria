@@ -18,6 +18,8 @@ import {
 import { ProductTypeMapper } from '@features/sales/product-types/infrastructure/mappers/product-type.mapper';
 import { SALE_ENDPOINTS } from '@features/sales/config/sale-endpoints';
 
+import { resolveHttpErrorMessage } from '@features/sales/infrastructure/utils/http-error-resolver';
+
 @Injectable({ providedIn: 'root' })
 export class ProductTypeRepositoryImpl implements ProductTypeRepository {
   private readonly http = inject(HttpClient);
@@ -39,7 +41,13 @@ export class ProductTypeRepositoryImpl implements ProductTypeRepository {
       .pipe(
         map((response) => this.resolveProductTypeResponse(response, payload)),
         catchError((error: unknown) =>
-          throwError(() => new ProductTypeMutationError('Failed to create product type', error)),
+          throwError(
+            () =>
+              new ProductTypeMutationError(
+                resolveHttpErrorMessage(error, 'Failed to create product type'),
+                error,
+              ),
+          ),
         ),
       );
   }
@@ -50,7 +58,13 @@ export class ProductTypeRepositoryImpl implements ProductTypeRepository {
       .pipe(
         map((response) => this.resolveProductTypeResponse(response, payload, id)),
         catchError((error: unknown) =>
-          throwError(() => new ProductTypeMutationError('Failed to update product type', error)),
+          throwError(
+            () =>
+              new ProductTypeMutationError(
+                resolveHttpErrorMessage(error, 'Failed to update product type'),
+                error,
+              ),
+          ),
         ),
       );
   }
@@ -59,7 +73,13 @@ export class ProductTypeRepositoryImpl implements ProductTypeRepository {
     return this.http.delete<void>(`${this.endpoint}/${id}`).pipe(
       map(() => true),
       catchError((error: unknown) =>
-        throwError(() => new ProductTypeMutationError('Failed to delete product type', error)),
+        throwError(
+            () =>
+              new ProductTypeMutationError(
+                resolveHttpErrorMessage(error, 'Failed to delete product type'),
+                error,
+              ),
+          ),
       ),
     );
   }

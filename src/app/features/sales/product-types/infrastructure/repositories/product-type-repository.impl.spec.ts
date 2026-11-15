@@ -63,7 +63,7 @@ describe('ProductTypeRepositoryImpl', () => {
       expect(result).toEqual([]);
     });
 
-    // Error: mensaje fijo y causa original.
+    // H-27: el mensaje del backend se propaga y la causa original se conserva.
     it('convierte un error HTTP en ProductTypeFetchError conservando la causa', () => {
       let error: ProductTypeFetchError | undefined;
       repository.getProductTypes().subscribe({ error: (e) => (error = e) });
@@ -110,7 +110,7 @@ describe('ProductTypeRepositoryImpl', () => {
       expect(result).toEqual({ id: 0, nombre: 'Frenos' });
     });
 
-    // Error: mensaje fijo y causa original.
+    // H-27: el mensaje del backend se propaga y la causa original se conserva.
     it('convierte un error HTTP en ProductTypeMutationError conservando la causa', () => {
       let error: ProductTypeMutationError | undefined;
       repository.createProductType({ nombre: 'Frenos' }).subscribe({ error: (e) => (error = e) });
@@ -118,7 +118,7 @@ describe('ProductTypeRepositoryImpl', () => {
       httpMock.expectOne(URL).flush({ error: 'Duplicado' }, { status: 400, statusText: 'Bad Request' });
 
       expect(error).toBeInstanceOf(ProductTypeMutationError);
-      expect(error?.message).toBe('Failed to create product type');
+      expect(error?.message).toBe('Duplicado');
       expect((error?.cause as { status: number }).status).toBe(400);
     });
   });
@@ -157,15 +157,15 @@ describe('ProductTypeRepositoryImpl', () => {
       expect(result).toEqual({ id: 4, nombre: '' });
     });
 
-    // Error: mensaje fijo y causa original.
+    // H-27: el mensaje del backend se propaga y la causa original se conserva.
     it('convierte un error HTTP en ProductTypeMutationError', () => {
       let error: ProductTypeMutationError | undefined;
       repository.updateProductType(4, { nombre: 'X' }).subscribe({ error: (e) => (error = e) });
 
-      httpMock.expectOne(`${URL}/4`).flush('x', { status: 404, statusText: 'Not Found' });
+      httpMock.expectOne(`${URL}/4`).flush({ detail: 'No encontrado' }, { status: 404, statusText: 'Not Found' });
 
       expect(error).toBeInstanceOf(ProductTypeMutationError);
-      expect(error?.message).toBe('Failed to update product type');
+      expect(error?.message).toBe('No encontrado');
     });
   });
 
@@ -182,15 +182,15 @@ describe('ProductTypeRepositoryImpl', () => {
       expect(result).toBe(true);
     });
 
-    // Error: mensaje fijo y causa original.
+    // H-27: el mensaje del backend se propaga y la causa original se conserva.
     it('convierte un error HTTP en ProductTypeMutationError', () => {
       let error: ProductTypeMutationError | undefined;
       repository.deleteProductType(4).subscribe({ error: (e) => (error = e) });
 
-      httpMock.expectOne(`${URL}/4`).flush('x', { status: 409, statusText: 'Conflict' });
+      httpMock.expectOne(`${URL}/4`).flush({ error: 'En uso por ventas' }, { status: 409, statusText: 'Conflict' });
 
       expect(error).toBeInstanceOf(ProductTypeMutationError);
-      expect(error?.message).toBe('Failed to delete product type');
+      expect(error?.message).toBe('En uso por ventas');
       expect((error?.cause as { status: number }).status).toBe(409);
     });
   });
