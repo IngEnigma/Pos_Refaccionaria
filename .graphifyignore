@@ -1,0 +1,13 @@
+node_modules/
+dist/
+dist_electron/
+coverage/
+.angular/
+.scannerwork/
+test-results/
+screenshots/
+tmp/
+.opencode/
+*.png
+*.lock
+package-lock.json
