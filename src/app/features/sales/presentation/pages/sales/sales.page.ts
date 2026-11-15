@@ -292,7 +292,8 @@ export class SalesPageComponent implements OnInit {
               if (!response.success) {
                 this.toastService.error(response.message ?? 'No fue posible generar el ticket.');
               }
-            });
+            })
+            .catch(() => this.toastService.error('No fue posible generar el ticket.'));
         },
         error: (error: unknown) => {
           const message =

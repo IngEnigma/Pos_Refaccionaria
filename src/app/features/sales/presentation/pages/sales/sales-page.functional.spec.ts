@@ -600,6 +600,21 @@ describe('SalesPageComponent (funcional)', () => {
     expect(lastToast().message).toBe('Sin papel');
   });
 
+  // H-11: si el IPC rechaza la promesa, el cajero ve un aviso y no queda un rechazo sin manejar.
+  it('H-11: si generateTicket rechaza se avisa al cajero', async () => {
+    desktop.generateTicket.mockRejectedValue(new Error('IPC caído'));
+    page.onAddToCart(page.productos()[0]);
+    page.onSelectPayment(PAGO);
+
+    page.processTransaction();
+    flushSuccessfulSale(50, 1);
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(lastToast().type).toBe('error');
+    expect(lastToast().message).toBe('No fue posible generar el ticket.');
+  });
+
   // D3: verifica que sin ticket (falló getSaleTicket) no se intente imprimir.
   it('D3: sin ticket no se llama al puerto de escritorio', () => {
     page.onAddToCart(page.productos()[0]);
