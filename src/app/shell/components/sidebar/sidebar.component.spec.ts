@@ -49,7 +49,7 @@ describe('SidebarComponent', () => {
 
   it('renderiza los navItems recibidos', () => {
     const labels = Array.from(
-      fixture.nativeElement.querySelectorAll('.link-text'),
+      fixture.nativeElement.querySelectorAll('.link-text') as NodeListOf<HTMLElement>,
     ).map((element) => element.textContent?.trim());
 
     expect(labels).toEqual(['Ventas', 'Inventario', 'Administración']);
@@ -61,7 +61,7 @@ describe('SidebarComponent', () => {
       .map((debugElement) => debugElement.injector.get(RouterLink));
 
     const serializedLinks = routerLinks.map((link) =>
-      router.serializeUrl(link.urlTree),
+      router.serializeUrl(link.urlTree!),
     );
 
     expect(serializedLinks).toEqual(['/sales', '/inventory']);
@@ -69,7 +69,7 @@ describe('SidebarComponent', () => {
 
   it('navega al hacer click en un item habilitado', fakeAsync(() => {
     const inventoryLink = Array.from(
-      fixture.nativeElement.querySelectorAll('a.sidebar-link'),
+      fixture.nativeElement.querySelectorAll('a.sidebar-link') as NodeListOf<HTMLAnchorElement>,
     ).find((anchor) => anchor.textContent?.includes('Inventario')) as
       | HTMLAnchorElement
       | undefined;
@@ -83,10 +83,10 @@ describe('SidebarComponent', () => {
 
   it('maneja items disabled sin enlace clickeable', () => {
     const disabledAnchor = Array.from(
-      fixture.nativeElement.querySelectorAll('a.sidebar-link'),
+      fixture.nativeElement.querySelectorAll('a.sidebar-link') as NodeListOf<HTMLAnchorElement>,
     ).find((anchor) => anchor.textContent?.includes('Administración'));
     const disabledSpan = Array.from(
-      fixture.nativeElement.querySelectorAll('span.sidebar-link-disabled'),
+      fixture.nativeElement.querySelectorAll('span.sidebar-link-disabled') as NodeListOf<HTMLSpanElement>,
     ).find((span) => span.textContent?.includes('Administración')) as
       | HTMLSpanElement
       | undefined;

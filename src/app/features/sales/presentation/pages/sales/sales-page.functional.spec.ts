@@ -198,16 +198,16 @@ describe('SalesPageComponent (funcional)', () => {
 
   function processButton(): HTMLButtonElement {
     const buttons = fixture.nativeElement.querySelectorAll('button') as NodeListOf<HTMLButtonElement>;
-    const found = Array.from(buttons).find((b) => b.textContent.includes('Procesar transacción') || b.textContent.includes('Procesando'));
+    const found = Array.from(buttons).find((b) => !!b.textContent?.includes('Procesar transacción') || !!b.textContent?.includes('Procesando'));
     if (!found) throw new Error('Botón de procesar no encontrado en el DOM');
     return found;
   }
 
   function summaryRow(label: string): string {
     const rows = fixture.nativeElement.querySelectorAll('.summary-row') as NodeListOf<HTMLElement>;
-    const row = Array.from(rows).find((r) => r.textContent.includes(label));
+    const row = Array.from(rows).find((r) => r.textContent?.includes(label));
     if (!row) throw new Error(`Fila de resumen no encontrada: ${label}`);
-    return row.textContent;
+    return row.textContent ?? '';
   }
 
   function flushSuccessfulSale(id: number) {

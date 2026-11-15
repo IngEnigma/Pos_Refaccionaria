@@ -125,7 +125,7 @@ describe('SalesFacade (integración)', () => {
     facade.createCompleteSale({ idMetodoPago: 1, productos: [{ id: 10, cantidad: 1 }] }).subscribe({
       // finalize corre tras entregar next: el flag se verifica después de los flush (flujo síncrono).
       next: (result) => {
-        folio = result.ticket.folio;
+        folio = result.ticket?.folio ?? -1;
         expect(result.sale.id).toBe(50);
       },
       error: done.fail,

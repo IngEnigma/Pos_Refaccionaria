@@ -100,7 +100,7 @@ describe('ClientSelectorModalComponent', () => {
 
   // Verifica que al seleccionar un cliente se emita ese cliente.
   it('seleccionar un cliente emite select con el cliente elegido', () => {
-    let emitted: Client | null | undefined = undefined;
+    let emitted = undefined as Client | null | undefined;
     component.select.subscribe((value) => (emitted = value));
 
     optionByText('María Gómez').click();

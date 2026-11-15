@@ -176,7 +176,7 @@ describe('Catálogo de ventas (funcional)', () => {
 
   function cardNames(): string[] {
     return Array.from(fixture.nativeElement.querySelectorAll('.product-name') as NodeListOf<HTMLElement>)
-      .map((el) => el.textContent.trim());
+      .map((el) => (el.textContent ?? '').trim());
   }
 
   // P2.1a: verifica que el buscador filtre el grid por nombre de producto.

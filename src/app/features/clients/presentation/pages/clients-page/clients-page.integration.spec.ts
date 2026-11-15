@@ -156,7 +156,7 @@ describe('ClientsPageComponent (integración)', () => {
   // así que no hay NG0600 y el toast de error queda registrado.
   function expectErrorToast(errorSpy: jest.SpyInstance): void {
     const sawNg0600 = errorSpy.mock.calls.some((args) =>
-      args.some((a) => String(a).includes('NG0600')),
+      args.some((a: unknown) => String(a).includes('NG0600')),
     );
     expect(sawNg0600).toBe(false);
     expect(toastTypes()).toContain('error');

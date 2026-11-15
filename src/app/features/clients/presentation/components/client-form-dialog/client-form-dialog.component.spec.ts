@@ -238,10 +238,10 @@ describe('ClientFormDialogComponent', () => {
     component.onSubmit();
 
     const payload = dialogRef.close.mock.calls[0][0] as Record<string, unknown>;
-    expect(payload.apellidoMaterno).toBeNull();
-    expect(payload.correo).toBeNull();
-    expect(payload.direccion).toBeNull();
-    expect(payload.rfc).toBeNull();
+    expect(payload['apellidoMaterno']).toBeNull();
+    expect(payload['correo']).toBeNull();
+    expect(payload['direccion']).toBeNull();
+    expect(payload['rfc']).toBeNull();
   });
 
   // Comprueba que isFieldInvalid solo sea true cuando el campo es inválido y ya fue tocado o modificado.

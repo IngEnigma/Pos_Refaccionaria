@@ -38,7 +38,7 @@ describe('BranchPricingTableComponent', () => {
     data,
     total: data.length,
     page: 1,
-    pageSize: 200,
+    limit: 200,
   });
 
   // sucursalId=0 no dispara la carga; los casos de renderizado siembran products/loading directamente.
