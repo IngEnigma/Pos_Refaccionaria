@@ -25,6 +25,7 @@
     "test:integration": "ng test --test-path-pattern=integration.spec --silent",
     "e2e": "playwright test",
     "e2e:real": "concurrently -k -s first \"ng serve --port 5173\" \"wait-on http://localhost:5173/login && BASE_URL=http://localhost:5173 E2E_REAL=1 playwright test e2e/auth.real.spec.ts --project=chromium\"",
+    "e2e:local": "concurrently -k -s first \"ng serve --configuration local --port 5173\" \"wait-on http://localhost:5173/login && BASE_URL=http://localhost:5173 E2E_REAL=1 API_BASE=http://127.0.0.1:8000 playwright test e2e/auth.real.spec.ts e2e/sales.real.spec.ts e2e/admin.real.spec.ts --project=chromium\"",
     "e2e:ui": "playwright test --ui",
     "e2e:headed": "playwright test --headed",
     "e2e:report": "playwright show-report",

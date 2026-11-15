@@ -20,8 +20,10 @@ import {
   SUCURSAL_ID,
 } from '../fixtures/api-data';
 
-export const API_HOST = 'refaccionariaback.onrender.com';
-export const API_BASE = `https://${API_HOST}`;
+/** `API_BASE=http://127.0.0.1:8000` apunta los helpers y los specs reales al backend local; por defecto Render. */
+export const API_BASE = (process.env['API_BASE'] ?? 'https://refaccionariaback.onrender.com').replace(/\/$/, '');
+export const API_HOST = new URL(API_BASE).host;
+export const IS_LOCAL_API = /^http:\/\/(127\.0\.0\.1|localhost)(:|$)/.test(API_BASE);
 export const API_PREFIX = `${API_BASE}/api`;
 
 /** Matchea POST .../api/login/ con o sin trailing slash, sin tocar /login local. */
@@ -64,6 +66,7 @@ export async function mockLogin401(page: Page) {
  * `test.skip(!desperto, 'Render no despertó (cold-start)')`.
  */
 export async function wakeBackend(page: Page): Promise<boolean> {
+  if (IS_LOCAL_API) return true; // backend local: sin cold-start
   for (let i = 1; i <= 3; i++) {
     try {
       // Root responde 200 "API is running...". Cualquier <500 = despertó.
