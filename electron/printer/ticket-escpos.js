@@ -1,8 +1,12 @@
 const ESC = 0x1b;
 const GS = 0x1d;
 
+// Los datos vienen del backend: se quitan los caracteres de control (salvo \n) para no inyectar comandos ESC/POS.
 function text(value) {
-    return Buffer.from(String(value ?? ''), 'ascii');
+    return Buffer.from(
+        String(value ?? '').replace(/[\x00-\x09\x0B-\x1F]/g, ''),
+        'ascii'
+    );
 }
 
 function command(...bytes) {

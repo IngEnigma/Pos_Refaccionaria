@@ -28,4 +28,15 @@ describe('ticket-escpos', () => {
     expect(text).toContain('IVA 16% incluido: $27.59');
     expect(text).toContain('TOTAL $200.00');
   });
+
+  // H-17: los datos vienen del backend; un nombre con ESC/GS no debe inyectar comandos a la impresora.
+  it('H-17: filtra caracteres de control del texto antes de ESC/POS', () => {
+    const hostil = { ...ticket, productos: [{ ...ticket.productos[0], nombre: 'Ba\x1B@\x1D\x56\x00lata\tX' }] };
+    const buffer: Buffer = generateTicket(hostil);
+    const text = buffer.toString('latin1');
+    expect(text).toContain('2x Ba@VlataX');
+    // Solo quedan los comandos propios (ESC @ inicial, GS V final), no los inyectados.
+    expect(buffer.indexOf(Buffer.from([0x1d, 0x56, 0x00]))).toBe(buffer.length - 3);
+    expect(text.split('\x1B@').length - 1).toBe(1);
+  });
 });
