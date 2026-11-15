@@ -148,7 +148,7 @@ test.describe('Sucursales — SIS-030', () => {
 
     await dialog.getByLabel('Teléfono').fill('abc');
     await dialog.getByLabel('Teléfono').blur();
-    await expect(dialog.getByText('Teléfono inválido (solo números)')).toBeVisible();
+    await expect(dialog.getByText('Teléfono inválido (solo números, máx. 15)')).toBeVisible();
     await expect(submit).toBeDisabled();
     expect(posts).toHaveLength(0);
   });
