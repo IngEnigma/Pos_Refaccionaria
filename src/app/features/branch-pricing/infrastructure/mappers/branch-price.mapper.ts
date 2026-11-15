@@ -6,12 +6,19 @@ import { SetBranchPricePayload } from '@features/branch-pricing/domain/repositor
 import { BranchPriceCreateRequestDto } from '@features/branch-pricing/application/dtos/branch-price-create-request.dto';
 
 export class BranchPriceMapper {
+  /** H-36: rechaza "", null o no numérico en vez de propagar NaN a la UI. */
+  private static parsePrice(raw: string): number {
+    const value = raw === null || raw === undefined || String(raw).trim() === '' ? NaN : Number(raw);
+    if (Number.isNaN(value)) throw new Error(`precio_venta inválido: ${String(raw)}`);
+    return value;
+  }
+
   static fromResponseDto(dto: BranchPriceResponseDto): BranchPrice {
     return {
       id: dto.id,
       idProducto: dto.id_producto,
       idSucursal: dto.id_sucursal,
-      precioVenta: parseFloat(dto.precio_venta),
+      precioVenta: BranchPriceMapper.parsePrice(dto.precio_venta),
       vigenteDesde: dto.vigente_desde,
       activo: dto.activo,
     };
@@ -22,7 +29,7 @@ export class BranchPriceMapper {
       id: dto.id,
       idProducto: dto.id_producto,
       idSucursal: dto.id_sucursal,
-      precioVenta: parseFloat(dto.precio_venta),
+      precioVenta: BranchPriceMapper.parsePrice(dto.precio_venta),
       vigenteDesde: dto.vigente_desde,
       activo: dto.activo,
     };

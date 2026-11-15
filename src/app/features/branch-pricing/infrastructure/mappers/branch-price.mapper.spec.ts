@@ -55,19 +55,10 @@ describe('BranchPriceMapper', () => {
       expect(BranchPriceMapper.fromResponseDto(makeDto({ activo: false })).activo).toBe(false);
     });
 
-    // Documenta el comportamiento actual: parseFloat no valida el contrato del backend.
-    it('devuelve NaN si el backend manda un precio no numérico (no falla)', () => {
-      const price = BranchPriceMapper.fromResponseDto(makeDto({ precio_venta: 'abc' }));
-
-      expect(price.precioVenta).toBeNaN();
+    // H-36: antes parseFloat producía NaN y la tabla pintaba "$NaN".
+    it.each(['abc', '', null as unknown as string])('rechaza precio_venta inválido (%p)', (bad) => {
+      expect(() => BranchPriceMapper.fromResponseDto(makeDto({ precio_venta: bad }))).toThrow(/precio_venta/);
     });
-
-    it('devuelve NaN si el backend manda precio_venta nulo o vacío', () => {
-      expect(BranchPriceMapper.fromResponseDto(makeDto({ precio_venta: null as unknown as string })).precioVenta).toBeNaN();
-      expect(BranchPriceMapper.fromResponseDto(makeDto({ precio_venta: '' })).precioVenta).toBeNaN();
-    });
-
-    it.todo('H-36: precio_venta no numérico ("", null, "abc") debería rechazarse en el mapper en lugar de producir NaN');
   });
 
   describe('fromHistoryResponseDto', () => {
@@ -102,8 +93,8 @@ describe('BranchPriceMapper', () => {
       expect(BranchPriceMapper.fromHistoryResponseDto(makeHistory({ precio_venta: '0.00' })).precioVenta).toBe(0);
     });
 
-    it('devuelve NaN si el precio del historial no es numérico', () => {
-      expect(BranchPriceMapper.fromHistoryResponseDto(makeHistory({ precio_venta: 'x' })).precioVenta).toBeNaN();
+    it('rechaza un precio del historial no numérico (H-36)', () => {
+      expect(() => BranchPriceMapper.fromHistoryResponseDto(makeHistory({ precio_venta: 'x' }))).toThrow(/precio_venta/);
     });
   });
 

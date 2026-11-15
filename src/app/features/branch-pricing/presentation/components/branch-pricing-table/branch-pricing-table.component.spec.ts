@@ -296,12 +296,12 @@ describe('BranchPricingTableComponent', () => {
       expect(component.formatPrice(undefined as unknown as null)).toBe('—');
     });
 
-    // Documenta el comportamiento actual: un NaN no se detecta y se pinta tal cual.
-    it('pinta "$NaN" si recibe NaN', () => {
-      expect(component.formatPrice(NaN)).toBe('$NaN');
+    // H-36
+    it('muestra "—" y "Sin precio" (no "$NaN" ni "Activo") si recibe NaN', () => {
+      expect(component.formatPrice(NaN)).toBe('—');
+      expect(component.getBadgeText(NaN)).toBe('Sin precio');
     });
 
-    it.todo('H-36: formatPrice(NaN) / precioSucursal NaN debería mostrar "—" y no "$NaN" ni badge "Activo"');
   });
 
   describe('badges', () => {

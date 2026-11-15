@@ -56,15 +56,20 @@ export class BranchPricingTableComponent {
   }
 
   formatPrice(price: number | null): string {
-    if (price === null || price === undefined) return '—';
-    return `$${price.toFixed(2)}`;
+    if (!this.hasPrice(price)) return '—';
+    return `$${(price as number).toFixed(2)}`;
+  }
+
+  /** H-36: un NaN cuenta como sin precio. */
+  hasPrice(price: number | null | undefined): boolean {
+    return price !== null && price !== undefined && !Number.isNaN(price);
   }
 
   getBadgeClass(precioSucursal: number | null): string {
-    return precioSucursal !== null ? 'badge-active' : 'badge-inactive';
+    return this.hasPrice(precioSucursal) ? 'badge-active' : 'badge-inactive';
   }
 
   getBadgeText(precioSucursal: number | null): string {
-    return precioSucursal !== null ? 'Activo' : 'Sin precio';
+    return this.hasPrice(precioSucursal) ? 'Activo' : 'Sin precio';
   }
 }
