@@ -1,0 +1,527 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Manual Técnico TRT</title>
+<link rel="stylesheet" href="manual.css">
+<style>
+  @page { @bottom-left { content: "TRT · Manual técnico"; } }
+  .portada__panel pre { white-space: pre; margin: 0; border: 0; background: none; font-size: 9.6pt; line-height: 1.55; padding: 5mm 7mm 8mm; break-inside: auto; }
+  .portada__panel .barra { font: 600 8pt 'JetBrains Mono', monospace; color: var(--gris); background: #eef1f8; padding: 2.4mm 7mm; border-bottom: .5pt solid #cdd3e0; }
+</style>
+</head>
+<body>
+
+<!-- ═════════════ PORTADA ═════════════ -->
+<div class="portada">
+  <img class="portada__logo" src="img/Logo_Horizontal.webp" alt="TRT">
+  <div class="portada__titulo">
+    <p class="t1">Manual<br>técnico</p>
+    <p class="t2">Frontend del punto de venta e inventario</p>
+    <p class="t3">Para desarrolladores que mantienen FrontTRT</p>
+  </div>
+  <div class="portada__base">
+    <div class="portada__panel">
+      <div class="barra">src/app/app.config.ts</div>
+<pre><code><span class="k">export const</span> appConfig: ApplicationConfig = {
+  providers: [
+    provideZoneChangeDetection({ eventCoalescing: <span class="k">true</span> }),
+    provideAnimations(),
+    provideRouter(routes),
+    provideHttpClient(
+      withInterceptors([httpErrorInterceptor, authTokenInterceptor, trailingSlashInterceptor]),
+    ),
+    { provide: APP_ENV, useValue: environment },
+    { provide: LOGGER_PORT, useExisting: LoggerService },
+    { provide: AuthRepository, useClass: AuthRepositoryImpl },
+    { provide: SaleRepository, useClass: SaleRepositoryImpl },
+    { provide: ProductRepository, useClass: ProductRepositoryImpl },
+    { provide: STORAGE_PORT, useClass: InMemoryStorageService },
+    { provide: PERSISTENT_STORAGE_PORT, useClass: LocalStorageService },</code></pre>
+    </div>
+    <div class="portada__pie">
+      <div><b>Transmisiones y Rodamientos de Tlalnepantla</b><br>Uso interno</div>
+      <div style="text-align:right">Versión 1.0<br>Noviembre 2026</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═════════════ ÍNDICE ═════════════ -->
+<section class="indice">
+  <h1><span class="num"></span> Contenido</h1>
+  <ol>
+    <li><a href="#c1"><span class="n">1</span><span>Introducción</span><span class="l"></span><span class="pg"></span></a>
+      <ol>
+        <li><a href="#c1-1"><span></span><span>1.1 Alcance</span><span class="l"></span><span class="pg"></span></a></li>
+        <li><a href="#c1-2"><span></span><span>1.2 Convenciones</span><span class="l"></span><span class="pg"></span></a></li>
+      </ol></li>
+    <li><a href="#c2"><span class="n">2</span><span>Tecnologías y versiones</span><span class="l"></span><span class="pg"></span></a></li>
+    <li><a href="#c3"><span class="n">3</span><span>Arquitectura</span><span class="l"></span><span class="pg"></span></a>
+      <ol>
+        <li><a href="#c3-1"><span></span><span>3.1 Vista general</span><span class="l"></span><span class="pg"></span></a></li>
+        <li><a href="#c3-2"><span></span><span>3.2 Estructura de carpetas</span><span class="l"></span><span class="pg"></span></a></li>
+        <li><a href="#c3-3"><span></span><span>3.3 Capas de un módulo</span><span class="l"></span><span class="pg"></span></a></li>
+        <li><a href="#c3-4"><span></span><span>3.4 Contratos e implementaciones</span><span class="l"></span><span class="pg"></span></a></li>
+      </ol></li>
+    <li><a href="#c4"><span class="n">4</span><span>Configuración base</span><span class="l"></span><span class="pg"></span></a>
+      <ol>
+        <li><a href="#c4-1"><span></span><span>4.1 Entornos</span><span class="l"></span><span class="pg"></span></a></li>
+        <li><a href="#c4-2"><span></span><span>4.2 Interceptores HTTP</span><span class="l"></span><span class="pg"></span></a></li>
+        <li><a href="#c4-3"><span></span><span>4.3 Iconos y registro</span><span class="l"></span><span class="pg"></span></a></li>
+      </ol></li>
+    <li><a href="#c5"><span class="n">5</span><span>Autenticación y roles</span><span class="l"></span><span class="pg"></span></a>
+      <ol>
+        <li><a href="#c5-1"><span></span><span>5.1 Inicio de sesión y tokens</span><span class="l"></span><span class="pg"></span></a></li>
+        <li><a href="#c5-2"><span></span><span>5.2 Estado de sesión</span><span class="l"></span><span class="pg"></span></a></li>
+        <li><a href="#c5-3"><span></span><span>5.3 Roles</span><span class="l"></span><span class="pg"></span></a></li>
+        <li><a href="#c5-4"><span></span><span>5.4 Rutas y guardias</span><span class="l"></span><span class="pg"></span></a></li>
+      </ol></li>
+    <li><a href="#c6"><span class="n">6</span><span>Módulos y API</span><span class="l"></span><span class="pg"></span></a>
+      <ol>
+        <li><a href="#c6-1"><span></span><span>6.1 Mapa de módulos</span><span class="l"></span><span class="pg"></span></a></li>
+        <li><a href="#c6-2"><span></span><span>6.2 Flujo de una venta</span><span class="l"></span><span class="pg"></span></a></li>
+      </ol></li>
+    <li><a href="#c7"><span class="n">7</span><span>Aplicación de escritorio</span><span class="l"></span><span class="pg"></span></a>
+      <ol>
+        <li><a href="#c7-1"><span></span><span>7.1 Proceso principal</span><span class="l"></span><span class="pg"></span></a></li>
+        <li><a href="#c7-2"><span></span><span>7.2 Puente con Angular</span><span class="l"></span><span class="pg"></span></a></li>
+        <li><a href="#c7-3"><span></span><span>7.3 Ticket ESC/POS</span><span class="l"></span><span class="pg"></span></a></li>
+      </ol></li>
+    <li><a href="#c8"><span class="n">8</span><span>Pruebas y calidad</span><span class="l"></span><span class="pg"></span></a>
+      <ol>
+        <li><a href="#c8-1"><span></span><span>8.1 Comandos</span><span class="l"></span><span class="pg"></span></a></li>
+        <li><a href="#c8-2"><span></span><span>8.2 Pruebas unitarias y de integración</span><span class="l"></span><span class="pg"></span></a></li>
+        <li><a href="#c8-3"><span></span><span>8.3 Pruebas de extremo a extremo</span><span class="l"></span><span class="pg"></span></a></li>
+        <li><a href="#c8-4"><span></span><span>8.4 Análisis estático</span><span class="l"></span><span class="pg"></span></a></li>
+      </ol></li>
+    <li><a href="#c9"><span class="n">9</span><span>Agregar un módulo</span><span class="l"></span><span class="pg"></span></a></li>
+    <li><a href="#c10"><span class="n">10</span><span>Pendientes conocidos</span><span class="l"></span><span class="pg"></span></a></li>
+  </ol>
+</section>
+
+<!-- ═════════════ 1. INTRODUCCIÓN ═════════════ -->
+<section class="cap" id="c1">
+  <h1><span class="num">1</span> Introducción</h1>
+  <p class="para">Desarrolladores</p>
+  <p>FrontTRT es el frontend del sistema de punto de venta e inventario de Transmisiones y Rodamientos de Tlalnepantla (TRT). Está escrito en Angular y se distribuye como aplicación de escritorio con Electron. Todos los datos viven en un backend Django REST (repositorio RefaccionariaBack), publicado en Render.</p>
+
+  <h2 id="c1-1"><span class="num">1.1</span> Alcance</h2>
+  <p>Este manual cubre el código de este repositorio: la estructura, la configuración, la sesión y los roles, los módulos funcionales con sus endpoints, la capa de Electron y las pruebas. El backend aparece solo como contrato: qué rutas llama el frontend y qué espera recibir.</p>
+  <p>La compilación de instaladores y su instalación en las cajas están en el <b>Manual de despliegue</b>. El uso de cada pantalla está en el <b>Manual de usuario</b>.</p>
+
+  <h2 id="c1-2"><span class="num">1.2</span> Convenciones</h2>
+  <p>Las rutas de archivo, comandos y nombres de código se escriben así: <code>src/app/app.config.ts</code>. Las rutas de archivo parten de la raíz del repositorio. Los bloques marcados como <i>Terminal</i> se ejecutan en una consola abierta en esa raíz.</p>
+  <p>Las notas usan los mismos tipos que el manual de usuario. <b style="color:var(--azul)">Nota</b> aclara algo, <b style="color:var(--verde)">Consejo</b> es una recomendación y <b style="color:var(--rojo)">Importante</b> marca lo que rompe la aplicación si se ignora.</p>
+</section>
+
+<!-- ═════════════ 2. TECNOLOGÍAS ═════════════ -->
+<section class="cap" id="c2">
+  <h1><span class="num">2</span> Tecnologías y versiones</h1>
+  <p class="para">Desarrolladores</p>
+  <p>Las versiones salen de <code>package.json</code>. El símbolo <code>^</code> acepta actualizaciones menores; <code>package-lock.json</code> fija la versión exacta que se instala.</p>
+  <table class="ancha">
+    <thead><tr><th style="width:30%">Paquete</th><th style="width:16%">Versión</th><th>Uso</th></tr></thead>
+    <tbody>
+      <tr><td><b>Angular</b> (core, router, forms, cdk)</td><td>^18.2</td><td>Framework de la interfaz. Componentes standalone, signals y carga diferida de rutas.</td></tr>
+      <tr><td><b>TypeScript</b></td><td>~5.5.2</td><td>Lenguaje del proyecto, en modo estricto.</td></tr>
+      <tr><td><b>RxJS</b></td><td>~7.8</td><td>Peticiones HTTP, reintentos y renovación de token.</td></tr>
+      <tr><td><b>Electron</b></td><td>^40.7</td><td>Contenedor de escritorio y puente con la impresora.</td></tr>
+      <tr><td><b>electron-builder</b></td><td>^26.8</td><td>Genera AppImage, .deb y el instalador NSIS de Windows.</td></tr>
+      <tr><td><b>lucide-angular</b></td><td>^0.577</td><td>Iconos.</td></tr>
+      <tr><td><b>fuse.js</b></td><td>^7.1</td><td>Búsqueda aproximada en listas.</td></tr>
+      <tr><td><b>@node-escpos/core</b></td><td>^0.6</td><td>Instalado para la impresora térmica. El ticket se arma hoy con código propio (sección 7.3).</td></tr>
+      <tr><td><b>Jest</b> + jest-preset-angular</td><td>^29.7 / ^14.6</td><td>Pruebas unitarias y de integración, con Testing Library y ng-mocks.</td></tr>
+      <tr><td><b>Playwright</b> + axe-core</td><td>^1.63 / ^4.13</td><td>Pruebas de extremo a extremo y de accesibilidad.</td></tr>
+      <tr><td><b>ESLint</b> + angular-eslint</td><td>^9.15 / 18.4.3</td><td>Análisis estático.</td></tr>
+    </tbody>
+  </table>
+  <div class="caja nota"><b class="t">Node.js</b><div><p>El repositorio no fija versión de Node. La compilación de producción de noviembre de 2026 se hizo con Node 22.23.4 y npm 10.9.9. Angular 18 acepta Node 18.19, 20.11 o 22.</p></div></div>
+</section>
+
+<!-- ═════════════ 3. ARQUITECTURA ═════════════ -->
+<section class="cap" id="c3">
+  <h1><span class="num">3</span> Arquitectura</h1>
+  <p class="para">Desarrolladores</p>
+
+  <h2 id="c3-1"><span class="num">3.1</span> Vista general</h2>
+  <p>La aplicación corre en dos procesos. El proceso principal de Electron abre la ventana y atiende la impresión. El proceso de la ventana carga la aplicación Angular, que habla con el backend por HTTP y con Electron por el objeto <code>window.desktop</code>.</p>
+  <p>Cada módulo funcional sigue una arquitectura por capas. Las pantallas llaman a una fachada; la fachada usa casos de uso; los casos de uso dependen de contratos de repositorio declarados en el dominio. Las implementaciones HTTP de esos contratos viven en infraestructura y se conectan en <code>app.config.ts</code>.</p>
+  <figure class="ancha">
+    <svg viewBox="0 0 660 300" xmlns="http://www.w3.org/2000/svg" font-family="Archivo, sans-serif">
+      <defs><marker id="f" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#233387"/></marker></defs>
+      <rect x="1" y="1" width="438" height="298" rx="4" fill="none" stroke="#98a2bd" stroke-dasharray="4 3"/>
+      <text x="14" y="20" font-size="11" font-weight="700" fill="#596277">Proceso de la ventana (Angular)</text>
+      <g font-size="12">
+        <rect x="20" y="34" width="250" height="54" rx="3" fill="#fff" stroke="#233387" stroke-width="1.4"/>
+        <text x="34" y="56" font-weight="700" fill="#18235f">Presentación</text>
+        <text x="34" y="75" font-size="10.5" fill="#596277">páginas, componentes, estado del carrito</text>
+        <rect x="20" y="124" width="250" height="54" rx="3" fill="#fff" stroke="#233387" stroke-width="1.4"/>
+        <text x="34" y="146" font-weight="700" fill="#18235f">Aplicación</text>
+        <text x="34" y="165" font-size="10.5" fill="#596277">fachadas, casos de uso, DTO de entrada</text>
+        <rect x="20" y="214" width="250" height="54" rx="3" fill="#233387"/>
+        <text x="34" y="236" font-weight="700" fill="#fff">Dominio</text>
+        <text x="34" y="255" font-size="10.5" fill="#dfe4f3">entidades, contratos de repositorio, errores</text>
+        <rect x="300" y="214" width="124" height="54" rx="3" fill="#fff" stroke="#233387" stroke-width="1.4"/>
+        <text x="312" y="236" font-weight="700" fill="#18235f">Infraestructura</text>
+        <text x="312" y="255" font-size="10.5" fill="#596277">repos HTTP, mappers</text>
+        <rect x="300" y="124" width="124" height="54" rx="3" fill="#eef1f8" stroke="#98a2bd"/>
+        <text x="312" y="146" font-weight="700" fill="#18235f">core · shared</text>
+        <text x="312" y="165" font-size="10.5" fill="#596277">interceptores, UI base</text>
+        <rect x="500" y="214" width="148" height="54" rx="3" fill="#f5b82e"/>
+        <text x="512" y="236" font-weight="700" fill="#18235f">API Django REST</text>
+        <text x="512" y="255" font-size="10.5" fill="#18235f">Render · /api</text>
+        <rect x="500" y="34" width="148" height="54" rx="3" fill="#fff" stroke="#98a2bd"/>
+        <text x="512" y="56" font-weight="700" fill="#18235f">Proceso principal</text>
+        <text x="512" y="75" font-size="10.5" fill="#596277">Electron · impresión</text>
+      </g>
+      <g stroke="#233387" stroke-width="1.4" fill="none" marker-end="url(#f)">
+        <path d="M145 88V122"/><path d="M145 178V212"/><path d="M300 241H272"/><path d="M424 241H498"/><path d="M270 61H498" stroke-dasharray="4 3"/>
+      </g>
+      <g font-size="10" fill="#596277">
+        <text x="152" y="109">usa</text><text x="152" y="199">depende de</text>
+        <text x="430" y="234">HttpClient</text><text x="300" y="54">window.desktop (IPC)</text>
+      </g>
+    </svg>
+    <figcaption>Capas del frontend. Las flechas indican quién depende de quién; el dominio no importa nada de las otras capas.</figcaption>
+  </figure>
+
+  <h2 id="c3-2"><span class="num">3.2</span> Estructura de carpetas</h2>
+<pre class="ancha"><code>electron/                 proceso principal de Electron
+  main.js                 ventana, seguridad y carga de Angular
+  preload.js              expone window.desktop
+  ipc/                    canales window:* y printer:*
+  printer/ticket-escpos.js
+src/
+  env/                    environment.ts, .local.ts, .prod.ts
+  app/
+    app.config.ts         proveedores, interceptores y contratos
+    app.routes.ts         rutas con guardias y carga diferida
+    core/                 HTTP, interceptores, logging, puertos, almacenamiento
+    shared/ui/            botón, campos, toast, diálogo, menú desplegable
+    shell/                layout principal, menú lateral, barra superior
+    features/             un directorio por módulo (sección 6.1)
+e2e/                      pruebas Playwright, helpers y fixtures
+docs/                     planes de prueba, casos de sistema y manuales</code></pre>
+  <p>Los imports usan alias en lugar de rutas relativas. Están declarados en <code>tsconfig.json</code> y repetidos en <code>jest.config.js</code> para las pruebas.</p>
+  <table>
+    <thead><tr><th>Alias</th><th>Apunta a</th></tr></thead>
+    <tbody>
+      <tr><td><code>@app/*</code></td><td><code>src/app/*</code></td></tr>
+      <tr><td><code>@core/*</code></td><td><code>src/app/core/*</code></td></tr>
+      <tr><td><code>@shared/*</code></td><td><code>src/app/shared/*</code></td></tr>
+      <tr><td><code>@features/*</code></td><td><code>src/app/features/*</code></td></tr>
+      <tr><td><code>@shell/*</code></td><td><code>src/app/shell/*</code></td></tr>
+      <tr><td><code>@env/*</code></td><td><code>src/env/*</code></td></tr>
+    </tbody>
+  </table>
+  <div class="caja importante"><b class="t">Importante</b><div><p>Si se agrega un alias en <code>tsconfig.json</code>, hay que agregarlo también en <code>moduleNameMapper</code> de <code>jest.config.js</code>. Sin él, la compilación pasa y las pruebas fallan con «Cannot find module».</p></div></div>
+
+  <h2 id="c3-3"><span class="num">3.3</span> Capas de un módulo</h2>
+  <p>El módulo de ventas, <code>src/app/features/sales/</code>, tiene las cuatro capas completas y sirve de referencia para los demás.</p>
+  <table class="ancha">
+    <thead><tr><th style="width:18%">Capa</th><th style="width:34%">Carpetas</th><th>Ejemplos en ventas</th></tr></thead>
+    <tbody>
+      <tr><td><b>Dominio</b></td><td><code>domain/entities</code>, <code>repository</code>, <code>value-objects</code>, <code>errors</code></td><td><code>Sale</code>, <code>SaleTicket</code>, el contrato abstracto <code>SaleRepository</code>.</td></tr>
+      <tr><td><b>Aplicación</b></td><td><code>application/facades</code>, <code>usecase</code>, <code>dtos</code>, <code>mappers</code>, <code>strategies</code></td><td><code>SalesFacade</code>, <code>CreateCompleteSaleUseCase</code>, <code>GetSaleTicketUseCase</code>.</td></tr>
+      <tr><td><b>Infraestructura</b></td><td><code>infrastructure/repositories</code>, <code>dtos</code>, <code>mappers</code>, <code>utils</code></td><td><code>SaleRepositoryImpl</code>, que traduce los DTO del backend a entidades.</td></tr>
+      <tr><td><b>Presentación</b></td><td><code>presentation/pages</code>, <code>components</code>, <code>state</code>, <code>models</code></td><td><code>SalesPage</code>, <code>TicketModalComponent</code>, <code>SalesCartService</code>.</td></tr>
+    </tbody>
+  </table>
+  <p>Los DTO reflejan los nombres del backend (<code>id_metodo_pago</code>, <code>precio_unitario</code>). Los mappers de infraestructura los convierten a entidades con nombres del dominio, así un cambio de nombre en el backend se corrige en un solo archivo.</p>
+  <p>Los componentes son standalone, declaran <code>ChangeDetectionStrategy.OnPush</code> y reciben datos con <code>input()</code> y <code>output()</code>. El estado de pantalla se guarda en signals dentro de fachadas o servicios de estado.</p>
+
+  <h2 id="c3-4"><span class="num">3.4</span> Contratos e implementaciones</h2>
+  <p>Cada repositorio es una clase abstracta en el dominio. <code>app.config.ts</code> asigna la implementación con <code>useClass</code>. Un componente o caso de uso inyecta el contrato y nunca la clase concreta, por eso en las pruebas basta con proveer un doble del contrato.</p>
+<pre><code>{ provide: SaleRepository, useClass: SaleRepositoryImpl },
+{ provide: ProductRepository, useClass: ProductRepositoryImpl },
+{ provide: STORAGE_PORT, useClass: InMemoryStorageService },
+{ provide: PERSISTENT_STORAGE_PORT, useClass: LocalStorageService },
+{ provide: LOGGER_PORT, useExisting: LoggerService },</code></pre>
+  <p class="fuente">Extracto de <code>src/app/app.config.ts</code>.</p>
+  <p>Hay contratos registrados para autenticación, perfil, ventas, detalle de venta, métodos de pago, tipos de producto, productos, inventario por sucursal, movimientos, precios por sucursal, sucursales, clientes, proveedores, usuarios, reportes y notificaciones. Además del almacenamiento y el logger, existen estos tokens:</p>
+  <table>
+    <thead><tr><th style="width:42%">Token</th><th>Valor</th></tr></thead>
+    <tbody>
+      <tr><td><code>APP_ENV</code></td><td>El objeto <code>environment</code> del entorno compilado.</td></tr>
+      <tr><td><code>LOGGING_LEVEL_TOKEN</code></td><td><code>ERROR</code> si <code>production</code> es verdadero; <code>DEBUG</code> en otro caso.</td></tr>
+      <tr><td><code>SEARCH_STRATEGY</code></td><td><code>DefaultSearchStrategy</code>, usada por el buscador de la barra superior.</td></tr>
+      <tr><td><code>DESKTOP_PORT</code></td><td><code>window.desktop</code> dentro de Electron; <code>null</code> en el navegador.</td></tr>
+      <tr><td><code>SHELL_*</code></td><td>Usuario, rol, sesión y cierre de sesión para el layout, sin que el shell importe el módulo de autenticación.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ═════════════ 4. CONFIGURACIÓN ═════════════ -->
+<section class="cap" id="c4">
+  <h1><span class="num">4</span> Configuración base</h1>
+  <p class="para">Desarrolladores</p>
+
+  <h2 id="c4-1"><span class="num">4.1</span> Entornos</h2>
+  <p>La interfaz <code>Environment</code> tiene tres campos: <code>production</code>, <code>loggingLevel</code> y <code>apiUrl</code>. <code>angular.json</code> sustituye <code>environment.ts</code> según la configuración de compilación.</p>
+  <table class="ancha">
+    <thead><tr><th style="width:18%">Configuración</th><th style="width:25%">Archivo</th><th style="width:33%">apiUrl</th><th>Se usa con</th></tr></thead>
+    <tbody>
+      <tr><td><b>development</b></td><td><code>environment.ts</code></td><td><code>https://refaccionariaback.onrender.com/api</code></td><td><code>npm start</code> (predeterminada)</td></tr>
+      <tr><td><b>local</b></td><td><code>environment.local.ts</code></td><td><code>http://127.0.0.1:8000/api</code></td><td><code>npm run e2e:local</code>, backend Django en la misma máquina</td></tr>
+      <tr><td><b>production</b></td><td><code>environment.prod.ts</code></td><td><code>https://refaccionariaback.onrender.com/api</code></td><td><code>npm run build:prod</code> y los instaladores</td></tr>
+    </tbody>
+  </table>
+  <p>La configuración <code>production</code> también fija <code>baseHref: "./"</code>, para que Electron cargue los archivos con rutas relativas desde disco, y aplica estos presupuestos de tamaño:</p>
+  <table>
+    <thead><tr><th>Presupuesto</th><th>Aviso</th><th>Error</th></tr></thead>
+    <tbody>
+      <tr><td>Paquete inicial</td><td>500 kB</td><td>1 MB</td></tr>
+      <tr><td>Estilos de un componente</td><td>4 kB</td><td>8 kB</td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="c4-2"><span class="num">4.2</span> Interceptores HTTP</h2>
+  <p>El cliente HTTP se registra con tres interceptores funcionales, en este orden:</p>
+<pre><code>provideHttpClient(
+  withInterceptors([httpErrorInterceptor, authTokenInterceptor, trailingSlashInterceptor]),
+)</code></pre>
+  <h3>httpErrorInterceptor</h3>
+  <p>Reintenta y centraliza los errores. Solo reintenta peticiones <code>GET</code>, hasta 2 veces, con espera exponencial desde 500 ms. Reintenta ante los códigos 0 (sin conexión), 502, 503 y 504, que son los que da Render mientras arranca. Al agotar los intentos, entrega el error a <code>HttpErrorHandlerService</code>, que lo registra en el logger. La configuración está en <code>src/app/core/config/http-retry.config.ts</code>.</p>
+  <h3>authTokenInterceptor</h3>
+  <p>Agrega el encabezado <code>Authorization: Bearer</code> con el token de acceso. Si la respuesta es 401, pide un token nuevo a <code>/token/refresh</code> y repite la petición una sola vez. Si la renovación falla, el error llega a quien hizo la petición; si la sesión ni siquiera tiene token de renovación, se limpia. <code>AuthTokenRefreshOrchestrator</code> comparte una sola renovación entre las peticiones que reciben 401 al mismo tiempo.</p>
+  <h3>trailingSlashInterceptor</h3>
+  <p>Django exige la diagonal final en casi todas sus rutas. El interceptor la agrega a toda petición dirigida a <code>apiUrl</code> que no la tenga. Las rutas definidas sin diagonal en el backend (<code>login</code>, <code>token/refresh</code>, <code>users</code> y <code>users/&lt;id&gt;</code>) se excluyen con el contexto <code>withoutTrailingSlash()</code>.</p>
+<pre><code>this.http.post(url, body, { context: withoutTrailingSlash() });</code></pre>
+  <div class="caja aviso"><b class="t">Error 404 en login</b><div><p>Si una ruta nueva del backend no lleva diagonal y el repositorio no pasa <code>withoutTrailingSlash()</code>, Django responde 404. Revisa <code>usuario/urls.py</code> en RefaccionariaBack antes de agregar el endpoint.</p></div></div>
+
+  <h2 id="c4-3"><span class="num">4.3</span> Iconos y registro</h2>
+  <p>Los iconos de lucide se registran uno por uno con <code>LucideAngularModule.pick()</code> en <code>app.config.ts</code>. Un icono que se usa en una plantilla y no está registrado no aparece, y en algunas tablas detiene el render de la fila completa. <code>pick()</code> registra por nombre de clave: por eso existe la entrada <code>ArrowLeftRight: ArrowLeftRightIcon</code>, que usa Inventario Sucursal.</p>
+  <p>El logger (<code>LoggerService</code>) escribe en consola con contexto por clase (<code>withContext('SessionStateService')</code>). En producción solo registra errores.</p>
+</section>
+
+<!-- ═════════════ 5. AUTENTICACIÓN ═════════════ -->
+<section class="cap" id="c5">
+  <h1><span class="num">5</span> Autenticación y roles</h1>
+  <p class="para">Desarrolladores</p>
+
+  <h2 id="c5-1"><span class="num">5.1</span> Inicio de sesión y tokens</h2>
+  <ol class="pasos">
+    <li><code>POST /api/login</code> recibe usuario y contraseña y devuelve el token de acceso, el de renovación y los datos del usuario, entre ellos <code>rol</code>.</li>
+    <li><code>AuthSessionMapper</code> arma la entidad <code>Session</code> y deduce el rol (sección 5.3).</li>
+    <li>El frontend pide <code>GET /api/perfil/</code> para obtener la sucursal asignada. Sin sucursal, la pantalla de acceso muestra <i>Tu usuario no tiene sucursal asignada.</i></li>
+    <li>La sesión se guarda en <code>SessionStateService</code> y el usuario entra a <code>/sales</code>.</li>
+  </ol>
+  <p>El token de acceso es un JWT. <code>JwtUtils</code> lee su expiración sin validar la firma; la validación real la hace el backend en cada petición.</p>
+
+  <h2 id="c5-2"><span class="num">5.2</span> Estado de sesión</h2>
+  <p><code>SessionStateService</code> guarda la sesión en un signal privado y expone versiones de solo lectura: <code>session</code>, <code>isAuthenticated</code>, <code>username</code>, <code>role</code> y <code>currentSucursalId</code>. Ventas e inventario leen <code>currentSucursalId</code> para filtrar existencias y precios.</p>
+  <table class="ancha">
+    <thead><tr><th style="width:28%">Almacén</th><th style="width:26%">Llave</th><th>Cuándo se usa</th></tr></thead>
+    <tbody>
+      <tr><td><code>STORAGE_PORT</code> (memoria)</td><td><code>session</code></td><td>Siempre. Se pierde al cerrar o recargar la ventana.</td></tr>
+      <tr><td><code>PERSISTENT_STORAGE_PORT</code> (localStorage)</td><td><code>session</code>, <code>session:remember</code></td><td>Solo si se pidió recordar la sesión. Al arrancar, si el token guardado ya expiró, se borran ambas llaves.</td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="c5-3"><span class="num">5.3</span> Roles</h2>
+  <p>El backend maneja tres roles en el campo <code>user.rol</code>. <code>mapAuthUserRole</code> los traduce al enum <code>UserRole</code> del frontend. Si el login no trae <code>rol</code>, el rol se deduce de <code>isadmin</code> e <code>isstaff</code>.</p>
+  <table>
+    <thead><tr><th>user.rol</th><th>UserRole</th><th>Sin rol: se deduce si</th></tr></thead>
+    <tbody>
+      <tr><td><code>admin</code></td><td><code>Admin</code> (<code>admin</code>)</td><td><code>isadmin</code> y <code>isstaff</code></td></tr>
+      <tr><td><code>encargado</code></td><td><code>Manager</code> (<code>manager</code>)</td><td>solo <code>isstaff</code></td></tr>
+      <tr><td><code>cajero</code></td><td><code>Seller</code> (<code>seller</code>)</td><td>ningún indicador</td></tr>
+    </tbody>
+  </table>
+  <div class="caja aviso"><b class="t">Admin sin perfil</b><div><p>El backend responde <code>rol: "cajero"</code> para un superusuario que no tiene registro de Perfil. Ese administrador entra como cajero y no ve Administración. Hay que crearle un Perfil con <code>rol=admin</code> (registrado como H-56).</p></div></div>
+  <p>El rol en el frontend solo decide qué se muestra. Los permisos reales los aplica el backend: si un cajero llama a un endpoint de gerente, la API responde 403 y el frontend muestra el error.</p>
+
+  <h2 id="c5-4"><span class="num">5.4</span> Rutas y guardias</h2>
+  <p>Los nombres de ruta están en <code>src/app/app-routes.ts</code>. Toda ruta privada usa <code>authGuard</code>, que sin sesión redirige a <code>/login</code> y guarda la ruta pedida en <code>redirectTo</code>. Las rutas restringidas agregan <code>roleGuard</code> con la lista de roles en <code>data.roles</code>. Cualquier ruta desconocida lleva a <code>/login</code>.</p>
+  <table class="ancha">
+    <thead><tr><th style="width:26%">Ruta</th><th style="width:26%">Pantalla en el menú</th><th>Roles</th></tr></thead>
+    <tbody>
+      <tr><td><code>/sales</code></td><td>Menú (punto de venta)</td><td>todos</td></tr>
+      <tr><td><code>/inventory</code></td><td>Inventario</td><td>todos</td></tr>
+      <tr><td><code>/reports</code></td><td>Reportes</td><td>todos (generar es de gerente)</td></tr>
+      <tr><td><code>/history</code></td><td>Historial</td><td>todos</td></tr>
+      <tr><td><code>/suppliers</code></td><td>Proveedores</td><td>todos</td></tr>
+      <tr><td><code>/clients</code></td><td>Clientes</td><td>todos</td></tr>
+      <tr><td><code>/notifications</code></td><td>Notificaciones</td><td>todos</td></tr>
+      <tr><td><code>/inventory-by-branch</code></td><td>Inventario Sucursal</td><td>admin, manager</td></tr>
+      <tr><td><code>/manager</code></td><td>Cajeros</td><td>admin, manager</td></tr>
+      <tr><td><code>/branches</code></td><td>Sucursales</td><td>admin</td></tr>
+      <tr><td><code>/branch-pricing</code></td><td>Precios por Sucursal</td><td>admin</td></tr>
+      <tr><td><code>/admin</code></td><td>Administración</td><td>admin</td></tr>
+    </tbody>
+  </table>
+  <p>El menú lateral se arma con <code>src/app/shell/config/sidebar-menu.defaults.ts</code>. Cada entrada lleva su propia lista <code>roles</code>, que debe coincidir con la de la ruta: si no coinciden, la opción aparece y la guardia la rechaza, o la ruta existe y nadie la ve en el menú.</p>
+</section>
+
+<!-- ═════════════ 6. MÓDULOS ═════════════ -->
+<section class="cap" id="c6">
+  <h1><span class="num">6</span> Módulos y API</h1>
+  <p class="para">Desarrolladores</p>
+
+  <h2 id="c6-1"><span class="num">6.1</span> Mapa de módulos</h2>
+  <p>Cada carpeta de <code>src/app/features/</code> se carga de forma diferida desde <code>app.routes.ts</code>. Los endpoints son relativos a <code>apiUrl</code>.</p>
+  <table class="ancha">
+    <thead><tr><th style="width:22%">Módulo</th><th style="width:38%">Endpoints principales</th><th>Qué hace</th></tr></thead>
+    <tbody>
+      <tr><td><code>auth</code></td><td><code>/login</code>, <code>/token/refresh</code>, <code>/perfil/</code></td><td>Acceso, renovación de token, perfil y guardias.</td></tr>
+      <tr><td><code>sales</code></td><td><code>/ventas/</code>, <code>/ventas/&lt;id&gt;/ticket/</code>, <code>/detalleventa/</code>, <code>/metodopago</code>, <code>/tipos</code></td><td>Punto de venta, carrito, cobro y ticket.</td></tr>
+      <tr><td><code>sales-history</code></td><td><code>/ventas/</code></td><td>Lista y detalle de ventas registradas.</td></tr>
+      <tr><td><code>inventory</code></td><td><code>/productos</code>, <code>/productos/codigo-barras/</code></td><td>Catálogo de la sucursal: alta, edición y baja.</td></tr>
+      <tr><td><code>inventory-by-branch</code></td><td><code>/inventarios</code>, <code>/inventarios/mi-sucursal/</code>, <code>/movimientos-inventario/</code>, <code>/detalles-inventario/bulk/</code></td><td>Existencias por sucursal y movimientos de entrada y salida. <code>mi-sucursal</code> también alimenta el punto de venta.</td></tr>
+      <tr><td><code>branch-pricing</code></td><td><code>/precios-sucursal</code>, <code>…/historial/</code></td><td>Precio especial de un producto en una sucursal.</td></tr>
+      <tr><td><code>branches</code></td><td><code>/sucursales</code></td><td>Alta y edición de sucursales (admin).</td></tr>
+      <tr><td><code>clients</code></td><td><code>/clientes</code></td><td>Registro de clientes.</td></tr>
+      <tr><td><code>suppliers</code></td><td><code>/proveedores</code></td><td>Directorio de proveedores.</td></tr>
+      <tr><td><code>users</code>, <code>admin</code></td><td><code>/users</code></td><td>Usuarios con rol y sucursal (pantalla Administración).</td></tr>
+      <tr><td><code>manager</code></td><td>ninguno</td><td>Pantalla Cajeros. Hoy no guarda datos (capítulo 10).</td></tr>
+      <tr><td><code>reports</code></td><td><code>/reporte/</code></td><td>Pide el PDF del periodo y lo abre en otra ventana.</td></tr>
+      <tr><td><code>notifications</code></td><td><code>/notifications</code>, <code>…/mark-all/</code></td><td>Avisos con contador en la barra superior, por consulta periódica.</td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="c6-2"><span class="num">6.2</span> Flujo de una venta</h2>
+  <p>La venta es el flujo con más reglas del sistema. Así recorre las capas:</p>
+  <ol class="pasos">
+    <li><code>SalesPage</code> carga los productos y su precio desde <code>/inventarios/mi-sucursal/</code>, la única fuente de stock y precio del punto de venta, y los métodos de pago. El lector de código de barras escribe en un campo y la búsqueda se hace sobre esa lista local, sin llamar a la API.</li>
+    <li><code>SalesCartService</code> guarda las líneas del carrito en signals y calcula subtotal, IVA y total. Los precios del catálogo no incluyen IVA; el carrito suma el 16 %.</li>
+    <li>Al cobrar, la página vuelve a pedir <code>mi-sucursal</code> y compara el carrito con el stock actual. Si otra caja vendió piezas, se detiene antes de enviar nada. Si todo cuadra, <code>SalesFacade</code> llama a <code>CreateCompleteSaleUseCase</code>.</li>
+    <li>Una sola petición <code>POST /ventas/</code> con el arreglo <code>detalles</code> crea cabecera, líneas y salidas de stock dentro de una transacción del backend. Si una línea falla, no queda venta a medias ni stock descontado.</li>
+    <li>El caso de uso pide <code>GET /ventas/&lt;id&gt;/ticket/</code> y la página abre <code>TicketModalComponent</code>. Dentro de Electron, el ticket se envía también a <code>window.desktop.generateTicket</code>.</li>
+  </ol>
+  <div class="caja importante"><b class="t">Importante</b><div><p>Si la venta se registró y falla la petición del ticket, el frontend avisa y no reintenta la venta. Repetir el <code>POST</code> crearía una venta duplicada y descontaría el stock dos veces.</p><p><code>DELETE /ventas/&lt;id&gt;/</code> no sirve como deshacer: exige el permiso <code>ventas.anular</code>, que el cajero no tiene, y marca la venta como cancelada en lugar de borrarla.</p></div></div>
+</section>
+
+<!-- ═════════════ 7. ELECTRON ═════════════ -->
+<section class="cap" id="c7">
+  <h1><span class="num">7</span> Aplicación de escritorio</h1>
+  <p class="para">Desarrolladores</p>
+
+  <h2 id="c7-1"><span class="num">7.1</span> Proceso principal</h2>
+  <p><code>electron/main.js</code> crea una ventana de 1200 × 800. En desarrollo carga <code>http://localhost:4200</code>; empaquetada, o con <code>npm run electron:prod</code>, carga el <code>index.html</code> de <code>dist/front-trt/browser/</code>. Si no lo encuentra, se detiene con un mensaje que pide correr <code>npm run build:prod</code>.</p>
+  <p>La ventana se abre con <code>contextIsolation: true</code>, <code>nodeIntegration: false</code> y <code>sandbox: true</code>, así que el código de Angular no tiene acceso a Node. El proceso principal también bloquea ventanas nuevas y cualquier navegación fuera del origen de confianza: archivos locales en producción y <code>localhost:4200</code> en desarrollo.</p>
+  <div class="caja aviso"><b class="t">Reportes en Electron</b><div><p>Reportes abre el PDF con <code>window.open</code> sobre una URL <code>blob:</code>. <code>setWindowOpenHandler</code> responde <code>deny</code> a toda ventana nueva, así que en la aplicación empaquetada el reporte probablemente no se abre. No se probó en el instalador. Si se confirma, la corrección va en ese manejador: permitir solo URLs <code>blob:</code> del propio origen y seguir negando las externas.</p></div></div>
+
+  <h2 id="c7-2"><span class="num">7.2</span> Puente con Angular</h2>
+  <p><code>electron/preload.js</code> publica el objeto <code>window.desktop</code> con <code>contextBridge</code>. Es la única puerta entre la interfaz y el sistema operativo.</p>
+  <table class="ancha">
+    <thead><tr><th style="width:34%">Función</th><th style="width:30%">Canal IPC</th><th>Qué hace</th></tr></thead>
+    <tbody>
+      <tr><td><code>minimize()</code></td><td><code>window:minimize</code></td><td>Minimiza la ventana.</td></tr>
+      <tr><td><code>close()</code></td><td><code>window:close</code></td><td>Cierra la ventana.</td></tr>
+      <tr><td><code>getAppVersion()</code></td><td><code>app:getVersion</code></td><td>Devuelve la versión de <code>package.json</code>.</td></tr>
+      <tr><td><code>printTest()</code></td><td><code>printer:test</code></td><td>Comprueba que el canal de impresión responde.</td></tr>
+      <tr><td><code>generateTicket(ticket)</code></td><td><code>printer:generate-ticket</code></td><td>Arma el ticket ESC/POS y devuelve <code>success</code>, el tamaño en bytes y una vista previa en texto.</td></tr>
+    </tbody>
+  </table>
+  <p>Angular no lee <code>window.desktop</code> directamente. Lo inyecta con el token <code>DESKTOP_PORT</code>, que vale <code>null</code> fuera de Electron. Con <code>null</code>, el modal del ticket muestra <i>Ticket listo para reimpresión (modo web)</i> y no intenta imprimir. Esto permite correr la aplicación con <code>npm start</code> en un navegador.</p>
+
+  <h2 id="c7-3"><span class="num">7.3</span> Ticket ESC/POS</h2>
+  <p><code>electron/printer/ticket-escpos.js</code> arma el ticket byte por byte para una impresora térmica de 42 columnas: centrado, negritas, doble tamaño, avance de papel y corte. Los textos vienen del backend, así que la función <code>text()</code> quita los caracteres de control (salvo el salto de línea) para que un nombre de producto no pueda inyectar comandos en la impresora.</p>
+  <div class="caja importante"><b class="t">Impresión pendiente</b><div><p>Hoy el canal <code>printer:generate-ticket</code> genera el búfer y la vista previa, pero no lo envía a ningún dispositivo. <code>@node-escpos/usb-adapter</code> está instalado y no se usa. Para imprimir falta abrir la impresora USB en <code>electron/ipc/printer.ipc.js</code> y escribir el búfer.</p></div></div>
+</section>
+
+<!-- ═════════════ 8. PRUEBAS ═════════════ -->
+<section class="cap" id="c8">
+  <h1><span class="num">8</span> Pruebas y calidad</h1>
+  <p class="para">Desarrolladores</p>
+
+  <h2 id="c8-1"><span class="num">8.1</span> Comandos</h2>
+  <table class="ancha">
+    <thead><tr><th style="width:34%">Comando</th><th>Qué hace</th></tr></thead>
+    <tbody>
+      <tr><td><code>npm start</code></td><td>Servidor de desarrollo en <code>http://localhost:4200</code> contra el backend de Render.</td></tr>
+      <tr><td><code>npm run electron:dev</code></td><td>Servidor de desarrollo y Electron al mismo tiempo.</td></tr>
+      <tr><td><code>npm test</code></td><td>Todas las pruebas Jest.</td></tr>
+      <tr><td><code>npm run test:coverage</code></td><td>Jest con cobertura en <code>coverage/</code> y revisión de umbrales.</td></tr>
+      <tr><td><code>npm run test:integration</code></td><td>Solo los archivos <code>*.integration.spec.ts</code>.</td></tr>
+      <tr><td><code>npm run e2e</code></td><td>Playwright con la API simulada. Levanta <code>ng serve</code> si no está corriendo.</td></tr>
+      <tr><td><code>npm run e2e:local</code></td><td>Playwright contra un backend Django local (sección 8.3).</td></tr>
+      <tr><td><code>npm run a11y</code></td><td>Pruebas de accesibilidad con axe.</td></tr>
+      <tr><td><code>npm run lint</code></td><td>ESLint sobre todo el proyecto.</td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="c8-2"><span class="num">8.2</span> Pruebas unitarias y de integración</h2>
+  <p>Jest corre los archivos <code>src/**/*.spec.ts</code>: 181 archivos, de los cuales 16 son de integración. Las pruebas de integración conectan las capas reales y sustituyen solo el HTTP con <code>HttpTestingController</code>; por ejemplo, <code>create-complete-sale.integration.spec.ts</code> recorre caso de uso, repositorio y cliente HTTP con el contrato real de <code>POST /ventas/</code>.</p>
+  <p>La corrida del 15 de noviembre de 2026 terminó con las 1584 pruebas en verde. La cobertura registrada ese día en <code>docs/plan-pruebas-admin-auth-ventas.md</code> es de 85.3 % de líneas. <code>jest.config.js</code> exige umbrales mínimos por módulo:</p>
+  <table>
+    <thead><tr><th>Ámbito</th><th class="c">Líneas</th><th class="c">Ramas</th><th class="c">Funciones</th></tr></thead>
+    <tbody>
+      <tr><td>Global</td><td class="c">28 %</td><td class="c">20 %</td><td class="c">20 %</td></tr>
+      <tr><td><code>features/auth</code></td><td class="c">90 %</td><td class="c">94 %</td><td class="c">95 %</td></tr>
+      <tr><td><code>features/sales</code></td><td class="c">85 %</td><td class="c">94 %</td><td class="c">91 %</td></tr>
+      <tr><td><code>features/branch-pricing</code></td><td class="c">85 %</td><td class="c">96 %</td><td class="c">100 %</td></tr>
+      <tr><td><code>features/admin</code>, <code>branches</code>, <code>users</code></td><td class="c">80 %</td><td class="c">81 a 100 %</td><td class="c">100 %</td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="c8-3"><span class="num">8.3</span> Pruebas de extremo a extremo</h2>
+  <p>Las pruebas de <code>e2e/</code> usan Chromium. Las normales interceptan las llamadas a la API con <code>page.route</code> y datos de <code>e2e/fixtures</code>, así que no dependen de Render. Los archivos <code>*.real.spec.ts</code> solo corren con <code>E2E_REAL=1</code> y hablan con un backend de verdad. Los tiempos de espera son de 90 s por prueba porque Render tarda hasta un minuto en despertar.</p>
+  <p><code>npm run e2e:local</code> compila con la configuración <code>local</code> en el puerto 5173 y corre las pruebas reales contra un Django en <code>127.0.0.1:8000</code>. Antes hay que preparar el backend:</p>
+<pre class="term ancha"><code><span class="c"># en RefaccionariaBack, sobre una copia de la base de datos</span>
+DATABASE_URL=sqlite:////ruta/copia.sqlite3#localhost DEBUG=True SECRET_KEY=... \
+CORS_ALLOWED_ORIGINS=http://localhost:5173 python manage.py migrate
+<span class="c"># sembrar sucursales, usuarios de e2e/helpers, método «Efectivo» y el producto E2E-001</span>
+python manage.py runserver 127.0.0.1:8000
+
+<span class="c"># en FrontTRT</span>
+<span class="k">npm run e2e:local</span></code></pre>
+  <div class="caja aviso"><b class="t">Migración rota</b><div><p>En RefaccionariaBack, la migración sin seguimiento <code>producto/0003_rename_codigosat…</code> depende de una <code>0002</code> que no existe. Con ese archivo en disco, <code>migrate</code> falla con <code>NodeNotFoundError</code>; hay que apartarlo antes de migrar.</p></div></div>
+
+  <h2 id="c8-4"><span class="num">8.4</span> Análisis estático</h2>
+  <p><code>npm run lint</code> usa ESLint 9 con angular-eslint 18 y está en cero errores. <code>sonar-project.properties</code> configura SonarQube: analiza <code>src</code> y <code>electron</code>, toma la cobertura de <code>coverage/lcov.info</code> y excluye de ella las pruebas, <code>electron/</code> y los archivos de entorno. El repositorio no tiene integración continua; las pruebas y el análisis se corren a mano antes de compilar.</p>
+</section>
+
+<!-- ═════════════ 9. AGREGAR MÓDULO ═════════════ -->
+<section class="cap" id="c9">
+  <h1><span class="num">9</span> Agregar un módulo</h1>
+  <p class="para">Desarrolladores</p>
+  <p>Estos son los archivos que toca un módulo nuevo, en el orden en que conviene crearlos. El nombre <code>garantias</code> es solo un ejemplo.</p>
+  <ol class="pasos">
+    <li>Crea <code>src/app/features/garantias/</code> con las carpetas <code>domain</code>, <code>application</code>, <code>infrastructure</code> y <code>presentation</code>.</li>
+    <li>En <code>domain/repository</code>, declara el contrato como clase abstracta. En <code>domain/entities</code>, la entidad con nombres del dominio.</li>
+    <li>En <code>infrastructure</code>, escribe el DTO con los nombres del backend, el mapper y <code>GarantiaRepositoryImpl</code>. Toma la URL de <code>APP_ENV</code> y decide si la ruta lleva diagonal final (sección 4.2).</li>
+    <li>Registra el par en <code>app.config.ts</code>: <code>{ provide: GarantiaRepository, useClass: GarantiaRepositoryImpl }</code>.</li>
+    <li>En <code>application</code>, escribe los casos de uso y una fachada con signals para la pantalla.</li>
+    <li>En <code>presentation</code>, crea la página standalone con <code>OnPush</code> y el archivo <code>garantias.routes.ts</code>.</li>
+    <li>Agrega el nombre a <code>app-routes.ts</code> y la ruta a <code>app.routes.ts</code> con <code>authGuard</code>, <code>MainLayoutComponent</code> y, si aplica, <code>roleGuard</code> con <code>data.roles</code>.</li>
+    <li>Agrega la entrada al menú en <code>sidebar-menu.defaults.ts</code> con los mismos roles, y registra en <code>app.config.ts</code> el icono que use.</li>
+    <li>Escribe las pruebas: unitarias para casos de uso y mapper, una de integración con <code>HttpTestingController</code> y, si el flujo es de cara al cajero, una E2E con la API simulada.</li>
+  </ol>
+  <div class="caja consejo"><b class="t">Consejo</b><div><p>Después de cambiar código, corre <code>graphify update .</code> en la raíz. Mantiene al día el grafo de <code>graphify-out/</code> que usan los asistentes de código del proyecto y no consume API.</p></div></div>
+</section>
+
+<!-- ═════════════ 10. PENDIENTES ═════════════ -->
+<section class="cap" id="c10">
+  <h1><span class="num">10</span> Pendientes conocidos</h1>
+  <p class="para">Desarrolladores</p>
+  <p>Estado al 15 de noviembre de 2026. Los identificadores H-## corresponden a los hallazgos de <code>docs/plan-pruebas-admin-auth-ventas.md</code>.</p>
+  <table class="ancha">
+    <thead><tr><th style="width:30%">Tema</th><th>Situación</th></tr></thead>
+    <tbody>
+      <tr><td>Impresión del ticket</td><td>Se genera el búfer ESC/POS y no se envía a la impresora (sección 7.3).</td></tr>
+      <tr><td>Pantalla Cajeros</td><td>Muestra el formulario de alta y no guarda nada. Las altas las hace el administrador.</td></tr>
+      <tr><td>Tamaño del paquete inicial</td><td>La compilación de producción pesa 615 kB (168 kB comprimido) y supera el aviso de 500 kB. No llega al límite de error de 1 MB.</td></tr>
+      <tr><td>Estilos de componentes</td><td><code>inventory-product-card.component.css</code> (6.67 kB) y <code>admin-management.page.css</code> (4.15 kB) pasan el aviso de 4 kB.</td></tr>
+      <tr><td>Reportes en la app de escritorio</td><td>Probable bloqueo de <code>window.open</code> por <code>setWindowOpenHandler</code> (sección 7.1). Falta confirmarlo en un instalador.</td></tr>
+      <tr><td>Inventario Sucursal tras recargar</td><td>La tabla puede quedar vacía si la página carga antes que el perfil con la sucursal. Se recupera navegando a otra opción y regresando.</td></tr>
+      <tr><td>Diagonal final</td><td>El bypass de <code>trailingSlashInterceptor</code> existe porque el backend mezcla rutas con y sin diagonal. Si el backend las unifica, se puede retirar.</td></tr>
+      <tr><td>Admin sin Perfil (H-56)</td><td>Backend. Entra como cajero (sección 5.3).</td></tr>
+      <tr><td>Icono de la aplicación</td><td>Los instaladores usan el icono por defecto de Electron. Falta agregar un <code>.png</code> y un <code>.ico</code>.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<script>
+  addEventListener('load', () => {
+    document.querySelectorAll('img').forEach((img) => {
+      if (img.naturalWidth) return;
+      const d = document.createElement('div');
+      d.className = 'falta';
+      d.textContent = 'Captura pendiente: ' + img.getAttribute('src');
+      img.replaceWith(d);
+    });
+  });
+</script>
+</body>
+</html>

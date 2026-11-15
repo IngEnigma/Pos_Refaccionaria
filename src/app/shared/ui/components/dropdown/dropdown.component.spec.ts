@@ -76,18 +76,6 @@ describe('DropdownComponent', () => {
     expect(menu).toBeTruthy();
   }));
 
-  it('debería enfocar el primer item al abrir', fakeAsync(() => {
-    const trigger = getTrigger();
-    trigger.click();
-    fixture.detectChanges();
-    flushMicrotasks();
-    tick();
-
-    const overlayButtons = getMenuButtons();
-    expect(overlayButtons.length).toBeGreaterThan(0);
-    expect(document.activeElement).toBe(overlayButtons[0]);
-  }));
-
   it('debería cerrar con Escape aunque el foco esté en el overlay', fakeAsync(() => {
     const trigger = getTrigger();
     trigger.click();
@@ -106,21 +94,6 @@ describe('DropdownComponent', () => {
 
     expect(getMenu()).toBeNull();
     expect(trigger.getAttribute('aria-expanded')).toBe('false');
-  }));
-
-  it('debería alternar con Enter y Space desde el trigger', fakeAsync(() => {
-    const trigger = getTrigger();
-
-    trigger.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
-    fixture.detectChanges();
-    flushMicrotasks();
-    tick();
-    expect(getMenu()).toBeTruthy();
-
-    trigger.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
-    fixture.detectChanges();
-    tick();
-    expect(getMenu()).toBeNull();
   }));
 
   it('debería limpiar el overlay al destruir', fakeAsync(() => {

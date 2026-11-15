@@ -1,0 +1,143 @@
+/* Estilos compartidos por los tres manuales (usuario, técnico y despliegue). */
+/* Archivo estático: con la versión variable, Chromium mete la fuente al PDF como Type 3 y se pierden los espacios entre palabras. */
+@font-face { font-family: Archivo; font-style: normal; font-weight: 400; src: url(https://cdn.jsdelivr.net/npm/@fontsource/archivo@5.2.5/files/archivo-latin-400-normal.woff2) format('woff2'); }
+@font-face { font-family: Archivo; font-style: italic; font-weight: 400; src: url(https://cdn.jsdelivr.net/npm/@fontsource/archivo@5.2.5/files/archivo-latin-400-italic.woff2) format('woff2'); }
+@font-face { font-family: Archivo; font-style: normal; font-weight: 500; src: url(https://cdn.jsdelivr.net/npm/@fontsource/archivo@5.2.5/files/archivo-latin-500-normal.woff2) format('woff2'); }
+@font-face { font-family: Archivo; font-style: normal; font-weight: 600; src: url(https://cdn.jsdelivr.net/npm/@fontsource/archivo@5.2.5/files/archivo-latin-600-normal.woff2) format('woff2'); }
+@font-face { font-family: Archivo; font-style: normal; font-weight: 700; src: url(https://cdn.jsdelivr.net/npm/@fontsource/archivo@5.2.5/files/archivo-latin-700-normal.woff2) format('woff2'); }
+@font-face { font-family: 'Archivo Narrow'; font-weight: 700; src: url(https://cdn.jsdelivr.net/npm/@fontsource/archivo-narrow@5.2.5/files/archivo-narrow-latin-700-normal.woff2) format('woff2'); }
+:root {
+  --azul: #233387;
+  --azul-osc: #18235f;
+  --amarillo: #f5b82e;
+  --tinta: #1b2232;
+  --gris: #596277;
+  --linea: #cdd3e0;
+  --rojo: #b42318;
+  --verde: #17703a;
+  --ambar: #8f5408;
+  --g: 40mm; /* columna izquierda: números, etiquetas de notas */
+}
+@page {
+  size: A4;
+  margin: 16mm 16mm 18mm;
+  @bottom-left { content: "TRT · Manual de usuario"; font: 500 8pt Archivo, sans-serif; color: #596277; }
+  @bottom-right { content: counter(page); font: 700 9pt Archivo, sans-serif; color: #233387; }
+}
+@page :first { margin: 0; @bottom-left { content: none; } @bottom-right { content: none; } }
+
+* { box-sizing: border-box; }
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body { margin: 0; background: #fff; color: var(--tinta); font: 400 10pt/1.5 Archivo, sans-serif; }
+p { margin: 0 0 2.5mm; text-wrap: pretty; }
+ul, ol { margin: 0 0 3mm; padding-left: 4.5mm; }
+li { margin-bottom: 1mm; }
+li::marker { color: var(--azul); }
+b, strong { font-weight: 600; color: var(--azul-osc); }
+a { color: inherit; text-decoration: none; }
+
+/* Botones y campos de la pantalla: como tecla */
+.ui { font-weight: 600; font-size: .9em; color: var(--azul-osc); white-space: nowrap; border: .6pt solid #98a2bd; border-bottom-width: 1.4pt; border-radius: 1.2mm; padding: 0 1.3mm; }
+/* Mensajes que muestra el sistema */
+.msg { font-style: italic; color: var(--azul-osc); }
+
+/* Capítulos */
+section.cap { break-before: page; counter-increment: cap; counter-reset: fig; }
+section.cap > * { margin-left: var(--g); }
+section.cap > :is(h1, h2, figure, .caja, .dos, .ancha) { margin-left: 0; }
+h1, h2 { display: grid; grid-template-columns: var(--g) 1fr; align-items: baseline; color: var(--azul-osc); break-after: avoid; font-variant-ligatures: none; text-wrap: balance; }
+h1 { font: 800 27pt/1.05 Archivo, sans-serif; font-family: 'Archivo Narrow', Archivo, sans-serif; margin: 0 0 1.5mm; padding-top: 5mm; border-top: 2.5pt solid var(--azul); }
+h1 .num { font-size: 44pt; font-weight: 900; color: var(--azul); line-height: .9; }
+h2 { font: 700 14pt/1.15 Archivo, sans-serif; font-family: 'Archivo Narrow', Archivo, sans-serif; margin: 8mm 0 2.5mm; padding-top: 2.5mm; border-top: .6pt solid var(--linea); }
+h2 .num { color: var(--azul); font-weight: 600; }
+h3 { font: 700 10.5pt/1.3 Archivo, sans-serif; color: var(--azul-osc); margin-top: 4.5mm; margin-bottom: 1.5mm; break-after: avoid; }
+
+/* A quién va dirigido */
+.para { font-weight: 600; font-size: 9pt; color: var(--gris); margin-bottom: 7mm; }
+.para::before, .tag::before { content: ""; display: inline-block; width: 2.2mm; height: 2.2mm; background: var(--azul); margin-right: 1.6mm; vertical-align: .1mm; }
+.para.gerente::before, .tag::before { background: var(--amarillo); }
+.tag { font: 600 8.5pt Archivo, sans-serif; color: var(--gris); margin-left: 3mm; white-space: nowrap; }
+
+/* Pasos: el número cuelga a la izquierda */
+ol.pasos { list-style: none; padding: 0; counter-reset: paso; }
+ol.pasos > li { counter-increment: paso; position: relative; padding-left: 7mm; margin-bottom: 1.8mm; break-inside: avoid; }
+ol.pasos > li::before { content: counter(paso); position: absolute; left: 0; top: -.4mm; font: 800 11.5pt Archivo, sans-serif; font-family: 'Archivo Narrow', Archivo, sans-serif; color: var(--azul); }
+
+/* Partes de la pantalla */
+dl.partes { display: grid; grid-template-columns: 38mm 1fr; gap: 1.4mm 4mm; margin-top: 0; margin-bottom: 3mm; }
+dl.partes dt { font-weight: 600; color: var(--azul-osc); }
+dl.partes dd { margin: 0; }
+
+/* Notas: la etiqueta va en la columna izquierda */
+.caja { display: grid; grid-template-columns: var(--g) 1fr; border-top: .75pt solid; padding-top: 2mm; margin: 4mm 0 5mm; break-inside: avoid; }
+.caja > .t { font: 700 9.5pt/1.3 Archivo, sans-serif; font-family: 'Archivo Narrow', Archivo, sans-serif; padding-right: 5mm; }
+.caja p:last-child, .caja ul:last-child { margin-bottom: 0; }
+.nota { border-color: var(--azul); } .nota > .t { color: var(--azul); }
+.consejo { border-color: var(--verde); } .consejo > .t { color: var(--verde); }
+.aviso { border-color: var(--ambar); } .aviso > .t { color: var(--ambar); }
+.importante { border-top: 1.6pt solid var(--rojo); border-bottom: .6pt solid var(--rojo); padding-bottom: 2mm; }
+.importante > .t { color: var(--rojo); }
+
+/* Figuras */
+figure { margin: 4mm 0 5mm; break-inside: avoid; counter-increment: fig; }
+figure img { display: block; max-width: 100%; max-height: 100mm; border: .5pt solid #b7bfd2; border-radius: 1mm; }
+figure.chica img { max-height: 60mm; }
+figcaption { font-size: 8.5pt; color: var(--gris); margin-top: 1.6mm; }
+figcaption::before { content: "Fig. " counter(cap) "." counter(fig) "\2003"; font-weight: 700; color: var(--azul-osc); }
+.falta { border: 1pt dashed var(--linea); padding: 14mm 4mm; color: var(--gris); font-size: 9pt; }
+.dos { display: grid; grid-template-columns: var(--g) 1fr; align-items: start; margin-bottom: 4mm; }
+.dos figure { margin: 0; padding-right: 6mm; }
+.dos figure img { width: 100%; height: 80mm; object-fit: cover; object-position: top; }
+.dos h3:first-child { margin-top: 0; }
+
+/* Tablas */
+table { width: calc(100% - var(--g)); border-collapse: collapse; margin-top: 3mm; margin-bottom: 4mm; font-size: 9.2pt; break-inside: avoid; }
+table.ancha { width: 100%; }
+th { text-align: left; font-weight: 700; font-size: 8.5pt; color: var(--azul-osc); padding: 1.4mm 3mm 1.4mm 0; border-bottom: 1.2pt solid var(--azul); }
+td { padding: 1.6mm 3mm 1.6mm 0; border-bottom: .5pt solid var(--linea); vertical-align: top; }
+td.c, th.c { text-align: center; padding-right: 0; }
+.si { color: var(--azul); font-weight: 700; }
+.no { color: #98a2b6; }
+.req { color: var(--rojo); font-weight: 600; }
+.pie-tabla { font-size: 8.5pt; color: var(--gris); margin-top: -2mm; }
+
+/* Portada */
+.portada { height: 297mm; position: relative; overflow: hidden; break-after: page; }
+.portada__logo { position: absolute; top: 16mm; left: 16mm; height: 12mm; }
+.portada__titulo { position: absolute; top: 50mm; left: 16mm; right: 16mm; }
+.portada__titulo .t1 { font: 900 64pt/.92 Archivo, sans-serif; font-family: 'Archivo Narrow', Archivo, sans-serif; color: var(--azul-osc); margin: 0 0 6mm; }
+.portada__titulo .t2 { font: 600 17pt/1.2 Archivo, sans-serif; color: var(--azul); margin: 0 0 1.5mm; }
+.portada__titulo .t3 { font-size: 11pt; color: var(--gris); margin: 0; }
+.portada__base { position: absolute; left: 0; right: 0; bottom: 0; height: 138mm; background: var(--azul); }
+.portada__shot { position: absolute; top: -36mm; left: 56mm; width: 200mm; border: .5pt solid #b7bfd2; border-radius: 1.2mm; }
+.portada__pie { position: absolute; left: 16mm; right: 16mm; bottom: 15mm; display: flex; justify-content: space-between; align-items: end; color: #dfe4f3; font-size: 9pt; line-height: 1.45; }
+.portada__pie b { color: #fff; font-size: 10pt; }
+.portada__pie > div:first-child::before { content: ""; display: block; width: 12mm; height: 2.2mm; background: var(--amarillo); margin-bottom: 4mm; }
+
+/* Índice */
+.indice ol { list-style: none; margin: 0; padding: 0; line-height: 1.35; }
+.indice a { display: grid; grid-template-columns: var(--g) auto 1fr 9mm; align-items: baseline; }
+.indice .l { border-bottom: .6pt dotted #98a2b6; margin: 0 2.5mm; }
+.indice .pg { text-align: right; font-variant-numeric: tabular-nums; }
+.indice > ol > li { margin-top: 2.4mm; }
+.indice > ol > li > a { font-weight: 700; font-size: 10.5pt; color: var(--azul-osc); }
+.indice > ol > li > a .n { font-weight: 800; font-family: 'Archivo Narrow', Archivo, sans-serif; font-size: 13pt; color: var(--azul); }
+.indice ol ol { margin: .8mm 0 0; }
+.indice ol ol a { font-size: 9pt; margin-bottom: .2mm; }
+.indice ol ol .pg { color: var(--gris); }
+
+/* ── Manuales técnico y de despliegue ── */
+@font-face { font-family: 'JetBrains Mono'; font-weight: 400; src: url(https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5.2.5/files/jetbrains-mono-latin-400-normal.woff2) format('woff2'); }
+@font-face { font-family: 'JetBrains Mono'; font-weight: 700; src: url(https://cdn.jsdelivr.net/npm/@fontsource/jetbrains-mono@5.2.5/files/jetbrains-mono-latin-700-normal.woff2) format('woff2'); }
+code, pre, .cod { font-family: 'JetBrains Mono', monospace; font-variant-ligatures: none; }
+code { font-size: .86em; color: var(--azul-osc); background: #eef1f8; border-radius: .8mm; padding: 0 .9mm; overflow-wrap: anywhere; }
+pre { font-size: 7.9pt; line-height: 1.5; color: var(--tinta); background: #f3f5fa; border-top: .75pt solid var(--azul); padding: 2.6mm 3.5mm; margin: 3mm 0 4mm; white-space: pre-wrap; break-inside: avoid; }
+pre code { font-size: inherit; background: none; padding: 0; color: inherit; }
+pre .c { color: #5d677c; }  /* comentario */
+pre .k { color: var(--azul); font-weight: 700; }  /* comando o palabra reservada */
+pre.term::before { content: "Terminal"; display: block; font: 600 7pt Archivo, sans-serif; color: var(--gris); margin-bottom: 1mm; }
+td code, th code { font-size: .84em; }
+.fuente { font-size: 8.5pt; color: var(--gris); margin-top: -2mm; }
+figure svg { display: block; width: 100%; height: auto; }
+.portada__panel { position: absolute; top: -36mm; left: 56mm; width: 200mm; background: #fff; border: .5pt solid #b7bfd2; border-radius: 1.2mm; overflow: hidden; }
+.portada__panel svg { display: block; width: 100%; height: auto; }

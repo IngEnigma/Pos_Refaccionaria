@@ -46,6 +46,7 @@ describe('InventoryByBranchFacade (integración)', () => {
     precio_base: '100.00',
     costo: '80.00',
     cantidad: 5,
+    vigente_desde: null,
   };
 
   const inventoryDto = [
@@ -101,6 +102,7 @@ describe('InventoryByBranchFacade (integración)', () => {
       precioBase: 100,
       costo: 80,
       cantidad: 5,
+      vigenteDesde: null,
     });
     expect(facade.loading()).toBe(false);
     expect(facade.errorMessage()).toBeNull();

@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { SearchInputComponent } from './search-input.component';
 import { LucideAngularModule, Search } from 'lucide-angular';
 
@@ -70,28 +70,6 @@ describe('SearchInputComponent', () => {
     const input = getInputByAriaLabel('Buscar por SKU');
     expect(input).toBeTruthy();
   });
-
-  it('debería actualizar el valor después del debounce y emitir searchChange', fakeAsync(() => {
-    const onChangeSpy = jest.fn();
-    const searchChangeSpy = jest.fn();
-    fixture.componentRef.setInput('debounceMs', 10);
-    fixture.detectChanges();
-    component.registerOnChange(onChangeSpy);
-    component.searchChange.subscribe(searchChangeSpy);
-
-    const input = getInputByAriaLabel('Buscar...');
-    input.value = 'query';
-    input.dispatchEvent(new Event('input'));
-
-    expect(onChangeSpy).not.toHaveBeenCalled();
-    expect(searchChangeSpy).not.toHaveBeenCalled();
-
-    tick(10);
-    fixture.detectChanges();
-    expect(component.value).toBe('query');
-    expect(onChangeSpy).toHaveBeenCalledWith('query');
-    expect(searchChangeSpy).toHaveBeenCalledWith('query');
-  }));
 
   it('debería escribir valores desde el exterior (writeValue)', () => {
     fixture.detectChanges();

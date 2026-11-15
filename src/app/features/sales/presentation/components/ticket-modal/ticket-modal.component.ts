@@ -183,7 +183,6 @@ export class TicketModalComponent {
 
     try {
       if (!this.desktop) {
-        // Fallback web: solo simula
         this.toast.success('Ticket listo para reimpresión (modo web)');
         return;
       }

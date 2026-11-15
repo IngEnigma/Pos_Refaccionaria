@@ -117,6 +117,7 @@ import {
   Hash,
   Activity,
   Mail, // H-51: lo usan la tarjeta y el formulario de sucursales
+  MessageSquare,
 } from 'lucide-angular';
 
 export const appConfig: ApplicationConfig = {
@@ -150,6 +151,9 @@ export const appConfig: ApplicationConfig = {
         CreditCard,
         BanknoteIcon,
         ArrowLeftRightIcon,
+        // pick() registra por nombre de clave: inventory-by-branch usa "ArrowLeftRight" y sin él la tabla deja de renderizar.
+        ArrowLeftRight: ArrowLeftRightIcon,
+        MessageSquare,
         CircleAlert,
         CircleCheck,
         TriangleAlert,

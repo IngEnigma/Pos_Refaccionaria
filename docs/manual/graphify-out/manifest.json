@@ -1,0 +1,52 @@
+{
+  "capturar.mjs": {
+    "mtime": 1794723861.9452717,
+    "ast_hash": "be06bd19c0070e485e2ae6a68833ae40",
+    "semantic_hash": ""
+  },
+  "generar-pdf.mjs": {
+    "mtime": 1794767559.5801466,
+    "ast_hash": "4b941d52abad5472453194193240db3c",
+    "semantic_hash": ""
+  },
+  "seed_demo.py": {
+    "mtime": 1794723000.9304538,
+    "ast_hash": "371d7bd9c69cc59b5d321ae416dd733e",
+    "semantic_hash": ""
+  },
+  "despliegue.html": {
+    "mtime": 1794767980.4433582,
+    "ast_hash": "6b104e2a3a8ddb957b11822b23857b75",
+    "semantic_hash": ""
+  },
+  "manual.html": {
+    "mtime": 1794767546.2090163,
+    "ast_hash": "e8e4dd24a7c9d2ba758b6ac4acb95dcf",
+    "semantic_hash": ""
+  },
+  "tecnico.html": {
+    "mtime": 1794767851.749735,
+    "ast_hash": "07dfa7e94172658514dfc0bb72bbae2c",
+    "semantic_hash": ""
+  },
+  "Manual-Tecnico-TRT.pdf": {
+    "mtime": 1794767835.0376565,
+    "ast_hash": "a4d8886d4b00434cdbf4c0d40f31f2be",
+    "semantic_hash": ""
+  },
+  "Manual-Usuario-TRT.pdf": {
+    "mtime": 1794767569.7915297,
+    "ast_hash": "7124ff65b599d41e660e30013eec0583",
+    "semantic_hash": ""
+  },
+  "img/Logo_Grande.webp": {
+    "mtime": 1794722037.1770558,
+    "ast_hash": "76b2ac890b52fb83399d4af5c96dfff5",
+    "semantic_hash": ""
+  },
+  "img/Logo_Horizontal.webp": {
+    "mtime": 1794722037.1770558,
+    "ast_hash": "ee2740c35e62c89b5aa67cd09d581eff",
+    "semantic_hash": ""
+  }
+}
