@@ -1,0 +1,343 @@
+{
+  "directed": false,
+  "multigraph": false,
+  "graph": {},
+  "nodes": [
+    {
+      "label": "capturar.mjs",
+      "file_type": "code",
+      "source_file": "capturar.mjs",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "capturar",
+      "community": 0,
+      "norm_label": "capturar.mjs"
+    },
+    {
+      "label": "IMG",
+      "file_type": "code",
+      "source_file": "capturar.mjs",
+      "source_location": "L21",
+      "_origin": "ast",
+      "id": "capturar_img",
+      "community": 0,
+      "norm_label": "img"
+    },
+    {
+      "label": "shot()",
+      "file_type": "code",
+      "source_file": "capturar.mjs",
+      "source_location": "L38",
+      "_origin": "ast",
+      "id": "capturar_shot",
+      "community": 0,
+      "norm_label": "shot()"
+    },
+    {
+      "label": "settle()",
+      "file_type": "code",
+      "source_file": "capturar.mjs",
+      "source_location": "L41",
+      "_origin": "ast",
+      "id": "capturar_settle",
+      "community": 0,
+      "norm_label": "settle()"
+    },
+    {
+      "label": "paso()",
+      "file_type": "code",
+      "source_file": "capturar.mjs",
+      "source_location": "L47",
+      "_origin": "ast",
+      "id": "capturar_paso",
+      "community": 0,
+      "norm_label": "paso()"
+    },
+    {
+      "label": "ir()",
+      "file_type": "code",
+      "source_file": "capturar.mjs",
+      "source_location": "L59",
+      "_origin": "ast",
+      "id": "capturar_ir",
+      "community": 0,
+      "norm_label": "ir()"
+    },
+    {
+      "label": "cancelar()",
+      "file_type": "code",
+      "source_file": "capturar.mjs",
+      "source_location": "L67",
+      "_origin": "ast",
+      "id": "capturar_cancelar",
+      "community": 0,
+      "norm_label": "cancelar()"
+    },
+    {
+      "label": "generar-pdf.mjs",
+      "file_type": "code",
+      "source_file": "generar-pdf.mjs",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "generar_pdf",
+      "community": 1,
+      "norm_label": "generar-pdf.mjs"
+    },
+    {
+      "label": "dir",
+      "file_type": "code",
+      "source_file": "generar-pdf.mjs",
+      "source_location": "L12",
+      "_origin": "ast",
+      "id": "generar_pdf_dir",
+      "community": 1,
+      "norm_label": "dir"
+    },
+    {
+      "label": "[entrada = 'manual.html', nombrePdf = 'Manual-Usuario-TRT.pdf']",
+      "file_type": "code",
+      "source_file": "generar-pdf.mjs",
+      "source_location": "L13",
+      "_origin": "ast",
+      "id": "generar_pdf_entrada_manual_html_nombrepdf_manual_usuario_trt_pdf",
+      "community": 1,
+      "norm_label": "[entrada = 'manual.html', nombrepdf = 'manual-usuario-trt.pdf']"
+    },
+    {
+      "label": "salida",
+      "file_type": "code",
+      "source_file": "generar-pdf.mjs",
+      "source_location": "L14",
+      "_origin": "ast",
+      "id": "generar_pdf_salida",
+      "community": 1,
+      "norm_label": "salida"
+    },
+    {
+      "label": "opciones",
+      "file_type": "code",
+      "source_file": "generar-pdf.mjs",
+      "source_location": "L15",
+      "_origin": "ast",
+      "id": "generar_pdf_opciones",
+      "community": 1,
+      "norm_label": "opciones"
+    },
+    {
+      "label": "paginas",
+      "file_type": "code",
+      "source_file": "generar-pdf.mjs",
+      "source_location": "L25",
+      "_origin": "ast",
+      "id": "generar_pdf_paginas",
+      "community": 1,
+      "norm_label": "paginas"
+    },
+    {
+      "label": "numeros",
+      "file_type": "code",
+      "source_file": "generar-pdf.mjs",
+      "source_location": "L37",
+      "_origin": "ast",
+      "id": "generar_pdf_numeros",
+      "community": 1,
+      "norm_label": "numeros"
+    },
+    {
+      "label": "seed_demo.py",
+      "file_type": "code",
+      "source_file": "seed_demo.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "seed_demo",
+      "community": 2,
+      "norm_label": "seed_demo.py"
+    },
+    {
+      "label": "usuario()",
+      "file_type": "code",
+      "source_file": "seed_demo.py",
+      "source_location": "L36",
+      "_origin": "ast",
+      "id": "seed_demo_usuario",
+      "community": 2,
+      "norm_label": "usuario()"
+    },
+    {
+      "label": "Datos de ejemplo para las capturas del manual (BD SQLite local, NO producci\u00f3n).",
+      "file_type": "rationale",
+      "source_file": "seed_demo.py",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "seed_demo_rationale_1",
+      "community": 2,
+      "norm_label": "datos de ejemplo para las capturas del manual (bd sqlite local, no produccion)."
+    }
+  ],
+  "links": [
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "capturar.mjs",
+      "source_location": "L67",
+      "weight": 1.0,
+      "source": "capturar",
+      "target": "capturar_cancelar",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "capturar.mjs",
+      "source_location": "L21",
+      "weight": 1.0,
+      "source": "capturar",
+      "target": "capturar_img",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "capturar.mjs",
+      "source_location": "L59",
+      "weight": 1.0,
+      "source": "capturar",
+      "target": "capturar_ir",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "capturar.mjs",
+      "source_location": "L47",
+      "weight": 1.0,
+      "source": "capturar",
+      "target": "capturar_paso",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "capturar.mjs",
+      "source_location": "L41",
+      "weight": 1.0,
+      "source": "capturar",
+      "target": "capturar_settle",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "capturar.mjs",
+      "source_location": "L38",
+      "weight": 1.0,
+      "source": "capturar",
+      "target": "capturar_shot",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "capturar.mjs",
+      "source_location": "L54",
+      "weight": 1.0,
+      "source": "capturar_paso",
+      "target": "capturar_shot",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "capturar.mjs",
+      "source_location": "L64",
+      "weight": 1.0,
+      "source": "capturar_ir",
+      "target": "capturar_settle",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "generar-pdf.mjs",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "generar_pdf",
+      "target": "generar_pdf_dir",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "generar-pdf.mjs",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "generar_pdf",
+      "target": "generar_pdf_entrada_manual_html_nombrepdf_manual_usuario_trt_pdf",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "generar-pdf.mjs",
+      "source_location": "L37",
+      "weight": 1.0,
+      "source": "generar_pdf",
+      "target": "generar_pdf_numeros",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "generar-pdf.mjs",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "generar_pdf",
+      "target": "generar_pdf_opciones",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "generar-pdf.mjs",
+      "source_location": "L25",
+      "weight": 1.0,
+      "source": "generar_pdf",
+      "target": "generar_pdf_paginas",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "generar-pdf.mjs",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "generar_pdf",
+      "target": "generar_pdf_salida",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "seed_demo.py",
+      "source_location": "L36",
+      "weight": 1.0,
+      "source": "seed_demo",
+      "target": "seed_demo_usuario",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "seed_demo.py",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "seed_demo_rationale_1",
+      "target": "seed_demo",
+      "confidence_score": 1.0
+    }
+  ],
+  "hyperedges": [],
+  "built_at_commit": "eb7b57b310268072ea8ae781a7989e0b7eaff377"
+}

@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Manual de Despliegue TRT</title>
+<link rel="stylesheet" href="manual.css">
+<style>
+  @page { @bottom-left { content: "TRT · Manual de despliegue"; } }
+  .portada__panel { left: 16mm; width: 178mm; }
+  ul.check { list-style: none; padding: 0; }
+  ul.check > li { position: relative; padding-left: 7mm; break-inside: avoid; }
+  ul.check > li::before { content: ""; position: absolute; left: 0; top: 1mm; width: 3.2mm; height: 3.2mm; border: .9pt solid var(--azul); border-radius: .6mm; }
+</style>
+</head>
+<body>
+
+<!-- ═════════════ PORTADA ═════════════ -->
+<div class="portada">
+  <img class="portada__logo" src="img/Logo_Horizontal.webp" alt="TRT">
+  <div class="portada__titulo">
+    <p class="t1">Manual<br>de despliegue</p>
+    <p class="t2">Compilar, empaquetar e instalar FrontTRT</p>
+    <p class="t3">Para quien prepara las cajas de cada sucursal</p>
+  </div>
+  <div class="portada__base">
+    <div class="portada__panel">
+      <svg viewBox="0 0 760 300" xmlns="http://www.w3.org/2000/svg" font-family="Archivo, sans-serif">
+        <defs><marker id="fp" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#233387"/></marker></defs>
+        <g font-size="13">
+          <rect x="30" y="118" width="130" height="64" rx="3" fill="#fff" stroke="#233387" stroke-width="1.5"/>
+          <text x="44" y="144" font-weight="700" fill="#18235f">Código fuente</text>
+          <text x="44" y="164" font-size="11" fill="#596277">src/ · electron/</text>
+          <rect x="200" y="118" width="150" height="64" rx="3" fill="#fff" stroke="#233387" stroke-width="1.5"/>
+          <text x="214" y="144" font-weight="700" fill="#18235f">npm run build:prod</text>
+          <text x="214" y="164" font-size="11" fill="#596277">dist/front-trt/browser</text>
+          <rect x="390" y="118" width="150" height="64" rx="3" fill="#233387"/>
+          <text x="404" y="144" font-weight="700" fill="#fff">electron-builder</text>
+          <text x="404" y="164" font-size="11" fill="#dfe4f3">dist_electron/</text>
+          <rect x="590" y="30" width="150" height="56" rx="3" fill="#f5b82e"/>
+          <text x="604" y="54" font-weight="700" fill="#18235f">AppImage</text>
+          <text x="604" y="73" font-size="11" fill="#18235f">Linux, sin instalar</text>
+          <rect x="590" y="122" width="150" height="56" rx="3" fill="#f5b82e"/>
+          <text x="604" y="146" font-weight="700" fill="#18235f">.deb</text>
+          <text x="604" y="165" font-size="11" fill="#18235f">Debian y Ubuntu</text>
+          <rect x="590" y="214" width="150" height="56" rx="3" fill="#f5b82e"/>
+          <text x="604" y="238" font-weight="700" fill="#18235f">Setup .exe</text>
+          <text x="604" y="257" font-size="11" fill="#18235f">Windows (Docker + Wine)</text>
+        </g>
+        <g stroke="#233387" stroke-width="1.5" fill="none" marker-end="url(#fp)">
+          <path d="M160 150H198"/><path d="M350 150H388"/>
+          <path d="M540 150H560Q570 150 570 140V68Q570 58 580 58H588"/><path d="M540 150H588"/><path d="M540 150H560Q570 150 570 160V232Q570 242 580 242H588"/>
+        </g>
+      </svg>
+    </div>
+    <div class="portada__pie">
+      <div><b>Transmisiones y Rodamientos de Tlalnepantla</b><br>Uso interno</div>
+      <div style="text-align:right">Versión 1.0<br>Noviembre 2026</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═════════════ ÍNDICE ═════════════ -->
+<section class="indice">
+  <h1><span class="num"></span> Contenido</h1>
+  <ol>
+    <li><a href="#c1"><span class="n">1</span><span>Qué se despliega</span><span class="l"></span><span class="pg"></span></a>
+      <ol>
+        <li><a href="#c1-1"><span></span><span>1.1 Piezas del sistema</span><span class="l"></span><span class="pg"></span></a></li>
+        <li><a href="#c1-2"><span></span><span>1.2 Artefactos</span><span class="l"></span><span class="pg"></span></a></li>
+      </ol></li>
+    <li><a href="#c2"><span class="n">2</span><span>Requisitos</span><span class="l"></span><span class="pg"></span></a>
+      <ol>
+        <li><a href="#c2-1"><span></span><span>2.1 Equipo de compilación</span><span class="l"></span><span class="pg"></span></a></li>
+        <li><a href="#c2-2"><span></span><span>2.2 Cajas de las sucursales</span><span class="l"></span><span class="pg"></span></a></li>
+      </ol></li>
+    <li><a href="#c3"><span class="n">3</span><span>Preparar el código</span><span class="l"></span><span class="pg"></span></a>
+      <ol>
+        <li><a href="#c3-1"><span></span><span>3.1 Obtener e instalar dependencias</span><span class="l"></span><span class="pg"></span></a></li>
+        <li><a href="#c3-2"><span></span><span>3.2 Apuntar al backend</span><span class="l"></span><span class="pg"></span></a></li>
+        <li><a href="#c3-3"><span></span><span>3.3 Número de versión</span><span class="l"></span><span class="pg"></span></a></li>
+        <li><a href="#c3-4"><span></span><span>3.4 Revisar antes de compilar</span><span class="l"></span><span class="pg"></span></a></li>
+      </ol></li>
+    <li><a href="#c4"><span class="n">4</span><span>Compilar Angular</span><span class="l"></span><span class="pg"></span></a></li>
+    <li><a href="#c5"><span class="n">5</span><span>Empaquetar el escritorio</span><span class="l"></span><span class="pg"></span></a>
+      <ol>
+        <li><a href="#c5-1"><span></span><span>5.1 Linux: AppImage y .deb</span><span class="l"></span><span class="pg"></span></a></li>
+        <li><a href="#c5-2"><span></span><span>5.2 Windows desde Linux con Docker</span><span class="l"></span><span class="pg"></span></a></li>
+        <li><a href="#c5-3"><span></span><span>5.3 Windows desde Windows</span><span class="l"></span><span class="pg"></span></a></li>
+      </ol></li>
+    <li><a href="#c6"><span class="n">6</span><span>Instalar en las cajas</span><span class="l"></span><span class="pg"></span></a>
+      <ol>
+        <li><a href="#c6-1"><span></span><span>6.1 Linux con AppImage</span><span class="l"></span><span class="pg"></span></a></li>
+        <li><a href="#c6-2"><span></span><span>6.2 Linux con .deb</span><span class="l"></span><span class="pg"></span></a></li>
+        <li><a href="#c6-3"><span></span><span>6.3 Windows</span><span class="l"></span><span class="pg"></span></a></li>
+      </ol></li>
+    <li><a href="#c7"><span class="n">7</span><span>Verificar la instalación</span><span class="l"></span><span class="pg"></span></a></li>
+    <li><a href="#c8"><span class="n">8</span><span>Actualizar y revertir</span><span class="l"></span><span class="pg"></span></a></li>
+    <li><a href="#c9"><span class="n">9</span><span>Publicar como sitio web</span><span class="l"></span><span class="pg"></span></a></li>
+    <li><a href="#c10"><span class="n">10</span><span>Solución de problemas</span><span class="l"></span><span class="pg"></span></a></li>
+    <li><a href="#c11"><span class="n">11</span><span>Lista de liberación</span><span class="l"></span><span class="pg"></span></a></li>
+  </ol>
+</section>
+
+<!-- ═════════════ 1. QUÉ SE DESPLIEGA ═════════════ -->
+<section class="cap" id="c1">
+  <h1><span class="num">1</span> Qué se despliega</h1>
+  <p class="para">Responsable de sistemas</p>
+  <p>Este manual explica cómo convertir el repositorio FrontTRT en instaladores y cómo dejarlos funcionando en las computadoras de cada sucursal. Los comandos se ejecutan en una terminal abierta en la raíz del repositorio, salvo que el paso diga otra cosa.</p>
+
+  <h2 id="c1-1"><span class="num">1.1</span> Piezas del sistema</h2>
+  <table class="ancha">
+    <thead><tr><th style="width:24%">Pieza</th><th style="width:30%">Dónde corre</th><th>Quién la despliega</th></tr></thead>
+    <tbody>
+      <tr><td><b>Aplicación de escritorio</b></td><td>En cada caja, como programa instalado (Electron).</td><td>Este manual.</td></tr>
+      <tr><td><b>API REST</b></td><td>Render, en <code>https://refaccionariaback.onrender.com/api</code>.</td><td>Repositorio RefaccionariaBack. Fuera de este manual.</td></tr>
+      <tr><td><b>Base de datos</b></td><td>Junto al backend.</td><td>Repositorio RefaccionariaBack.</td></tr>
+    </tbody>
+  </table>
+  <p>La aplicación de escritorio no guarda datos del negocio. Todo lo que muestra lo pide a la API, así que cada caja necesita internet para trabajar.</p>
+
+  <h2 id="c1-2"><span class="num">1.2</span> Artefactos</h2>
+  <p>electron-builder deja los instaladores en <code>dist_electron/</code>. El nombre lleva el número de versión de <code>package.json</code>.</p>
+  <table class="ancha">
+    <thead><tr><th style="width:36%">Archivo (versión 1.0.0)</th><th style="width:22%">Sistema</th><th style="width:12%">Tamaño</th><th>Notas</th></tr></thead>
+    <tbody>
+      <tr><td><code>FrontTRT-1.0.0.AppImage</code></td><td>Linux x64</td><td>138 MB</td><td>Un solo archivo ejecutable. No se instala.</td></tr>
+      <tr><td><code>front-trt_1.0.0_amd64.deb</code></td><td>Debian, Ubuntu y derivados x64</td><td>104 MB</td><td>Se instala con apt y aparece en el menú de aplicaciones.</td></tr>
+      <tr><td><code>FrontTRT Setup 1.0.0.exe</code></td><td>Windows x64</td><td>110 MB</td><td>Instalador NSIS. Va acompañado de un <code>.blockmap</code> que no hace falta copiar.</td></tr>
+    </tbody>
+  </table>
+  <p class="pie-tabla">Tamaños de la compilación de abril de 2026.</p>
+  <div class="caja nota"><b class="t">macOS</b><div><p><code>package.json</code> declara un destino <code>dmg</code> para macOS, pero nunca se ha compilado ni probado. Generarlo requiere una Mac.</p></div></div>
+</section>
+
+<!-- ═════════════ 2. REQUISITOS ═════════════ -->
+<section class="cap" id="c2">
+  <h1><span class="num">2</span> Requisitos</h1>
+  <p class="para">Responsable de sistemas</p>
+
+  <h2 id="c2-1"><span class="num">2.1</span> Equipo de compilación</h2>
+  <p>Es la computadora donde se generan los instaladores. Lo más sencillo es un Linux x64, porque desde ahí salen los tres formatos.</p>
+  <table class="ancha">
+    <thead><tr><th style="width:26%">Programa</th><th style="width:22%">Versión</th><th>Para qué</th></tr></thead>
+    <tbody>
+      <tr><td><b>Node.js</b> y <b>npm</b></td><td>Node 22 y npm 10</td><td>Compilar. La última compilación se hizo con Node 22.23.4 y npm 10.9.9.</td></tr>
+      <tr><td><b>Git</b></td><td>cualquiera reciente</td><td>Obtener el código.</td></tr>
+      <tr><td><b>binutils</b></td><td>la del sistema</td><td>Solo en Linux, para armar el <code>.deb</code>.</td></tr>
+      <tr><td><b>Docker</b></td><td>cualquiera reciente</td><td>Solo para generar el instalador de Windows desde Linux.</td></tr>
+      <tr><td><b>Espacio en disco</b></td><td>unos 3 GB libres</td><td>Dependencias, la imagen de Docker (cerca de 1 GB) y los tres instaladores.</td></tr>
+    </tbody>
+  </table>
+  <p>La primera compilación necesita internet: npm descarga las dependencias y electron-builder descarga los binarios de Electron a <code>~/.cache/electron</code>.</p>
+
+  <h2 id="c2-2"><span class="num">2.2</span> Cajas de las sucursales</h2>
+  <ul>
+    <li>Computadora de 64 bits con Windows 10 u 11, o con un Linux de escritorio (Ubuntu, Debian, Linux Mint o similar).</li>
+    <li>Conexión a internet estable hacia <code>refaccionariaback.onrender.com</code>.</li>
+    <li>Pantalla de 1280 × 800 o mayor. La ventana abre en 1200 × 800.</li>
+    <li>Lector de código de barras USB que funcione como teclado y mande Enter al final. No necesita controlador.</li>
+    <li>Un usuario creado en el backend, con rol y sucursal asignados. Sin sucursal, el usuario no puede vender.</li>
+  </ul>
+  <div class="caja importante"><b class="t">Impresora</b><div><p>La versión 1.0 arma el ticket en formato ESC/POS pero todavía no lo envía a la impresora térmica. El ticket se ve en pantalla y se consulta en Historial. No es necesario conectar la impresora para esta versión.</p></div></div>
+</section>
+
+<!-- ═════════════ 3. PREPARAR ═════════════ -->
+<section class="cap" id="c3">
+  <h1><span class="num">3</span> Preparar el código</h1>
+  <p class="para">Responsable de sistemas</p>
+
+  <h2 id="c3-1"><span class="num">3.1</span> Obtener e instalar dependencias</h2>
+  <ol class="pasos">
+    <li>Clona el repositorio, o actualiza tu copia, y cámbiate a la rama que vas a liberar.</li>
+    <li>Instala las dependencias exactas de <code>package-lock.json</code>:</li>
+  </ol>
+<pre class="term"><code><span class="k">npm ci</span></code></pre>
+  <p><code>npm ci</code> rearma <code>node_modules</code> desde el lock, así dos compilaciones del mismo commit usan las mismas versiones.</p>
+
+  <h2 id="c3-2"><span class="num">3.2</span> Apuntar al backend</h2>
+  <p>La dirección de la API queda fija dentro del instalador en el momento de compilar. Se toma de <code>src/env/environment.prod.ts</code>:</p>
+<pre><code>apiUrl: <span class="k">'https://refaccionariaback.onrender.com/api'</span>,</code></pre>
+  <p>Si el backend cambia de dirección, edita <code>apiUrl</code> y vuelve a generar todos los instaladores; en una caja ya instalada no se puede cambiar. Los otros archivos de <code>src/env/</code> son para desarrollo y pruebas y nunca llegan a un instalador.</p>
+
+  <h2 id="c3-3"><span class="num">3.3</span> Número de versión</h2>
+  <p>Sube el campo <code>"version"</code> de <code>package.json</code> antes de cada liberación, por ejemplo de <code>1.0.0</code> a <code>1.0.1</code>. Ese número va en el nombre de los instaladores y es el que reporta la aplicación. Si no lo cambias, el instalador nuevo se llama igual que el anterior y es fácil confundirlos.</p>
+
+  <h2 id="c3-4"><span class="num">3.4</span> Revisar antes de compilar</h2>
+  <p>El repositorio no tiene integración continua. Corre estas revisiones a mano y no sigas si alguna falla:</p>
+<pre class="term"><code><span class="k">npm run lint</span>          <span class="c"># debe terminar sin errores</span>
+<span class="k">npm run test:coverage</span> <span class="c"># pruebas en verde y cobertura mínima</span>
+<span class="k">npm run e2e</span>           <span class="c"># pruebas de extremo a extremo con la API simulada</span></code></pre>
+</section>
+
+<!-- ═════════════ 4. COMPILAR ═════════════ -->
+<section class="cap" id="c4">
+  <h1><span class="num">4</span> Compilar Angular</h1>
+  <p class="para">Responsable de sistemas</p>
+  <p>Este paso convierte el código Angular en archivos estáticos. Los comandos de empaquetado del capítulo 5 ya lo incluyen; córrelo por separado cuando quieras revisar la compilación antes de empaquetar.</p>
+<pre class="term"><code><span class="k">npm run build:prod</span></code></pre>
+  <p>El resultado queda en <code>dist/front-trt/browser/</code>, unos 1.7 MB. La compilación tarda menos de 10 segundos en un equipo actual y termina con <span class="msg">Application bundle generation complete.</span></p>
+  <p>Hoy aparecen tres avisos de presupuesto, y no detienen la compilación:</p>
+  <table class="ancha">
+    <thead><tr><th style="width:52%">Aviso</th><th>Significado</th></tr></thead>
+    <tbody>
+      <tr><td><code>bundle initial exceeded maximum budget</code></td><td>El paquete inicial pesa 615 kB y el aviso salta en 500 kB. El error sería en 1 MB.</td></tr>
+      <tr><td><code>inventory-product-card.component.css exceeded…</code></td><td>Estilos de 6.67 kB contra un aviso de 4 kB.</td></tr>
+      <tr><td><code>admin-management.page.css exceeded…</code></td><td>Estilos de 4.15 kB contra un aviso de 4 kB.</td></tr>
+    </tbody>
+  </table>
+  <p>Un mensaje que diga <code>[ERROR]</code> sí detiene la compilación y no se genera nada.</p>
+  <div class="caja importante"><b class="t">Archivos de root</b><div><p>Si antes se generó el instalador de Windows con Docker (sección 5.2), parte de <code>dist/</code> y <code>dist_electron/</code> queda a nombre de root. La compilación falla al final con <code>EACCES: permission denied, rmdir</code> y deja <code>dist/front-trt/browser/</code> incompleto. Devuelve los archivos a tu usuario y vuelve a compilar:</p>
+<pre class="term"><code><span class="k">sudo chown -R "$USER":"$USER" dist dist_electron node_modules</span></code></pre></div></div>
+</section>
+
+<!-- ═════════════ 5. EMPAQUETAR ═════════════ -->
+<section class="cap" id="c5">
+  <h1><span class="num">5</span> Empaquetar el escritorio</h1>
+  <p class="para">Responsable de sistemas</p>
+  <p>electron-builder toma <code>dist/front-trt/</code>, la carpeta <code>electron/</code> y <code>package.json</code>, y los empaqueta junto con Electron. La configuración está en la sección <code>"build"</code> de <code>package.json</code>.</p>
+
+  <h2 id="c5-1"><span class="num">5.1</span> Linux: AppImage y .deb</h2>
+  <ol class="pasos">
+    <li>Si es la primera vez, instala binutils: <code>sudo apt install binutils</code>.</li>
+    <li>Compila y empaqueta:</li>
+  </ol>
+<pre class="term"><code><span class="k">npm run build:installer</span>   <span class="c"># = npm run build:prod && electron-builder</span></code></pre>
+  <ol class="pasos" start="3" style="counter-reset: paso 2">
+    <li>Al terminar, revisa que <code>dist_electron/</code> tenga el <code>.AppImage</code> y el <code>.deb</code> con la versión nueva en el nombre.</li>
+  </ol>
+  <div class="caja nota"><b class="t">Archivos viejos</b><div><p><code>dist_electron/</code> conserva los instaladores de compilaciones anteriores, incluido un <code>FrontTRT-0.0.0.AppImage</code> de antes de fijar la versión. Antes de copiar a las cajas, confirma por nombre y fecha que tomas el archivo correcto.</p></div></div>
+
+  <h2 id="c5-2"><span class="num">5.2</span> Windows desde Linux con Docker</h2>
+  <p><code>build-win.sh</code> corre la compilación dentro de la imagen <code>electronuserland/builder:wine</code>, que trae Wine para generar el instalador de Windows sin salir de Linux.</p>
+  <ol class="pasos">
+    <li>Confirma que Docker está corriendo: <code>docker info</code> no debe dar error.</li>
+    <li>Ejecuta:</li>
+  </ol>
+<pre class="term"><code><span class="k">npm run build:installer:win</span></code></pre>
+  <ol class="pasos" start="3" style="counter-reset: paso 2">
+    <li>La primera vez se descarga la imagen, cerca de 1 GB. Las siguientes reutilizan la imagen y las cachés de <code>~/.cache/electron</code> y <code>~/.cache/electron-builder</code>.</li>
+    <li>Dentro del contenedor se ejecutan <code>npm install</code>, <code>npm run build:prod</code> y <code>npm run build:win</code>. Al terminar, el script imprime si la construcción salió bien.</li>
+    <li>Busca <code>FrontTRT Setup X.Y.Z.exe</code> en <code>dist_electron/</code>.</li>
+    <li>Devuelve los archivos a tu usuario con el <code>chown</code> del capítulo 4. Si no lo haces, la siguiente compilación en Linux falla.</li>
+  </ol>
+
+  <h2 id="c5-3"><span class="num">5.3</span> Windows desde Windows</h2>
+  <p>En una PC con Windows, Node 22 y Git, sin Docker:</p>
+<pre class="term"><code><span class="k">npm ci</span>
+<span class="k">npm run build:installer</span></code></pre>
+  <p>En Windows, <code>build:installer</code> genera el instalador NSIS en lugar del AppImage y el <code>.deb</code>.</p>
+</section>
+
+<!-- ═════════════ 6. INSTALAR ═════════════ -->
+<section class="cap" id="c6">
+  <h1><span class="num">6</span> Instalar en las cajas</h1>
+  <p class="para">Responsable de sistemas</p>
+  <p>Copia el instalador a la caja con una memoria USB o una carpeta compartida. Usa siempre el archivo de <code>dist_electron/</code> de la compilación que revisaste.</p>
+
+  <h2 id="c6-1"><span class="num">6.1</span> Linux con AppImage</h2>
+  <ol class="pasos">
+    <li>Copia el archivo a una carpeta fija, por ejemplo <code>~/Aplicaciones/</code>. Si lo mueves después, los accesos directos dejan de funcionar.</li>
+    <li>Dale permiso de ejecución. Desde el explorador de archivos: clic derecho, <span class="ui">Propiedades</span>, <span class="ui">Permisos</span>, marcar <span class="ui">Permitir ejecutar el archivo como un programa</span>. Desde la terminal:</li>
+  </ol>
+<pre class="term"><code><span class="k">chmod +x ~/Aplicaciones/FrontTRT-1.0.0.AppImage</span></code></pre>
+  <ol class="pasos" start="3" style="counter-reset: paso 2">
+    <li>Haz doble clic en el archivo.</li>
+  </ol>
+  <div class="caja aviso"><b class="t">Error de FUSE</b><div><p>Si el AppImage no abre y la terminal menciona FUSE o <code>libfuse.so.2</code>, instala la biblioteca: <code>sudo apt install libfuse2</code>. En Ubuntu 24.04 el paquete se llama <code>libfuse2t64</code>. Otra opción es instalar el <code>.deb</code>.</p></div></div>
+
+  <h2 id="c6-2"><span class="num">6.2</span> Linux con .deb</h2>
+<pre class="term"><code><span class="k">sudo apt install ./front-trt_1.0.0_amd64.deb</span></code></pre>
+  <p>El <code>./</code> es necesario para que apt instale el archivo local en lugar de buscarlo en los repositorios. La aplicación aparece en el menú como FrontTRT. Para quitarla: <code>sudo apt remove front-trt</code>.</p>
+
+  <h2 id="c6-3"><span class="num">6.3</span> Windows</h2>
+  <ol class="pasos">
+    <li>Haz doble clic en <code>FrontTRT Setup 1.0.0.exe</code>.</li>
+    <li>El instalador no está firmado, así que Windows puede mostrar <span class="msg">Windows protegió su PC</span>. Pulsa <span class="ui">Más información</span> y luego <span class="ui">Ejecutar de todas formas</span>. Si el antivirus pone el archivo en cuarentena, agrégalo como excepción.</li>
+    <li>El instalador termina sin hacer preguntas, crea los accesos directos y abre la aplicación.</li>
+  </ol>
+  <p>Se instala solo para la cuenta de Windows que lo ejecutó. Para quitarla: <span class="ui">Configuración</span>, <span class="ui">Aplicaciones</span>, FrontTRT, <span class="ui">Desinstalar</span>.</p>
+</section>
+
+<!-- ═════════════ 7. VERIFICAR ═════════════ -->
+<section class="cap" id="c7">
+  <h1><span class="num">7</span> Verificar la instalación</h1>
+  <p class="para">Responsable de sistemas</p>
+  <p>Haz esta revisión en cada caja, con un usuario real de esa sucursal, antes de entregarla.</p>
+  <ul class="check">
+    <li>La aplicación abre y muestra la pantalla de acceso.</li>
+    <li>El inicio de sesión entra al punto de venta. La primera vez del día puede tardar hasta un minuto mientras Render despierta.</li>
+    <li>La barra superior muestra el usuario y la etiqueta <span class="ui">SUC-#</span> de la sucursal correcta.</li>
+    <li>El punto de venta lista productos con existencias. Si la lista sale vacía, la sucursal no tiene inventario cargado.</li>
+    <li>El lector de código de barras agrega un producto al carrito con una sola lectura.</li>
+    <li>Historial carga las ventas de la sucursal.</li>
+    <li>Con un usuario de gerente, Reportes genera y abre el PDF del día.</li>
+    <li>Cerrar sesión regresa a la pantalla de acceso.</li>
+  </ul>
+  <div class="caja importante"><b class="t">Venta de prueba</b><div><p>Una venta de prueba descuenta existencias reales y el cajero no puede cancelarla. Si necesitas probar el cobro, hazlo con un producto de prueba y pide al administrador que ajuste el inventario después.</p></div></div>
+  <div class="caja aviso"><b class="t">Reportes</b><div><p>La aplicación de escritorio bloquea las ventanas nuevas, y Reportes abre el PDF en una. Es probable que en la versión instalada el reporte no se abra. Si pasa, anótalo como falla conocida y genera los reportes desde la versión web (capítulo 9) mientras se corrige.</p></div></div>
+</section>
+
+<!-- ═════════════ 8. ACTUALIZAR ═════════════ -->
+<section class="cap" id="c8">
+  <h1><span class="num">8</span> Actualizar y revertir</h1>
+  <p class="para">Responsable de sistemas</p>
+  <p>La aplicación no se actualiza sola. Cada versión nueva se instala a mano en cada caja, fuera del horario de venta.</p>
+  <table class="ancha">
+    <thead><tr><th style="width:20%">Formato</th><th>Cómo actualizar</th></tr></thead>
+    <tbody>
+      <tr><td><b>AppImage</b></td><td>Cierra la aplicación, reemplaza el archivo por el nuevo y dale permiso de ejecución otra vez.</td></tr>
+      <tr><td><b>.deb</b></td><td><code>sudo apt install ./front-trt_X.Y.Z_amd64.deb</code>. apt reemplaza la versión instalada.</td></tr>
+      <tr><td><b>Windows</b></td><td>Cierra la aplicación y ejecuta el <code>Setup</code> nuevo. Reemplaza la versión anterior.</td></tr>
+    </tbody>
+  </table>
+  <h3>Revertir</h3>
+  <p>Guarda los instaladores de cada versión liberada fuera de <code>dist_electron/</code>, en una carpeta con el número de versión. Si la versión nueva falla, instala la anterior de la misma forma. En <code>.deb</code>, apt puede pedir confirmación para bajar de versión: <code>sudo apt install --allow-downgrades ./front-trt_X.Y.Z_amd64.deb</code>.</p>
+  <div class="caja nota"><b class="t">Datos</b><div><p>Actualizar o revertir la aplicación no toca ventas, inventario ni usuarios, porque viven en el backend. Lo único local es la sesión guardada, que a lo mucho obliga a iniciar sesión otra vez.</p></div></div>
+</section>
+
+<!-- ═════════════ 9. WEB ═════════════ -->
+<section class="cap" id="c9">
+  <h1><span class="num">9</span> Publicar como sitio web</h1>
+  <p class="para">Responsable de sistemas</p>
+  <p>El destino oficial es la aplicación de escritorio. Si hace falta abrir el sistema desde un navegador, por ejemplo para generar reportes, la misma compilación sirve como sitio estático. En el navegador la impresión de tickets queda desactivada.</p>
+  <ol class="pasos">
+    <li>Compila con base absoluta. La configuración de producción usa <code>baseHref: "./"</code> para Electron; en un servidor web eso rompe la carga de archivos al recargar una ruta interna.</li>
+  </ol>
+<pre class="term"><code><span class="k">npx ng build --configuration=production --base-href /</span></code></pre>
+  <ol class="pasos" start="2" style="counter-reset: paso 1">
+    <li>Sube el contenido de <code>dist/front-trt/browser/</code> a cualquier servidor de archivos estáticos.</li>
+    <li>Configura el servidor para que responda <code>index.html</code> a cualquier ruta que no sea un archivo. Sin eso, recargar en <code>/sales</code> da 404.</li>
+    <li>En el backend, agrega el dominio del sitio a <code>CORS_ALLOWED_ORIGINS</code>. Sin ese permiso, el navegador bloquea las peticiones a la API.</li>
+  </ol>
+  <p>Ejemplo de regla de respaldo en nginx:</p>
+<pre><code>location / {
+  try_files $uri $uri/ /index.html;
+}</code></pre>
+  <div class="caja aviso"><b class="t">No usar ng serve</b><div><p><code>npm start</code> y <code>npm run web</code> levantan el servidor de desarrollo, sin optimizar y con el entorno de desarrollo. No sirven para publicar.</p></div></div>
+</section>
+
+<!-- ═════════════ 10. PROBLEMAS ═════════════ -->
+<section class="cap" id="c10">
+  <h1><span class="num">10</span> Solución de problemas</h1>
+  <p class="para">Responsable de sistemas</p>
+  <table class="ancha">
+    <thead><tr><th style="width:42%">Qué pasa</th><th>Qué hacer</th></tr></thead>
+    <tbody>
+      <tr><td><code>EACCES: permission denied</code> al compilar.</td><td>Hay archivos de root que dejó Docker. Corre el <code>chown</code> del capítulo 4.</td></tr>
+      <tr><td><code>Docker no está instalado</code> al correr <code>build:installer:win</code>.</td><td>Instala Docker o compila desde Windows (sección 5.3). Si está instalado, revisa que el servicio corra y que tu usuario pueda usarlo sin sudo.</td></tr>
+      <tr><td>Falla el <code>.deb</code> con un error sobre <code>ar</code>.</td><td>Falta binutils: <code>sudo apt install binutils</code>.</td></tr>
+      <tr><td><code>npm run electron:prod</code> dice <span class="msg">No se encontró index.html de Angular en dist.</span></td><td>Falta la compilación o quedó incompleta. Corre <code>npm run build:prod</code> y revisa que exista <code>dist/front-trt/browser/index.html</code>.</td></tr>
+      <tr><td>electron-builder se detiene descargando Electron.</td><td>Necesita internet la primera vez. Revisa la conexión o el proxy y repite.</td></tr>
+      <tr><td>El AppImage no abre.</td><td>Revisa el permiso de ejecución. Si menciona FUSE, instala <code>libfuse2</code> (sección 6.1).</td></tr>
+      <tr><td>Windows borra o bloquea el instalador.</td><td>Es SmartScreen o el antivirus, porque el instalador no está firmado (sección 6.3).</td></tr>
+      <tr><td>El inicio de sesión tarda o falla la primera vez del día.</td><td>Render apaga el backend gratuito cuando no hay uso y tarda hasta un minuto en despertar. Espera e intenta otra vez.</td></tr>
+      <tr><td>Error de red al iniciar sesión en todas las cajas.</td><td>Revisa que <code>https://refaccionariaback.onrender.com/api</code> responda desde un navegador. Si no responde, el problema está en el backend.</td></tr>
+      <tr><td>Inicia sesión pero dice <span class="msg">Tu usuario no tiene sucursal asignada.</span></td><td>El administrador debe asignar sucursal al usuario en el backend.</td></tr>
+      <tr><td>Un administrador entra y no ve Administración.</td><td>Le falta un registro de Perfil con <code>rol=admin</code> en el backend.</td></tr>
+      <tr><td>No sale el ticket impreso.</td><td>La versión 1.0 no envía el ticket a la impresora (sección 2.2). Consulta la venta en Historial.</td></tr>
+      <tr><td>El reporte no abre en la app de escritorio.</td><td>Falla conocida probable (capítulo 7). Genera el reporte desde la versión web (capítulo 9).</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ═════════════ 11. LISTA ═════════════ -->
+<section class="cap" id="c11">
+  <h1><span class="num">11</span> Lista de liberación</h1>
+  <p class="para">Responsable de sistemas</p>
+  <p>Imprime esta página y márcala en cada liberación.</p>
+  <h3>Antes de compilar</h3>
+  <ul class="check">
+    <li>Rama y commit a liberar anotados.</li>
+    <li><code>"version"</code> de <code>package.json</code> aumentada.</li>
+    <li><code>apiUrl</code> de <code>environment.prod.ts</code> revisada.</li>
+    <li><code>npm ci</code> sin errores.</li>
+    <li><code>npm run lint</code>, <code>npm run test:coverage</code> y <code>npm run e2e</code> en verde.</li>
+    <li>Sin archivos de root en <code>dist/</code> ni <code>dist_electron/</code>.</li>
+  </ul>
+  <h3>Compilación</h3>
+  <ul class="check">
+    <li><code>npm run build:installer</code> generó el AppImage y el <code>.deb</code> con la versión nueva.</li>
+    <li><code>npm run build:installer:win</code> generó el <code>Setup .exe</code> con la versión nueva.</li>
+    <li><code>chown</code> después de Docker.</li>
+    <li>Instaladores copiados a una carpeta con el número de versión, junto con los de la versión anterior.</li>
+  </ul>
+  <h3>Instalación</h3>
+  <ul class="check">
+    <li>Instalado y verificado en una caja piloto (capítulo 7).</li>
+    <li>Instalado en el resto de las cajas fuera del horario de venta.</li>
+    <li>Cada caja verificada con un usuario de su sucursal.</li>
+    <li>Fallas encontradas anotadas con hora, caja y mensaje exacto.</li>
+  </ul>
+</section>
+
+</body>
+</html>

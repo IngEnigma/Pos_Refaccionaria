@@ -1,0 +1,529 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Manual de Usuario TRT</title>
+<link rel="stylesheet" href="manual.css">
+</head>
+<body>
+
+<!-- ═════════════ PORTADA ═════════════ -->
+<div class="portada">
+  <img class="portada__logo" src="img/Logo_Horizontal.webp" alt="TRT">
+  <div class="portada__titulo">
+    <p class="t1">Manual<br>de usuario</p>
+    <p class="t2">Punto de venta e inventario</p>
+    <p class="t3">Para cajeros y gerentes de sucursal</p>
+  </div>
+  <div class="portada__base">
+    <img class="portada__shot" src="img/pos.png" alt="">
+    <div class="portada__pie">
+      <div><b>Transmisiones y Rodamientos de Tlalnepantla</b><br>Uso interno</div>
+      <div style="text-align:right">Versión 1.0<br>Noviembre 2026</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═════════════ ÍNDICE ═════════════ -->
+<section class="indice">
+  <h1><span class="num"></span> Contenido</h1>
+  <ol>
+    <li><a href="#c1"><span class="n">1</span><span>Bienvenida</span><span class="l"></span><span class="pg"></span></a>
+      <ol>
+        <li><a href="#c1-1"><span></span><span>1.1 Qué puedes hacer con el sistema</span><span class="l"></span><span class="pg"></span></a></li>
+        <li><a href="#c1-2"><span></span><span>1.2 Qué ve cada rol</span><span class="l"></span><span class="pg"></span></a></li>
+        <li><a href="#c1-3"><span></span><span>1.3 Cómo leer este manual</span><span class="l"></span><span class="pg"></span></a></li>
+      </ol></li>
+    <li><a href="#c2"><span class="n">2</span><span>Primeros pasos</span><span class="l"></span><span class="pg"></span></a>
+      <ol>
+        <li><a href="#c2-1"><span></span><span>2.1 Iniciar sesión</span><span class="l"></span><span class="pg"></span></a></li>
+        <li><a href="#c2-2"><span></span><span>2.2 La pantalla</span><span class="l"></span><span class="pg"></span></a></li>
+        <li><a href="#c2-3"><span></span><span>2.3 Cerrar sesión</span><span class="l"></span><span class="pg"></span></a></li>
+      </ol></li>
+    <li><a href="#c3"><span class="n">3</span><span>Punto de venta</span><span class="l"></span><span class="pg"></span></a>
+      <ol>
+        <li><a href="#c3-1"><span></span><span>3.1 Vista general</span><span class="l"></span><span class="pg"></span></a></li>
+        <li><a href="#c3-2"><span></span><span>3.2 Agregar productos</span><span class="l"></span><span class="pg"></span></a></li>
+        <li><a href="#c3-3"><span></span><span>3.3 Ajustar el carrito</span><span class="l"></span><span class="pg"></span></a></li>
+        <li><a href="#c3-4"><span></span><span>3.4 Elegir cliente</span><span class="l"></span><span class="pg"></span></a></li>
+        <li><a href="#c3-5"><span></span><span>3.5 Cobrar la venta</span><span class="l"></span><span class="pg"></span></a></li>
+        <li><a href="#c3-6"><span></span><span>3.6 El ticket</span><span class="l"></span><span class="pg"></span></a></li>
+      </ol></li>
+    <li><a href="#c4"><span class="n">4</span><span>Inventario</span><span class="l"></span><span class="pg"></span></a>
+      <ol>
+        <li><a href="#c4-1"><span></span><span>4.1 Leer una tarjeta de producto</span><span class="l"></span><span class="pg"></span></a></li>
+        <li><a href="#c4-2"><span></span><span>4.2 Añadir un producto</span><span class="l"></span><span class="pg"></span></a></li>
+        <li><a href="#c4-3"><span></span><span>4.3 Editar un producto</span><span class="l"></span><span class="pg"></span></a></li>
+        <li><a href="#c4-4"><span></span><span>4.4 Fijar precio de sucursal</span><span class="l"></span><span class="pg"></span></a></li>
+        <li><a href="#c4-5"><span></span><span>4.5 Eliminar un producto</span><span class="l"></span><span class="pg"></span></a></li>
+      </ol></li>
+    <li><a href="#c5"><span class="n">5</span><span>Clientes</span><span class="l"></span><span class="pg"></span></a>
+      <ol>
+        <li><a href="#c5-1"><span></span><span>5.1 Registrar un cliente</span><span class="l"></span><span class="pg"></span></a></li>
+        <li><a href="#c5-2"><span></span><span>5.2 Editar o eliminar</span><span class="l"></span><span class="pg"></span></a></li>
+      </ol></li>
+    <li><a href="#c6"><span class="n">6</span><span>Proveedores</span><span class="l"></span><span class="pg"></span></a>
+      <ol>
+        <li><a href="#c6-1"><span></span><span>6.1 Registrar un proveedor</span><span class="l"></span><span class="pg"></span></a></li>
+        <li><a href="#c6-2"><span></span><span>6.2 Editar o eliminar</span><span class="l"></span><span class="pg"></span></a></li>
+      </ol></li>
+    <li><a href="#c7"><span class="n">7</span><span>Historial de ventas</span><span class="l"></span><span class="pg"></span></a></li>
+    <li><a href="#c8"><span class="n">8</span><span>Reportes</span><span class="l"></span><span class="pg"></span></a></li>
+    <li><a href="#c9"><span class="n">9</span><span>Notificaciones</span><span class="l"></span><span class="pg"></span></a></li>
+    <li><a href="#c10"><span class="n">10</span><span>Funciones de gerente</span><span class="l"></span><span class="pg"></span></a>
+      <ol>
+        <li><a href="#c10-1"><span></span><span>10.1 Inventario por sucursal</span><span class="l"></span><span class="pg"></span></a></li>
+        <li><a href="#c10-2"><span></span><span>10.2 Registrar movimientos</span><span class="l"></span><span class="pg"></span></a></li>
+        <li><a href="#c10-3"><span></span><span>10.3 Cajeros</span><span class="l"></span><span class="pg"></span></a></li>
+      </ol></li>
+    <li><a href="#c11"><span class="n">11</span><span>Solución de problemas</span><span class="l"></span><span class="pg"></span></a></li>
+    <li><a href="#c12"><span class="n">12</span><span>Glosario</span><span class="l"></span><span class="pg"></span></a></li>
+  </ol>
+</section>
+
+<!-- ═════════════ 1. BIENVENIDA ═════════════ -->
+<section class="cap" id="c1">
+  <h1><span class="num">1</span> Bienvenida</h1>
+  <p class="para">Cajero y gerente</p>
+  <p>Este manual es para quien atiende el mostrador y para el gerente de la sucursal. Explica cómo vender, consultar existencias, registrar clientes y proveedores, revisar ventas pasadas y generar reportes en el sistema de Transmisiones y Rodamientos de Tlalnepantla (TRT).</p>
+
+  <h2 id="c1-1"><span class="num">1.1</span> Qué puedes hacer con el sistema</h2>
+  <ul>
+    <li>Vender en el mostrador, con lector de código de barras o eligiendo el producto en pantalla.</li>
+    <li>Emitir y reimprimir tickets de venta.</li>
+    <li>Ver el precio y las existencias de cada producto de tu sucursal.</li>
+    <li>Registrar clientes y proveedores con sus datos de contacto.</li>
+    <li>Revisar las ventas registradas y el detalle de cada una.</li>
+    <li>Generar reportes en PDF por día, semana, quincena, mes o año (gerente).</li>
+    <li>Registrar entradas y salidas de mercancía en la sucursal (gerente).</li>
+  </ul>
+
+  <h2 id="c1-2"><span class="num">1.2</span> Qué ve cada rol</h2>
+  <p>El menú lateral muestra solo las opciones de tu rol. El gerente ve todo lo que ve el cajero y, además, las pantallas de control de la sucursal.</p>
+  <table class="ancha">
+    <thead><tr><th>Opción del menú</th><th>Para qué sirve</th><th class="c">Cajero</th><th class="c">Gerente</th></tr></thead>
+    <tbody>
+      <tr><td><b>Menú</b></td><td>Punto de venta</td><td class="c si">✓</td><td class="c si">✓</td></tr>
+      <tr><td><b>Inventario</b></td><td>Productos y precios de tu sucursal</td><td class="c si">✓</td><td class="c si">✓</td></tr>
+      <tr><td><b>Reportes</b></td><td>Reportes de ventas en PDF</td><td class="c no">—*</td><td class="c si">✓</td></tr>
+      <tr><td><b>Historial</b></td><td>Ventas registradas</td><td class="c si">✓</td><td class="c si">✓</td></tr>
+      <tr><td><b>Proveedores</b></td><td>Directorio de proveedores</td><td class="c si">✓</td><td class="c si">✓</td></tr>
+      <tr><td><b>Clientes</b></td><td>Registro de clientes</td><td class="c si">✓</td><td class="c si">✓</td></tr>
+      <tr><td><b>Notificaciones</b></td><td>Avisos del sistema</td><td class="c si">✓</td><td class="c si">✓</td></tr>
+      <tr><td><b>Inventario Sucursal</b></td><td>Existencias y movimientos de entrada y salida</td><td class="c no">—</td><td class="c si">✓</td></tr>
+      <tr><td><b>Cajeros</b></td><td>Cajeros de la sucursal</td><td class="c no">—</td><td class="c si">✓</td></tr>
+    </tbody>
+  </table>
+  <p class="pie-tabla">* El cajero ve Reportes en el menú, pero no puede generar reportes.</p>
+  <p>Dentro de cada pantalla, algunas acciones son solo del gerente:</p>
+  <table class="ancha">
+    <thead><tr><th>Acción</th><th class="c">Cajero</th><th class="c">Gerente</th></tr></thead>
+    <tbody>
+      <tr><td>Vender y consultar inventario, historial y notificaciones</td><td class="c si">✓</td><td class="c si">✓</td></tr>
+      <tr><td>Registrar productos, clientes y proveedores nuevos</td><td class="c si">✓</td><td class="c si">✓</td></tr>
+      <tr><td>Editar o eliminar productos, clientes y proveedores</td><td class="c no">—</td><td class="c si">✓</td></tr>
+      <tr><td>Fijar precio de sucursal</td><td class="c no">—</td><td class="c si">✓</td></tr>
+      <tr><td>Generar reportes</td><td class="c no">—</td><td class="c si">✓</td></tr>
+      <tr><td>Registrar entradas y salidas de inventario</td><td class="c no">—</td><td class="c si">✓</td></tr>
+    </tbody>
+  </table>
+  <p>Si un cajero intenta una de estas acciones, el sistema muestra un error y no guarda el cambio.</p>
+
+  <h2 id="c1-3"><span class="num">1.3</span> Cómo leer este manual</h2>
+  <p>Debajo del título de cada capítulo dice para quién es: <b>cajero y gerente</b> (cuadro azul) o <b>solo gerente</b> (cuadro amarillo). Los botones y campos de la pantalla se escriben así: <span class="ui">Procesar transacción</span>, y los mensajes del sistema van en <span class="msg">cursiva</span>.</p>
+  <p>Las notas llevan su tipo a la izquierda. <b style="color:var(--verde)">Consejo</b> es una recomendación, <b style="color:var(--azul)">Nota</b> aclara algo, e <b style="color:var(--rojo)">Importante</b> marca lo que no se puede deshacer o lo que afecta dinero o existencias.</p>
+</section>
+
+<!-- ═════════════ 2. PRIMEROS PASOS ═════════════ -->
+<section class="cap" id="c2">
+  <h1><span class="num">2</span> Primeros pasos</h1>
+  <p class="para">Cajero y gerente</p>
+
+  <h2 id="c2-1"><span class="num">2.1</span> Iniciar sesión</h2>
+  <p>El administrador te da tu usuario y contraseña. Son personales; no los compartas.</p>
+  <ol class="pasos">
+    <li>Abre la aplicación TRT en tu computadora.</li>
+    <li>Escribe tu usuario en <span class="ui">Usuario</span> y tu contraseña en <span class="ui">Contraseña</span>.</li>
+    <li>Marca <span class="ui">Recordar sesión</span> solo si nadie más usa esa computadora.</li>
+    <li>Pulsa <span class="ui">Ingresar</span>. Entras directo al punto de venta.</li>
+  </ol>
+  <figure><img src="img/login.png" alt="Pantalla de inicio de sesión"><figcaption>Pantalla de acceso.</figcaption></figure>
+  <div class="caja nota"><b class="t">Nota</b><div><p>En la primera entrada del día el botón puede quedarse en <span class="msg">Ingresando...</span> hasta un minuto mientras arranca el servidor. Espera sin cerrar la ventana; después el sistema responde rápido.</p></div></div>
+  <div class="caja importante"><b class="t">Importante</b><div><p>Si aparece <span class="msg">Tu usuario no tiene sucursal asignada.</span>, no podrás vender ni ver inventario hasta que el administrador te asigne una sucursal.</p></div></div>
+
+  <h2 id="c2-2"><span class="num">2.2</span> La pantalla</h2>
+  <p>Todas las pantallas tienen el menú lateral a la izquierda y la barra superior arriba.</p>
+  <div class="dos">
+    <figure><img src="img/menu-lateral.png" alt="Menú lateral"><figcaption>Menú lateral del gerente.</figcaption></figure>
+    <div>
+      <h3>Menú lateral</h3>
+      <p>Te lleva a cada sección. La opción en la que estás aparece resaltada. Las opciones dependen de tu rol (tabla de la sección 1.2).</p>
+      <h3>Barra superior</h3>
+      <p>De izquierda a derecha:</p>
+      <ul>
+        <li>El buscador, que busca dentro de la pantalla actual.</li>
+        <li>Tu usuario, con la etiqueta <span class="ui">SUC-#</span> que indica el número de tu sucursal, y la fecha del día.</li>
+        <li>El botón de perfil, desde donde cierras sesión.</li>
+        <li>La campana de notificaciones. El número rojo es lo que no has leído.</li>
+      </ul>
+    </div>
+  </div>
+  <figure><img src="img/barra-superior.png" alt="Barra superior"><figcaption>Barra superior: buscador, usuario, sucursal, fecha, perfil y notificaciones.</figcaption></figure>
+
+  <h2 id="c2-3"><span class="num">2.3</span> Cerrar sesión</h2>
+  <ol class="pasos">
+    <li>Pulsa el botón de perfil en la barra superior.</li>
+    <li>Elige <span class="ui">Cerrar sesión</span>.</li>
+  </ol>
+  <figure class="chica"><img src="img/perfil.png" alt="Menú de perfil"><figcaption>Menú de perfil.</figcaption></figure>
+  <div class="caja consejo"><b class="t">Consejo</b><div><p>Cierra sesión al terminar tu turno o cuando te alejes de la caja. Cada venta queda a nombre del usuario que tiene la sesión abierta.</p></div></div>
+</section>
+
+<!-- ═════════════ 3. PUNTO DE VENTA ═════════════ -->
+<section class="cap" id="c3">
+  <h1><span class="num">3</span> Punto de venta</h1>
+  <p class="para">Cajero y gerente</p>
+  <p>Es la pantalla principal, la opción <span class="ui">Menú</span> del menú lateral. Aquí armas la venta, eliges cliente y forma de pago, y emites el ticket.</p>
+
+  <h2 id="c3-1"><span class="num">3.1</span> Vista general</h2>
+  <figure><img src="img/pos.png" alt="Punto de venta"><figcaption>Punto de venta: categorías, lector de código, productos y el panel Detalle de Venta.</figcaption></figure>
+  <dl class="partes">
+    <dt>Categorías</dt><dd>Filtran los productos. <span class="ui">Todos</span> muestra el catálogo completo.</dd>
+    <dt>Escanear código de barras</dt><dd>El campo donde escribe el lector.</dd>
+    <dt>Productos</dt><dd>Solo aparecen los que tienen existencias en tu sucursal. Al bajar se cargan más.</dd>
+    <dt>Detalle de Venta</dt><dd>A la derecha: cliente, productos agregados, totales, forma de pago y el botón para cobrar.</dd>
+  </dl>
+  <p>Cada tarjeta muestra nombre, descripción, precio y existencias. La etiqueta <span class="ui">Sucursal</span> junto al precio indica un precio especial de tu sucursal, distinto del general.</p>
+
+  <h2 id="c3-2"><span class="num">3.2</span> Agregar productos</h2>
+  <h3>Con lector de código de barras</h3>
+  <ol class="pasos">
+    <li>Revisa que el cursor esté en <span class="ui">Escanear código de barras...</span> Al abrir la pantalla ya está ahí.</li>
+    <li>Escanea el producto. El lector manda el código y el Enter por sí solo.</li>
+    <li>Aparece el aviso <span class="msg">«Producto» agregado al carrito</span>.</li>
+  </ol>
+  <p>Sin lector, escribe el código en el mismo campo y pulsa Enter.</p>
+  <h3>Desde la pantalla</h3>
+  <ol class="pasos">
+    <li>Elige una categoría o busca el producto en la lista.</li>
+    <li>Pulsa <span class="ui">Añadir</span> en su tarjeta. Si el botón está gris, no hay existencias.</li>
+  </ol>
+  <div class="caja aviso"><b class="t">Mensajes al escanear</b><div>
+    <p><span class="msg">Producto no encontrado en tu sucursal o sin stock</span>: el código no existe en tu sucursal. Revisa el código o pregunta al gerente.</p>
+    <p><span class="msg">Producto sin existencias en esta sucursal</span>: el producto existe, pero quedan 0 piezas.</p>
+  </div></div>
+
+  <h2 id="c3-3"><span class="num">3.3</span> Ajustar el carrito</h2>
+  <figure><img src="img/pos-carrito.png" alt="Venta con productos en el carrito"><figcaption>Venta en curso con productos, totales y forma de pago.</figcaption></figure>
+  <ul>
+    <li><span class="ui">+</span> y <span class="ui">−</span> cambian la cantidad de piezas.</li>
+    <li>La papelera quita el producto del carrito.</li>
+    <li>Con el carrito vacío verás <span class="msg">No hay productos agregados.</span></li>
+  </ul>
+  <h3>Totales</h3>
+  <table>
+    <thead><tr><th>Concepto</th><th>Qué es</th></tr></thead>
+    <tbody>
+      <tr><td><b>Subtotal</b></td><td>La suma de los productos, sin IVA.</td></tr>
+      <tr><td><b>IVA</b></td><td>El 16 % del subtotal.</td></tr>
+      <tr><td><b>Total</b></td><td>Subtotal más IVA. Es lo que paga el cliente.</td></tr>
+    </tbody>
+  </table>
+  <div class="caja nota"><b class="t">Nota</b><div><p>Los precios del catálogo <b>no incluyen IVA</b>. El sistema suma el 16 % al cobrar, así que el total es mayor que la suma de los precios. Por ejemplo, dos piezas de $100 dan un subtotal de $200, IVA de $32 y total de $232.</p></div></div>
+
+  <h2 id="c3-4"><span class="num">3.4</span> Elegir cliente</h2>
+  <p>Si no eliges a nadie, la venta queda como <b>Público general</b>. Para asignarla a un cliente registrado:</p>
+  <ol class="pasos">
+    <li>En el panel Detalle de Venta pulsa <span class="ui">Cambiar</span>, junto a «Cliente».</li>
+    <li>Busca por nombre, apellidos o teléfono.</li>
+    <li>Pulsa sobre el cliente. La ventana se cierra y su nombre aparece en el panel.</li>
+  </ol>
+  <figure><img src="img/pos-cliente.png" alt="Selección de cliente"><figcaption>Ventana Seleccionar cliente.</figcaption></figure>
+  <div class="caja consejo"><b class="t">Consejo</b><div><p>Si el cliente no está registrado, dalo de alta primero en <span class="ui">Clientes</span> (capítulo 5). Para regresar a público general, abre la misma ventana y elige <span class="ui">Público general</span>.</p></div></div>
+
+  <h2 id="c3-5"><span class="num">3.5</span> Cobrar la venta</h2>
+  <ol class="pasos">
+    <li>Revisa productos, cantidades y total.</li>
+    <li>En <span class="ui">Seleccionar método de pago</span> elige Efectivo o Tarjeta. El botón elegido queda resaltado.</li>
+    <li>Cobra al cliente.</li>
+    <li>Pulsa <span class="ui">Procesar transacción</span>. Mientras se registra verás <span class="msg">Procesando transacción...</span></li>
+    <li>Al terminar aparece <span class="msg">Venta registrada correctamente.</span> y se abre el ticket.</li>
+  </ol>
+  <div class="caja nota"><b class="t">Botón gris</b><div><p>Si <span class="ui">Procesar transacción</span> está gris, falta agregar al menos un producto o elegir la forma de pago.</p></div></div>
+  <div class="caja importante"><b class="t">Importante</b><div><p>Justo antes de registrar, el sistema vuelve a revisar existencias. Si otra caja vendió el mismo producto, verás un aviso como <span class="msg">Stock insuficiente para «Producto»: solicitas 3, disponible 1.</span> Baja la cantidad y procesa otra vez.</p><p>Desde la caja no se puede deshacer una venta registrada.</p></div></div>
+
+  <h2 id="c3-6"><span class="num">3.6</span> El ticket</h2>
+  <p>Al terminar cada venta aparece el ticket con folio, productos, totales y forma de pago.</p>
+  <figure class="chica"><img src="img/pos-ticket.png" alt="Ticket de venta"><figcaption>Ticket de una venta.</figcaption></figure>
+  <ul>
+    <li><span class="ui">Reimprimir ticket</span> manda el ticket otra vez a la impresora.</li>
+    <li><span class="ui">Cerrar</span> cierra el ticket y deja la caja lista para la siguiente venta.</li>
+  </ul>
+  <div class="caja aviso"><b class="t">Si no sale el ticket</b><div><p>Si ves <span class="msg">Venta registrada, pero no se pudo obtener el ticket. Consúltalo en el historial de ventas.</span>, la venta sí se guardó. No la repitas: búscala en <span class="ui">Historial</span> (capítulo 7).</p></div></div>
+</section>
+
+<!-- ═════════════ 4. INVENTARIO ═════════════ -->
+<section class="cap" id="c4">
+  <h1><span class="num">4</span> Inventario</h1>
+  <p class="para">Cajero y gerente</p>
+  <p>Lista los productos de tu sucursal con su precio y existencias.</p>
+  <figure><img src="img/inventario.png" alt="Inventario"><figcaption>Inventario de la sucursal.</figcaption></figure>
+
+  <h2 id="c4-1"><span class="num">4.1</span> Leer una tarjeta de producto</h2>
+  <ul>
+    <li>Arriba van la clave (#), la marca y el código de barras.</li>
+    <li>El precio lleva la etiqueta <span class="ui">Sucursal</span> cuando es un precio especial de tu sucursal.</li>
+    <li>Las existencias («N en stock») tienen una barra de nivel, que cambia a color de alerta cuando quedan pocas piezas o se agotan.</li>
+    <li>Abajo están <span class="ui">Editar</span>, <span class="ui">Precio</span> y la papelera para eliminar.</li>
+  </ul>
+  <div class="caja nota"><b class="t">Nota</b><div><p>El cajero puede registrar productos nuevos. Editar, cambiar el precio y eliminar son acciones del gerente.</p></div></div>
+
+  <h2 id="c4-2"><span class="num">4.2</span> Añadir un producto</h2>
+  <ol class="pasos">
+    <li>Pulsa <span class="ui">+ Añadir Producto</span>.</li>
+    <li>Llena el formulario. Si falta un campo obligatorio, se marca en rojo.</li>
+    <li>Pulsa <span class="ui">Crear Producto</span>. El botón se activa cuando todos los campos obligatorios son válidos.</li>
+  </ol>
+  <figure><img src="img/inventario-nuevo.png" alt="Formulario de nuevo producto"><figcaption>Formulario Nuevo Producto.</figcaption></figure>
+  <table>
+    <thead><tr><th>Campo</th><th>Obligatorio</th><th>Indicaciones</th></tr></thead>
+    <tbody>
+      <tr><td>Nombre del Producto</td><td class="req">Sí</td><td>Mínimo 3 caracteres. Ej.: «Filtro de Aceite PH2».</td></tr>
+      <tr><td>Clave / SKU</td><td class="req">Sí</td><td>Clave interna del producto.</td></tr>
+      <tr><td>Código de Barras</td><td class="req">Sí</td><td>El número que lee el escáner.</td></tr>
+      <tr><td>Categoría</td><td class="req">Sí</td><td>Se elige de la lista.</td></tr>
+      <tr><td>Marca</td><td class="req">Sí</td><td>Ej.: Fram, Bosch.</td></tr>
+      <tr><td>Costo (Compra)</td><td class="req">Sí</td><td>Lo que cuesta comprarlo.</td></tr>
+      <tr><td>Precio de Venta</td><td class="req">Sí</td><td>Precio general, sin IVA. El IVA se suma al cobrar.</td></tr>
+      <tr><td>Código SAT</td><td>No</td><td>Máximo 8 caracteres.</td></tr>
+      <tr><td>Descripción</td><td>No</td><td>Detalles adicionales.</td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="c4-3"><span class="num">4.3</span> <span>Editar un producto <span class="tag">Solo gerente</span></span></h2>
+  <p>Pulsa <span class="ui">Editar</span> en la tarjeta, corrige los datos y pulsa <span class="ui">Guardar Cambios</span>. Verás <span class="msg">Producto actualizado correctamente</span>.</p>
+
+  <h2 id="c4-4"><span class="num">4.4</span> <span>Fijar precio de sucursal <span class="tag">Solo gerente</span></span></h2>
+  <p>Sirve para que un producto cueste en tu sucursal algo distinto del precio general.</p>
+  <ol class="pasos">
+    <li>Pulsa <span class="ui">Precio</span> en la tarjeta del producto.</li>
+    <li>Escribe el nuevo <span class="ui">Precio de Venta (MXN)</span>.</li>
+    <li>Confirma. Verás <span class="msg">Precio de sucursal actualizado correctamente</span> y la etiqueta <span class="ui">Sucursal</span> junto al precio.</li>
+  </ol>
+  <figure class="chica"><img src="img/inventario-precio.png" alt="Fijar precio de sucursal"><figcaption>Ventana Fijar Precio de Sucursal.</figcaption></figure>
+
+  <h2 id="c4-5"><span class="num">4.5</span> <span>Eliminar un producto <span class="tag">Solo gerente</span></span></h2>
+  <p>Pulsa la papelera de la tarjeta y confirma.</p>
+  <div class="caja importante"><b class="t">Importante</b><div><p>Eliminar un producto no se puede deshacer. Si solo quieres dejar de venderlo un tiempo, consulta antes con el administrador.</p></div></div>
+</section>
+
+<!-- ═════════════ 5. CLIENTES ═════════════ -->
+<section class="cap" id="c5">
+  <h1><span class="num">5</span> Clientes</h1>
+  <p class="para">Cajero y gerente</p>
+  <p>Aquí están los clientes de la sucursal con sus datos de contacto y fiscales. Un cliente registrado se puede asignar a una venta (sección 3.4).</p>
+  <figure><img src="img/clientes.png" alt="Lista de clientes"><figcaption>Lista de clientes con nombre, teléfono, correo y RFC.</figcaption></figure>
+
+  <h2 id="c5-1"><span class="num">5.1</span> Registrar un cliente</h2>
+  <ol class="pasos">
+    <li>Pulsa <span class="ui">+ Registrar Cliente</span>, arriba a la derecha.</li>
+    <li>Llena los datos y pulsa <span class="ui">Registrar Cliente</span>.</li>
+  </ol>
+  <figure><img src="img/clientes-nuevo.png" alt="Formulario de nuevo cliente"><figcaption>Formulario Nuevo Cliente.</figcaption></figure>
+  <table>
+    <thead><tr><th>Campo</th><th>Obligatorio</th><th>Indicaciones</th></tr></thead>
+    <tbody>
+      <tr><td>Nombre(s)</td><td class="req">Sí</td><td>Mínimo 2 caracteres.</td></tr>
+      <tr><td>Apellido Paterno</td><td class="req">Sí</td><td></td></tr>
+      <tr><td>Apellido Materno</td><td>No</td><td></td></tr>
+      <tr><td>Teléfono</td><td class="req">Sí</td><td>De 7 a 15 caracteres.</td></tr>
+      <tr><td>Correo Electrónico</td><td>No</td><td>Con formato válido (nombre@dominio.com).</td></tr>
+      <tr><td>RFC</td><td>No</td><td>Máximo 13 caracteres. Hace falta si el cliente pide factura.</td></tr>
+      <tr><td>Dirección</td><td>No</td><td>Calle, número, colonia, ciudad.</td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="c5-2"><span class="num">5.2</span> <span>Editar o eliminar <span class="tag">Solo gerente</span></span></h2>
+  <p>En la columna Acciones, el lápiz abre el formulario para editar (se guarda con <span class="ui">Guardar Cambios</span>) y la papelera elimina al cliente después de pedir confirmación.</p>
+</section>
+
+<!-- ═════════════ 6. PROVEEDORES ═════════════ -->
+<section class="cap" id="c6">
+  <h1><span class="num">6</span> Proveedores</h1>
+  <p class="para">Cajero y gerente</p>
+  <p>Directorio de proveedores con dirección, teléfono y correo. Al pulsar un correo se abre tu programa de correo para escribirle.</p>
+  <figure><img src="img/proveedores.png" alt="Lista de proveedores"><figcaption>Lista de proveedores.</figcaption></figure>
+
+  <h2 id="c6-1"><span class="num">6.1</span> Registrar un proveedor</h2>
+  <ol class="pasos">
+    <li>Pulsa <span class="ui">+ Registrar Proveedor</span>, arriba a la derecha.</li>
+    <li>Llena los datos y pulsa <span class="ui">Registrar Proveedor</span>.</li>
+  </ol>
+  <figure><img src="img/proveedores-nuevo.png" alt="Formulario de nuevo proveedor"><figcaption>Formulario Nuevo Proveedor.</figcaption></figure>
+  <table>
+    <thead><tr><th>Campo</th><th>Obligatorio</th><th>Indicaciones</th></tr></thead>
+    <tbody>
+      <tr><td>Nombre / Razón Social</td><td class="req">Sí</td><td>Mínimo 3 caracteres.</td></tr>
+      <tr><td>Dirección</td><td class="req">Sí</td><td>Calle, número, colonia, ciudad.</td></tr>
+      <tr><td>Teléfono</td><td class="req">Sí</td><td>Solo números.</td></tr>
+      <tr><td>Correo Electrónico</td><td class="req">Sí</td><td>Con formato válido.</td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="c6-2"><span class="num">6.2</span> <span>Editar o eliminar <span class="tag">Solo gerente</span></span></h2>
+  <p>Usa el lápiz o la papelera de la columna Acciones. Para eliminar, el sistema pide confirmación.</p>
+</section>
+
+<!-- ═════════════ 7. HISTORIAL ═════════════ -->
+<section class="cap" id="c7">
+  <h1><span class="num">7</span> Historial de ventas</h1>
+  <p class="para">Cajero y gerente</p>
+  <p>Lista las ventas registradas con su número (ID), fecha y hora, vendedor, forma de pago y total.</p>
+  <figure><img src="img/historial.png" alt="Historial de ventas"><figcaption>Historial de ventas.</figcaption></figure>
+  <ul>
+    <li>Para buscar una venta, escribe su número o el nombre del vendedor en <span class="ui">Buscar por ID o Usuario...</span></li>
+    <li>Para filtrar por forma de pago, elige <span class="ui">Efectivo</span>, <span class="ui">Tarjeta</span> o <span class="ui">Todos los métodos</span>.</li>
+    <li><span class="ui">Actualizar</span> recarga la lista con las ventas más recientes.</li>
+    <li><span class="ui">Detalle</span> abre la venta con sus productos.</li>
+  </ul>
+  <figure><img src="img/historial-detalle.png" alt="Detalle de una venta"><figcaption>Detalle de una venta.</figcaption></figure>
+  <p>En el detalle, <span class="ui">Imprimir Ticket</span> vuelve a imprimir el comprobante de esa venta.</p>
+  <div class="caja consejo"><b class="t">Consejo</b><div><p>Si un cliente pide una aclaración sobre una compra, pídele el folio de su ticket y búscalo aquí.</p></div></div>
+</section>
+
+<!-- ═════════════ 8. REPORTES ═════════════ -->
+<section class="cap" id="c8">
+  <h1><span class="num">8</span> Reportes</h1>
+  <p class="para gerente">Solo gerente</p>
+  <p>Genera reportes de operación en PDF. Los cajeros ven esta opción en el menú, pero no pueden generar reportes.</p>
+  <figure><img src="img/reportes.png" alt="Centro de reportes"><figcaption>Centro de Reportes con el periodo mensual elegido.</figcaption></figure>
+  <ol class="pasos">
+    <li>Elige una opción en <span class="ui">Periodo del Reporte</span>.</li>
+    <li>Si elegiste Quincenal, Mensual o Anual, llena los campos que aparecen: <span class="ui">Mes</span>, <span class="ui">Quincena</span> o <span class="ui">Año</span>.</li>
+    <li>Pulsa <span class="ui">Ver Reporte</span>. El reporte se abre en una ventana nueva, donde puedes imprimirlo o guardarlo.</li>
+  </ol>
+  <table>
+    <thead><tr><th>Periodo</th><th>Qué incluye</th><th>Datos a elegir</th></tr></thead>
+    <tbody>
+      <tr><td>Hoy</td><td>Ventas del día</td><td>—</td></tr>
+      <tr><td>Semana Actual</td><td>Ventas de la semana en curso</td><td>—</td></tr>
+      <tr><td>Quincenal (Específico)</td><td>Una quincena</td><td>Mes, quincena y año</td></tr>
+      <tr><td>Mensual (Específico)</td><td>Un mes completo</td><td>Mes y año</td></tr>
+      <tr><td>Anual (Específico)</td><td>Un año completo</td><td>Año</td></tr>
+    </tbody>
+  </table>
+  <div class="caja nota"><b class="t">Nota</b><div><p>Mientras se arma el reporte verás <span class="msg">Generando...</span>. Si la ventana no se abre, permite las ventanas emergentes para el sistema.</p></div></div>
+</section>
+
+<!-- ═════════════ 9. NOTIFICACIONES ═════════════ -->
+<section class="cap" id="c9">
+  <h1><span class="num">9</span> Notificaciones</h1>
+  <p class="para">Cajero y gerente</p>
+  <p>La campana de la barra superior muestra cuántos avisos del sistema no has leído. Púlsala para verlos rápido, o entra a <span class="ui">Notificaciones</span> en el menú para ver la lista completa.</p>
+  <figure><img src="img/notificaciones.png" alt="Notificaciones"><figcaption>Pantalla de notificaciones.</figcaption></figure>
+  <ul>
+    <li>La palomita marca el aviso como leído.</li>
+    <li>La papelera lo elimina.</li>
+    <li><span class="ui">Marcar todo como leído</span> pone el contador en cero.</li>
+  </ul>
+</section>
+
+<!-- ═════════════ 10. GERENTE ═════════════ -->
+<section class="cap" id="c10">
+  <h1><span class="num">10</span> Funciones de gerente</h1>
+  <p class="para gerente">Solo gerente</p>
+
+  <h2 id="c10-1"><span class="num">10.1</span> Inventario por sucursal</h2>
+  <p>Muestra las existencias de la sucursal en una tabla y la lista de Movimientos recientes, con entradas y salidas.</p>
+  <figure><img src="img/inventario-sucursal.png" alt="Inventario por sucursal"><figcaption>Inventario por Sucursal con existencias y movimientos recientes.</figcaption></figure>
+  <ul>
+    <li>Las columnas son Producto, Clave, Marca, Código de Barras, Stock, Precio y Acciones.</li>
+    <li>El stock cambia de color: bajo con 5 piezas o menos, medio de 6 a 15.</li>
+    <li>La etiqueta <span class="ui">Sucursal</span> junto al precio indica un precio especial de la sucursal.</li>
+  </ul>
+
+  <h2 id="c10-2"><span class="num">10.2</span> Registrar movimientos</h2>
+  <p>Un movimiento ajusta las existencias del sistema para que coincidan con la mercancía que hay en el local.</p>
+  <table>
+    <thead><tr><th>Tipo</th><th>Cuándo usarlo</th></tr></thead>
+    <tbody>
+      <tr><td><b>Entrada</b></td><td>Llega mercancía de un proveedor, se recibe un traspaso o un cliente devuelve producto en buen estado.</td></tr>
+      <tr><td><b>Salida</b></td><td>Merma, producto dañado, traspaso a otra sucursal o ajuste por conteo físico.</td></tr>
+    </tbody>
+  </table>
+  <ol class="pasos">
+    <li>Pulsa <span class="ui">Movimiento</span> en la fila del producto, o <span class="ui">+ Registrar Movimiento</span> arriba a la derecha.</li>
+    <li>Elige el <span class="ui">Tipo de Movimiento</span>: Entrada o Salida. En una salida aparece el stock actual como referencia.</li>
+    <li>Revisa el <span class="ui">Producto</span>. Si entraste desde la fila, ya viene puesto.</li>
+    <li>Escribe la <span class="ui">Cantidad</span> (mayor que 0) y la <span class="ui">Razón</span> (mínimo 3 caracteres). Agrega <span class="ui">Observaciones</span> si hace falta.</li>
+    <li>Pulsa <span class="ui">Registrar Movimiento</span>.</li>
+  </ol>
+  <figure><img src="img/inventario-movimiento.png" alt="Registrar movimiento"><figcaption>Ventana Registrar Movimiento.</figcaption></figure>
+  <div class="caja importante"><b class="t">Importante</b><div><p>El movimiento cambia las existencias en ese momento, y con ellas lo que los cajeros pueden vender. Escribe una razón clara, como «Compra factura A-1234» o «Merma: caja dañada», para poder rastrearlo después.</p></div></div>
+
+  <h2 id="c10-3"><span class="num">10.3</span> Cajeros</h2>
+  <figure><img src="img/cajeros.png" alt="Cajeros de mi sucursal"><figcaption>Pantalla Cajeros de mi sucursal.</figcaption></figure>
+  <div class="caja aviso"><b class="t">En construcción</b><div><p>Esta pantalla muestra cómo será el alta de cajeros, pero todavía no guarda nada. Por ahora, para dar de alta, modificar o desactivar un cajero, pídeselo al administrador del sistema.</p></div></div>
+</section>
+
+<!-- ═════════════ 11. PROBLEMAS ═════════════ -->
+<section class="cap" id="c11">
+  <h1><span class="num">11</span> Solución de problemas</h1>
+  <p class="para">Cajero y gerente</p>
+  <table class="ancha">
+    <thead><tr><th style="width:42%">Qué pasa</th><th>Qué hacer</th></tr></thead>
+    <tbody>
+      <tr><td>El inicio de sesión tarda mucho (<span class="msg">Ingresando...</span>).</td><td>Pasa en la primera entrada del día porque el servidor está arrancando. Espera hasta un minuto. Si falla, intenta otra vez.</td></tr>
+      <tr><td>Usuario o contraseña incorrectos.</td><td>Revisa mayúsculas y que Bloq Mayús esté apagado. Si sigue fallando, pide al administrador que restablezca tu acceso.</td></tr>
+      <tr><td><span class="msg">Tu usuario no tiene sucursal asignada.</span></td><td>El administrador tiene que asignarte una sucursal.</td></tr>
+      <tr><td>El sistema me regresó a la pantalla de acceso.</td><td>La sesión expiró por seguridad. Vuelve a entrar; la venta que no se procesó hay que capturarla de nuevo.</td></tr>
+      <tr><td><span class="ui">Procesar transacción</span> está gris.</td><td>Agrega al menos un producto y elige la forma de pago.</td></tr>
+      <tr><td><span class="msg">Producto no encontrado en tu sucursal o sin stock</span> al escanear.</td><td>Revisa que el código esté completo. Si el producto sí está en el anaquel, avisa al gerente para que registre la entrada.</td></tr>
+      <tr><td><span class="msg">Stock insuficiente para…</span> al cobrar.</td><td>Otra caja vendió piezas del mismo producto. Baja la cantidad a lo disponible y procesa otra vez.</td></tr>
+      <tr><td><span class="msg">…ya no está disponible en tu sucursal. Recarga el catálogo.</span></td><td>Quita el producto del carrito; el catálogo se actualiza solo.</td></tr>
+      <tr><td>La venta se registró pero no salió el ticket.</td><td>No repitas la venta. Búscala en <span class="ui">Historial</span>, o pulsa <span class="ui">Reimprimir ticket</span> si la ventana sigue abierta. Revisa que la impresora esté encendida y tenga papel.</td></tr>
+      <tr><td>El total no coincide con la suma de los precios.</td><td>Es correcto: los precios no incluyen IVA y el sistema suma el 16 % al cobrar (sección 3.3).</td></tr>
+      <tr><td>El reporte no se abre.</td><td>Permite las ventanas emergentes y pulsa otra vez <span class="ui">Ver Reporte</span>.</td></tr>
+      <tr><td>Inventario Sucursal sale vacío después de recargar la página.</td><td>Entra a otra opción del menú y regresa a <span class="ui">Inventario Sucursal</span>.</td></tr>
+      <tr><td>No veo productos en el punto de venta.</td><td>Tu sucursal no tiene productos con existencias (<span class="msg">Sin productos con stock en tu sucursal.</span>). Avisa al gerente.</td></tr>
+    </tbody>
+  </table>
+  <div class="caja nota"><b class="t">Si el problema sigue</b><div><p>Anota la hora, la pantalla y el mensaje exacto, y repórtalo al administrador del sistema.</p></div></div>
+</section>
+
+<!-- ═════════════ 12. GLOSARIO ═════════════ -->
+<section class="cap" id="c12">
+  <h1><span class="num">12</span> Glosario</h1>
+  <p class="para">Cajero y gerente</p>
+  <table class="ancha">
+    <thead><tr><th style="width:30%">Término</th><th>Significado</th></tr></thead>
+    <tbody>
+      <tr><td><b>Clave / SKU</b></td><td>Código interno de cada producto.</td></tr>
+      <tr><td><b>Código de barras</b></td><td>Número impreso en el producto que lee el escáner.</td></tr>
+      <tr><td><b>Código SAT</b></td><td>Clave del catálogo del SAT para facturación.</td></tr>
+      <tr><td><b>Existencias / Stock</b></td><td>Piezas disponibles de un producto en la sucursal.</td></tr>
+      <tr><td><b>Folio</b></td><td>Número único de cada ticket de venta.</td></tr>
+      <tr><td><b>IVA</b></td><td>Impuesto al Valor Agregado, 16 %. Los precios del catálogo no lo incluyen; se suma al cobrar.</td></tr>
+      <tr><td><b>Movimiento</b></td><td>Entrada o salida de mercancía que cambia las existencias.</td></tr>
+      <tr><td><b>Precio de sucursal</b></td><td>Precio especial de un producto en una sola sucursal. Se marca con la etiqueta «Sucursal».</td></tr>
+      <tr><td><b>Público general</b></td><td>Venta sin cliente registrado.</td></tr>
+      <tr><td><b>RFC</b></td><td>Registro Federal de Contribuyentes del cliente, para facturación.</td></tr>
+      <tr><td><b>SUC-#</b></td><td>Número de la sucursal a la que está asignado tu usuario.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<script>
+  // Captura faltante → recuadro "pendiente" en lugar del ícono de imagen rota.
+  addEventListener('load', () => {
+    document.querySelectorAll('img').forEach((img) => {
+      if (img.naturalWidth) return;
+      const d = document.createElement('div');
+      d.className = 'falta';
+      d.textContent = 'Captura pendiente: ' + img.getAttribute('src');
+      img.replaceWith(d);
+    });
+  });
+</script>
+</body>
+</html>
