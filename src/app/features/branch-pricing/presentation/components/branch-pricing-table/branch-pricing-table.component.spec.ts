@@ -261,6 +261,17 @@ describe('BranchPricingTableComponent', () => {
     });
   });
 
+  it('el botón de fijar precio dice "Fijar" (H-50) y nombra el producto', () => {
+    setup();
+    seed([makeProduct({ nombre: 'Balata delantera' })]);
+
+    const btn = el().querySelector('button.set-price') as HTMLButtonElement;
+
+    expect(btn.textContent).toContain('Fijar');
+    expect(btn.textContent).not.toContain('Fixar');
+    expect(btn.getAttribute('aria-label')).toBe('Fijar precio de Balata delantera');
+  });
+
   describe('acción desactivar precio (H-37)', () => {
     it('solo se ofrece con precio de sucursal y emite deactivatePrice con el id del producto', () => {
       setup();

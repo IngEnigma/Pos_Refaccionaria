@@ -78,4 +78,13 @@ describe('BranchCardComponent', () => {
     expect(onDelete).toHaveBeenCalledWith(branch);
     expect(edit).not.toHaveBeenCalled();
   });
+
+  // H-50: la tarjeta tiene rol y nombre; los botones dicen a qué sucursal se refieren.
+  it('expone la tarjeta como grupo con nombre y botones con contexto', async () => {
+    await renderCard(branch);
+
+    expect(screen.getByRole('group', { name: 'Sucursal Sucursal Centro' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Editar sucursal Sucursal Centro' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Eliminar sucursal Sucursal Centro' })).toBeInTheDocument();
+  });
 });

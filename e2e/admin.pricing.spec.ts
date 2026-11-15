@@ -1,7 +1,7 @@
 /**
  * SISTEMA E2E — Precio diferenciado por sucursal (SIS-023). Con mocks, sin Render.
  * El backend se simula con estado: los precios fijados viven en un mapa sucursal → producto → precio.
- * El botón de la tabla dice "Fixar" (typo conocido, por eso el nombre se busca con /Fi[jx]ar/).
+ * El botón de la tabla dice "Fijar" (H-50); la regex tolera el typo antiguo.
  */
 import { test, expect, Page } from '@playwright/test';
 

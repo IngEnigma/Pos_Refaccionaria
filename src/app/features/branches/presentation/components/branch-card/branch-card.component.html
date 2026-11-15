@@ -1,4 +1,4 @@
-<div class="branch-card">
+<div class="branch-card" role="group" [attr.aria-label]="'Sucursal ' + (branch().nombreSucursal || 'sin nombre')">
   <div class="branch-header">
     <div class="branch-avatar">
       <lucide-icon name="Building" [size]="22"></lucide-icon>
@@ -25,11 +25,11 @@
   </div>
 
   <div class="branch-footer">
-    <button class="btn-action edit" (click)="edit.emit(branch())" title="Editar">
+    <button class="btn-action edit" (click)="edit.emit(branch())" title="Editar" [attr.aria-label]="'Editar sucursal ' + branch().nombreSucursal">
       <lucide-icon name="Pencil" [size]="16"></lucide-icon>
       Editar
     </button>
-    <button class="btn-action delete" (click)="delete.emit(branch())" title="Eliminar">
+    <button class="btn-action delete" (click)="delete.emit(branch())" title="Eliminar" [attr.aria-label]="'Eliminar sucursal ' + branch().nombreSucursal">
       <lucide-icon name="Trash2" [size]="16"></lucide-icon>
       Eliminar
     </button>
