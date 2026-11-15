@@ -1,3 +1,4 @@
+import { firstValueFrom } from 'rxjs';
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
@@ -142,10 +143,10 @@ describe('SalesFacade (integración)', () => {
     expect(facade.isCreatingSale()).toBe(false);
   });
 
-  // Verifica que la validación del use case (idMetodoPago requerido) lance sin emitir HTTP.
-  it('createSale sin método de pago lanza sin tocar la red', () => {
-    // CreateSaleUseCase.execute valida de forma síncrona: facade.createSale propaga el throw (ver reporte Nivel 2).
-    expect(() => facade.createSale({ idMetodoPago: 0 })).toThrow('CreateSale: idMetodoPago requerido');
+  // H-29: la validación del use case (idMetodoPago requerido) llega por el observable, sin emitir HTTP.
+  it('createSale sin método de pago emite el error por el observable sin tocar la red', async () => {
+    await expect(firstValueFrom(facade.createSale({ idMetodoPago: 0 }))).rejects.toThrow('CreateSale: idMetodoPago requerido');
+    expect(facade.isCreatingSale()).toBe(false);
     httpMock.expectNone(VENTAS);
   });
 

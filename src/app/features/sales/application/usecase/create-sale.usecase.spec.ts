@@ -49,11 +49,11 @@ describe('CreateSaleUseCase', () => {
 
   // Validación: un método de pago ausente o 0 se rechaza antes de tocar el repositorio.
   it.each([[0], [undefined], [null]])(
-    'lanza error si idMetodoPago es %p y no llama al repositorio',
-    (idMetodoPago) => {
+    'H-29: emite el error por el observable si idMetodoPago es %p y no llama al repositorio',
+    async (idMetodoPago) => {
       const payload = { idMetodoPago } as unknown as { idMetodoPago: number };
 
-      expect(() => useCase.execute(payload)).toThrow('CreateSale: idMetodoPago requerido');
+      await expect(firstValueFrom(useCase.execute(payload))).rejects.toThrow('CreateSale: idMetodoPago requerido');
       expect(repository.createSale).not.toHaveBeenCalled();
     },
   );
