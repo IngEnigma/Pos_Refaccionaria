@@ -76,6 +76,7 @@ describe('LoginPageComponent', () => {
     expect(authFacadeSpy.login).toHaveBeenCalledWith({
       username: 'admin',
       password: '123456',
+      remember: false,
     });
     expect(routerSpy.navigateByUrl).toHaveBeenCalledWith('/sales');
   });
@@ -117,15 +118,15 @@ describe('LoginPageComponent', () => {
       submitButton().click();
 
       expect(authFacadeSpy.login).toHaveBeenCalledTimes(1);
-      expect(authFacadeSpy.login).toHaveBeenCalledWith(credentials);
+      expect(authFacadeSpy.login).toHaveBeenCalledWith({ ...credentials, remember: false });
     });
 
-    it('no envía "remember": la pantalla no ofrece recordar sesión', () => {
+    it('H-19: remember va en false si no se marca "Recordar sesión"', () => {
       (authFacadeSpy.login as jest.Mock).mockReturnValue(of(true));
 
       fillAndSubmit();
 
-      expect((authFacadeSpy.login as jest.Mock).mock.calls[0][0]).not.toHaveProperty('remember');
+      expect((authFacadeSpy.login as jest.Mock).mock.calls[0][0].remember).toBe(false);
     });
 
     it('mientras carga el botón queda deshabilitado y marcado como ocupado (no hay doble envío)', () => {
@@ -167,7 +168,15 @@ describe('LoginPageComponent', () => {
       expect(routerSpy.navigateByUrl).not.toHaveBeenCalled();
     });
 
-    it.todo('H-20: onSubmit() ignora un segundo envío mientras loading() es true (hoy solo lo evita el botón deshabilitado)');
+    it('H-20: onSubmit() ignora un envío mientras loading() es true', () => {
+      (authFacadeSpy.login as jest.Mock).mockReturnValue(of(true));
+      component.loginForm.setValue(credentials);
+      loadingState.set(true);
+
+      component.onSubmit();
+
+      expect(authFacadeSpy.login).not.toHaveBeenCalled();
+    });
   });
 
   describe('redirección tras el login', () => {
@@ -198,7 +207,16 @@ describe('LoginPageComponent', () => {
       expect(routerSpy.navigateByUrl).toHaveBeenCalledWith('/sales?q=filtro');
     });
 
-    it.todo('H-18: valida redirectTo (solo rutas internas que empiecen con "/" y no con "//" ni con esquema)');
+    it.each([['//evil.com'], ['/\\evil.com'], ['https://evil.com'], ['javascript:alert(1)'], ['inventory'], ['']])(
+      'H-18: rechaza el redirectTo no interno %p y va a /sales',
+      (redirectTo) => {
+        queryParams = { redirectTo };
+
+        component.onSubmit();
+
+        expect(routerSpy.navigateByUrl).toHaveBeenCalledWith('/sales');
+      },
+    );
   });
 
   describe('errores de autenticación', () => {
@@ -265,6 +283,23 @@ describe('LoginPageComponent', () => {
       expect(Array.from(inputs).some((i) => i.type === 'password')).toBe(true);
     });
 
-    it.todo('H-19: la pantalla ofrece "Recordar sesión" y envía remember (hoy LoginCommand.remember nunca se usa desde la UI)');
+    it('H-19: ofrece la casilla "Recordar sesión" desmarcada por defecto', () => {
+      const checkbox = fixture.nativeElement.querySelector('input[type="checkbox"]') as HTMLInputElement;
+
+      expect(checkbox).not.toBeNull();
+      expect(checkbox.checked).toBe(false);
+      expect(fixture.nativeElement.textContent).toContain('Recordar sesión');
+    });
+
+    it('H-19: al marcar la casilla se envía remember: true', () => {
+      (authFacadeSpy.login as jest.Mock).mockReturnValue(of(true));
+      const checkbox = fixture.nativeElement.querySelector('input[type="checkbox"]') as HTMLInputElement;
+      checkbox.click();
+      component.loginForm.setValue({ username: 'admin', password: '123456' });
+
+      component.onSubmit();
+
+      expect(authFacadeSpy.login).toHaveBeenCalledWith({ username: 'admin', password: '123456', remember: true });
+    });
   });
 });

@@ -30,6 +30,11 @@
           errorMessage="La contraseña es requerida"
         />
 
+        <label class="remember">
+          <input type="checkbox" [formControl]="rememberCtrl" />
+          Recordar sesión
+        </label>
+
         <div class="form-actions">
           <app-button
             type="submit"

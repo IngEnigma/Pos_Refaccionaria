@@ -55,6 +55,16 @@
   text-align: center;
 }
 
+.remember {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  font-size: var(--pr-font-size-sm);
+  color: var(--color-text-strong);
+  cursor: pointer;
+}
+
 .form-actions {
   margin-top: 2rem;
 }
