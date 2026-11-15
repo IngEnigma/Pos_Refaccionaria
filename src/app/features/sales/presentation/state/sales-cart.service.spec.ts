@@ -336,23 +336,23 @@ describe('SalesCartService', () => {
       ...overrides,
     });
 
-    // Verifica los valores exactos de subtotal, IVA y total para un producto de $120.
-    it('calcula subtotal, IVA y total exactos para un producto (120 -> 120 / 19.2 / 139.2)', () => {
+    // Verifica el total y el desglose de IVA incluido para un producto de $120 (H-40).
+    it('calcula total y desglose de IVA incluido para un producto (120 -> 103.45 / 16.55 / 120)', () => {
       service.addToCart(makeProduct({ precio: 120 }));
-      expect(service.subtotal()).toBe(120);
-      expect(service.iva()).toBeCloseTo(19.2, 10);
-      expect(service.total()).toBeCloseTo(139.2, 10);
+      expect(service.subtotal()).toBe(103.45);
+      expect(service.iva()).toBe(16.55);
+      expect(service.total()).toBe(120);
     });
 
-    // Verifica los totales con varios productos y distintas cantidades (200 -> 32 -> 232).
+    // Verifica los totales con varios productos y distintas cantidades (total 200 -> subtotal 172.41 + IVA 27.59).
     it('calcula totales con múltiples productos y cantidades', () => {
       service.addToCart(makeProduct({ id: 1, precio: 100, stock: 100 }));
       service.addToCart(makeProduct({ id: 2, precio: 50, stock: 100 }));
       service.addToCart(makeProduct({ id: 2, precio: 50, stock: 100 }));
-      // subtotal = 100 + 50*2 = 200, iva = 32, total = 232
-      expect(service.subtotal()).toBe(200);
-      expect(service.iva()).toBeCloseTo(32, 10);
-      expect(service.total()).toBeCloseTo(232, 10);
+      // total = 100 + 50*2 = 200 (IVA incluido)
+      expect(service.subtotal()).toBe(172.41);
+      expect(service.iva()).toBe(27.59);
+      expect(service.total()).toBe(200);
     });
 
     // Verifica los totales exactos con precios con centavos (subtotal redondeado a 2 decimales).
@@ -360,8 +360,7 @@ describe('SalesCartService', () => {
       service.addToCart(makeProduct({ id: 1, precio: 19.99, stock: 100 }));
       service.addToCart(makeProduct({ id: 1, precio: 19.99, stock: 100 }));
       service.addToCart(makeProduct({ id: 2, precio: 5.5, stock: 100 }));
-      expect(service.subtotal()).toBe(45.48);
-      expect(service.total()).toBeCloseTo(45.48 * 1.16, 2);
+      expect(service.total()).toBe(45.48);
     });
 
     // Verifica que sin productos todos los totales del servicio sean cero.
@@ -376,7 +375,7 @@ describe('SalesCartService', () => {
       service.addToCart(makeProduct({ id: 7, precio: 33.33, stock: 100 }));
       service.addToCart(makeProduct({ id: 7, precio: 33.33, stock: 100 }));
       service.addToCart(makeProduct({ id: 7, precio: 33.33, stock: 100 }));
-      expect(service.subtotal()).toBe(99.99);
+      expect(service.total()).toBe(99.99);
     });
 
     // Verifica que el subtotal nunca exponga artefactos float en el resumen (interpolación directa).
@@ -384,7 +383,7 @@ describe('SalesCartService', () => {
       service.addToCart(makeProduct({ id: 9, precio: 19.99, stock: 100 }));
       service.addToCart(makeProduct({ id: 9, precio: 19.99, stock: 100 }));
       service.addToCart(makeProduct({ id: 9, precio: 19.99, stock: 100 }));
-      expect(service.subtotal()).toBe(59.97);
+      expect(service.total()).toBe(59.97);
     });
   });
 
@@ -486,7 +485,7 @@ describe('SalesCartService', () => {
       });
       const order = service.order();
       expect(order.items).toHaveLength(1);
-      expect(order.subtotal.value).toBe(100);
+      expect(order.total.value).toBe(100);
     });
   });
 
@@ -732,13 +731,13 @@ describe('SalesCartService', () => {
       id, nombre: 'P', descripcion: '', precio, stock: 100, codigoBarras: `c${id}`, hasSucursalPrice: false, imagen: '',
     });
 
-    // Verifica que IVA y total de 19.99 x3 (59.97) cuadren a centavos: 9.60 y 69.57.
-    it('19.99 x3 → subtotal 59.97, IVA 9.6, total 69.57', () => {
+    // Verifica que el desglose de 19.99 x3 (59.97) cuadre a centavos: 51.70 + 8.27.
+    it('19.99 x3 → total 59.97, subtotal 51.7, IVA 8.27', () => {
       [1, 2, 3].forEach(() => service.addToCart(product(19.99)));
 
-      expect(service.subtotal()).toBe(59.97);
-      expect(service.iva()).toBe(9.6);
-      expect(service.total()).toBe(69.57);
+      expect(service.total()).toBe(59.97);
+      expect(service.subtotal()).toBe(51.7);
+      expect(service.iva()).toBe(8.27);
     });
 
     // Verifica que el total sea siempre subtotal + IVA (sin diferencias de centavo).
@@ -755,7 +754,7 @@ describe('SalesCartService', () => {
       service.addToCart(product(100));
 
       expect(service.descuento()).toBe(0);
-      expect(service.total()).toBeCloseTo(116, 2);
+      expect(service.total()).toBe(100);
     });
   });
 });

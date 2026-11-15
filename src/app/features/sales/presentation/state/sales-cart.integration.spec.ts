@@ -84,24 +84,25 @@ describe('INT-06 carrito vs payload enviado al backend', () => {
   afterEach(() => httpMock.verify());
 
   describe('totales del carrito', () => {
-    it('subtotal, IVA 16 % y total con redondeo a centavos', () => {
+    it('total = suma de líneas; subtotal e IVA 16 % se desglosan como incluidos', () => {
       cart.addToCart(product(1, 33.33));
       cart.increaseQty(cart.cart()[0]);
       cart.increaseQty(cart.cart()[0]);
 
-      expect(cart.subtotal()).toBe(99.99);
-      expect(cart.iva()).toBe(16);
-      expect(cart.total()).toBe(115.99);
+      expect(cart.total()).toBe(99.99);
+      expect(cart.subtotal()).toBe(86.2);
+      expect(cart.iva()).toBe(13.79);
     });
 
-    it('suma varias líneas y el total siempre es subtotal + IVA', () => {
+    it('suma varias líneas y subtotal + IVA siempre es el total', () => {
       cart.addToCart(product(1, 100.5));
       cart.increaseQty(cart.cart()[0]);
       cart.addToCart(product(2, 49.99));
 
-      expect(cart.subtotal()).toBe(250.99);
-      expect(cart.iva()).toBe(40.16);
-      expect(cart.total()).toBe(+(cart.subtotal() + cart.iva()).toFixed(2));
+      expect(cart.total()).toBe(250.99);
+      expect(cart.subtotal()).toBe(216.37);
+      expect(cart.iva()).toBe(34.62);
+      expect(+(cart.subtotal() + cart.iva()).toFixed(2)).toBe(cart.total());
     });
 
     it('agregar el mismo producto varias veces deja una sola línea y no supera el stock', () => {
@@ -135,6 +136,8 @@ describe('INT-06 carrito vs payload enviado al backend', () => {
       for (const key of ['total', 'subtotal', 'iva', 'descuento', 'precio']) {
         expect(req.request.body).not.toHaveProperty(key);
       }
+      // H-40: el precio ya incluye IVA; el total del carrito es el que calcula y guarda el backend.
+      expect(cart.total()).toBe(250.99);
       req.flush({ id: 70, id_usuario: 1, id_metodo_pago: 1, total: '250.99', fecha: '2024-01-01T00:00:00Z' });
       httpMock.expectOne(`${API}/ventas/70/ticket/`).flush({
         folio: 70, fecha: '2024-01-01T00:00:00Z', vendedor: 'v', metodo_pago: 'EFECTIVO', sucursal: 'S1',
@@ -190,8 +193,4 @@ describe('INT-06 carrito vs payload enviado al backend', () => {
       httpMock.expectNone(VENTAS);
     });
   });
-
-  // El backend (VentaService.crear_venta_completa) fija subtotal = precio de sucursal x cantidad y
-  // total = suma de subtotales, SIN IVA; el ticket imprime ese total. El carrito muestra subtotal + 16 %.
-  it.todo('H-40: el total que ve el cajero (con IVA 16 %) debe coincidir con el total del ticket del backend (sin IVA)');
 });

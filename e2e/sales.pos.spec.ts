@@ -126,7 +126,7 @@ test.describe('POS — ventas', () => {
     await expect(card(page, 'Bujía NGK').getByRole('button', { name: 'Añadir' })).toBeDisabled();
   });
 
-  test('SIS-015 subtotal, IVA 16 % y total del carrito (1 × $100 + 2 × $50)', async ({ page }) => {
+  test('SIS-015 total, subtotal e IVA 16 % incluido del carrito (1 × $100 + 2 × $50)', async ({ page }) => {
     await setupPos(page);
     await page.goto('/sales');
 
@@ -135,14 +135,13 @@ test.describe('POS — ventas', () => {
     await addToCart(page, 'Filtro de aceite');
 
     const panel = cartPanel(page);
-    await expect(panel.getByText('Subtotal').locator('..')).toContainText('$200.00');
-    await expect(panel.getByText('IVA').locator('..')).toContainText('$32.00');
-    await expect(panel.getByText('Total', { exact: true }).locator('..')).toContainText('$232.00');
+    await expect(panel.getByText('Subtotal').locator('..')).toContainText('$172.41');
+    await expect(panel.getByText('IVA').locator('..')).toContainText('$27.59');
+    await expect(panel.getByText('Total', { exact: true }).locator('..')).toContainText('$200.00');
   });
 
-  test.fixme('H-40: el total del carrito debe coincidir con el total del ticket del backend', async ({ page }) => {
-    // El backend suma subtotales SIN IVA (total = $200); el carrito cobra $232 (16 % de IVA).
-    // Pendiente de decisión de negocio (¿el precio ya incluye IVA?). Al resolverla, quitar el fixme.
+  test('H-40: el total del carrito coincide con el total del ticket del backend', async ({ page }) => {
+    // El precio ya incluye IVA: el backend suma subtotales (total = $200) y el carrito cobra lo mismo.
     await setupPos(page);
     await mockApi(page, '/ventas/77/ticket', { ...TICKET_77, total: '200.00' });
     await page.goto('/sales');
