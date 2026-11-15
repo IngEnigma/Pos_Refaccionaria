@@ -3,6 +3,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { TicketModalComponent } from './ticket-modal.component';
 import { ToastService } from '@shared/ui/components/toast/toast.service';
 import { SaleTicket } from '@features/sales/domain/entities/sale-ticket.entity';
+import { toTicketPrintPayload } from '@features/sales/application/mappers/ticket-print-payload.mapper';
+import { DESKTOP_PORT, DesktopPort } from '@core/ports/desktop.port';
 
 // Funcional: modal de ticket real + ToastService real. Sin dobles de colaboradores.
 describe('TicketModalComponent (funcional)', () => {
@@ -28,14 +30,20 @@ describe('TicketModalComponent (funcional)', () => {
     if (typeof c['randomUUID'] !== 'function') c['randomUUID'] = () => `uuid-${Math.random()}`;
   });
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({ providers: [ToastService] });
+  // H-10/H-40: el modal usa el puerto de escritorio inyectable (null = modo web).
+  const mount = (port: DesktopPort | null) => {
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [ToastService, { provide: DESKTOP_PORT, useValue: port }],
+    });
     toasts = TestBed.inject(ToastService);
     fixture = TestBed.createComponent(TicketModalComponent);
     component = fixture.componentInstance;
     fixture.componentRef.setInput('ticket', ticket);
     fixture.detectChanges();
-  });
+  };
+
+  beforeEach(() => mount(null));
 
   // Verifica que el modal muestre folio, líneas del ticket y total al usuario.
   it('muestra folio, productos y total del ticket', () => {
@@ -81,35 +89,39 @@ describe('TicketModalComponent (funcional)', () => {
     expect((fixture.nativeElement.querySelector('.btn-primary') as HTMLButtonElement).disabled).toBe(false);
   });
 
+  // H-40: el precio ya incluye IVA; se desglosa del total (278.40 / 1.16 = 240.00).
+  it('desglosa subtotal e IVA incluido a partir del total', () => {
+    const text = fixture.nativeElement.textContent as string;
+    expect(text).toMatch(/Subtotal:\s*(MX)?\$240\.00/);
+    expect(text).toMatch(/IVA 16% incluido:\s*(MX)?\$38\.40/);
+  });
+
+  // H-17: el modo web no debe filtrar el payload del ticket a la consola.
+  it('reimprimir en modo web no escribe en consola', async () => {
+    const log = jest.spyOn(console, 'log').mockImplementation();
+
+    await component.onReprint();
+
+    expect(log).not.toHaveBeenCalled();
+    log.mockRestore();
+  });
+
   describe('reimpresión con puente de escritorio', () => {
-    const w = window as unknown as { desktop?: unknown };
     const generateTicket = jest.fn();
     const lastToast = () => toasts.toasts()[toasts.toasts().length - 1];
 
     beforeEach(() => {
       generateTicket.mockReset();
-      w.desktop = { generateTicket };
+      mount({ generateTicket });
     });
 
-    afterEach(() => {
-      delete w.desktop;
-    });
-
-    // Verifica que se envíe el payload snake_case al puente y se avise éxito.
-    it('envía el payload snake_case y avisa éxito', async () => {
+    // Verifica que se envíe el payload del mapper compartido con sales.page y se avise éxito.
+    it('envía el payload del mapper y avisa éxito', async () => {
       generateTicket.mockResolvedValue({ success: true });
 
       await component.onReprint();
 
-      expect(generateTicket).toHaveBeenCalledWith({
-        folio: 50,
-        fecha: '2024-01-01T00:00:00Z',
-        vendedor: 'vendedora',
-        metodo_pago: 'EFECTIVO',
-        sucursal: 'Central',
-        productos: [{ nombre: 'Filtro de aceite', cantidad: 2, subtotal: '240.00', precio_unitario: '120.00' }],
-        total: '278.40',
-      });
+      expect(generateTicket).toHaveBeenCalledWith(toTicketPrintPayload(ticket));
       expect(lastToast()).toMatchObject({ type: 'success', message: 'Ticket reimpreso correctamente.' });
       expect(component.isReprinting()).toBe(false);
     });
