@@ -30,6 +30,7 @@
         <app-branch-pricing-table
           [sucursalId]="sid"
           (setPrice)="onSetPrice({ productId: $event, sucursalId: sid })"
+          (deactivatePrice)="onDeactivate({ productId: $event, sucursalId: sid })"
         />
       </ng-container>
 

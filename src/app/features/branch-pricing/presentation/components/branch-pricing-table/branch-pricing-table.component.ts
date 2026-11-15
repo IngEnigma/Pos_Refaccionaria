@@ -19,6 +19,7 @@ export class BranchPricingTableComponent {
 
   readonly sucursalId = input.required<number>();
   readonly setPrice = output<number>();
+  readonly deactivatePrice = output<number>();
 
   readonly products = signal<readonly ProductStock[]>([]);
   readonly loading = signal(false);

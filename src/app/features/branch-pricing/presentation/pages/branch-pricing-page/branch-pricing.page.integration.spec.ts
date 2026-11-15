@@ -3,7 +3,7 @@ import { importProvidersFrom } from '@angular/core';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { Dialog } from '@angular/cdk/dialog';
-import { Building, DollarSign, LucideAngularModule, Package } from 'lucide-angular';
+import { Building, DollarSign, LucideAngularModule, OctagonX, Package } from 'lucide-angular';
 import { of } from 'rxjs';
 
 import { environment } from '@env/environment';
@@ -68,7 +68,7 @@ describe('INT-08 Precios por sucursal (página + facade + repositorio + http)', 
       providers: [
         provideHttpClient(withInterceptors([trailingSlashInterceptor])),
         provideHttpClientTesting(),
-        importProvidersFrom(LucideAngularModule.pick({ Building, DollarSign, Package })),
+        importProvidersFrom(LucideAngularModule.pick({ Building, DollarSign, OctagonX, Package })),
         { provide: APP_ENV, useValue: environment },
         { provide: LOGGING_LEVEL_TOKEN, useValue: LogLevel.FATAL },
         { provide: LOGGER_PORT, useClass: LoggerService },
@@ -177,7 +177,7 @@ describe('INT-08 Precios por sucursal (página + facade + repositorio + http)', 
         .expectOne(PRECIOS)
         .flush({ error: 'precio_venta debe ser mayor a 0' }, { status: 400, statusText: 'Bad Request' });
 
-      expect(lastError()).toBeTruthy();
+      expect(lastError()).toBe('precio_venta debe ser mayor a 0'); // H-45
       expect(getProducts).toHaveBeenCalledTimes(1);
       expect(facade.errorMessage()).toBe('precio_venta debe ser mayor a 0');
     });
@@ -213,6 +213,25 @@ describe('INT-08 Precios por sucursal (página + facade + repositorio + http)', 
       req.flush({});
     });
 
-    it.todo('H-45: el toast del error al fijar precio ignora el texto del backend (HttpErrorResponse no es Error)');
+
+    it('onDeactivate confirma, busca el precio activo, lo desactiva con PUT, avisa y recarga (H-37)', () => {
+      closeWith(true);
+      page.onDeactivate({ productId: 7, sucursalId: 1 });
+
+      httpMock.expectOne((r) => r.url === `${PRECIOS}activo/`).flush(precioDto(11, '85.50', true, '2026-11-13T10:00:00Z'));
+      const put = httpMock.expectOne(`${PRECIOS}11/`);
+      expect(put.request.method).toBe('PUT');
+      expect(put.request.body).toEqual({ activo: false });
+      put.flush({});
+
+      expect(toasts.toasts().some((t) => t.type === 'success' && /desactivado/.test(t.message))).toBe(true);
+      expect(getProducts).toHaveBeenCalledTimes(2);
+    });
+
+    it('onDeactivate cancelado no envía nada', () => {
+      closeWith(false);
+      page.onDeactivate({ productId: 7, sucursalId: 1 });
+      httpMock.expectNone(`${PRECIOS}activo/`);
+    });
   });
 });

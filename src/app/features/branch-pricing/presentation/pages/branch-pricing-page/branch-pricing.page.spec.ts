@@ -14,6 +14,7 @@ import { BranchPrice } from '../../../domain/entities/branch-price.entity';
 import { SetBranchPricePayload } from '../../../domain/repository/branch-price-repository';
 import { BranchPricingFacade } from '../../../application/facades/branch-pricing.facade';
 import { SetBranchPriceUseCase } from '../../../application/usecase/set-branch-price.usecase';
+import { DeactivatePriceUseCase } from '../../../application/usecase/deactivate-price.usecase';
 import { GetActivePriceUseCase } from '../../../application/usecase/get-active-price.usecase';
 import { GetPriceHistoryUseCase } from '../../../application/usecase/get-price-history.usecase';
 import { BranchPricingTableComponent } from '../../components/branch-pricing-table/branch-pricing-table.component';
@@ -75,6 +76,7 @@ describe('BranchPricingPageComponent', () => {
         importProvidersFrom(LucideAngularModule.pick({ Building })),
         { provide: BranchesFacade, useValue: { branches: branchesSignal.asReadonly(), loadBranches } },
         { provide: SetBranchPriceUseCase, useValue: { execute: setPriceUseCase } },
+        { provide: DeactivatePriceUseCase, useValue: { execute: jest.fn() } },
         { provide: GetActivePriceUseCase, useValue: { execute: jest.fn() } },
         { provide: GetPriceHistoryUseCase, useValue: { execute: jest.fn() } },
         { provide: LoggerService, useValue: { withContext: () => ({ error: jest.fn() }) } },

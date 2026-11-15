@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { importProvidersFrom } from '@angular/core';
-import { LucideAngularModule, DollarSign, Package } from 'lucide-angular';
+import { LucideAngularModule, DollarSign, OctagonX, Package } from 'lucide-angular';
 import { of, Subject, throwError } from 'rxjs';
 
 import { PaginatedResponse } from '@core/models/pagination.model';
@@ -46,7 +46,7 @@ describe('BranchPricingTableComponent', () => {
     TestBed.configureTestingModule({
       providers: [
         // Iconos lucide del template (producto y botón de acción).
-        importProvidersFrom(LucideAngularModule.pick({ DollarSign, Package })),
+        importProvidersFrom(LucideAngularModule.pick({ DollarSign, OctagonX, Package })),
         { provide: ProductRepository, useValue: { getProducts } },
       ],
     });
@@ -256,6 +256,21 @@ describe('BranchPricingTableComponent', () => {
 
       const buttons = el().querySelectorAll<HTMLButtonElement>('button.set-price');
       buttons[1].click();
+
+      expect(emitted).toEqual([42]);
+    });
+  });
+
+  describe('acción desactivar precio (H-37)', () => {
+    it('solo se ofrece con precio de sucursal y emite deactivatePrice con el id del producto', () => {
+      setup();
+      seed([makeProduct({ id: 41, precioSucursal: null }), makeProduct({ id: 42, precioSucursal: 50 })]);
+      const emitted: number[] = [];
+      component.deactivatePrice.subscribe((id) => emitted.push(id));
+
+      const buttons = el().querySelectorAll<HTMLButtonElement>('button.deactivate-price');
+      expect(buttons).toHaveLength(1);
+      buttons[0].click();
 
       expect(emitted).toEqual([42]);
     });

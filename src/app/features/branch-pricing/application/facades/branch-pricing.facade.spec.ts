@@ -8,6 +8,7 @@ import { PriceHistoryItem } from '../../domain/entities/price-history-item.entit
 import { SetBranchPricePayload } from '../../domain/repository/branch-price-repository';
 import { GetActivePriceUseCase } from '../usecase/get-active-price.usecase';
 import { GetPriceHistoryUseCase } from '../usecase/get-price-history.usecase';
+import { DeactivatePriceUseCase } from '../usecase/deactivate-price.usecase';
 import { SetBranchPriceUseCase } from '../usecase/set-branch-price.usecase';
 import { BranchPricingFacade } from './branch-pricing.facade';
 
@@ -35,6 +36,7 @@ describe('BranchPricingFacade', () => {
   let getActive: jest.Mock;
   let getHistory: jest.Mock;
   let setPrice: jest.Mock;
+  let deactivate: jest.Mock;
   let loggerError: jest.Mock;
   let facade: BranchPricingFacade;
 
@@ -42,12 +44,14 @@ describe('BranchPricingFacade', () => {
     getActive = jest.fn();
     getHistory = jest.fn();
     setPrice = jest.fn();
+    deactivate = jest.fn();
     loggerError = jest.fn();
     TestBed.configureTestingModule({
       providers: [
         { provide: GetActivePriceUseCase, useValue: { execute: getActive } },
         { provide: GetPriceHistoryUseCase, useValue: { execute: getHistory } },
         { provide: SetBranchPriceUseCase, useValue: { execute: setPrice } },
+        { provide: DeactivatePriceUseCase, useValue: { execute: deactivate } },
         { provide: LoggerService, useValue: { withContext: () => ({ error: loggerError }) } },
       ],
     });
@@ -265,7 +269,44 @@ describe('BranchPricingFacade', () => {
       expect(facade.errorMessage()).toBeNull();
     });
 
-    it.todo('H-37: la fachada no expone deactivatePrice; DeactivatePriceUseCase existe pero ninguna capa lo usa');
+  });
+
+  describe('deactivatePrice (H-37)', () => {
+    it('busca el precio activo del par y lo desactiva por su id', () => {
+      getActive.mockReturnValue(of(makePrice({ id: 33 })));
+      deactivate.mockReturnValue(of(undefined));
+      let done = false;
+
+      facade.deactivatePrice(5, 2).subscribe({ complete: () => (done = true) });
+
+      expect(getActive).toHaveBeenCalledWith(5, 2);
+      expect(deactivate).toHaveBeenCalledWith(33);
+      expect(done).toBe(true);
+      expect(facade.loading()).toBe(false);
+    });
+
+    it('sin precio activo falla con mensaje y no desactiva', () => {
+      getActive.mockReturnValue(of(null));
+      let error: unknown;
+
+      facade.deactivatePrice(5, 2).subscribe({ error: (e) => (error = e) });
+
+      expect(deactivate).not.toHaveBeenCalled();
+      expect((error as Error).message).toBe('No hay un precio activo para desactivar.');
+    });
+
+    it('si el backend falla expone el mensaje y relanza', () => {
+      getActive.mockReturnValue(of(makePrice()));
+      deactivate.mockReturnValue(
+        throwError(() => new HttpErrorResponse({ status: 403, error: { message: 'sin permiso' } })),
+      );
+      let failed = false;
+
+      facade.deactivatePrice(5, 2).subscribe({ error: () => (failed = true) });
+
+      expect(failed).toBe(true);
+      expect(facade.errorMessage()).toBe('sin permiso');
+      expect(facade.loading()).toBe(false);
   });
 
   describe('resolución del mensaje de error', () => {
