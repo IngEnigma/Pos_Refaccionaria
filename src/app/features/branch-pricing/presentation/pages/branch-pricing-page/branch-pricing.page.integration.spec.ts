@@ -228,6 +228,18 @@ describe('INT-08 Precios por sucursal (página + facade + repositorio + http)', 
       expect(getProducts).toHaveBeenCalledTimes(2);
     });
 
+    it('onDeactivate sin permiso (403) avisa con el mensaje del backend y no recarga', () => {
+      closeWith(true);
+      page.onDeactivate({ productId: 7, sucursalId: 1 });
+
+      httpMock
+        .expectOne((r) => r.url === `${PRECIOS}activo/`)
+        .flush({ detail: 'Requiere permiso precios.escribir' }, { status: 403, statusText: 'Forbidden' });
+
+      expect(lastError()).toBe('Requiere permiso precios.escribir');
+      expect(getProducts).toHaveBeenCalledTimes(1);
+    });
+
     it('onDeactivate cancelado no envía nada', () => {
       closeWith(false);
       page.onDeactivate({ productId: 7, sucursalId: 1 });

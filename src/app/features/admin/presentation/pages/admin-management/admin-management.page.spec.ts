@@ -322,6 +322,15 @@ describe('AdminManagementPageComponent', () => {
       expect(usersFacade.deleteUser).not.toHaveBeenCalled();
     });
 
+    it('si falla el borrado muestra el error', () => {
+      confirm(true);
+      usersFacade.deleteUser.mockReturnValue(throwError(() => new Error('no se puede eliminar')));
+
+      fixture.nativeElement.querySelector('button.delete-user').click();
+
+      expect(toast.error).toHaveBeenCalledWith('no se puede eliminar');
+    });
+
     it('si falla muestra el error', () => {
       usersFacade.updateUser.mockReturnValue(throwError(() => new Error('sin permiso')));
 
