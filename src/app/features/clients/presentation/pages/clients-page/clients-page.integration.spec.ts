@@ -158,16 +158,14 @@ describe('ClientsPageComponent (integración)', () => {
     return toastService.toasts().map((t) => t.type);
   }
 
-  // EVIDENCIA de bug: el effect de la página llama a ToastService.error, que escribe una
-  // señal dentro de un effect sin allowSignalWrites -> NG0600. Angular lo captura con su
-  // ErrorHandler (console.error) y el toast nunca se registra. Pendiente de revisión por
-  // el encargado de frontend; el comportamiento de producción no se modifica aquí.
-  function expectNg0600Evidence(errorSpy: jest.SpyInstance): void {
+  // H-43 corregido: el effect de la página llama a ToastService.error con allowSignalWrites,
+  // así que no hay NG0600 y el toast de error queda registrado.
+  function expectErrorToast(errorSpy: jest.SpyInstance): void {
     const sawNg0600 = errorSpy.mock.calls.some((args) =>
       args.some((a) => String(a).includes('NG0600')),
     );
-    expect(sawNg0600).toBe(true);
-    expect(toastService.toasts()).toEqual([]);
+    expect(sawNg0600).toBe(false);
+    expect(toastTypes()).toContain('error');
   }
 
   // ---------- A. Carga del catálogo ----------
@@ -199,9 +197,9 @@ describe('ClientsPageComponent (integración)', () => {
   });
 
   // Comprueba que un 500 con {"message"} alcance el errorMessage de la fachada (cadena
-  // HTTP -> facade íntegra) y deja constancia del BUG: el effect de la página lanza
-  // NG0600 al escribir la señal de ToastService, así que el toast de error nunca aparece.
-  it('EVIDENCIA: el error de carga llega a la fachada pero el toast no aparece (NG0600)', () => {
+  // HTTP -> facade íntegra) y y el effect de la página lo
+  // muestra como toast de error (sin NG0600).
+  it('el error de carga llega a la fachada y se muestra en un toast de error (H-43)', () => {
     const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
     fixture.detectChanges();
 
@@ -212,8 +210,8 @@ describe('ClientsPageComponent (integración)', () => {
 
     // La cadena de integración sí entregó el mensaje a la fachada...
     expect(TestBed.inject(ClientsFacade).errorMessage()).toBe('Error interno del servidor.');
-    // ...pero el toast nunca se registra porque el effect falla (NG0600) y no hay éxito.
-    expectNg0600Evidence(errorSpy);
+    // ...y el effect de la página lo muestra como toast de error.
+    expectErrorToast(errorSpy);
     expect(toastTypes()).not.toContain('success');
     expect(fixture.nativeElement.querySelectorAll('.client-row')).toHaveLength(0);
     errorSpy.mockRestore();
@@ -276,9 +274,9 @@ describe('ClientsPageComponent (integración)', () => {
   });
 
   // Comprueba que un POST fallido no muestre éxito ni recargue el catálogo, que el
-  // mensaje del backend alcance la fachada, y deja constancia del BUG NG0600 que
-  // impide que el toast de error se registre con el ToastService real.
-  it('EVIDENCIA: un alta fallida no se muestra como exitosa ni recarga (NG0600 en el toast)', () => {
+  // mensaje del backend alcance la fachada, y que el
+  // toast de error se registre con el ToastService real.
+  it('un alta fallida muestra el toast de error, no el de éxito, y no recarga (H-43)', () => {
     const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
     startAndFlushInitial([dto()]);
 
@@ -292,7 +290,7 @@ describe('ClientsPageComponent (integración)', () => {
 
     expect(toastTypes()).not.toContain('success');
     expect(TestBed.inject(ClientsFacade).errorMessage()).toBe('Datos inválidos.');
-    expectNg0600Evidence(errorSpy);
+    expectErrorToast(errorSpy);
     // No se emitió una segunda petición GET: el catálogo no se recargó.
     expect(fixture.nativeElement.textContent).toContain('Juan Pérez López');
     errorSpy.mockRestore();
@@ -361,8 +359,8 @@ describe('ClientsPageComponent (integración)', () => {
   });
 
   // Comprueba que un PUT fallido no recargue el catálogo ni muestre éxito (el nombre
-  // original permanece) y deja constancia del BUG NG0600 en el toast de error.
-  it('EVIDENCIA: una edición fallida conserva el nombre original (NG0600 en el toast)', () => {
+  // original permanece) y se muestre el toast de error.
+  it('una edición fallida conserva el nombre original y muestra el toast de error (H-43)', () => {
     const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
     startAndFlushInitial([dto()]);
     dialogOpen.mockReturnValue({ closed: of({ nombre: 'Hacker' }) } as never);
@@ -386,7 +384,7 @@ describe('ClientsPageComponent (integración)', () => {
 
     expect(toastTypes()).not.toContain('success');
     expect(TestBed.inject(ClientsFacade).errorMessage()).toBe('Cliente no encontrado.');
-    expectNg0600Evidence(errorSpy);
+    expectErrorToast(errorSpy);
     expect(fixture.nativeElement.textContent).toContain('Juan Pérez López');
     errorSpy.mockRestore();
   });
@@ -433,8 +431,8 @@ describe('ClientsPageComponent (integración)', () => {
   });
 
   // Comprueba que un DELETE fallido no elimine visualmente al cliente ni recargue la
-  // lista (la fila permanece) y deja constancia del BUG NG0600 en el toast de error.
-  it('EVIDENCIA: una eliminación fallida conserva la fila (NG0600 en el toast)', () => {
+  // lista (la fila permanece) y se muestre el toast de error.
+  it('una eliminación fallida conserva la fila y muestra el toast de error (H-43)', () => {
     const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
     startAndFlushInitial([dto()]);
     dialogOpen.mockReturnValue({ closed: of(true) } as never);
@@ -458,7 +456,7 @@ describe('ClientsPageComponent (integración)', () => {
 
     expect(toastTypes()).not.toContain('success');
     expect(TestBed.inject(ClientsFacade).errorMessage()).toBe('Cliente con ventas asociadas.');
-    expectNg0600Evidence(errorSpy);
+    expectErrorToast(errorSpy);
     expect(fixture.nativeElement.querySelectorAll('.client-row')).toHaveLength(1);
     expect(fixture.nativeElement.textContent).toContain('Juan Pérez López');
     errorSpy.mockRestore();
