@@ -55,8 +55,18 @@ describe('SaleDate', () => {
     });
 
     // Date.parse usa el parser legacy de V8: acepta basura con números y fechas calendario imposibles.
-    it.todo('H-25: SaleDate.fromPrimitive acepta "abc 1" y "12" (Date.parse legacy) aunque el mensaje promete ISO');
-    it.todo('H-25: SaleDate.fromPrimitive acepta "2024-02-30" (día inexistente; Date.parse lo desborda a 1-mar)');
+    it.each(['abc 1', '12', 'Jan 1 2024'])('H-25: rechaza "%s" (no es ISO)', (value) => {
+      expect(() => SaleDate.fromPrimitive(value, 'Test.ctx')).toThrow('Test.ctx: sale date must be an ISO date string');
+    });
+
+    it.each(['2024-02-30', '2024-02-30T10:00:00Z', '2023-02-29'])('H-25: rechaza el día inexistente "%s"', (value) => {
+      expect(() => SaleDate.fromPrimitive(value, 'Test.ctx')).toThrow('Test.ctx');
+    });
+
+    it('H-25: acepta ISO con fracción y offset, y el 29 de febrero bisiesto', () => {
+      expect(SaleDate.fromPrimitive('2024-02-29T10:00:00.123456-06:00', 'Test').value).toBe('2024-02-29T10:00:00.123456-06:00');
+      expect(SaleDate.fromPrimitive('2026-09-19T08:30:00', 'Test').value).toBe('2026-09-19T08:30:00');
+    });
   });
 
   describe('fromNullable', () => {
