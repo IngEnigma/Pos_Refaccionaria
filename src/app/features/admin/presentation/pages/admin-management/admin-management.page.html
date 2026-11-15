@@ -50,23 +50,28 @@
         <form id="branch-form" class="form-grid" [formGroup]="branchForm" (ngSubmit)="saveBranch()">
           <div class="field">
             <label for="branch-name">Nombre de sucursal</label>
-            <input id="branch-name" type="text" formControlName="nombreSucursal" placeholder="Ej. Sucursal Poniente" />
+            <input id="branch-name" type="text" formControlName="nombreSucursal" placeholder="Ej. Sucursal Poniente" [attr.aria-invalid]="invalid(branchForm, 'nombreSucursal')" [attr.aria-describedby]="invalid(branchForm, 'nombreSucursal') ? 'branch-name-error' : null" />
+            @if (invalid(branchForm, 'nombreSucursal')) { <span class="error-text" id="branch-name-error">El nombre es requerido (mín. 3 caracteres)</span> }
           </div>
           <div class="field">
             <label for="branch-phone">Teléfono</label>
-            <input id="branch-phone" type="tel" formControlName="numeroTelefono" placeholder="5512345678" />
+            <input id="branch-phone" type="tel" formControlName="numeroTelefono" placeholder="5512345678" [attr.aria-invalid]="invalid(branchForm, 'numeroTelefono')" [attr.aria-describedby]="invalid(branchForm, 'numeroTelefono') ? 'branch-phone-error' : null" />
+            @if (invalid(branchForm, 'numeroTelefono')) { <span class="error-text" id="branch-phone-error">Teléfono inválido (solo números, máx. 15)</span> }
           </div>
           <div class="field full">
             <label for="branch-address">Dirección</label>
-            <input id="branch-address" type="text" formControlName="ubicacion" placeholder="Calle, número, colonia y ciudad" />
+            <input id="branch-address" type="text" formControlName="ubicacion" placeholder="Calle, número, colonia y ciudad" [attr.aria-invalid]="invalid(branchForm, 'ubicacion')" [attr.aria-describedby]="invalid(branchForm, 'ubicacion') ? 'branch-address-error' : null" />
+            @if (invalid(branchForm, 'ubicacion')) { <span class="error-text" id="branch-address-error">La dirección es requerida</span> }
           </div>
           <div class="field">
             <label for="branch-zip">Código postal</label>
-            <input id="branch-zip" type="text" formControlName="codigoPostal" />
+            <input id="branch-zip" type="text" formControlName="codigoPostal" [attr.aria-invalid]="invalid(branchForm, 'codigoPostal')" [attr.aria-describedby]="invalid(branchForm, 'codigoPostal') ? 'branch-zip-error' : null" />
+            @if (invalid(branchForm, 'codigoPostal')) { <span class="error-text" id="branch-zip-error">El código postal es requerido (máx. 10 caracteres)</span> }
           </div>
           <div class="field">
             <label for="branch-email">Correo</label>
-            <input id="branch-email" type="email" formControlName="correoElectronico" placeholder="sucursal@trt.com" />
+            <input id="branch-email" type="email" formControlName="correoElectronico" placeholder="sucursal@trt.com" [attr.aria-invalid]="invalid(branchForm, 'correoElectronico')" [attr.aria-describedby]="invalid(branchForm, 'correoElectronico') ? 'branch-email-error' : null" />
+            @if (invalid(branchForm, 'correoElectronico')) { <span class="error-text" id="branch-email-error">Ingrese un correo electrónico válido</span> }
           </div>
           <div class="form-actions full">
             <button class="btn-secondary" type="button" (click)="branchForm.reset()">Limpiar</button>
@@ -89,15 +94,18 @@
         <form id="user-form" class="form-grid" [formGroup]="userForm" (ngSubmit)="saveUser()">
           <div class="field">
             <label for="user-name">Usuario</label>
-            <input id="user-name" type="text" formControlName="username" autocomplete="off" />
+            <input id="user-name" type="text" formControlName="username" autocomplete="off" [attr.aria-invalid]="invalid(userForm, 'username')" [attr.aria-describedby]="invalid(userForm, 'username') ? 'user-name-error' : null" />
+            @if (invalid(userForm, 'username')) { <span class="error-text" id="user-name-error">El usuario es requerido</span> }
           </div>
           <div class="field">
             <label for="user-email">Correo</label>
-            <input id="user-email" type="email" formControlName="email" placeholder="usuario@trt.com" />
+            <input id="user-email" type="email" formControlName="email" placeholder="usuario@trt.com" [attr.aria-invalid]="invalid(userForm, 'email')" [attr.aria-describedby]="invalid(userForm, 'email') ? 'user-email-error' : null" />
+            @if (invalid(userForm, 'email')) { <span class="error-text" id="user-email-error">Ingrese un correo electrónico válido</span> }
           </div>
           <div class="field">
             <label for="user-password">Contraseña</label>
-            <input id="user-password" type="password" formControlName="password" autocomplete="new-password" />
+            <input id="user-password" type="password" formControlName="password" autocomplete="new-password" [attr.aria-invalid]="invalid(userForm, 'password')" [attr.aria-describedby]="invalid(userForm, 'password') ? 'user-password-error' : null" />
+            @if (invalid(userForm, 'password')) { <span class="error-text" id="user-password-error">La contraseña es requerida</span> }
           </div>
           <div class="field">
             <label for="user-active">Estado</label>

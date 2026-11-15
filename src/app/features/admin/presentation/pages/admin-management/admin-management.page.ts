@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, inject } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Dialog } from '@angular/cdk/dialog';
 import { LucideAngularModule } from 'lucide-angular';
 
@@ -9,6 +9,7 @@ import { ToastService } from '@app/shared/ui/components/toast/toast.service';
 import { BranchesFacade } from '@features/branches/application/facades/branches.facade';
 import { ConfirmDialogComponent } from '@app/shared/ui/components/confirm-dialog/confirm-dialog.component';
 import { User } from '@features/users/domain/entities/user.entity';
+import { branchFieldValidators } from '@features/branches/presentation/validators/branch-form.validators';
 import { UsersFacade } from '@features/users/application/facades/users.facade';
 
 @Component({
@@ -34,11 +35,11 @@ export class AdminManagementPageComponent implements OnInit {
   readonly activeUsers = computed(() => this.users().filter((u) => u.isActive).length);
 
   readonly branchForm = this.fb.group({
-    nombreSucursal: ['', [Validators.required, Validators.minLength(3)]],
-    ubicacion: ['', Validators.required],
-    codigoPostal: ['', Validators.required],
-    numeroTelefono: ['', [Validators.required, Validators.pattern(/^[0-9]+$/)]],
-    correoElectronico: ['', [Validators.required, Validators.email]],
+    nombreSucursal: ['', branchFieldValidators.nombreSucursal],
+    ubicacion: ['', branchFieldValidators.ubicacion],
+    codigoPostal: ['', branchFieldValidators.codigoPostal],
+    numeroTelefono: ['', branchFieldValidators.numeroTelefono],
+    correoElectronico: ['', branchFieldValidators.correoElectronico],
   });
 
   readonly userForm = this.fb.group({
@@ -87,6 +88,12 @@ export class AdminManagementPageComponent implements OnInit {
         },
         error: (error: unknown) => this.toast.error(this.messageOf(error)),
       });
+  }
+
+  /** H-53: el control es inválido y el usuario ya lo tocó (o intentó enviar). */
+  invalid(form: FormGroup, name: string): boolean {
+    const control = form.get(name);
+    return !!control && control.invalid && (control.touched || control.dirty);
   }
 
   toggleUser(user: User): void {

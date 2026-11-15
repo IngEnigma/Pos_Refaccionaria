@@ -330,4 +330,42 @@ describe('AdminManagementPageComponent', () => {
       expect(toast.error).toHaveBeenCalledWith('sin permiso');
     });
   });
+
+  describe('mensajes de validación (H-53)', () => {
+    it('al enviar la sucursal vacía muestra un mensaje por campo', () => {
+      submit('branch-form');
+
+      expect(text()).toContain('El nombre es requerido');
+      expect(text()).toContain('La dirección es requerida');
+      expect(text()).toContain('El código postal es requerido');
+      expect(text()).toContain('Teléfono inválido');
+      expect(text()).toContain('Ingrese un correo electrónico válido');
+    });
+
+    it('al enviar el usuario vacío muestra un mensaje por campo', () => {
+      submit('user-form');
+
+      expect(text()).toContain('El usuario es requerido');
+      expect(text()).toContain('Ingrese un correo electrónico válido');
+      expect(text()).toContain('La contraseña es requerida');
+    });
+
+    it('el campo inválido queda marcado con aria-invalid', () => {
+      submit('user-form');
+
+      expect(fixture.nativeElement.querySelector('#user-name').getAttribute('aria-invalid')).toBe('true');
+    });
+
+    it('la sucursal respeta los topes del backend (CP 10, teléfono 15, sin solo espacios)', () => {
+      page.branchForm.setValue({
+        nombreSucursal: '   ', ubicacion: '  ', codigoPostal: '12345678901',
+        numeroTelefono: '1234567890123456', correoElectronico: 'n@trt.com',
+      });
+
+      expect(page.branchForm.controls.nombreSucursal.invalid).toBe(true);
+      expect(page.branchForm.controls.ubicacion.invalid).toBe(true);
+      expect(page.branchForm.controls.codigoPostal.invalid).toBe(true);
+      expect(page.branchForm.controls.numeroTelefono.invalid).toBe(true);
+    });
+  });
 });
