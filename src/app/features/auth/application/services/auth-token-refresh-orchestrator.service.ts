@@ -18,7 +18,7 @@ import { RefreshTokenUseCase } from '@features/auth/application/usecase/refresh.
 import {
   isRefreshRequest,
   withBearerToken,
-} from '@features/auth/infrastructure/http/auth-token-http.utils';
+} from './auth-token-http.utils';
 
 @Injectable({ providedIn: 'root' })
 export class AuthTokenRefreshOrchestrator {

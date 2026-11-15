@@ -6,12 +6,12 @@ import { LOGGER_PORT } from '@core/logging/logger.port';
 import { AuthTokenRefreshOrchestrator } from '@features/auth/application/services/auth-token-refresh-orchestrator.service';
 import { throwError } from 'rxjs';
 
-jest.mock('./auth-token-http.utils', () => ({
+jest.mock('@features/auth/application/services/auth-token-http.utils', () => ({
   isRefreshRequest: jest.fn(),
   isUnauthorizedError: jest.fn(),
 }));
 
-import * as authUtils from './auth-token-http.utils';
+import * as authUtils from '@features/auth/application/services/auth-token-http.utils';
 
 describe('authTokenInterceptor', () => {
   let httpMock: HttpTestingController;

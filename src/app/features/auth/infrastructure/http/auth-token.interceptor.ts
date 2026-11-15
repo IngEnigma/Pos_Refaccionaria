@@ -6,7 +6,7 @@ import { LOGGER_PORT } from '@core/logging/logger.port';
 import {
   isRefreshRequest,
   isUnauthorizedError,
-} from './auth-token-http.utils';
+} from '@features/auth/application/services/auth-token-http.utils';
 import { AuthTokenRefreshOrchestrator } from '@features/auth/application/services/auth-token-refresh-orchestrator.service';
 
 export const authTokenInterceptor: HttpInterceptorFn = (req, next) => {
