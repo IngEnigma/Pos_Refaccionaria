@@ -211,14 +211,15 @@ describe('BranchPriceRepositoryImpl', () => {
   describe('deactivatePrice', () => {
     beforeEach(() => setup());
 
-    it('hace DELETE a /precios-sucursal/{id}', () => {
+    it('hace PUT {activo:false} a /precios-sucursal/{id} (no borra el historial, H-44)', () => {
       let completed = false;
 
       repository.deactivatePrice(9).subscribe({ complete: () => (completed = true) });
 
       const req = httpMock.expectOne(`${endpoint}/9`);
-      expect(req.request.method).toBe('DELETE');
-      req.flush(null, { status: 204, statusText: 'No Content' });
+      expect(req.request.method).toBe('PUT');
+      expect(req.request.body).toEqual({ activo: false });
+      req.flush(priceDto);
       expect(completed).toBe(true);
     });
 
@@ -242,10 +243,10 @@ describe('BranchPriceRepositoryImpl', () => {
       httpMock.expectOne(`${endpoint}/`).flush(priceDto);
     });
 
-    it('DELETE llega a /precios-sucursal/{id}/', () => {
+    it('PUT de desactivar llega a /precios-sucursal/{id}/', () => {
       repository.deactivatePrice(9).subscribe();
 
-      httpMock.expectOne(`${endpoint}/9/`).flush(null);
+      httpMock.expectOne(`${endpoint}/9/`).flush(priceDto);
     });
 
     it('GET activo conserva la ruta con slash y los query params', () => {

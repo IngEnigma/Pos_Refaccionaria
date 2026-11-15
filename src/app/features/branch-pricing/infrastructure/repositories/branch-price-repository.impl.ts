@@ -47,6 +47,7 @@ export class BranchPriceRepositoryImpl implements BranchPriceRepository {
   }
 
   deactivatePrice(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.endpoint}/${id}`);
+    // PUT activo:false conserva el historial; DELETE borraba la fila (H-44).
+    return this.http.put(`${this.endpoint}/${id}`, { activo: false }).pipe(map(() => undefined));
   }
 }

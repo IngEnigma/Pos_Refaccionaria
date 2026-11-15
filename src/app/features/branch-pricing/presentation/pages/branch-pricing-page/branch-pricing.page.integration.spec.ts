@@ -204,15 +204,15 @@ describe('INT-08 Precios por sucursal (página + facade + repositorio + http)', 
   });
 
   describe('desactivar', () => {
-    it('deactivatePrice llama DELETE /precios-sucursal/<id>/ (el backend borra la fila, no la desactiva)', () => {
+    it('deactivatePrice llama PUT {activo:false} a /precios-sucursal/<id>/ (conserva el historial, H-44)', () => {
       TestBed.inject(DeactivatePriceUseCase).execute(11).subscribe();
 
       const req = httpMock.expectOne(`${PRECIOS}11/`);
-      expect(req.request.method).toBe('DELETE');
-      req.flush({ message: 'PrecioSucursal eliminado exitosamente' });
+      expect(req.request.method).toBe('PUT');
+      expect(req.request.body).toEqual({ activo: false });
+      req.flush({});
     });
 
-    it.todo('H-44: "desactivar" un precio debe conservar el historial (PUT activo=false), hoy DELETE borra la fila y la UI no lo ofrece');
     it.todo('H-45: el toast del error al fijar precio ignora el texto del backend (HttpErrorResponse no es Error)');
   });
 });
