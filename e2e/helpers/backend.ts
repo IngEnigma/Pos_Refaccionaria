@@ -95,11 +95,11 @@ export async function loginMockeado(
 
 export type E2eRole = 'admin' | 'manager' | 'seller';
 
-/** El front deduce el rol de isAdmin/isStaff (auth-role.mapper.ts, H-46). */
-const ROLE_FLAGS: Record<E2eRole, { isAdmin: boolean; isStaff: boolean }> = {
-  admin: { isAdmin: true, isStaff: true },
-  manager: { isAdmin: false, isStaff: true },
-  seller: { isAdmin: false, isStaff: false },
+/** El front toma el rol de `user.rol` (cajero/encargado/admin); isAdmin/isStaff son solo el respaldo (H-46). */
+const ROLE_FLAGS: Record<E2eRole, { isAdmin: boolean; isStaff: boolean; rol: string }> = {
+  admin: { isAdmin: true, isStaff: true, rol: 'admin' },
+  manager: { isAdmin: false, isStaff: true, rol: 'encargado' },
+  seller: { isAdmin: false, isStaff: false, rol: 'cajero' },
 };
 
 export function sessionFor(role: E2eRole, username = `${role}1`) {

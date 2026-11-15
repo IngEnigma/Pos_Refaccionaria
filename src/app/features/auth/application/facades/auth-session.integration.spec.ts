@@ -313,7 +313,20 @@ describe('Sesión integración (login, perfil, refresh concurrente, logout)', ()
     });
   });
 
-  // El backend manda `user.rol` ('cajero' | 'encargado' | 'admin'), que define sus permisos, pero el front deriva el rol
-  // solo de isadmin/isstaff y trata a un staff sin superuser como manager aunque el backend lo trata como admin.
-  it.todo('H-46: usar user.rol del login (o documentar la equivalencia) en lugar de deducir el rol de isadmin/isstaff');
+  // H-46: `user.rol` define los permisos en el backend; el front ya no lo deduce solo de isadmin/isstaff.
+  it.each([
+    ['encargado', { isadmin: true, isstaff: true }, UserRole.Manager],
+    ['admin', { isadmin: false, isstaff: true }, UserRole.Admin],
+    ['cajero', { isadmin: false, isstaff: true }, UserRole.Seller],
+  ])('H-46: user.rol=%s manda sobre las banderas', async (rol, flags, expected) => {
+    const done = firstValueFrom(facade.login({ username: 'u', password: 'x', remember: false }));
+    httpMock.expectOne(`${API}/login`).flush({
+      access: jwt('a1'),
+      refresh: jwt('r1', 86400),
+      user: { id: 1, username: 'u', ...flags, rol },
+    });
+
+    expect(await done).toBe(true);
+    expect(facade.role()).toBe(expected);
+  });
 });

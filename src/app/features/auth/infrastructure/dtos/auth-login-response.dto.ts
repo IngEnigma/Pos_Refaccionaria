@@ -6,5 +6,7 @@ export interface LoginResponseDto {
     username: string;
     isAdmin: boolean;
     isStaff: boolean;
+    /** 'cajero' | 'encargado' | 'admin'; define los permisos en el backend. */
+    rol?: string;
   };
 }
