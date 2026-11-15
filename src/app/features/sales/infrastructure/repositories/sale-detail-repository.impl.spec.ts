@@ -119,6 +119,16 @@ describe('SaleDetailRepositoryImpl', () => {
       expect(result).toEqual({ id: 0, productId: 10, saleId: 50, subtotal: 0, cantidad: 2 });
     });
 
+    // H-28: si la respuesta trae el id pero no el subtotal, se conserva el id real.
+    it('H-28: conserva el id real cuando la respuesta no trae subtotal', () => {
+      let result: unknown;
+      repository.createSaleDetail({ productId: 10, saleId: 50, cantidad: 2 }).subscribe((r) => (result = r));
+
+      httpMock.expectOne(URL).flush({ id: 3 });
+
+      expect(result).toEqual({ id: 3, productId: 10, saleId: 50, subtotal: 0, cantidad: 2 });
+    });
+
     // Error 400 con mensaje del backend (p. ej. stock insuficiente): llega al usuario y se registra.
     it('convierte un 400 en SaleDetailMutationError con el mensaje del backend y lo registra', () => {
       let error: SaleDetailMutationError | undefined;

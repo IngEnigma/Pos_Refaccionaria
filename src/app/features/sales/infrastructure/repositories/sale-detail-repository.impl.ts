@@ -103,7 +103,7 @@ export class SaleDetailRepositoryImpl implements SaleDetailRepository {
     }
 
     return SaleDetailFactory.fromPrimitives({
-      id: id ?? 0,
+      id: id ?? (response as { id?: number } | null)?.id ?? 0,
       productId: (payload as CreateSaleDetailPayload).productId ?? 0,
       saleId: (payload as CreateSaleDetailPayload).saleId ?? 0,
       subtotal: 0,

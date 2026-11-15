@@ -78,7 +78,11 @@ describe('SaleMapper', () => {
     });
 
     // Number("") y Number(null) valen 0: un total vacío o null del backend se acepta como venta de $0.
-    it.todo('H-26: SaleMapper.fromResponseDto acepta total "" o null como 0 (sale.mapper.ts:13, Number() sin validar vacío)');
+    it.each([[''], [null], ['  ']])('H-26: rechaza total vacío o null (%p)', (total) => {
+      expect(() => SaleMapper.fromResponseDto({ ...dto, total: total as unknown as string })).toThrow(
+        'Sale.total: money must be a non-negative number',
+      );
+    });
   });
 
   describe('toCreateRequestDto', () => {

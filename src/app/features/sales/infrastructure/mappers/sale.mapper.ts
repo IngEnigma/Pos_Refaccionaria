@@ -10,7 +10,8 @@ import { Money } from '@features/sales/domain/value-objects/money.value';
 
 export class SaleMapper {
   static fromResponseDto(dto: SaleResponseDto): Sale {
-    const total = Number(dto.total);
+    // Number('') y Number(null) valen 0: un total vacío no es una venta de $0.
+    const total = dto.total == null || String(dto.total).trim() === '' ? NaN : Number(dto.total);
     Money.fromNumber(total, 'Sale.total');
 
     return SaleFactory.fromPrimitives({
