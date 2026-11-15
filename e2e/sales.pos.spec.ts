@@ -149,7 +149,10 @@ test.describe('POS — ventas', () => {
     await addToCart(page, 'Balata delantera');
     await addToCart(page, 'Filtro de aceite');
     await addToCart(page, 'Filtro de aceite');
-    const totalCarrito = await cartPanel(page).locator('.total-amount').innerText();
+    // innerText() no espera: se confirma primero el total esperado (2 × $50 + $100) con auto-espera.
+    const total = cartPanel(page).locator('.total-amount');
+    await expect(total).toHaveText('$200.00');
+    const totalCarrito = await total.innerText();
     await cartPanel(page).getByRole('button', { name: 'Efectivo' }).click();
     await processBtn(page).click();
 
