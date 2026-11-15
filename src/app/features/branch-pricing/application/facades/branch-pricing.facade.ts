@@ -114,6 +114,10 @@ export class BranchPricingFacade {
     );
   }
 
+  selectSucursal(id: number | null): void {
+    this._selectedSucursalId.set(id);
+  }
+
   clearHistory(): void {
     this._priceHistory.set([]);
   }

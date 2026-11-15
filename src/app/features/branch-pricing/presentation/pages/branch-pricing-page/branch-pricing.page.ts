@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, OnInit, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { filter, switchMap } from 'rxjs';
 import { LucideAngularModule } from 'lucide-angular';
 import { Dialog, DialogModule } from '@angular/cdk/dialog';
 
@@ -8,6 +9,7 @@ import { ConfirmDialogComponent } from '@shared/ui/components/confirm-dialog/con
 import { resolveHttpErrorMessage } from '@features/sales/infrastructure/utils/http-error-resolver';
 import { ToastService } from '@shared/ui/components/toast/toast.service';
 import { BranchesFacade } from '@features/branches/application/facades/branches.facade';
+import { SetBranchPricePayload } from '../../../domain/repository/branch-price-repository';
 import { BranchPricingFacade } from '../../../application/facades/branch-pricing.facade';
 import { BranchPricingTableComponent } from '../../components/branch-pricing-table/branch-pricing-table.component';
 import { SetPriceDialogComponent } from '../../components/set-price-dialog/set-price-dialog.component';
@@ -42,26 +44,26 @@ export class BranchPricingPageComponent implements OnInit {
   }
 
   onBranchChange(sucursalId: number): void {
-    (this.branchPricingFacade as any)._selectedSucursalId.set(sucursalId);
+    this.branchPricingFacade.selectSucursal(sucursalId);
   }
 
   onSetPrice(event: { productId: number; sucursalId: number }): void {
-    const dialogRef = this.dialog.open(SetPriceDialogComponent, {
-      data: { idProducto: event.productId, idSucursal: event.sucursalId },
-    });
-
-    dialogRef.closed.subscribe((result) => {
-      if (result) {
-        this.branchPricingFacade.setBranchPrice(result as any).subscribe({
-          next: () => {
-            this.toastService.success('Precio de sucursal actualizado correctamente');
-            this.table()?.reload();
-          },
-          error: (err: unknown) =>
-            this.toastService.error(resolveHttpErrorMessage(err, 'No se pudo actualizar el precio')),
-        });
-      }
-    });
+    this.dialog
+      .open<SetBranchPricePayload | null>(SetPriceDialogComponent, {
+        data: { idProducto: event.productId, idSucursal: event.sucursalId },
+      })
+      .closed.pipe(
+        filter((result): result is SetBranchPricePayload => !!result),
+        switchMap((payload) => this.branchPricingFacade.setBranchPrice(payload)),
+      )
+      .subscribe({
+        next: () => {
+          this.toastService.success('Precio de sucursal actualizado correctamente');
+          this.table()?.reload();
+        },
+        error: (err: unknown) =>
+          this.toastService.error(resolveHttpErrorMessage(err, 'No se pudo actualizar el precio')),
+      });
   }
 
   onDeactivate(event: { productId: number; sucursalId: number }): void {
