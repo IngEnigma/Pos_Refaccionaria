@@ -170,7 +170,7 @@ describe('INT-08 Precios por sucursal (página + facade + repositorio + http)', 
 
   describe('errores del backend', () => {
     it('precio inválido (400): avisa con un toast de error y NO recarga la tabla', () => {
-      closeWith({ idProducto: 7, idSucursal: 1, precioVenta: 0 });
+      closeWith({ idProducto: 7, idSucursal: 1, precioVenta: 5 });
 
       page.onSetPrice({ productId: 7, sucursalId: 1 });
       httpMock

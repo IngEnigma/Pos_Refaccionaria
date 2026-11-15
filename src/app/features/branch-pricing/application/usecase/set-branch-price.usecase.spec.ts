@@ -41,16 +41,20 @@ describe('SetBranchPriceUseCase', () => {
     });
   });
 
-  it('no altera ni redondea el precio del payload', () => {
-    repository.setBranchPrice.mockReturnValue(of(price));
+  // H-14: el use case valida el precio antes de llamar al repositorio.
+  it.each([0, -5, 10.999, 1.005, 100000000, NaN, 'abc' as unknown as number])(
+    'rechaza el precio inválido %p sin llamar al repositorio',
+    (precioVenta) => {
+      let error: Error | undefined;
 
-    useCase.execute({ ...payload, precioVenta: 10.999 }).subscribe();
+      useCase.execute({ ...payload, precioVenta }).subscribe({ error: (e) => (error = e) });
 
-    expect(repository.setBranchPrice).toHaveBeenCalledWith({ ...payload, precioVenta: 10.999 });
-  });
+      expect(error?.message).toMatch(/precio/i);
+      expect(repository.setBranchPrice).not.toHaveBeenCalled();
+    },
+  );
 
-  // Documenta el comportamiento actual (H-14): el use case no valida el precio.
-  it.each([0, -5, 10.999])('no valida el precio %p: lo reenvía al repositorio', (precioVenta) => {
+  it.each([0.01, 8.75, 99999999.99])('acepta el precio válido %p', (precioVenta) => {
     repository.setBranchPrice.mockReturnValue(of(price));
 
     useCase.execute({ ...payload, precioVenta }).subscribe();

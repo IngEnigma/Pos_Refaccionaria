@@ -159,39 +159,31 @@ describe('SetPriceDialogComponent', () => {
     });
   });
 
-  // H-14: la única validación es Validators.min(0.01). Estos tests documentan el
-  // comportamiento ACTUAL del formulario; no afirman que sea el correcto.
-  describe('comportamiento actual con decimales y límites (H-14)', () => {
-    it('acepta hoy un precio con 3 decimales (10.999) y lo envía sin redondear', async () => {
+  // H-14: máximo 2 decimales y tope 99999999.99 (DecimalField(10,2) del backend).
+  describe('decimales y límites (H-14)', () => {
+    it.each(['10.999', '1.005', '100000000', '1000000000'])('rechaza %s y no envía', async (value) => {
       const { user } = await setup();
 
-      await typePrice(user, '10.999');
+      await typePrice(user, value);
 
-      expect(saveButton()).toBeEnabled();
-      await user.click(saveButton());
-      expect(close).toHaveBeenCalledWith({ idProducto: 5, idSucursal: 2, precioVenta: 10.999 });
+      expect(saveButton()).toBeDisabled();
     });
 
-    it('acepta hoy 1.005 sin normalizarlo a 2 decimales', async () => {
+    it.each(['0.01', '8.75', '99999999.99'])('acepta %s', async (value) => {
       const { user } = await setup();
 
-      await typePrice(user, '1.005');
-      await user.click(saveButton());
-
-      expect(close.mock.calls[0][0].precioVenta).toBe(1.005);
-    });
-
-    it('acepta hoy un precio por encima del máximo del backend (decimal 10,2) porque no hay límite superior', async () => {
-      const { user } = await setup();
-
-      await typePrice(user, '1000000000');
+      await typePrice(user, value);
 
       expect(saveButton()).toBeEnabled();
     });
 
-    it.todo('H-14: precio con más de 2 decimales debería rechazarse');
-    it.todo('H-14b: precio mayor a 99999999.99 (máximo del backend) debería rechazarse en el formulario');
-    it.todo('H-14c: priceForm.setValue({ precioVenta: "abc" }) por código pasa Validators.min (NaN) y enviaría un string como precioVenta');
+    it('un valor no numérico fijado por código es inválido', async () => {
+      const { fixture } = await setup();
+
+      fixture.componentInstance.priceForm.setValue({ precioVenta: 'abc' });
+
+      expect(fixture.componentInstance.priceForm.invalid).toBe(true);
+    });
   });
 
   describe('cancelar', () => {
