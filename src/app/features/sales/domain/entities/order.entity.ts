@@ -19,7 +19,7 @@ export class OrderItem {
   }
 
   get subtotal(): Money {
-    return Money.fromNumber(+(this.price.value * this.quantity.value).toFixed(2), 'OrderItem.subtotal');
+    return Money.fromNumber(Money.round2(this.price.value * this.quantity.value), 'OrderItem.subtotal');
   }
 }
 
@@ -39,37 +39,31 @@ export class Order {
   /** El precio de catálogo ya incluye IVA: total = Σ(precio × cantidad) − descuento, igual que el backend. */
   get total(): Money {
     const sum = this._items.reduce((acc, item) => acc + item.subtotal.value, 0);
-    return Money.fromNumber(this.round2(Math.max(0, sum - this._discount)), 'Order.total');
+    return Money.fromNumber(Money.round2(Math.max(0, sum - this._discount)), 'Order.total');
   }
 
   /** Base sin IVA: total / 1.16. */
   get subtotal(): Money {
-    return Money.fromNumber(this.round2(this.total.value / (1 + this._ivaRate)), 'Order.subtotal');
+    return Money.fromNumber(Money.round2(this.total.value / (1 + this._ivaRate)), 'Order.subtotal');
   }
 
   /** IVA incluido en el total. */
   get iva(): Money {
-    return Money.fromNumber(this.round2(this.total.value - this.subtotal.value), 'Order.iva');
-  }
-
-  private round2(value: number): number {
-    return +value.toFixed(2);
+    return Money.fromNumber(Money.round2(this.total.value - this.subtotal.value), 'Order.iva');
   }
 
   setDiscount(amount: number): void {
+    if (!Number.isFinite(amount)) throw new Error('Discount must be a finite number');
     if (amount < 0) throw new Error('Discount cannot be negative');
     this._discount = amount;
   }
 
   addItem(props: OrderItemProps): void {
     const existing = this._items.find(i => i.productId === props.productId);
-    if (existing) {
-      const newQty = existing.quantity.value + props.quantity;
-      const index = this._items.indexOf(existing);
-      this._items[index] = new OrderItem({ ...props, quantity: Math.min(999, newQty) });
-    } else {
-      this._items.push(new OrderItem(props));
-    }
+    const quantity = Math.min(999, props.quantity + (existing?.quantity.value ?? 0));
+    const item = new OrderItem({ ...props, quantity });
+    if (existing) this._items[this._items.indexOf(existing)] = item;
+    else this._items.push(item);
   }
 
   validate(): void {

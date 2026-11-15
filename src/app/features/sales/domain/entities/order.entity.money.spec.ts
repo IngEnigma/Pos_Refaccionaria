@@ -30,8 +30,13 @@ describe('OrderItem - redondeo del subtotal', () => {
 
   // H-12: el subtotal usa toFixed(2) sobre un double; con cantidades fraccionarias el medio centavo
   // cae del lado equivocado (0.15 x 1.5 = 0.225 debería redondear a 0.23 y da 0.22).
-  it.todo('H-12: OrderItem.subtotal redondea mal el medio centavo con cantidad fraccionaria (0.15 x 1.5 -> 0.22, esperado 0.23)');
-  it.todo('H-12: OrderItem.subtotal redondea mal el medio centavo con cantidad fraccionaria (0.01 x 1.5 -> 0.01, esperado 0.02)');
+  it('H-12: redondea el medio centavo hacia arriba con cantidad fraccionaria (0.15 x 1.5 -> 0.23)', () => {
+    expect(new OrderItem({ productId: 1, price: 0.15, quantity: 1.5 }).subtotal.value).toBe(0.23);
+  });
+
+  it('H-12: redondea el medio centavo hacia arriba con cantidad fraccionaria (0.01 x 1.5 -> 0.02)', () => {
+    expect(new OrderItem({ productId: 1, price: 0.01, quantity: 1.5 }).subtotal.value).toBe(0.02);
+  });
 });
 
 describe('Order - IVA 16 % incluido y redondeo', () => {
@@ -181,8 +186,17 @@ describe('Order - descuento con decimales', () => {
   });
 
   // setDiscount solo valida < 0: NaN e Infinity pasan y luego revientan los getters (discount/iva/total).
-  it.todo('H-23: Order.setDiscount(NaN) no lanza (order.entity.ts:54-57); después order.discount/iva/total lanzan "money must be a non-negative number"');
-  it.todo('H-23: Order.setDiscount(Infinity) no lanza (order.entity.ts:54-57); después order.discount lanza "money must be a non-negative number"');
+  it('H-23: setDiscount(NaN) lanza y no deja la orden en estado inválido', () => {
+    const order = new Order();
+    expect(() => order.setDiscount(NaN)).toThrow('Discount must be a finite number');
+    expect(order.discount.value).toBe(0);
+  });
+
+  it('H-23: setDiscount(Infinity) lanza y no deja la orden en estado inválido', () => {
+    const order = new Order();
+    expect(() => order.setDiscount(Infinity)).toThrow('Discount must be a finite number');
+    expect(order.total.value).toBe(0);
+  });
 });
 
 describe('Order - addItem (casos límite)', () => {
@@ -235,5 +249,9 @@ describe('Order - addItem (casos límite)', () => {
   });
 
   // El tope de 999 solo se aplica al acumular; una línea nueva con quantity > 999 pasa sin topar.
-  it.todo('H-24: Order.addItem({ quantity: 1500 }) en producto nuevo no se topa en 999 (order.entity.ts:62-66, el tope solo aplica al acumular)');
+  it('H-24: el tope de 999 también aplica a un producto nuevo', () => {
+    const order = new Order();
+    order.addItem({ productId: 1, price: 10, quantity: 1500 });
+    expect(order.items[0].quantity.value).toBe(999);
+  });
 });
