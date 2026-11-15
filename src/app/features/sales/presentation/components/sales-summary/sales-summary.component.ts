@@ -11,7 +11,6 @@ import { CommonModule } from '@angular/common';
 })
 export class SalesSummaryComponent {
   readonly subtotal = input(0);
-  readonly descuento = input(0);
   readonly iva = input(0);
   readonly total = input(0);
 }

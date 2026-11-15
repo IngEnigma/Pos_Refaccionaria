@@ -183,7 +183,6 @@ export class SalesPageComponent implements OnInit {
   });
 
   readonly cartItems = this.cartService.cart;
-  readonly descuento = this.cartService.descuento;
   readonly subtotal = this.cartService.subtotal;
   readonly iva = this.cartService.iva;
   readonly total = this.cartService.total;

@@ -26,20 +26,15 @@ export class OrderItem {
 export class Order {
   private readonly _items: OrderItem[] = [];
   private readonly _ivaRate = 0.16;
-  private _discount = 0;
 
   get items(): readonly OrderItem[] {
     return this._items;
   }
 
-  get discount(): Money {
-    return Money.fromNumber(this._discount, 'Order.discount');
-  }
-
-  /** Base sin IVA: Σ(precio × cantidad) − descuento. El precio de catálogo no incluye IVA. */
+  /** Base sin IVA: Σ(precio × cantidad). El precio de catálogo no incluye IVA. */
   get subtotal(): Money {
     const sum = this._items.reduce((acc, item) => acc + item.subtotal.value, 0);
-    return Money.fromNumber(Money.round2(Math.max(0, sum - this._discount)), 'Order.subtotal');
+    return Money.fromNumber(Money.round2(sum), 'Order.subtotal');
   }
 
   /** IVA 16 % sobre el subtotal, igual que el backend. */
@@ -50,12 +45,6 @@ export class Order {
   /** total = subtotal + IVA, igual que el backend. */
   get total(): Money {
     return Money.fromNumber(Money.round2(this.subtotal.value + this.iva.value), 'Order.total');
-  }
-
-  setDiscount(amount: number): void {
-    if (!Number.isFinite(amount)) throw new Error('Discount must be a finite number');
-    if (amount < 0) throw new Error('Discount cannot be negative');
-    this._discount = amount;
   }
 
   addItem(props: OrderItemProps): void {

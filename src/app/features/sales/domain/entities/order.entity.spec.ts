@@ -43,7 +43,6 @@ describe('Order - estado inicial', () => {
     expect(order.subtotal.value).toBe(0);
     expect(order.iva.value).toBe(0);
     expect(order.total.value).toBe(0);
-    expect(order.discount.value).toBe(0);
   });
 
   // Verifica que validar una orden vacía lance el error de carrito vacío.
@@ -161,38 +160,3 @@ describe('Order - cálculos', () => {
   });
 });
 
-describe('Order - descuento', () => {
-  // Verifica que el descuento se reste antes del IVA.
-  it('descuento se resta antes del IVA (100 - 10 = 90, IVA 14.40, total 104.40)', () => {
-    const order = new Order();
-    order.addItem({ productId: 1, price: 100, quantity: 1 });
-    order.setDiscount(10);
-    expect(order.discount.value).toBe(10);
-    expect(order.subtotal.value).toBe(90);
-    expect(order.iva.value).toBe(14.4);
-    expect(order.total.value).toBe(104.4);
-  });
-
-  // Verifica que un descuento mayor al total no genere totales negativos (base en cero).
-  it('descuento mayor al total deja todo en cero (sin negativos)', () => {
-    const order = new Order();
-    order.addItem({ productId: 1, price: 50, quantity: 1 });
-    order.setDiscount(100);
-    expect(order.subtotal.value).toBe(0);
-    expect(order.iva.value).toBe(0);
-    expect(order.total.value).toBe(0);
-  });
-
-  // Verifica que un descuento negativo sea rechazado con error.
-  it('descuento negativo lanza error', () => {
-    const order = new Order();
-    expect(() => order.setDiscount(-1)).toThrow('Discount cannot be negative');
-  });
-
-  // Verifica que un descuento cero sea válido y no altere los totales.
-  it('descuento cero es válido', () => {
-    const order = new Order();
-    expect(() => order.setDiscount(0)).not.toThrow();
-    expect(order.discount.value).toBe(0);
-  });
-});

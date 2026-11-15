@@ -22,17 +22,14 @@ export class SalesCartService {
 
   private readonly _cart = signal<SalesCartItem[]>([]);
   private readonly _selectedPayment = signal<SalesPaymentMethod | null>(null);
-  private readonly _descuento = signal(0);
   private readonly _selectedClient = signal<Client | null>(null);
   readonly cart = this._cart.asReadonly();
   readonly selectedPayment = this._selectedPayment.asReadonly();
-  readonly descuento = this._descuento.asReadonly();
   /** Cliente de la venta actual. null = Público general. */
   readonly selectedClient = this._selectedClient.asReadonly();
 
   readonly order = computed(() => {
     const o = new Order();
-    o.setDiscount(this.descuento());
     this.cart().forEach(item =>
       o.addItem({ productId: item.productId, price: item.precio, quantity: item.qty })
     );
@@ -112,7 +109,6 @@ export class SalesCartService {
   clearCart(): void {
     this._cart.set([]);
     this._selectedPayment.set(null);
-    this._descuento.set(0);
     this._selectedClient.set(null);
   }
 

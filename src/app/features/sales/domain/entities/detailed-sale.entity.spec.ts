@@ -20,6 +20,8 @@ describe('DetailedSale', () => {
     id: 55,
     idInventario: 4,
     fecha: '2025-01-15T10:00:00Z',
+    subtotal: 240,
+    iva: 38.4,
     total: 278.4,
     detalles: [item],
   };

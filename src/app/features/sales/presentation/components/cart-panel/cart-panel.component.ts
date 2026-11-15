@@ -20,7 +20,6 @@ import { ButtonComponent } from '@shared/ui';
 export class CartPanelComponent {
   readonly cartItems = input<SalesCartItem[]>([]);
   readonly subtotal = input(0);
-  readonly descuento = input(0);
   readonly iva = input(0);
   readonly total = input(0);
   paymentMethods = input<readonly PaymentMethod[]>([]);

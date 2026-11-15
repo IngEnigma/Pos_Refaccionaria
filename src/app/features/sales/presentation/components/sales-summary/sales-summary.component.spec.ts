@@ -9,7 +9,7 @@ describe('SalesSummaryComponent', () => {
     fixture = TestBed.createComponent(SalesSummaryComponent);
   });
 
-  function setInputs(values: Partial<Record<'subtotal' | 'descuento' | 'iva' | 'total', number>>) {
+  function setInputs(values: Partial<Record<'subtotal' | 'iva' | 'total', number>>) {
     Object.entries(values).forEach(([k, v]) => fixture.componentRef.setInput(k, v));
     fixture.detectChanges();
   }
@@ -27,19 +27,17 @@ describe('SalesSummaryComponent', () => {
     fixture.detectChanges();
 
     expect(row('Subtotal')).toBe('Subtotal$0.00');
-    expect(row('Descuento')).toBe('Descuento$0.00');
     expect(row('IVA')).toBe('IVA$0.00');
     expect(total()).toBe('$0.00');
   });
 
   // Verifica formato de dos decimales (pipe number 1.2-2).
   it('formatea con dos decimales y separador de miles', () => {
-    setInputs({ subtotal: 1200, descuento: 50.5, iva: 184, total: 1333.5 });
+    setInputs({ subtotal: 1200, iva: 192, total: 1392 });
 
     expect(row('Subtotal')).toBe('Subtotal$1,200.00');
-    expect(row('Descuento')).toBe('Descuento$50.50');
-    expect(row('IVA')).toBe('IVA$184.00');
-    expect(total()).toBe('$1,333.50');
+    expect(row('IVA')).toBe('IVA$192.00');
+    expect(total()).toBe('$1,392.00');
   });
 
   // Verifica que un decimal largo se redondee a dos decimales al mostrarse.

@@ -55,7 +55,7 @@ test.describe('Ventas REAL (backend local)', () => {
     await expect(page.locator('.total-value')).toHaveText(`MX$${TOTAL}`);
 
     if (DB) {
-      expect(sql(`select total from ventas_venta where id=${venta.id}`)).toBe(TOTAL);
+      expect(Number(sql(`select total from ventas_venta where id=${venta.id}`))).toBe(Number(TOTAL));
       expect(sql(`select estado from ventas_venta where id=${venta.id}`)).toBe('completada');
       expect(sql(`select cantidad from ventas_detalleventa where id_venta_id=${venta.id}`)).toBe('1');
       expect(Number(sql(stockSql))).toBe(stockAntes! - 1);

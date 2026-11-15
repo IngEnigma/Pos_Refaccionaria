@@ -63,6 +63,20 @@ import { DetailedSale } from '../../../../sales/domain/entities/detailed-sale.en
                     </tr>
                   }
                 </tbody>
+                <tfoot>
+                  <tr>
+                    <td colspan="4" class="text-right">Subtotal</td>
+                    <td class="text-right">{{ sale().subtotal.value | currency: 'MXN' }}</td>
+                  </tr>
+                  <tr>
+                    <td colspan="4" class="text-right">IVA 16%</td>
+                    <td class="text-right">{{ sale().iva.value | currency: 'MXN' }}</td>
+                  </tr>
+                  <tr>
+                    <td colspan="4" class="text-right font-bold">Total</td>
+                    <td class="text-right font-bold">{{ sale().total.value | currency: 'MXN' }}</td>
+                  </tr>
+                </tfoot>
               </table>
             </div>
           </div>

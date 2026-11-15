@@ -13,7 +13,9 @@ describe('GetSaleDetailUseCase', () => {
     id: 12,
     idInventario: 2,
     fecha: '2024-01-01',
-    total: 120,
+    subtotal: 120,
+    iva: 19.2,
+    total: 139.2,
     detalles: [],
   });
 

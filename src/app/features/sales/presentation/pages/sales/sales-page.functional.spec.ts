@@ -280,13 +280,12 @@ describe('SalesPageComponent (funcional)', () => {
     expect(page.lastTicket()?.folio).toBe(50);
   });
 
-  // F6: verifica que el resumen renderice subtotal, descuento, IVA y total exactos para $120.
-  it('F6: el resumen muestra subtotal, descuento, IVA y total exactos', () => {
+  // F6: verifica que el resumen renderice subtotal, IVA y total exactos para $120.
+  it('F6: el resumen muestra subtotal, IVA y total exactos', () => {
     page.onAddToCart(page.productos()[0]);
     fixture.detectChanges();
 
     expect(summaryRow('Subtotal')).toContain('$120.00');
-    expect(summaryRow('Descuento')).toContain('$0');
     expect(summaryRow('IVA')).toContain('$19.20');
     expect((fixture.nativeElement.querySelector('.total-amount') as HTMLElement).textContent).toContain('$139.20');
   });

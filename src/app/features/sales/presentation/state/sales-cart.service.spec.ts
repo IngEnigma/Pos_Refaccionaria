@@ -151,11 +151,10 @@ describe('SalesCartService', () => {
   });
 
   describe('estado inicial', () => {
-    // Verifica el estado inicial: carrito vacío, sin pago, descuento y totales en cero.
+    // Verifica el estado inicial: carrito vacío, sin pago y totales en cero.
     it('inicia con carrito vacío, sin pago y totales en cero', () => {
       expect(service.cart()).toEqual([]);
       expect(service.selectedPayment()).toBeNull();
-      expect(service.descuento()).toBe(0);
       expect(service.subtotal()).toBe(0);
       expect(service.iva()).toBe(0);
       expect(service.total()).toBe(0);
@@ -241,14 +240,13 @@ describe('SalesCartService', () => {
       expect(service.cart()[0].qty).toBe(1);
     });
 
-    // Verifica que clearCart vacíe el carrito y resetee pago, descuento y totales.
-    it('clearCart vacía el carrito y resetea pago y descuento', () => {
+    // Verifica que clearCart vacíe el carrito y resetee pago y totales.
+    it('clearCart vacía el carrito y resetea el pago', () => {
       service.addToCart(makeProduct());
       service.selectPayment({ id: 1, tipo: 'EFECTIVO', descripcion: 'Efectivo' });
       service.clearCart();
       expect(service.cart()).toEqual([]);
       expect(service.selectedPayment()).toBeNull();
-      expect(service.descuento()).toBe(0);
       expect(service.subtotal()).toBe(0);
       expect(service.total()).toBe(0);
     });
@@ -751,12 +749,5 @@ describe('SalesCartService', () => {
       expect(service.total()).toBeCloseTo(service.subtotal() + service.iva(), 2);
     });
 
-    // Verifica que el descuento siga en 0 (no hay forma de fijarlo desde la UI) y no altere totales.
-    it('el descuento inicial es 0', () => {
-      service.addToCart(product(100));
-
-      expect(service.descuento()).toBe(0);
-      expect(service.total()).toBe(116);
-    });
   });
 });

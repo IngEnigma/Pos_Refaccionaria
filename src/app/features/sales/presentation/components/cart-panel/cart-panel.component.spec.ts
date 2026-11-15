@@ -90,15 +90,14 @@ describe('CartPanelComponent', () => {
   });
 
   // Verifica que los importes se pasen al resumen.
-  it('pasa subtotal, descuento, IVA y total al resumen', () => {
+  it('pasa subtotal, IVA y total al resumen', () => {
     set('subtotal', 100);
-    set('descuento', 10);
-    set('iva', 14.4);
-    set('total', 104.4);
+    set('iva', 16);
+    set('total', 116);
     fixture.detectChanges();
 
     expect(el('app-sales-summary')?.textContent?.replace(/\s+/g, '')).toContain('Subtotal$100.00');
-    expect(el('.total-amount')?.textContent?.trim()).toBe('$104.40');
+    expect(el('.total-amount')?.textContent?.trim()).toBe('$116.00');
   });
 
   // Verifica que elegir método de pago emita selectPayment con el método.

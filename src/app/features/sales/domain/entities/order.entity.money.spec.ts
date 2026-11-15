@@ -1,6 +1,6 @@
 import { Order, OrderItem } from './order.entity';
 
-// Complementa order.entity.spec.ts: redondeo a centavos, IVA 16 % incluido, descuentos con decimales y casos límite.
+// Complementa order.entity.spec.ts: redondeo a centavos, IVA 16 % sobre el subtotal y casos límite.
 describe('OrderItem - redondeo del subtotal', () => {
   // Verifica que un precio de 1 centavo con cantidad 1 conserve el centavo.
   it('subtotal de un centavo se conserva', () => {
@@ -106,99 +106,6 @@ describe('Order - IVA 16 % sobre el subtotal y redondeo', () => {
   });
 });
 
-describe('Order - descuento con decimales', () => {
-  // Verifica que un descuento con centavos se reste antes del IVA (100 - 10.50 = 89.50).
-  it('descuento de 10.50 sobre 100 -> subtotal 89.50, IVA 14.32, total 103.82', () => {
-    const order = new Order();
-    order.addItem({ productId: 1, price: 100, quantity: 1 });
-    order.setDiscount(10.5);
-    expect(order.discount.value).toBe(10.5);
-    expect(order.subtotal.value).toBe(89.5);
-    expect(order.iva.value).toBe(14.32);
-    expect(order.total.value).toBe(103.82);
-  });
-
-  // Verifica que el resultado con descuento 33.33 sea exacto al centavo.
-  it('descuento de 33.33 sobre 100 -> subtotal 66.67, IVA 10.67, total 77.34', () => {
-    const order = new Order();
-    order.addItem({ productId: 1, price: 100, quantity: 1 });
-    order.setDiscount(33.33);
-    expect(order.subtotal.value).toBe(66.67);
-    expect(order.iva.value).toBe(10.67);
-    expect(order.total.value).toBe(77.34);
-  });
-
-  // Verifica que un descuento igual al total deje subtotal, IVA y total en cero.
-  it('descuento igual al total deja subtotal, IVA y total en cero', () => {
-    const order = new Order();
-    order.addItem({ productId: 1, price: 50, quantity: 2 });
-    order.setDiscount(100);
-    expect(order.subtotal.value).toBe(0);
-    expect(order.iva.value).toBe(0);
-    expect(order.total.value).toBe(0);
-  });
-
-  // Verifica que el descuento reduzca la base del IVA (100 - 40 = 60, IVA 9.60, total 69.60).
-  it('el descuento reduce el total y su desglose', () => {
-    const order = new Order();
-    order.addItem({ productId: 1, price: 100, quantity: 1 });
-    order.setDiscount(40);
-    expect(order.subtotal.value).toBe(60);
-    expect(order.iva.value).toBe(9.6);
-    expect(order.total.value).toBe(69.6);
-  });
-
-  // Verifica que el getter discount devuelva el monto tal cual aunque supere el subtotal (sin tope).
-  it('discount devuelve el monto configurado aunque supere el subtotal', () => {
-    const order = new Order();
-    order.addItem({ productId: 1, price: 10, quantity: 1 });
-    order.setDiscount(500);
-    expect(order.discount.value).toBe(500);
-  });
-
-  // Verifica que un segundo setDiscount reemplace al primero (no se acumulan).
-  it('el último descuento reemplaza al anterior', () => {
-    const order = new Order();
-    order.addItem({ productId: 1, price: 100, quantity: 1 });
-    order.setDiscount(10);
-    order.setDiscount(20);
-    expect(order.discount.value).toBe(20);
-    expect(order.subtotal.value).toBe(80);
-    expect(order.total.value).toBe(92.8);
-  });
-
-  // Verifica que aplicar descuento a un carrito vacío no genere totales negativos.
-  it('descuento sobre carrito vacío deja totales en cero', () => {
-    const order = new Order();
-    order.setDiscount(25);
-    expect(order.subtotal.value).toBe(0);
-    expect(order.iva.value).toBe(0);
-    expect(order.total.value).toBe(0);
-  });
-
-  // Verifica que el descuento se aplique sobre el subtotal actual si se agregan items después.
-  it('el descuento previo se aplica a items agregados después', () => {
-    const order = new Order();
-    order.setDiscount(10);
-    order.addItem({ productId: 1, price: 100, quantity: 1 });
-    expect(order.subtotal.value).toBe(90);
-    expect(order.total.value).toBe(104.4);
-  });
-
-  // setDiscount solo valida < 0: NaN e Infinity pasan y luego revientan los getters (discount/iva/total).
-  it('H-23: setDiscount(NaN) lanza y no deja la orden en estado inválido', () => {
-    const order = new Order();
-    expect(() => order.setDiscount(NaN)).toThrow('Discount must be a finite number');
-    expect(order.discount.value).toBe(0);
-  });
-
-  it('H-23: setDiscount(Infinity) lanza y no deja la orden en estado inválido', () => {
-    const order = new Order();
-    expect(() => order.setDiscount(Infinity)).toThrow('Discount must be a finite number');
-    expect(order.total.value).toBe(0);
-  });
-});
-
 describe('Order - addItem (casos límite)', () => {
   // Verifica que al acumular la misma línea se use el precio del último addItem.
   it('la línea acumulada toma el precio del último addItem', () => {
@@ -235,9 +142,8 @@ describe('Order - addItem (casos límite)', () => {
     const a = new Order();
     const b = new Order();
     a.addItem({ productId: 1, price: 10, quantity: 1 });
-    a.setDiscount(5);
     expect(b.items).toHaveLength(0);
-    expect(b.discount.value).toBe(0);
+    expect(b.total.value).toBe(0);
   });
 
   // Verifica que un precio negativo en el segundo addItem de la misma línea sea rechazado.
