@@ -3,7 +3,8 @@ import { AuthTokenRefreshOrchestrator } from './auth-token-refresh-orchestrator.
 import { SessionStateService } from '@features/auth/application/services/session-state.service';
 import { RefreshTokenUseCase } from '@features/auth/application/usecase/refresh.usecase';
 import { LOGGER_PORT } from '@core/logging/logger.port';
-import { HttpRequest, HttpHandlerFn, HttpEvent, HttpResponse } from '@angular/common/http';
+import { APP_ENV } from '@core/tokens/app-env.token';
+import { HttpRequest, HttpHandlerFn, HttpResponse } from '@angular/common/http';
 import { of, throwError, delay } from 'rxjs';
 
 describe('AuthTokenRefreshOrchestrator', () => {
@@ -35,6 +36,7 @@ describe('AuthTokenRefreshOrchestrator', () => {
         { provide: SessionStateService, useValue: sessionServiceMock },
         { provide: RefreshTokenUseCase, useValue: refreshTokenUseCaseMock },
         { provide: LOGGER_PORT, useValue: loggerMock },
+        { provide: APP_ENV, useValue: { apiUrl: 'http://api.test/api', production: false } },
       ],
     });
 
@@ -58,6 +60,41 @@ describe('AuthTokenRefreshOrchestrator', () => {
       const attached = service.attachAccessToken(req);
       
       expect(attached.headers.get('Authorization')).toBe('Bearer valid-token');
+    });
+
+    describe('con sesión activa', () => {
+      beforeEach(() => {
+        sessionServiceMock.getSession.mockReturnValue({ accessToken: 'valid-token' });
+      });
+
+      it.each([
+        'http://api.test/api/productos/',
+        'http://api.test/api/login',
+        '/api/productos/',
+      ])('adjunta el token a la API propia (%s)', (url) => {
+        const attached = service.attachAccessToken(new HttpRequest('GET', url));
+
+        expect(attached.headers.get('Authorization')).toBe('Bearer valid-token');
+      });
+
+      it('NO adjunta el token a la petición de refresh', () => {
+        const attached = service.attachAccessToken(
+          new HttpRequest('POST', 'http://api.test/api/token/refresh', {}),
+        );
+
+        expect(attached.headers.has('Authorization')).toBe(false);
+      });
+
+      it.each([
+        'https://evil.example.com/collect',
+        'http://api.test.evil.com/api/x',
+        'http://other.test/api/x',
+        '//evil.example.com/x',
+      ])('NO adjunta el token a hosts externos (%s)', (url) => {
+        const attached = service.attachAccessToken(new HttpRequest('GET', url));
+
+        expect(attached.headers.has('Authorization')).toBe(false);
+      });
     });
   });
 

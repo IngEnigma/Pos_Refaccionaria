@@ -1,3 +1,4 @@
+import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 
 import { LucideAngularModule } from 'lucide-angular';
@@ -7,7 +8,7 @@ import { ButtonComponent } from '../../../../../shared/ui/components/button/butt
 @Component({
   selector: 'app-product-card',
   standalone: true,
-  imports: [ButtonComponent, LucideAngularModule],
+  imports: [ButtonComponent, DecimalPipe, LucideAngularModule],
   templateUrl: './product-card.component.html',
   styleUrl: './product-card.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

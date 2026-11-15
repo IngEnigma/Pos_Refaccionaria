@@ -1,5 +1,5 @@
 <div class="sales-root">
-  <main class="sales-main animate-slide-up">
+  <div class="sales-main animate-slide-up">
     <section class="catalog-section">
       @if (!authFacade.sucursalId()) {
         <div class="empty-state">
@@ -19,6 +19,7 @@
         />
 
         <div class="barcode-input-wrapper">
+          <!-- eslint-disable @angular-eslint/template/no-autofocus -- el lector de códigos escribe aquí al abrir el POS -->
           <input
             type="text"
             class="barcode-input"
@@ -28,6 +29,7 @@
             (keydown)="onBarcodeKeyDown($event)"
             autofocus
           />
+          <!-- eslint-enable @angular-eslint/template/no-autofocus -->
         </div>
         
         <h2 class="section-title">Productos</h2>
@@ -43,12 +45,11 @@
         }
       }
     </section>
-  </main>
+  </div>
 
   <app-cart-panel class="animate-fade-in"
     [cartItems]="cartItems()"
     [subtotal]="subtotal()"
-    [descuento]="descuento()"
     [iva]="iva()"
     [total]="total()"
     [paymentMethods]="paymentMethods()"

@@ -2,9 +2,7 @@
  * SISTEMA + A11Y — SIS-061
  * Ejecuta: npm run a11y
  *
- * Política inicial: FALLA solo en "critical". Las "serious" se adjuntan al
- * reporte como deuda técnica (ver HALLAZGOS abajo) para no bloquear el CI
- * mientras se corrigen. Subir a critical+serious cuando se fije el umbral.
+ * Política (H-55): FALLA en "critical" y "serious"; el detalle de axe se adjunta al reporte.
  *
  * HALLAZGOS 2026-09-14 (login y sales, con mocks, sin backend):
  *  - aria-prohibited-attr (serious): toast-container usa aria-label en un div
@@ -17,14 +15,26 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
-const P0_ROUTES = ['/login', '/sales'];
+import { loginAs } from './helpers/backend';
+
+// Públicas: sin sesión. Privadas: con sesión de admin sembrada y API mockeada (Fase 6).
+// Antes '/sales' sin sesión redirigía a /login y en realidad auditaba el login.
+const PUBLIC_ROUTES = ['/login'];
+const PRIVATE_ROUTES = ['/sales', '/branches', '/branch-pricing'];
+const P0_ROUTES = [...PUBLIC_ROUTES, ...PRIVATE_ROUTES];
 
 test.describe('A11y smoke P0 (axe-core)', () => {
   for (const route of P0_ROUTES) {
-    test(`sin violaciones críticas en ${route} (serious se reportan)`, async ({
+    test(`sin violaciones críticas ni serias en ${route}`, async ({
       page,
     }) => {
+      if (PRIVATE_ROUTES.includes(route)) await loginAs(page, 'admin');
       await page.goto(route);
+      if (PRIVATE_ROUTES.includes(route)) {
+        await expect(page).toHaveURL(new RegExp(`${route}$`));
+        await expect(page.getByRole('main').first()).toBeVisible();
+      }
+      await page.waitForLoadState('networkidle');
 
       const results = await new AxeBuilder({ page })
         .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
@@ -51,8 +61,11 @@ test.describe('A11y smoke P0 (axe-core)', () => {
         critical,
         `Violaciones axe CRITICAL en ${route}: ${critical.map((v) => v.id).join(', ')}`,
       ).toEqual([]);
-      // Serious no bloquea aún (deuda documentada arriba). Para endurecer:
-      // expect(serious).toEqual([]);
+      // H-55: umbral endurecido a critical + serious.
+      expect(
+        serious,
+        `Violaciones axe SERIOUS en ${route}: ${serious.map((v) => v.id).join(', ')}`,
+      ).toEqual([]);
     });
   }
 

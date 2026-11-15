@@ -1,7 +1,7 @@
 import { Observable } from 'rxjs';
 
 import { PaginationParams, PaginatedResponse } from '@core/models/pagination.model';
-import { Product, ProductStock } from '@features/inventory/domain/entities/product.entity';
+import { Product } from '@features/inventory/domain/entities/product.entity';
 
 export interface CreateProductPayload {
   idTipo: number | null;

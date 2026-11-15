@@ -7,7 +7,6 @@ import {
   effect,
   inject,
   signal,
-  untracked,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -31,6 +30,8 @@ import { SalesCartService } from '@features/sales/presentation/state/sales-cart.
 import { InventoryByBranchFacade } from '@features/inventory-by-branch';
 import { ProductType } from '@features/sales/product-types/domain/entities/product-type.entity';
 import { GlobalSearchService } from '@core/search/global-search.service';
+import { DESKTOP_PORT } from '@core/ports/desktop.port';
+import { toTicketPrintPayload } from '@features/sales/application/mappers/ticket-print-payload.mapper';
 import { SaleTicket } from '@features/sales/domain/entities/sale-ticket.entity';
 import { Client } from '@features/clients/domain/entities/client.entity';
 
@@ -51,6 +52,7 @@ export class SalesPageComponent implements OnInit {
   readonly toastService = inject(ToastService);
   readonly cartService = inject(SalesCartService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly desktop = inject(DESKTOP_PORT);
 
   readonly loadingProducts = computed(() => this.inventoryByBranchFacade.loading());
   readonly loadingCategories = computed(() => this.productTypesFacade.loading());
@@ -80,21 +82,24 @@ export class SalesPageComponent implements OnInit {
       if (errorMsg) {
         this.toastService.error(errorMsg);
       }
-    });
+      // H-43: el toast escribe una señal; sin esto Angular lanza NG0600 y el error no se mostraba.
+    }, { allowSignalWrites: true });
 
     effect(() => {
       const errorMsg = this.inventoryByBranchFacade.errorMessage();
       if (errorMsg) {
         this.toastService.error(errorMsg);
       }
-    });
+      // H-43: el toast escribe una señal; sin esto Angular lanza NG0600 y el error no se mostraba.
+    }, { allowSignalWrites: true });
 
     effect(() => {
       const errorMsg = this.productTypesFacade.errorMessage();
       if (errorMsg) {
         this.toastService.error(errorMsg);
       }
-    });
+      // H-43: el toast escribe una señal; sin esto Angular lanza NG0600 y el error no se mostraba.
+    }, { allowSignalWrites: true });
 
     // Carga reactiva: si sucursalId llega después (refreshProfile async en MainLayout)
     effect(
@@ -140,7 +145,6 @@ export class SalesPageComponent implements OnInit {
     // Filtro local por búsqueda y categoría (sin consulta adicional a /productos)
     const query = this.searchQuery().trim().toLowerCase();
     const barcodeQuery = this.barcodeInput().trim().toLowerCase();
-    const selectedCategoryId = this.selectedCategoryId();
     // Nota: InventoryItem no expone id_tipo; filtro categoría deshabilitado si no hay mapeo
     // Se mantiene el slider pero el filtrado se hace por nombre/clave si hay query
     let filtered = items;
@@ -177,7 +181,6 @@ export class SalesPageComponent implements OnInit {
   });
 
   readonly cartItems = this.cartService.cart;
-  readonly descuento = this.cartService.descuento;
   readonly subtotal = this.cartService.subtotal;
   readonly iva = this.cartService.iva;
   readonly total = this.cartService.total;
@@ -258,22 +261,13 @@ export class SalesPageComponent implements OnInit {
     if (this.isCreatingSale()) return;
 
     // Validación fresca contra stock actual de mi-sucursal (evita POST si el stock cambió desde que se agregó al carrito)
-    const freshStockById = new Map<number, number>(
-      this.inventoryByBranchFacade.allItems().map((it) => [it.idProducto, it.cantidad]),
+    const issue = this.cartService.findStockIssue(
+      new Map(this.inventoryByBranchFacade.allItems().map((it) => [it.idProducto, it.cantidad])),
     );
-    for (const item of this.cartService.cart()) {
-      const freshStock = freshStockById.get(item.productId);
-      if (freshStock === undefined) {
-        this.toastService.error(`"${item.nombre}" ya no está disponible en tu sucursal. Recarga el catálogo.`);
-        this.inventoryByBranchFacade.loadMyBranchInventory();
-        return;
-      }
-      if (item.qty > freshStock) {
-        this.toastService.error(
-          `Stock insuficiente para "${item.nombre}": solicitas ${item.qty}, disponible ${freshStock}.`,
-        );
-        return;
-      }
+    if (issue) {
+      this.toastService.error(issue.message);
+      if (issue.kind === 'missing') this.inventoryByBranchFacade.loadMyBranchInventory();
+      return;
     }
 
     this.cartService
@@ -283,32 +277,20 @@ export class SalesPageComponent implements OnInit {
         next: (result) => {
           this.toastService.success('Venta registrada correctamente.');
           this.inventoryByBranchFacade.loadMyBranchInventory();
+          if (!result.ticket) {
+            this.toastService.warning('Venta registrada, pero no se pudo obtener el ticket. Consúltalo en el historial de ventas.');
+            return;
+          }
           this.lastTicket.set(result.ticket);
 
-          const desktop = (window as unknown as { desktop?: { generateTicket: (d: unknown) => Promise<{ success: boolean; message?: string }> } }).desktop;
-          if (desktop?.generateTicket) {
-            const ticketPayload = {
-              folio: result.ticket.folio,
-              fecha: result.ticket.fecha,
-              vendedor: result.ticket.vendedor,
-              metodo_pago: result.ticket.metodoPago,
-              sucursal: result.ticket.sucursal,
-              productos: result.ticket.productos.map((p) => ({
-                nombre: p.nombre,
-                cantidad: p.cantidad,
-                subtotal: p.subtotal,
-                precio_unitario: p.precioUnitario,
-              })),
-              total: result.ticket.total,
-            };
-            desktop.generateTicket(ticketPayload).then((response) => {
+          this.desktop
+            ?.generateTicket(toTicketPrintPayload(result.ticket))
+            .then((response) => {
               if (!response.success) {
-                this.toastService.error(
-                  response.message ?? 'No fue posible generar el ticket.',
-                );
+                this.toastService.error(response.message ?? 'No fue posible generar el ticket.');
               }
-            });
-          }
+            })
+            .catch(() => this.toastService.error('No fue posible generar el ticket.'));
         },
         error: (error: unknown) => {
           const message =

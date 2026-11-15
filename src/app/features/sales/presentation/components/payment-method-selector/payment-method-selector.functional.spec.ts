@@ -71,4 +71,54 @@ describe('PaymentMethodSelectorComponent (funcional)', () => {
 
     expect(emitted).toEqual(methods[0]);
   });
+
+  // Verifica que no se auto-seleccione si ya hay un método elegido.
+  it('no auto-selecciona EFECTIVO si ya hay método elegido', () => {
+    const seen: PaymentMethod[] = [];
+    fixture = TestBed.createComponent(PaymentMethodSelectorComponent);
+    component = fixture.componentInstance;
+    component.selectPayment.subscribe((m) => seen.push(m));
+    fixture.componentRef.setInput('paymentMethods', methods);
+    fixture.componentRef.setInput('selectedPayment', methods[0]);
+    fixture.detectChanges();
+
+    expect(seen).toEqual([]);
+  });
+
+  // Verifica que sin método tipo efectivo no se auto-seleccione ninguno.
+  it('no auto-selecciona si no existe método efectivo', () => {
+    const seen: PaymentMethod[] = [];
+    fixture = TestBed.createComponent(PaymentMethodSelectorComponent);
+    component = fixture.componentInstance;
+    component.selectPayment.subscribe((m) => seen.push(m));
+    fixture.componentRef.setInput('paymentMethods', [methods[0]]);
+    fixture.componentRef.setInput('selectedPayment', null);
+    fixture.detectChanges();
+
+    expect(seen).toEqual([]);
+  });
+
+  // Verifica que la detección de "efectivo" no distinga mayúsculas/minúsculas.
+  it('auto-selecciona "Efectivo" sin importar mayúsculas', () => {
+    const seen: PaymentMethod[] = [];
+    fixture = TestBed.createComponent(PaymentMethodSelectorComponent);
+    component = fixture.componentInstance;
+    component.selectPayment.subscribe((m) => seen.push(m));
+    const cash: PaymentMethod = { id: 9, tipo: 'Efectivo MXN', descripcion: '' };
+    fixture.componentRef.setInput('paymentMethods', [methods[0], cash]);
+    fixture.componentRef.setInput('selectedPayment', null);
+    fixture.detectChanges();
+
+    expect(seen).toEqual([cash]);
+  });
+
+  // Verifica el icono por tipo de pago: tarjeta, transferencia y por defecto (billete).
+  it('resolveIcon elige icono según el tipo de pago', () => {
+    setup(methods);
+
+    expect(component.resolveIcon({ id: 1, tipo: 'TARJETA', descripcion: '' })).toBe('CreditCard');
+    expect(component.resolveIcon({ id: 2, tipo: 'Transferencia', descripcion: '' })).toBe('ArrowLeftRightIcon');
+    expect(component.resolveIcon({ id: 3, tipo: 'EFECTIVO', descripcion: '' })).toBe('BanknoteIcon');
+    expect(component.resolveIcon({ id: 4, tipo: 'VALES', descripcion: '' })).toBe('BanknoteIcon');
+  });
 });

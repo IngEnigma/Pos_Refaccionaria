@@ -1,17 +1,17 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClient, HttpInterceptorFn, HttpRequest, provideHttpClient, withInterceptors } from '@angular/common/http';
+import { HttpClient, HttpRequest, provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { authTokenInterceptor } from './auth-token.interceptor';
 import { LOGGER_PORT } from '@core/logging/logger.port';
 import { AuthTokenRefreshOrchestrator } from '@features/auth/application/services/auth-token-refresh-orchestrator.service';
 import { throwError } from 'rxjs';
 
-jest.mock('./auth-token-http.utils', () => ({
+jest.mock('@features/auth/application/services/auth-token-http.utils', () => ({
   isRefreshRequest: jest.fn(),
   isUnauthorizedError: jest.fn(),
 }));
 
-import * as authUtils from './auth-token-http.utils';
+import * as authUtils from '@features/auth/application/services/auth-token-http.utils';
 
 describe('authTokenInterceptor', () => {
   let httpMock: HttpTestingController;
@@ -105,5 +105,19 @@ describe('authTokenInterceptor', () => {
 
     expect(loggerMock.warn).toHaveBeenCalledWith('401 Unauthorized error intercepted, attempting token refresh');
     expect(orchestratorMock.retryRequestAfterRefresh).toHaveBeenCalled();
+  });
+
+  it('401 en una petición sin token adjunto (sin sesión o host externo) pasa intacto y no intenta refresh', () => {
+    (authUtils.isUnauthorizedError as unknown as jest.Mock).mockReturnValue(true);
+    (authUtils.isRefreshRequest as unknown as jest.Mock).mockReturnValue(false);
+    orchestratorMock.attachAccessToken.mockImplementation((req: HttpRequest<unknown>) => req);
+    let status: number | undefined;
+
+    httpClient.get('/api/login').subscribe({ error: (err) => (status = err.status) });
+
+    httpMock.expectOne('/api/login').flush('No', { status: 401, statusText: 'Unauthorized' });
+
+    expect(status).toBe(401);
+    expect(orchestratorMock.retryRequestAfterRefresh).not.toHaveBeenCalled();
   });
 });

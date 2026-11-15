@@ -9,7 +9,7 @@ export class SessionMapper {
     const { accessToken, refreshToken } = this.normalizeResponse(response);
     const normalizedUser = this.normalizeUser(response.user);
 
-    const role = mapAuthUserRole(normalizedUser.isAdmin, normalizedUser.isStaff);
+    const role = mapAuthUserRole(normalizedUser.isAdmin, normalizedUser.isStaff, response.user.rol);
     const accessExp = JwtUtils.decodeExpiration(accessToken);
     const refreshExp = refreshToken ? JwtUtils.decodeExpiration(refreshToken) : 0;
 

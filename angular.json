@@ -59,6 +59,17 @@
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true
+            },
+            "local": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/env/environment.ts",
+                  "with": "src/env/environment.local.ts"
+                }
+              ]
             }
           },
           "defaultConfiguration": "production"
@@ -71,6 +82,9 @@
             },
             "development": {
               "buildTarget": "FrontTRT:build:development"
+            },
+            "local": {
+              "buildTarget": "FrontTRT:build:local"
             }
           },
           "defaultConfiguration": "development"
@@ -92,8 +106,22 @@
             ],
             "scripts": []
           }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "src/**/*.ts",
+              "src/**/*.html"
+            ]
+          }
         }
       }
     }
+  },
+  "cli": {
+    "schematicCollections": [
+      "@angular-eslint/schematics"
+    ]
   }
 }

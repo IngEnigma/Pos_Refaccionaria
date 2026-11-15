@@ -6,9 +6,9 @@ import { InventoryByBranchFacade } from './inventory-by-branch.facade';
 import { GetMyBranchInventoryUseCase } from '../usecase/get-my-branch-inventory.usecase';
 import { GetMovementsUseCase } from '../usecase/get-movements.usecase';
 import { RegisterMovementUseCase } from '../usecase/register-movement.usecase';
-import { BranchInventory } from '../domain/entities/inventory.entity';
-import { InventoryItem } from '../domain/entities/inventory-item.entity';
-import { InventoryMovement, RegisterMovementPayload } from '../domain/entities/inventory-movement.entity';
+import { BranchInventory } from '../../domain/entities/inventory.entity';
+import { InventoryItem } from '../../domain/entities/inventory-item.entity';
+import { InventoryMovement, RegisterMovementPayload } from '../../domain/entities/inventory-movement.entity';
 import { LoggerService } from '@core/logging/logger.service';
 
 // Unitario: fachada con casos de uso sustituidos por stubs (sin HTTP). El camino HTTP

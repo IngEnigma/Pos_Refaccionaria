@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, untracked } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, effect, inject, signal, untracked } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Dialog, DialogModule } from '@angular/cdk/dialog';
 import { ToastService } from '@shared/ui/components/toast/toast.service';
@@ -10,7 +10,7 @@ import { AuthFacade } from '@features/auth/application/facades/auth.facade';
 import { InventoryFacade } from '@app/features/inventory/application/facades/inventory.facade';
 import { InventoryByBranchFacade } from '@features/inventory-by-branch';
 import { BranchPricingFacade } from '@features/branch-pricing/application/facades/branch-pricing.facade';
-import { SalesFacade, ProductTypesFacade, ProductType } from '@app/features/sales';
+import { ProductTypesFacade, ProductType } from '@app/features/sales';
 import { CategorySliderComponent } from '@app/features/sales/presentation/components/category-slider/category-slider.component';
 import { InventoryProductGridComponent } from '../../components/inventory-product-grid/inventory-product-grid.component';
 import { ProductFormDialogComponent } from '../../components/product-form-dialog/product-form-dialog.component';
@@ -33,7 +33,7 @@ import { Product } from '../../../domain/entities/product.entity';
   styleUrls: ['./inventory.page.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class InventoryPageComponent {
+export class InventoryPageComponent implements OnInit {
   readonly authFacade = inject(AuthFacade);
   readonly productTypesFacade = inject(ProductTypesFacade);
   readonly inventoryFacade = inject(InventoryFacade);

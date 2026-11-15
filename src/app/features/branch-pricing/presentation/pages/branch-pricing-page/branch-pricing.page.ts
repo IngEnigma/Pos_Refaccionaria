@@ -1,11 +1,15 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { filter, switchMap } from 'rxjs';
 import { LucideAngularModule } from 'lucide-angular';
 import { Dialog, DialogModule } from '@angular/cdk/dialog';
 
+import { ConfirmDialogComponent } from '@shared/ui/components/confirm-dialog/confirm-dialog.component';
+import { resolveHttpErrorMessage } from '@features/sales/infrastructure/utils/http-error-resolver';
 import { ToastService } from '@shared/ui/components/toast/toast.service';
 import { BranchesFacade } from '@features/branches/application/facades/branches.facade';
+import { SetBranchPricePayload } from '../../../domain/repository/branch-price-repository';
 import { BranchPricingFacade } from '../../../application/facades/branch-pricing.facade';
 import { BranchPricingTableComponent } from '../../components/branch-pricing-table/branch-pricing-table.component';
 import { SetPriceDialogComponent } from '../../components/set-price-dialog/set-price-dialog.component';
@@ -30,6 +34,8 @@ export class BranchPricingPageComponent implements OnInit {
   private readonly toastService = inject(ToastService);
   private readonly dialog = inject(Dialog);
 
+  private readonly table = viewChild(BranchPricingTableComponent);
+
   readonly branches = this.branchesFacade.branches;
   readonly selectedSucursalId = this.branchPricingFacade.selectedSucursalId;
 
@@ -38,23 +44,49 @@ export class BranchPricingPageComponent implements OnInit {
   }
 
   onBranchChange(sucursalId: number): void {
-    (this.branchPricingFacade as any)._selectedSucursalId.set(sucursalId);
+    this.branchPricingFacade.selectSucursal(sucursalId);
   }
 
   onSetPrice(event: { productId: number; sucursalId: number }): void {
-    const dialogRef = this.dialog.open(SetPriceDialogComponent, {
-      data: { idProducto: event.productId, idSucursal: event.sucursalId },
+    this.dialog
+      .open<SetBranchPricePayload | null>(SetPriceDialogComponent, {
+        data: { idProducto: event.productId, idSucursal: event.sucursalId },
+      })
+      .closed.pipe(
+        filter((result): result is SetBranchPricePayload => !!result),
+        switchMap((payload) => this.branchPricingFacade.setBranchPrice(payload)),
+      )
+      .subscribe({
+        next: () => {
+          this.toastService.success('Precio de sucursal actualizado correctamente');
+          this.table()?.reload();
+        },
+        error: (err: unknown) =>
+          this.toastService.error(resolveHttpErrorMessage(err, 'No se pudo actualizar el precio')),
+      });
+  }
+
+  onDeactivate(event: { productId: number; sucursalId: number }): void {
+    const dialogRef = this.dialog.open<boolean>(ConfirmDialogComponent, {
+      data: {
+        title: 'Desactivar precio',
+        message: 'El producto volverá a usar el precio base en esta sucursal. El historial se conserva.',
+        confirmText: 'Desactivar',
+        cancelText: 'Cancelar',
+        variant: 'warning',
+      },
     });
 
-    dialogRef.closed.subscribe((result) => {
-      if (result) {
-        this.branchPricingFacade.setBranchPrice(result as any).subscribe({
-          next: () => {
-            this.toastService.success('Precio de sucursal actualizado correctamente');
-          },
-          error: () => {},
-        });
-      }
+    dialogRef.closed.subscribe((confirmed) => {
+      if (!confirmed) return;
+      this.branchPricingFacade.deactivatePrice(event.productId, event.sucursalId).subscribe({
+        next: () => {
+          this.toastService.success('Precio de sucursal desactivado');
+          this.table()?.reload();
+        },
+        error: (err: unknown) =>
+          this.toastService.error(resolveHttpErrorMessage(err, 'No se pudo desactivar el precio')),
+      });
     });
   }
 }

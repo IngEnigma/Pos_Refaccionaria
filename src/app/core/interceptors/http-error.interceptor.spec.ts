@@ -16,7 +16,7 @@ describe('httpErrorInterceptor', () => {
   let retryStrategyMock: jest.Mocked<Partial<RetryStrategyService>>;
   let routerMock: jest.Mocked<Partial<Router>>;
   let sessionStateMock: jest.Mocked<Partial<SessionStateService>>;
-  let loggerMock = { withContext: jest.fn().mockReturnValue({ error: jest.fn(), warn: jest.fn(), info: jest.fn(), debug: jest.fn() }) };
+  const loggerMock = { withContext: jest.fn().mockReturnValue({ error: jest.fn(), warn: jest.fn(), info: jest.fn(), debug: jest.fn() }) };
 
   beforeEach(() => {
     retryStrategyMock = {

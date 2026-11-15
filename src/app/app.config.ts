@@ -5,6 +5,7 @@ import {
   provideZoneChangeDetection,
 } from '@angular/core';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideRouter } from '@angular/router';
 
 import { authTokenInterceptor } from '@features/auth/infrastructure/http/auth-token.interceptor';
@@ -115,11 +116,13 @@ import {
   ArrowUpRight,
   Hash,
   Activity,
+  Mail, // H-51: lo usan la tarjeta y el formulario de sucursales
 } from 'lucide-angular';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
+    provideAnimations(), // H-49: el toast usa @toastAnimation; sin proveedor lanza NG05105
     provideRouter(routes),
     provideHttpClient(
       withInterceptors([httpErrorInterceptor, authTokenInterceptor, trailingSlashInterceptor]),
@@ -175,6 +178,7 @@ export const appConfig: ApplicationConfig = {
         ArrowUpRight,
         Hash,
         Activity,
+        Mail,
       }),
     ),
     {

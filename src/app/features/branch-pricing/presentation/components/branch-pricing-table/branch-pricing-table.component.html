@@ -42,7 +42,7 @@
           <td>{{ product.marca }}</td>
           <td class="price-cell">{{ formatPrice(product.precioVenta) }}</td>
           <td class="price-cell">
-            <span *ngIf="product.precioSucursal !== null; else noBranchPrice" class="branch-price">
+            <span *ngIf="hasPrice(product.precioSucursal); else noBranchPrice" class="branch-price">
               {{ formatPrice(product.precioSucursal) }}
             </span>
             <ng-template #noBranchPrice>
@@ -55,9 +55,18 @@
             </span>
           </td>
           <td class="actions-cell">
-            <button class="btn-action set-price" (click)="setPrice.emit(product.id)" title="Fijar precio">
+            <button class="btn-action set-price" (click)="setPrice.emit(product.id)" title="Fijar precio" [attr.aria-label]="'Fijar precio de ' + product.nombre">
               <lucide-icon name="DollarSign" [size]="16"></lucide-icon>
-              <span>Fixar</span>
+              <span>Fijar</span>
+            </button>
+            <button
+              *ngIf="hasPrice(product.precioSucursal)"
+              class="btn-action deactivate-price"
+              (click)="deactivatePrice.emit(product.id)"
+              title="Desactivar precio de sucursal" [attr.aria-label]="'Desactivar precio de ' + product.nombre"
+            >
+              <lucide-icon name="OctagonX" [size]="16"></lucide-icon>
+              <span>Desactivar</span>
             </button>
           </td>
         </tr>

@@ -6,5 +6,9 @@ export interface LoginResponseDto {
     username: string;
     isAdmin: boolean;
     isStaff: boolean;
+    /** 'cajero' | 'encargado' | 'admin'; define los permisos en el backend. */
+    rol?: string;
+    /** No se usa: la sucursal se carga del perfil en MainLayout (también al recargar). */
+    id_sucursal?: number | null;
   };
 }

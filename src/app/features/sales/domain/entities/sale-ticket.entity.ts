@@ -12,6 +12,8 @@ export interface SaleTicketProps {
     metodoPago: string | null;
     sucursal: string | null;
     productos: SaleTicketProductProps[];
+    subtotal: string;
+    iva: string;
     total: string;
 }
 
@@ -22,6 +24,8 @@ export class SaleTicket {
     readonly metodoPago: string | null;
     readonly sucursal: string | null;
     readonly productos: readonly SaleTicketProductProps[];
+    readonly subtotal: string;
+    readonly iva: string;
     readonly total: string;
 
     constructor(props: SaleTicketProps) {
@@ -31,6 +35,8 @@ export class SaleTicket {
         this.metodoPago = props.metodoPago;
         this.sucursal = props.sucursal;
         this.productos = props.productos;
+        this.subtotal = props.subtotal;
+        this.iva = props.iva;
         this.total = props.total;
     }
 }

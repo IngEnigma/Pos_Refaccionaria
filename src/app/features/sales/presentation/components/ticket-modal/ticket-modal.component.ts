@@ -5,9 +5,12 @@ import {
   output,
   inject,
   signal,
+  computed,
 } from '@angular/core';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { SaleTicket } from '@features/sales/domain/entities/sale-ticket.entity';
+import { DESKTOP_PORT } from '@core/ports/desktop.port';
+import { toTicketPrintPayload } from '@features/sales/application/mappers/ticket-print-payload.mapper';
 import { ToastService } from '@app/shared/ui/components/toast/toast.service';
 
 @Component({
@@ -15,8 +18,8 @@ import { ToastService } from '@app/shared/ui/components/toast/toast.service';
   standalone: true,
   imports: [CurrencyPipe, DatePipe],
   template: `
-    <div class="modal-backdrop" (click)="onBackdropClick($event)">
-      <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-backdrop" tabindex="-1" (click)="onBackdropClick($event)" (keydown.escape)="close.emit()">
+      <div class="modal-content">
         <header class="modal-header">
           <div class="header-left">
             <span class="modal-badge">Venta exitosa</span>
@@ -73,6 +76,9 @@ import { ToastService } from '@app/shared/ui/components/toast/toast.service';
             </div>
 
             <div class="ticket-divider-solid"></div>
+
+            <div class="ticket-tax"><span>Subtotal:</span><span>{{ subtotal() | currency:'MXN':'symbol':'1.2-2' }}</span></div>
+            <div class="ticket-tax"><span>IVA 16%:</span><span>{{ iva() | currency:'MXN':'symbol':'1.2-2' }}</span></div>
 
             <!-- Total -->
             <div class="ticket-total">
@@ -135,6 +141,7 @@ import { ToastService } from '@app/shared/ui/components/toast/toast.service';
     .product-name{word-break:break-word;font-weight:600}
     .product-subtotal{text-align:right;font-weight:700}
     .product-unit{font-size:.72rem;color:#64748b;margin-left:48px;margin-top:-2px}
+    .ticket-tax{display:flex;justify-content:space-between;font-size:.82rem;color:#475569}
     .ticket-total{display:flex;justify-content:space-between;align-items:center;font-weight:900;font-size:1.05rem}
     .total-value{font-size:1.15rem}
     .ticket-footer{text-align:center;margin-top:14px}
@@ -157,6 +164,11 @@ export class TicketModalComponent {
   close = output<void>();
 
   private readonly toast = inject(ToastService);
+  private readonly desktop = inject(DESKTOP_PORT);
+
+  // El backend suma el IVA 16 % al subtotal y manda el desglose en el ticket.
+  readonly subtotal = computed(() => Number(this.ticket().subtotal));
+  readonly iva = computed(() => Number(this.ticket().iva));
   readonly isReprinting = signal(false);
 
   onBackdropClick(event: MouseEvent): void {
@@ -169,31 +181,13 @@ export class TicketModalComponent {
     if (this.isReprinting()) return;
     this.isReprinting.set(true);
 
-    const t = this.ticket();
-    const payload = {
-      folio: t.folio,
-      fecha: t.fecha,
-      vendedor: t.vendedor,
-      metodo_pago: t.metodoPago,
-      sucursal: t.sucursal,
-      productos: t.productos.map((p) => ({
-        nombre: p.nombre,
-        cantidad: p.cantidad,
-        subtotal: p.subtotal,
-        precio_unitario: p.precioUnitario,
-      })),
-      total: t.total,
-    };
-
     try {
-      const w = window as unknown as { desktop?: { generateTicket: (d: unknown) => Promise<{ success: boolean; message?: string }> } };
-      if (!w.desktop?.generateTicket) {
+      if (!this.desktop) {
         // Fallback web: solo simula
-        console.log('[TicketModal] Preview payload', payload);
         this.toast.success('Ticket listo para reimpresión (modo web)');
         return;
       }
-      const response = await w.desktop.generateTicket(payload);
+      const response = await this.desktop.generateTicket(toTicketPrintPayload(this.ticket()));
       if (!response.success) {
         this.toast.error(response.message ?? 'No fue posible reimprimir el ticket.');
       } else {

@@ -1,8 +1,9 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
+import { branchFieldValidators } from '../../validators/branch-form.validators';
 import { Branch } from '@features/branches/domain/entities/branch.entity';
 import { ButtonComponent } from '@shared/ui/components/button/button.component';
 import { CreateBranchPayload, UpdateBranchPayload } from '@features/branches/domain/repository/branch-repository';
@@ -39,13 +40,15 @@ export class BranchFormDialogComponent implements OnInit {
 
   private initForm(): void {
     const b = this.data?.branch;
+    const v = branchFieldValidators;
     this.branchForm = this.fb.group({
-      nombreSucursal: [b?.nombreSucursal || '', [Validators.required, Validators.minLength(3)]],
-      ubicacion: [b?.ubicacion || '', [Validators.required]],
-      codigoPostal: [b?.codigoPostal || '', [Validators.required]],
-      numeroTelefono: [b?.numeroTelefono || '', [Validators.required, Validators.pattern(/^[0-9]+$/)]],
-      correoElectronico: [b?.correoElectronico || '', [Validators.required, Validators.email]],
+      nombreSucursal: [b?.nombreSucursal || '', v.nombreSucursal],
+      ubicacion: [b?.ubicacion || '', v.ubicacion],
+      codigoPostal: [b?.codigoPostal || '', v.codigoPostal],
+      numeroTelefono: [b?.numeroTelefono || '', v.numeroTelefono],
+      correoElectronico: [b?.correoElectronico || '', v.correoElectronico],
     });
+
   }
 
   onSubmit(): void {

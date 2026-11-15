@@ -11,7 +11,6 @@ import { Environment } from '@env/environment.model';
 import { CreateSalePayload } from '@features/sales/domain/repository/sale-repository';
 import { SaleResponseDto } from '@features/sales/infrastructure/dtos/sale-response.dto';
 import { LOGGER_PORT, LoggerPort } from '@core/logging/logger.port';
-import { LogLevel } from '@core/logging/log-level.enum';
 import { SALE_ENDPOINTS } from '@features/sales/config/sale-endpoints';
 
 const envStub: Environment = {
@@ -58,8 +57,12 @@ describe('SaleRepositoryImpl', () => {
     const response: SaleResponseDto = {
       id: 100,
       id_usuario: 1,
-      id_inventario: 1,
-      id_metodoPago: 2,
+      id_sucursal: 1,
+      id_metodo_pago: 2,
+      id_cliente: null,
+      estado: 'completada',
+      subtotal: '99.50',
+      iva: '0.00',
       total: '99.50',
       fecha: '2024-01-01',
     };
@@ -69,14 +72,14 @@ describe('SaleRepositoryImpl', () => {
       expect(sale.total.value).toBe(99.5);
       expect(sale.idUsuario).toBe(1);
       expect(sale.idMetodoPago).toBe(2);
-      expect(sale.idInventario).toBe(1);
+      expect(sale.idSucursal).toBe(1);
     });
 
     const expectedUrl = `${envStub.apiUrl}${SALE_ENDPOINTS.BASE}`;
     const req = httpMock.expectOne(expectedUrl);
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toEqual({
-      id_metodoPago: 2,
+      id_metodo_pago: 2,
     });
     // Público general: el campo id_cliente debe omitirse por completo.
     expect(req.request.body).not.toHaveProperty('id_cliente');
@@ -91,8 +94,12 @@ describe('SaleRepositoryImpl', () => {
     const response: SaleResponseDto = {
       id: 101,
       id_usuario: 1,
-      id_inventario: 1,
-      id_metodoPago: 2,
+      id_sucursal: 1,
+      id_metodo_pago: 2,
+      id_cliente: null,
+      estado: 'completada',
+      subtotal: '50.00',
+      iva: '0.00',
       total: '50.00',
       fecha: '2024-01-01',
     };
@@ -105,7 +112,7 @@ describe('SaleRepositoryImpl', () => {
     const req = httpMock.expectOne(expectedUrl);
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toEqual({
-      id_metodoPago: 2,
+      id_metodo_pago: 2,
       id_cliente: 25,
     });
     req.flush(response);
@@ -137,8 +144,12 @@ describe('SaleRepositoryImpl', () => {
       {
         id: 1,
         id_usuario: 2,
-        id_inventario: 1,
-        id_metodoPago: 3,
+        id_sucursal: 1,
+        id_metodo_pago: 3,
+        id_cliente: null,
+        estado: 'completada',
+        subtotal: '150',
+        iva: '0.00',
         total: '150',
         fecha: null,
       },

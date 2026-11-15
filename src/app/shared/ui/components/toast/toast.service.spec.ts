@@ -67,7 +67,7 @@ describe('ToastService', () => {
 
   it('debería limitar la cantidad de toasts activos a 5', () => {
     let count = 0;
-    jest.spyOn(crypto, 'randomUUID').mockImplementation(() => `uuid-${count++}`);
+    jest.spyOn(crypto, 'randomUUID').mockImplementation(() => `uuid-${count++}` as ReturnType<typeof crypto.randomUUID>);
 
     for (let i = 0; i < 10; i++) {
       service.show(`Toast ${i}`);

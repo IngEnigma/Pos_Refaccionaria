@@ -20,6 +20,7 @@ export class ButtonComponent {
   readonly loading = input(false);
   readonly loadingText = input('Cargando...');
   readonly fullWidth = input(false);
+  // eslint-disable-next-line @angular-eslint/no-output-on-prefix -- API pública (onClick) usada en varias plantillas
   readonly onClick = output<void>();
 
   handleInternalClick(event: MouseEvent): void {

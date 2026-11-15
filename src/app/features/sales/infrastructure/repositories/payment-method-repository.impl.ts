@@ -46,7 +46,13 @@ export class PaymentMethodRepositoryImpl implements PaymentMethodRepository {
       .pipe(
         map((response) => this.resolvePaymentMethodResponse(response, payload)),
         catchError((error: unknown) =>
-          throwError(() => new PaymentMethodMutationError('Failed to create payment method', error)),
+          throwError(
+            () =>
+              new PaymentMethodMutationError(
+                resolveHttpErrorMessage(error, 'Failed to create payment method'),
+                error,
+              ),
+          ),
         ),
       );
   }
@@ -57,7 +63,13 @@ export class PaymentMethodRepositoryImpl implements PaymentMethodRepository {
       .pipe(
         map((response) => this.resolvePaymentMethodResponse(response, payload, id)),
         catchError((error: unknown) =>
-          throwError(() => new PaymentMethodMutationError('Failed to update payment method', error)),
+          throwError(
+            () =>
+              new PaymentMethodMutationError(
+                resolveHttpErrorMessage(error, 'Failed to update payment method'),
+                error,
+              ),
+          ),
         ),
       );
   }
@@ -66,7 +78,13 @@ export class PaymentMethodRepositoryImpl implements PaymentMethodRepository {
     return this.http.delete<void>(`${this.endpoint}/${id}`).pipe(
       map(() => true),
       catchError((error: unknown) =>
-        throwError(() => new PaymentMethodMutationError('Failed to delete payment method', error)),
+        throwError(
+            () =>
+              new PaymentMethodMutationError(
+                resolveHttpErrorMessage(error, 'Failed to delete payment method'),
+                error,
+              ),
+          ),
       ),
     );
   }

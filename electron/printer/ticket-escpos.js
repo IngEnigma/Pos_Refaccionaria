@@ -1,8 +1,12 @@
 const ESC = 0x1b;
 const GS = 0x1d;
 
+// Los datos vienen del backend: se quitan los caracteres de control (salvo \n) para no inyectar comandos ESC/POS.
 function text(value) {
-    return Buffer.from(String(value ?? ''), 'ascii');
+    return Buffer.from(
+        String(value ?? '').replace(/[\x00-\x09\x0B-\x1F]/g, ''),
+        'ascii'
+    );
 }
 
 function command(...bytes) {
@@ -58,6 +62,11 @@ function separator(width = 42) {
 
 function money(value) {
     return `$${Number(value || 0).toFixed(2)}`;
+}
+
+// El backend suma el IVA 16 % al subtotal (total = subtotal + iva) y manda el desglose.
+function breakdown(ticket) {
+    return { subtotal: ticket.subtotal, iva: ticket.iva };
 }
 
 function formatProduct(product) {
@@ -147,6 +156,12 @@ function generateTicket(ticket) {
 
     chunks.push(separator());
 
+    // Desglose de IVA
+    const { subtotal, iva } = breakdown(ticket);
+    chunks.push(left());
+    chunks.push(line(`Subtotal: ${money(subtotal)}`));
+    chunks.push(line(`IVA 16%: ${money(iva)}`));
+
     // Total
     chunks.push(center());
     chunks.push(bold(true));
@@ -208,6 +223,9 @@ function generatePreview(ticket) {
     }
 
     lines.push('------------------------------------------');
+    const { subtotal, iva } = breakdown(ticket);
+    lines.push(`Subtotal: ${money(subtotal)}`);
+    lines.push(`IVA 16%: ${money(iva)}`);
     lines.push('');
     lines.push(`TOTAL: ${money(ticket.total)}`);
     lines.push('');

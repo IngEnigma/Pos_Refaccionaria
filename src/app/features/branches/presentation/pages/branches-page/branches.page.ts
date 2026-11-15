@@ -2,12 +2,14 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, effect, inject, OnInit } from '@angular/core';
 import { LucideAngularModule } from 'lucide-angular';
 import { Dialog, DialogModule } from '@angular/cdk/dialog';
+import { filter, switchMap } from 'rxjs';
 
 import { ToastService } from '@shared/ui/components/toast/toast.service';
 import { ConfirmDialogComponent } from '@shared/ui/components/confirm-dialog/confirm-dialog.component';
 import { BranchesFacade } from '../../../application/facades/branches.facade';
 import { BranchCardComponent } from '../../components/branch-card/branch-card.component';
 import { BranchFormDialogComponent } from '../../components/branch-form-dialog/branch-form-dialog.component';
+import { CreateBranchPayload, UpdateBranchPayload } from '../../../domain/repository/branch-repository';
 import { Branch } from '../../../domain/entities/branch.entity';
 
 @Component({
@@ -34,7 +36,8 @@ export class BranchesPageComponent implements OnInit {
       if (errorMsg) {
         this.toastService.error(errorMsg);
       }
-    });
+      // H-43: el toast escribe una señal; sin esto Angular lanza NG0600 y el error no se mostraba.
+    }, { allowSignalWrites: true });
   }
 
   ngOnInit(): void {
@@ -42,43 +45,34 @@ export class BranchesPageComponent implements OnInit {
   }
 
   onAddBranch(): void {
-    const dialogRef = this.dialog.open(BranchFormDialogComponent, {
-      data: {}
-    });
-
-    dialogRef.closed.subscribe(result => {
-      if (result) {
-        this.branchesFacade.createBranch(result as any).subscribe({
-          next: () => {
-            this.toastService.success('Sucursal registrada correctamente');
-            this.branchesFacade.loadBranches();
-          },
-          error: () => {
-            // Error handled by facade
-          }
-        });
-      }
-    });
+    this.dialog
+      .open<CreateBranchPayload | null>(BranchFormDialogComponent, { data: {} })
+      .closed.pipe(
+        filter((result): result is CreateBranchPayload => !!result),
+        switchMap((payload) => this.branchesFacade.createBranch(payload)),
+      )
+      .subscribe({
+        next: () => this.afterChange('Sucursal registrada correctamente'),
+        error: () => undefined, // el error lo expone la facade
+      });
   }
 
   onEditBranch(branch: Branch): void {
-    const dialogRef = this.dialog.open(BranchFormDialogComponent, {
-      data: { branch }
-    });
+    this.dialog
+      .open<UpdateBranchPayload | null>(BranchFormDialogComponent, { data: { branch } })
+      .closed.pipe(
+        filter((result): result is UpdateBranchPayload => !!result),
+        switchMap((payload) => this.branchesFacade.updateBranch(branch.id, payload)),
+      )
+      .subscribe({
+        next: () => this.afterChange('Sucursal actualizada correctamente'),
+        error: () => undefined, // el error lo expone la facade
+      });
+  }
 
-    dialogRef.closed.subscribe(result => {
-      if (result) {
-        this.branchesFacade.updateBranch(branch.id, result as any).subscribe({
-          next: () => {
-            this.toastService.success('Sucursal actualizada correctamente');
-            this.branchesFacade.loadBranches();
-          },
-          error: () => {
-            // Error handled by facade
-          }
-        });
-      }
-    });
+  private afterChange(message: string): void {
+    this.toastService.success(message);
+    this.branchesFacade.loadBranches();
   }
 
   onDeleteBranch(branch: Branch): void {
@@ -92,18 +86,14 @@ export class BranchesPageComponent implements OnInit {
       }
     });
 
-    dialogRef.closed.subscribe(result => {
-      if (result) {
-        this.branchesFacade.deleteBranch(branch.id).subscribe({
-          next: () => {
-            this.toastService.success('Sucursal eliminada correctamente');
-            this.branchesFacade.loadBranches();
-          },
-          error: () => {
-            // Error handled by facade
-          }
-        });
-      }
-    });
+    dialogRef.closed
+      .pipe(
+        filter(Boolean),
+        switchMap(() => this.branchesFacade.deleteBranch(branch.id)),
+      )
+      .subscribe({
+        next: () => this.afterChange('Sucursal eliminada correctamente'),
+        error: () => undefined, // el error lo expone la facade
+      });
   }
 }

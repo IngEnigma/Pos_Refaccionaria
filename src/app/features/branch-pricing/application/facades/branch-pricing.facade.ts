@@ -1,11 +1,12 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-import { catchError, finalize, Observable, of } from 'rxjs';
+import { catchError, finalize, Observable, of, switchMap, throwError } from 'rxjs';
 
 import { LoggerService } from '@core/logging/logger.service';
 import { BranchPrice } from '../../domain/entities/branch-price.entity';
 import { PriceHistoryItem } from '../../domain/entities/price-history-item.entity';
 import { SetBranchPricePayload } from '../../domain/repository/branch-price-repository';
+import { DeactivatePriceUseCase } from '../usecase/deactivate-price.usecase';
 import { GetActivePriceUseCase } from '../usecase/get-active-price.usecase';
 import { GetPriceHistoryUseCase } from '../usecase/get-price-history.usecase';
 import { SetBranchPriceUseCase } from '../usecase/set-branch-price.usecase';
@@ -15,6 +16,7 @@ export class BranchPricingFacade {
   private readonly getActivePriceUseCase = inject(GetActivePriceUseCase);
   private readonly getPriceHistoryUseCase = inject(GetPriceHistoryUseCase);
   private readonly setBranchPriceUseCase = inject(SetBranchPriceUseCase);
+  private readonly deactivatePriceUseCase = inject(DeactivatePriceUseCase);
   private readonly logger = inject(LoggerService).withContext('BranchPricingFacade');
 
   private readonly _selectedSucursalId = signal<number | null>(null);
@@ -89,6 +91,31 @@ export class BranchPricingFacade {
       }),
       finalize(() => this._loading.set(false)),
     );
+  }
+
+  /** Desactiva el precio vigente del par producto-sucursal (el historial se conserva). */
+  deactivatePrice(idProducto: number, idSucursal: number): Observable<void> {
+    this._loading.set(true);
+    this._errorMessage.set(null);
+
+    return this.getActivePriceUseCase.execute(idProducto, idSucursal).pipe(
+      switchMap((price) =>
+        price
+          ? this.deactivatePriceUseCase.execute(price.id)
+          : throwError(() => new Error('No hay un precio activo para desactivar.')),
+      ),
+      catchError((error: unknown) => {
+        const message = this.resolveErrorMessage(error);
+        this._errorMessage.set(message);
+        this.logger.error('Failed to deactivate branch price', { message, idProducto, idSucursal });
+        throw error;
+      }),
+      finalize(() => this._loading.set(false)),
+    );
+  }
+
+  selectSucursal(id: number | null): void {
+    this._selectedSucursalId.set(id);
   }
 
   clearHistory(): void {

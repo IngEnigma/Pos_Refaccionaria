@@ -27,7 +27,9 @@
         />
       </div>
       <span class="error-text" *ngIf="isFieldInvalid('precioVenta')">
-        El precio debe ser mayor a $0.00
+        {{ priceForm.get('precioVenta')?.errors?.['min'] || priceForm.get('precioVenta')?.errors?.['required']
+          ? 'El precio debe ser mayor a $0.00'
+          : 'Máximo 2 decimales y hasta $99,999,999.99' }}
       </span>
     </div>
 

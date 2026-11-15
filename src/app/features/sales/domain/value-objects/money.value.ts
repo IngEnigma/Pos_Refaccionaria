@@ -7,4 +7,9 @@ export class Money {
     }
     return new Money(value);
   }
+
+  /** Redondea al centavo (mitad hacia arriba); toPrecision absorbe el error binario (0.225 -> 22.4999...). */
+  static round2(value: number): number {
+    return Math.round(+(value * 100).toPrecision(12)) / 100;
+  }
 }

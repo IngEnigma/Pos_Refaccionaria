@@ -64,4 +64,49 @@ describe('CategorySliderComponent (funcional)', () => {
     expect(fixture.nativeElement.querySelectorAll('button.category-btn')).toHaveLength(0);
     expect(fixture.nativeElement.querySelectorAll('.category-skeleton').length).toBeGreaterThan(0);
   });
+
+  // Verifica que no se auto-emita si ya hay una categoría seleccionada (incluido id 0 "Todos").
+  it('no auto-emite si ya hay selección, aunque sea id 0', () => {
+    const seen: ProductType[] = [];
+    fixture = TestBed.createComponent(CategorySliderComponent);
+    component = fixture.componentInstance;
+    component.selected.subscribe((c) => seen.push(c));
+    fixture.componentRef.setInput('categories', cats);
+    fixture.componentRef.setInput('selectedCategoryId', 0);
+    fixture.detectChanges();
+
+    expect(seen).toEqual([]);
+  });
+
+  // Verifica que sin categorías no se emita nada ni se renderice botón.
+  it('sin categorías no emite ni renderiza botones', () => {
+    const seen: ProductType[] = [];
+    fixture = TestBed.createComponent(CategorySliderComponent);
+    component = fixture.componentInstance;
+    component.selected.subscribe((c) => seen.push(c));
+    fixture.componentRef.setInput('categories', []);
+    fixture.detectChanges();
+
+    expect(seen).toEqual([]);
+    expect(fixture.nativeElement.querySelectorAll('button.category-btn')).toHaveLength(0);
+  });
+
+  // Verifica que durante la carga se muestren exactamente 5 skeletons aunque haya categorías.
+  it('cargando muestra 5 skeletons y oculta las categorías existentes', () => {
+    setup(cats, 0, true);
+
+    expect(fixture.nativeElement.querySelectorAll('.category-skeleton')).toHaveLength(5);
+    expect(fixture.nativeElement.querySelectorAll('button.category-btn')).toHaveLength(0);
+  });
+
+  // Verifica que sólo la categoría seleccionada tenga la clase selected al cambiar la selección.
+  it('mueve la marca visual al cambiar la categoría seleccionada', () => {
+    setup(cats, 0);
+    fixture.componentRef.setInput('selectedCategoryId', 5);
+    fixture.detectChanges();
+
+    const selected = fixture.nativeElement.querySelectorAll('button.category-btn.selected');
+    expect(selected).toHaveLength(1);
+    expect(selected[0].textContent).toContain('Filtros');
+  });
 });

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal, untracked } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 import { catchError, finalize, of } from 'rxjs';
@@ -19,6 +19,7 @@ export class BranchPricingTableComponent {
 
   readonly sucursalId = input.required<number>();
   readonly setPrice = output<number>();
+  readonly deactivatePrice = output<number>();
 
   readonly products = signal<readonly ProductStock[]>([]);
   readonly loading = signal(false);
@@ -29,9 +30,15 @@ export class BranchPricingTableComponent {
     effect(() => {
       const sucursalId = this.sucursalId();
       if (sucursalId) {
-        this.loadProducts(sucursalId);
+        untracked(() => this.loadProducts(sucursalId)); // H-33: loadProducts escribe señales
       }
     });
+  }
+
+  /** Vuelve a consultar los precios de la sucursal actual (H-35: tras fijar un precio). */
+  reload(): void {
+    const sucursalId = this.sucursalId();
+    if (sucursalId) this.loadProducts(sucursalId);
   }
 
   private loadProducts(sucursalId: number): void {
@@ -49,15 +56,20 @@ export class BranchPricingTableComponent {
   }
 
   formatPrice(price: number | null): string {
-    if (price === null || price === undefined) return '—';
-    return `$${price.toFixed(2)}`;
+    if (!this.hasPrice(price)) return '—';
+    return `$${(price as number).toFixed(2)}`;
+  }
+
+  /** H-36: un NaN cuenta como sin precio. */
+  hasPrice(price: number | null | undefined): boolean {
+    return price !== null && price !== undefined && !Number.isNaN(price);
   }
 
   getBadgeClass(precioSucursal: number | null): string {
-    return precioSucursal !== null ? 'badge-active' : 'badge-inactive';
+    return this.hasPrice(precioSucursal) ? 'badge-active' : 'badge-inactive';
   }
 
   getBadgeText(precioSucursal: number | null): string {
-    return precioSucursal !== null ? 'Activo' : 'Sin precio';
+    return this.hasPrice(precioSucursal) ? 'Activo' : 'Sin precio';
   }
 }

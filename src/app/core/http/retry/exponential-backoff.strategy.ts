@@ -9,7 +9,7 @@ import { RetryStrategy } from './retry-strategy.interface';
 export class ExponentialBackoffStrategy implements RetryStrategy {
   private readonly config = inject(RETRY_CONFIG);
 
-  canRetry(req: HttpRequest<unknown>, error: unknown, retryCount: number): boolean {
+  canRetry(req: HttpRequest<unknown>, error: unknown, _retryCount: number): boolean {
     return canRetryRequest(req.method, error, this.config.retryableMethods);
   }
 

@@ -74,7 +74,7 @@ describe('SalesFacade', () => {
     const sale: Sale = SaleFactory.fromPrimitives({
       id: 99,
       idUsuario: 1,
-      idInventario: 1,
+      idSucursal: 1,
       idMetodoPago: 2,
       total: 120,
       fecha: '2024-01-01',
@@ -98,7 +98,7 @@ describe('SalesFacade', () => {
     const sale: Sale = SaleFactory.fromPrimitives({
       id: 50,
       idUsuario: 1,
-      idInventario: 5,
+      idSucursal: 5,
       idMetodoPago: 1,
       total: 200,
       fecha: '2024-01-01',

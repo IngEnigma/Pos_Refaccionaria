@@ -1,5 +1,5 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { catchError, finalize, Observable, of, tap } from 'rxjs';
+import { catchError, finalize, of, tap } from 'rxjs';
 
 import { LoggerService } from '@core/logging/logger.service';
 import { Notification } from '@features/notifications/domain/entities/notification.entity';

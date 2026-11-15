@@ -73,6 +73,15 @@ export const TEST_USERS = {
     ubicacion: 'Sur Puebla - Blvd Atlixco 789',
     uso: 'Segunda usuaria Sur',
   },
+  /** Admin con perfil (rol admin, sucursal 1): ve /admin. Un staff sin perfil llega como `cajero` (el backend deduce el rol del perfil). */
+  adminE2e: {
+    username: 'admin.e2e',
+    password: 'AdminE2e123',
+    email: 'admin.e2e@refaccionaria.com',
+    sucursalId: 1,
+    ubicacion: 'Centro CDMX - Av Reforma 123',
+    uso: 'Smoke real de /admin (alta de usuario, H-47)',
+  },
   /** Sin sucursal: debe ver empty-state "Tu usuario no tiene sucursal asignada." */
   adminSinPerfil: {
     username: 'admin_neon',

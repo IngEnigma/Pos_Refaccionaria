@@ -3,4 +3,6 @@ export interface UserCreateRequestDto {
   password: string;
   email: string;
   is_active: boolean;
+  id_sucursal: number;
+  rol: 'cajero' | 'encargado' | 'admin';
 }

@@ -3,7 +3,6 @@ import { IconButtonComponent } from './icon-button.component';
 import { LucideAngularModule, Search } from 'lucide-angular';
 
 describe('IconButtonComponent', () => {
-  let component: IconButtonComponent;
   let fixture: ComponentFixture<IconButtonComponent>;
 
   beforeEach(async () => {
@@ -15,10 +14,7 @@ describe('IconButtonComponent', () => {
     }).compileComponents();
 
     fixture = TestBed.createComponent(IconButtonComponent);
-    component = fixture.componentInstance;
-    // @ts-ignore - setting required inputs
     fixture.componentRef.setInput('icon', 'search');
-    // @ts-ignore
     fixture.componentRef.setInput('label', 'Search');
     fixture.detectChanges();
   });

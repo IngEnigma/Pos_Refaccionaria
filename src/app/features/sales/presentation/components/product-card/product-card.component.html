@@ -15,7 +15,7 @@
 
   <div class="product-row">
     <span class="product-price">
-      ${{ product().precio }}
+      ${{ product().precio | number: '1.2-2' }}
       @if (product().hasSucursalPrice) {
         <span class="sucursal-badge">Sucursal</span>
       }

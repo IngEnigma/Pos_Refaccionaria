@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-import { provideHttpClient } from '@angular/common/http';
+import { HttpClient, provideHttpClient } from '@angular/common/http';
+import { throwError } from 'rxjs';
 import {
   HttpTestingController,
   provideHttpClientTesting,
@@ -11,6 +12,12 @@ import { Environment } from '@env/environment.model';
 import { LOGGER_PORT, LoggerPort } from '@core/logging/logger.port';
 import { LogLevel } from '@core/logging/log-level.enum';
 import { LoginCredentials } from '@features/auth/domain/repository/auth-repository';
+import {
+  AuthError,
+  InvalidCredentialsError,
+  NetworkAuthError,
+  UnknownAuthError,
+} from '@features/auth/domain/errors/auth.errors';
 import { LoginResponseDto } from '@features/auth/infrastructure/dtos/auth-login-response.dto';
 
 const envStub: Environment = {
@@ -85,5 +92,102 @@ describe('AuthRepositoryImpl', () => {
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toEqual({ refresh: 'refresh-token' });
     req.flush({ access: 'new-access' });
+  });
+
+  describe('mapeo de errores HTTP', () => {
+    const credentials: LoginCredentials = { username: 'admin', password: 'secret' };
+
+    function loginError(flush: (req: ReturnType<HttpTestingController['expectOne']>) => void): unknown {
+      let error: unknown;
+      repository.login(credentials).subscribe({ error: (e) => (error = e) });
+      flush(httpMock.expectOne('http://api.test/login'));
+      return error;
+    }
+
+    it('401 → InvalidCredentialsError', () => {
+      const error = loginError((req) =>
+        req.flush({ detail: 'No active account' }, { status: 401, statusText: 'Unauthorized' }),
+      );
+
+      expect(error).toBeInstanceOf(InvalidCredentialsError);
+      expect((error as Error).message).toBe('Credenciales inválidas');
+    });
+
+    it('status 0 (sin red) → NetworkAuthError', () => {
+      const error = loginError((req) => req.error(new ProgressEvent('error')));
+
+      expect(error).toBeInstanceOf(NetworkAuthError);
+    });
+
+    it('500 con { detail } → UnknownAuthError con ese texto', () => {
+      const error = loginError((req) =>
+        req.flush({ detail: 'Fallo interno' }, { status: 500, statusText: 'Server Error' }),
+      );
+
+      expect(error).toBeInstanceOf(UnknownAuthError);
+      expect((error as Error).message).toBe('Fallo interno');
+    });
+
+    it('500 con { message } → UnknownAuthError con ese texto', () => {
+      const error = loginError((req) =>
+        req.flush({ message: 'Mantenimiento' }, { status: 503, statusText: 'Unavailable' }),
+      );
+
+      expect(error).toBeInstanceOf(UnknownAuthError);
+      expect((error as Error).message).toBe('Mantenimiento');
+    });
+
+    it.each([
+      ['cuerpo HTML', '<html>502</html>'],
+      ['objeto sin detail ni message', { errors: ['x'] }],
+      ['detail que no es texto', { detail: 42 }],
+    ])('500 con %s → UnknownAuthError genérico', (_caso, body) => {
+      const error = loginError((req) => req.flush(body, { status: 500, statusText: 'Server Error' }));
+
+      expect(error).toBeInstanceOf(UnknownAuthError);
+      expect((error as Error).message).toBe('Error desconocido');
+    });
+
+    it('el error de refresh también se traduce (401 → InvalidCredentialsError)', () => {
+      let error: unknown;
+      repository.refresh('r').subscribe({ error: (e) => (error = e) });
+
+      httpMock
+        .expectOne('http://api.test/token/refresh')
+        .flush({ detail: 'Token is invalid' }, { status: 401, statusText: 'Unauthorized' });
+
+      expect(error).toBeInstanceOf(InvalidCredentialsError);
+    });
+
+    it('registra el fallo sin incluir la contraseña', () => {
+      loginError((req) => req.flush({}, { status: 500, statusText: 'Server Error' }));
+
+      expect(loggerPort.error).toHaveBeenCalled();
+      expect(JSON.stringify(loggerPort.error.mock.calls)).not.toContain('secret');
+    });
+  });
+
+  describe('errores que no vienen del HttpClient', () => {
+    it('un Error común se relanza tal cual', () => {
+      const boom = new Error('boom');
+      const http = TestBed.inject(HttpClient);
+      jest.spyOn(http, 'post').mockReturnValue(throwError(() => boom));
+      let error: unknown;
+
+      repository.login({ username: 'a', password: 'b' }).subscribe({ error: (e) => (error = e) });
+
+      expect(error).toBe(boom);
+    });
+
+    it('un valor que no es Error → UnknownAuthError', () => {
+      const http = TestBed.inject(HttpClient);
+      jest.spyOn(http, 'post').mockReturnValue(throwError(() => 'raro'));
+      let error: unknown;
+
+      repository.refresh('r').subscribe({ error: (e) => (error = e) });
+
+      expect(error).toBeInstanceOf(UnknownAuthError);
+      expect(error).toBeInstanceOf(AuthError);
+    });
   });
 });

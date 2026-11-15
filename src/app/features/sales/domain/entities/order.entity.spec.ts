@@ -43,7 +43,6 @@ describe('Order - estado inicial', () => {
     expect(order.subtotal.value).toBe(0);
     expect(order.iva.value).toBe(0);
     expect(order.total.value).toBe(0);
-    expect(order.discount.value).toBe(0);
   });
 
   // Verifica que validar una orden vacía lance el error de carrito vacío.
@@ -105,63 +104,41 @@ describe('Order - addItem', () => {
 });
 
 describe('Order - cálculos', () => {
-  // Verifica el subtotal exacto para un solo producto con cantidad 1.
-  it('calcula subtotal de un solo producto', () => {
+  // El precio no incluye IVA: subtotal = suma de líneas, IVA 16 % encima, igual que el backend.
+  it('el IVA se suma al subtotal (precio 120 -> subtotal 120, IVA 19.20, total 139.20)', () => {
     const order = new Order();
     order.addItem({ productId: 1, price: 120, quantity: 1 });
     expect(order.subtotal.value).toBe(120);
+    expect(order.iva.value).toBe(19.2);
+    expect(order.total.value).toBe(139.2);
   });
 
-  // Verifica el subtotal sumando varias líneas con distintas cantidades.
-  it('calcula subtotal con múltiples productos y cantidades', () => {
+  // Verifica el total sumando varias líneas con distintas cantidades.
+  it('calcula total con múltiples productos (subtotal 250, IVA 40, total 290)', () => {
     const order = new Order();
     order.addItem({ productId: 1, price: 100, quantity: 2 });
-    order.addItem({ productId: 2, price: 50, quantity: 3 });
-    expect(order.subtotal.value).toBe(350);
+    order.addItem({ productId: 2, price: 50, quantity: 1 });
+    expect(order.subtotal.value).toBe(250);
+    expect(order.iva.value).toBe(40);
+    expect(order.total.value).toBe(290);
   });
 
-  // Verifica el subtotal exacto con precios con centavos (redondeo a 2 decimales).
-  it('calcula subtotal con precios con centavos', () => {
+  // Verifica el total exacto con precios con centavos (redondeo a 2 decimales).
+  it('calcula total con precios con centavos', () => {
     const order = new Order();
     order.addItem({ productId: 1, price: 19.99, quantity: 2 });
     order.addItem({ productId: 2, price: 5.5, quantity: 1 });
     expect(order.subtotal.value).toBe(45.48);
+    expect(order.total.value).toBe(52.76);
   });
 
-  // Verifica que el subtotal se redondee a centavos exactos (sin artefactos float como 59.9699...).
-  it('subtotal redondea a centavos exactos (19.99 x 3 = 59.97)', () => {
-    // Antes del fix, 19.99 * 3 en IEEE 754 producía 59.96999999999999 y se mostraba así en el resumen.
+  // Verifica que el total se redondee a centavos exactos (sin artefactos float como 59.9699...).
+  it('total redondea a centavos exactos (19.99 x 3 = 59.97 + 9.60 = 69.57)', () => {
     const order = new Order();
     order.addItem({ productId: 1, price: 19.99, quantity: 3 });
     expect(order.subtotal.value).toBe(59.97);
-    expect(Number.isInteger(order.subtotal.value * 100)).toBe(true);
-  });
-
-  // Verifica que el IVA sea el 16% del subtotal cuando no hay descuento.
-  it('calcula IVA del 16% sobre el subtotal', () => {
-    const order = new Order();
-    order.addItem({ productId: 1, price: 100, quantity: 1 });
-    expect(order.iva.value).toBeCloseTo(16, 10);
-  });
-
-  // Verifica la terna completa subtotal/IVA/total para un caso conocido (120 -> 139.2).
-  it('calcula total como base + IVA (precio 120 -> total 139.2)', () => {
-    const order = new Order();
-    order.addItem({ productId: 1, price: 120, quantity: 1 });
-    expect(order.subtotal.value).toBe(120);
-    expect(order.iva.value).toBeCloseTo(19.2, 10);
-    expect(order.total.value).toBeCloseTo(139.2, 10);
-  });
-
-  // Verifica subtotal/IVA/total con múltiples productos (250 -> 40 -> 290).
-  it('calcula total con múltiples productos', () => {
-    const order = new Order();
-    order.addItem({ productId: 1, price: 100, quantity: 2 });
-    order.addItem({ productId: 2, price: 50, quantity: 1 });
-    // subtotal 250, iva 40, total 290
-    expect(order.subtotal.value).toBe(250);
-    expect(order.iva.value).toBeCloseTo(40, 10);
-    expect(order.total.value).toBeCloseTo(290, 10);
+    expect(order.iva.value).toBe(9.6);
+    expect(order.total.value).toBe(69.57);
   });
 
   // Verifica que una orden vacía produzca todos los totales en cero.
@@ -173,7 +150,7 @@ describe('Order - cálculos', () => {
   });
 
   // Verifica que el caso clásico 0.1 + 0.2 produzca valores exactos a nivel centavos.
-  it('caso clásico 0.1 + 0.2: subtotal 0.3 e IVA/total exactos', () => {
+  it('caso clásico 0.1 + 0.2: subtotal 0.3 y desglose exacto', () => {
     const order = new Order();
     order.addItem({ productId: 1, price: 0.1, quantity: 1 });
     order.addItem({ productId: 2, price: 0.2, quantity: 1 });
@@ -183,36 +160,3 @@ describe('Order - cálculos', () => {
   });
 });
 
-describe('Order - descuento', () => {
-  // Verifica que el descuento reduzca la base sobre la que se calculan IVA y total.
-  it('descuento reduce la base del IVA y del total', () => {
-    const order = new Order();
-    order.addItem({ productId: 1, price: 100, quantity: 1 });
-    order.setDiscount(10);
-    expect(order.discount.value).toBe(10);
-    expect(order.iva.value).toBeCloseTo(14.4, 10);
-    expect(order.total.value).toBeCloseTo(104.4, 10);
-  });
-
-  // Verifica que un descuento mayor al subtotal no genere totales negativos (base en cero).
-  it('descuento mayor al subtotal deja base en cero (sin negativos)', () => {
-    const order = new Order();
-    order.addItem({ productId: 1, price: 50, quantity: 1 });
-    order.setDiscount(100);
-    expect(order.iva.value).toBe(0);
-    expect(order.total.value).toBe(0);
-  });
-
-  // Verifica que un descuento negativo sea rechazado con error.
-  it('descuento negativo lanza error', () => {
-    const order = new Order();
-    expect(() => order.setDiscount(-1)).toThrow('Discount cannot be negative');
-  });
-
-  // Verifica que un descuento cero sea válido y no altere los totales.
-  it('descuento cero es válido', () => {
-    const order = new Order();
-    expect(() => order.setDiscount(0)).not.toThrow();
-    expect(order.discount.value).toBe(0);
-  });
-});

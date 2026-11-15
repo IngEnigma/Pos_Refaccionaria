@@ -1,5 +1,5 @@
 <div class="pricing-root">
-  <main class="pricing-main animate-slide-up">
+  <div class="pricing-main animate-slide-up">
     <section class="pricing-section">
       <div class="section-header">
         <div>
@@ -30,6 +30,7 @@
         <app-branch-pricing-table
           [sucursalId]="sid"
           (setPrice)="onSetPrice({ productId: $event, sucursalId: sid })"
+          (deactivatePrice)="onDeactivate({ productId: $event, sucursalId: sid })"
         />
       </ng-container>
 
@@ -42,5 +43,5 @@
         </div>
       </ng-template>
     </section>
-  </main>
+  </div>
 </div>

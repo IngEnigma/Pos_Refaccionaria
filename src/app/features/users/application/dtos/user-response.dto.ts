@@ -3,4 +3,6 @@ export interface UserResponseDto {
   username: string;
   email: string;
   is_active: boolean;
+  id_sucursal: number | null;
+  rol: 'cajero' | 'encargado' | 'admin';
 }

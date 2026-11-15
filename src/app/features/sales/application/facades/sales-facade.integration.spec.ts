@@ -1,3 +1,4 @@
+import { firstValueFrom } from 'rxjs';
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
@@ -71,7 +72,7 @@ describe('SalesFacade (integración)', () => {
     expect(facade.isLoadingSales()).toBe(true);
 
     httpMock.expectOne(VENTAS).flush([
-      { id: 1, id_usuario: 2, id_inventario: 1, id_metodoPago: 3, total: '150.00', fecha: '2024-01-01' },
+      { id: 1, id_usuario: 2, id_inventario: 1, id_metodo_pago: 3, total: '150.00', fecha: '2024-01-01' },
     ]);
 
     expect(facade.sales()).toHaveLength(1);
@@ -124,7 +125,7 @@ describe('SalesFacade (integración)', () => {
     facade.createCompleteSale({ idMetodoPago: 1, productos: [{ id: 10, cantidad: 1 }] }).subscribe({
       // finalize corre tras entregar next: el flag se verifica después de los flush (flujo síncrono).
       next: (result) => {
-        folio = result.ticket.folio;
+        folio = result.ticket?.folio ?? -1;
         expect(result.sale.id).toBe(50);
       },
       error: done.fail,
@@ -132,8 +133,7 @@ describe('SalesFacade (integración)', () => {
     });
     expect(facade.isCreatingSale()).toBe(true);
 
-    httpMock.expectOne(VENTAS).flush({ id: 50, id_usuario: 1, id_inventario: 1, id_metodoPago: 1, total: '100.00', fecha: '2024-01-01' });
-    httpMock.expectOne(`${API}/detalleventa/`).flush({ id: 11, id_producto: 10, id_venta: 50, subtotal: '100.00', cantidad: 1 });
+    httpMock.expectOne(VENTAS).flush({ id: 50, id_usuario: 1, id_inventario: 1, id_metodo_pago: 1, total: '100.00', fecha: '2024-01-01' });
     httpMock.expectOne(`${API}/ventas/50/ticket/`).flush({
       folio: 50, fecha: '2024-01-01T00:00:00Z', vendedor: 'v1', metodo_pago: 'EFECTIVO',
       sucursal: 'S1', productos: [], total: '116.00',
@@ -143,15 +143,15 @@ describe('SalesFacade (integración)', () => {
     expect(facade.isCreatingSale()).toBe(false);
   });
 
-  // Verifica que la validación del use case (idMetodoPago requerido) lance sin emitir HTTP.
-  it('createSale sin método de pago lanza sin tocar la red', () => {
-    // CreateSaleUseCase.execute valida de forma síncrona: facade.createSale propaga el throw (ver reporte Nivel 2).
-    expect(() => facade.createSale({ idMetodoPago: 0 })).toThrow('CreateSale: idMetodoPago requerido');
+  // H-29: la validación del use case (idMetodoPago requerido) llega por el observable, sin emitir HTTP.
+  it('createSale sin método de pago emite el error por el observable sin tocar la red', async () => {
+    await expect(firstValueFrom(facade.createSale({ idMetodoPago: 0 }))).rejects.toThrow('CreateSale: idMetodoPago requerido');
+    expect(facade.isCreatingSale()).toBe(false);
     httpMock.expectNone(VENTAS);
   });
 
   // Verifica que un error de validación por campo ({"cantidad": [...]}) en un detalle llegue al suscriptor.
-  it('error por campo del backend en el detalle llega al suscriptor de la venta', (done) => {
+  it('error por línea del backend (400 atómico) llega al suscriptor de la venta', (done) => {
     let message = '';
     facade.createCompleteSale({ idMetodoPago: 1, productos: [{ id: 10, cantidad: 99 }] }).subscribe({
       error: (err) => {
@@ -160,14 +160,13 @@ describe('SalesFacade (integración)', () => {
       },
     });
 
-    httpMock.expectOne(VENTAS).flush({ id: 50, id_usuario: 1, id_inventario: 1, id_metodoPago: 1, total: '0', fecha: null });
-    httpMock.expectOne(`${API}/detalleventa/`).flush(
-      { cantidad: ['Stock insuficiente para esa cantidad.'] },
+    httpMock.expectOne(VENTAS).flush(
+      { error: 'Errores en detalles: Línea 0 (producto 10): stock insuficiente' },
       { status: 400, statusText: 'Bad Request' },
     );
-    httpMock.expectOne(`${API}/ventas/50/`).flush(null);
+    httpMock.expectNone(`${API}/detalleventa/`);
 
-    expect(message).toBe('Stock insuficiente para esa cantidad.');
+    expect(message).toBe('Errores en detalles: Línea 0 (producto 10): stock insuficiente');
     expect(facade.isCreatingSale()).toBe(false);
   });
 });

@@ -2,11 +2,15 @@ import { Observable } from 'rxjs';
 
 import { User } from '@features/users/domain/entities/user.entity';
 
+export type UserRole = 'cajero' | 'encargado' | 'admin';
+
 export interface CreateUserPayload {
   username: string;
   password: string;
   email: string;
   isActive: boolean;
+  branchId: number;
+  role: UserRole;
 }
 
 export interface UpdateUserPayload {
@@ -14,6 +18,9 @@ export interface UpdateUserPayload {
   password?: string;
   email?: string;
   isActive?: boolean;
+  /** Solo staff puede reasignar sucursal y rol. */
+  branchId?: number;
+  role?: UserRole;
 }
 
 export abstract class UserRepository {

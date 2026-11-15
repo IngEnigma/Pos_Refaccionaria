@@ -151,11 +151,10 @@ describe('SalesCartService', () => {
   });
 
   describe('estado inicial', () => {
-    // Verifica el estado inicial: carrito vacío, sin pago, descuento y totales en cero.
+    // Verifica el estado inicial: carrito vacío, sin pago y totales en cero.
     it('inicia con carrito vacío, sin pago y totales en cero', () => {
       expect(service.cart()).toEqual([]);
       expect(service.selectedPayment()).toBeNull();
-      expect(service.descuento()).toBe(0);
       expect(service.subtotal()).toBe(0);
       expect(service.iva()).toBe(0);
       expect(service.total()).toBe(0);
@@ -241,14 +240,13 @@ describe('SalesCartService', () => {
       expect(service.cart()[0].qty).toBe(1);
     });
 
-    // Verifica que clearCart vacíe el carrito y resetee pago, descuento y totales.
-    it('clearCart vacía el carrito y resetea pago y descuento', () => {
+    // Verifica que clearCart vacíe el carrito y resetee pago y totales.
+    it('clearCart vacía el carrito y resetea el pago', () => {
       service.addToCart(makeProduct());
       service.selectPayment({ id: 1, tipo: 'EFECTIVO', descripcion: 'Efectivo' });
       service.clearCart();
       expect(service.cart()).toEqual([]);
       expect(service.selectedPayment()).toBeNull();
-      expect(service.descuento()).toBe(0);
       expect(service.subtotal()).toBe(0);
       expect(service.total()).toBe(0);
     });
@@ -336,23 +334,23 @@ describe('SalesCartService', () => {
       ...overrides,
     });
 
-    // Verifica los valores exactos de subtotal, IVA y total para un producto de $120.
-    it('calcula subtotal, IVA y total exactos para un producto (120 -> 120 / 19.2 / 139.2)', () => {
+    // Verifica que el IVA 16 % se sume al subtotal de un producto de $120.
+    it('calcula subtotal, IVA y total para un producto (120 -> 120 / 19.20 / 139.20)', () => {
       service.addToCart(makeProduct({ precio: 120 }));
       expect(service.subtotal()).toBe(120);
-      expect(service.iva()).toBeCloseTo(19.2, 10);
-      expect(service.total()).toBeCloseTo(139.2, 10);
+      expect(service.iva()).toBe(19.2);
+      expect(service.total()).toBe(139.2);
     });
 
-    // Verifica los totales con varios productos y distintas cantidades (200 -> 32 -> 232).
+    // Verifica los totales con varios productos y distintas cantidades (subtotal 200 + IVA 32 = 232).
     it('calcula totales con múltiples productos y cantidades', () => {
       service.addToCart(makeProduct({ id: 1, precio: 100, stock: 100 }));
       service.addToCart(makeProduct({ id: 2, precio: 50, stock: 100 }));
       service.addToCart(makeProduct({ id: 2, precio: 50, stock: 100 }));
-      // subtotal = 100 + 50*2 = 200, iva = 32, total = 232
+      // subtotal = 100 + 50*2 = 200; IVA encima
       expect(service.subtotal()).toBe(200);
-      expect(service.iva()).toBeCloseTo(32, 10);
-      expect(service.total()).toBeCloseTo(232, 10);
+      expect(service.iva()).toBe(32);
+      expect(service.total()).toBe(232);
     });
 
     // Verifica los totales exactos con precios con centavos (subtotal redondeado a 2 decimales).
@@ -361,7 +359,7 @@ describe('SalesCartService', () => {
       service.addToCart(makeProduct({ id: 1, precio: 19.99, stock: 100 }));
       service.addToCart(makeProduct({ id: 2, precio: 5.5, stock: 100 }));
       expect(service.subtotal()).toBe(45.48);
-      expect(service.total()).toBeCloseTo(45.48 * 1.16, 2);
+      expect(service.total()).toBe(52.76);
     });
 
     // Verifica que sin productos todos los totales del servicio sean cero.
@@ -389,7 +387,7 @@ describe('SalesCartService', () => {
   });
 
   describe('confirmSale - validaciones y estado', () => {
-    const prod = (id: number, cantidadVeces = 1, precio = 100): SalesProduct => ({
+    const prod = (id: number, precio = 100): SalesProduct => ({
       id,
       nombre: `P${id}`,
       descripcion: '',
@@ -487,6 +485,7 @@ describe('SalesCartService', () => {
       const order = service.order();
       expect(order.items).toHaveLength(1);
       expect(order.subtotal.value).toBe(100);
+      expect(order.total.value).toBe(116);
     });
   });
 
@@ -646,5 +645,109 @@ describe('SalesCartService', () => {
         },
       });
     });
+  });
+
+  describe('findStockIssue (revalidación contra inventario fresco)', () => {
+    const product = (id: number, nombre: string, stock = 10): SalesProduct => ({
+      id,
+      nombre,
+      descripcion: '',
+      precio: 100,
+      stock,
+      codigoBarras: `750${id}`,
+      hasSucursalPrice: false,
+      imagen: 'x.jpg',
+    });
+
+    // Verifica que con carrito vacío no haya problema de stock.
+    it('devuelve null con carrito vacío', () => {
+      expect(service.findStockIssue(new Map())).toBeNull();
+    });
+
+    // Verifica que pedir exactamente el stock disponible sea válido.
+    it('devuelve null cuando la cantidad iguala al stock fresco', () => {
+      service.addToCart(product(1, 'Filtro'));
+      service.increaseQty(service.cart()[0]);
+
+      expect(service.findStockIssue(new Map([[1, 2]]))).toBeNull();
+    });
+
+    // Verifica que el producto ausente del inventario se reporte como no disponible.
+    it('reporta producto que ya no está en la sucursal', () => {
+      service.addToCart(product(1, 'Filtro'));
+
+      const issue = service.findStockIssue(new Map([[2, 5]]));
+
+      expect(issue).toEqual({
+        kind: 'missing',
+        message: '"Filtro" ya no está disponible en tu sucursal. Recarga el catálogo.',
+      });
+    });
+
+    // Verifica que cantidad mayor al stock fresco se reporte con cifras solicitada/disponible.
+    it('reporta stock insuficiente con solicitado y disponible', () => {
+      service.addToCart(product(1, 'Filtro'));
+      service.increaseQty(service.cart()[0]);
+      service.increaseQty(service.cart()[0]);
+
+      const issue = service.findStockIssue(new Map([[1, 2]]));
+
+      expect(issue).toEqual({
+        kind: 'insufficient',
+        message: 'Stock insuficiente para "Filtro": solicitas 3, disponible 2.',
+      });
+    });
+
+    // Verifica que stock fresco en 0 cuente como insuficiente (no como ausente).
+    it('stock fresco 0 es insuficiente, no ausente', () => {
+      service.addToCart(product(1, 'Filtro'));
+
+      expect(service.findStockIssue(new Map([[1, 0]]))?.kind).toBe('insufficient');
+    });
+
+    // Verifica que se devuelva el primer problema en orden de carrito.
+    it('devuelve el primer problema en orden de carrito', () => {
+      service.addToCart(product(1, 'Filtro'));
+      service.addToCart(product(2, 'Bujía'));
+
+      const issue = service.findStockIssue(new Map());
+
+      expect(issue?.message).toContain('Filtro');
+    });
+
+    // Verifica que no modifique el carrito.
+    it('no modifica el carrito', () => {
+      service.addToCart(product(1, 'Filtro'));
+      const before = service.cart();
+
+      service.findStockIssue(new Map());
+
+      expect(service.cart()).toBe(before);
+    });
+  });
+
+  describe('IVA y total con decimales', () => {
+    const product = (precio: number, id = 1): SalesProduct => ({
+      id, nombre: 'P', descripcion: '', precio, stock: 100, codigoBarras: `c${id}`, hasSucursalPrice: false, imagen: '',
+    });
+
+    // Verifica que 19.99 x3 cuadre a centavos: 59.97 + 9.60 = 69.57.
+    it('19.99 x3 → subtotal 59.97, IVA 9.6, total 69.57', () => {
+      [1, 2, 3].forEach(() => service.addToCart(product(19.99)));
+
+      expect(service.subtotal()).toBe(59.97);
+      expect(service.iva()).toBe(9.6);
+      expect(service.total()).toBe(69.57);
+    });
+
+    // Verifica que el total sea siempre subtotal + IVA (sin diferencias de centavo).
+    it('total = subtotal + IVA en una mezcla de precios con centavos', () => {
+      service.addToCart(product(0.99, 1));
+      service.addToCart(product(12.35, 2));
+      service.addToCart(product(7.77, 3));
+
+      expect(service.total()).toBeCloseTo(service.subtotal() + service.iva(), 2);
+    });
+
   });
 });

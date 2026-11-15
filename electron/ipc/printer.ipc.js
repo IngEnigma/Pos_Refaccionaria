@@ -30,9 +30,7 @@ function registerPrinterIpc() {
             const escposBuffer = generateTicket(ticket);
             const preview = generatePreview(ticket);
 
-            console.log('[Printer] Ticket generado');
-            console.log(`[Printer] Bytes ESC/POS: ${escposBuffer.length}`);
-            console.log(preview);
+            console.log(`[Printer] Ticket generado (${escposBuffer.length} bytes ESC/POS)`);
 
             return {
                 success: true,

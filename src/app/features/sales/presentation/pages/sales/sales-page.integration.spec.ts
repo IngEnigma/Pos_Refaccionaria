@@ -71,7 +71,6 @@ describe('SalesPageComponent (integración)', () => {
   const VENTAS = `${API}/ventas/`;
   const METODOS = `${API}/metodopago/`;
   const TIPOS = `${API}/tipos/`;
-  const DETALLE = `${API}/detalleventa/`;
 
   let httpMock: HttpTestingController;
   let fixture: ComponentFixture<SalesPageComponent>;
@@ -194,6 +193,19 @@ describe('SalesPageComponent (integración)', () => {
     return all[all.length - 1];
   }
 
+  // H-43: el effect que muestra el error de las facades escribía una señal (NG0600) y el cajero no veía el aviso.
+  it('H-43: un error del backend al cargar métodos de pago o inventario se muestra en un toast', () => {
+    httpMock.match(VENTAS).forEach((r) => r.flush([]));
+    httpMock.match(TIPOS).forEach((r) => r.flush([]));
+    httpMock.match(METODOS).forEach((r) => r.flush({ detail: 'Sin permiso para métodos de pago.' }, { status: 403, statusText: 'Forbidden' }));
+    httpMock.match(INV).forEach((r) => r.flush({ error: 'El usuario no tiene una sucursal asignada' }, { status: 400, statusText: 'Bad Request' }));
+    fixture.detectChanges();
+    TestBed.flushEffects();
+
+    const errors = toasts.toasts().filter((t) => t.type === 'error').map((t) => t.message);
+    expect(errors).toEqual(expect.arrayContaining([expect.stringContaining('sucursal asignada')]));
+  });
+
   // Verifica que el inventario HTTP llegue al catálogo con id, nombre, precio de sucursal, stock y código intactos.
   it('el inventario del backend aparece en el catálogo con datos íntegros', () => {
     flushStartup(inventoryDto([itemDto()]));
@@ -290,10 +302,9 @@ describe('SalesPageComponent (integración)', () => {
 
     page.processTransaction();
 
-    httpMock.expectOne(VENTAS).flush({ id: 50, id_usuario: 1, id_inventario: 7, id_metodoPago: 1, total: '120.00', fecha: '2024-01-01' });
-    const detail = httpMock.expectOne(DETALLE);
-    expect(detail.request.body).toEqual({ id_producto: 101, id_venta: 50, cantidad: 1 });
-    detail.flush({ id: 11, id_producto: 101, id_venta: 50, subtotal: '120.00', cantidad: 1 });
+    const saleReq = httpMock.expectOne(VENTAS);
+    expect(saleReq.request.body.detalles).toEqual([{ id_producto: 101, cantidad: 1 }]);
+    saleReq.flush({ id: 50, id_usuario: 1, id_metodo_pago: 1, total: '120.00', fecha: '2024-01-01' });
     httpMock.expectOne(`${API}/ventas/50/ticket/`).flush(ticketDto);
     httpMock.match(VENTAS).forEach((r) => r.flush([]));
     // processTransaction recarga el inventario tras el éxito (sales.page.ts).
@@ -369,8 +380,7 @@ describe('SalesPageComponent (integración)', () => {
 
     const sale = httpMock.expectOne(VENTAS);
     expect(sale.request.method).toBe('POST');
-    sale.flush({ id: 51, id_usuario: 1, id_inventario: 7, id_metodoPago: 1, total: '240.00', fecha: '2024-01-01' });
-    httpMock.expectOne(DETALLE).flush({ id: 12, id_producto: 101, id_venta: 51, subtotal: '240.00', cantidad: 2 });
+    sale.flush({ id: 51, id_usuario: 1, id_inventario: 7, id_metodo_pago: 1, total: '240.00', fecha: '2024-01-01' });
     httpMock.expectOne(`${API}/ventas/51/ticket/`).flush({ ...ticketDto, folio: 51 });
     httpMock.match(VENTAS).forEach((r) => r.flush([]));
     // processTransaction recarga el inventario tras el éxito (sales.page.ts).

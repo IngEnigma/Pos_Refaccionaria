@@ -1,4 +1,6 @@
+import { importProvidersFrom } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { LucideAngularModule, Package } from 'lucide-angular';
 
 import { ProductCardComponent } from './product-card.component';
 import { SalesProduct } from '../../models/sales-ui.models';
@@ -19,6 +21,12 @@ describe('ProductCardComponent (funcional)', () => {
     hasSucursalPrice: true,
   };
 
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [importProvidersFrom(LucideAngularModule.pick({ Package }))],
+    });
+  });
+
   function setup(p: SalesProduct) {
     fixture = TestBed.createComponent(ProductCardComponent);
     component = fixture.componentInstance;
@@ -34,6 +42,14 @@ describe('ProductCardComponent (funcional)', () => {
     expect(text).toContain('Filtro de aceite');
     expect(text).toContain('120');
     expect(text).toContain('5');
+  });
+
+  // H-52: el precio se imprime siempre con 2 decimales.
+  it('H-52: muestra el precio con 2 decimales', () => {
+    setup({ ...product, precio: 50.5 });
+    expect(fixture.nativeElement.querySelector('.product-price').textContent).toContain('$50.50');
+    setup(product);
+    expect(fixture.nativeElement.querySelector('.product-price').textContent).toContain('$120.00');
   });
 
   // Verifica que pulsar "Añadir" emita el producto para agregarlo al carrito.
@@ -64,5 +80,40 @@ describe('ProductCardComponent (funcional)', () => {
     (fixture.nativeElement.querySelector('button') as HTMLButtonElement).click();
 
     expect(emitted).toBe(0);
+  });
+
+  // Verifica que el badge "Sucursal" aparezca sólo si el precio es de la sucursal.
+  it('muestra el badge Sucursal solo con precio de sucursal', () => {
+    setup(product);
+    expect(fixture.nativeElement.querySelector('.sucursal-badge')?.textContent).toContain('Sucursal');
+
+    setup({ ...product, hasSucursalPrice: false });
+    expect(fixture.nativeElement.querySelector('.sucursal-badge')).toBeNull();
+  });
+
+  // Verifica que el stock 0 se marque con la clase stock-zero.
+  it('marca el stock 0 con stock-zero', () => {
+    setup({ ...product, stock: 0 });
+    expect(fixture.nativeElement.querySelector('.product-stock').classList).toContain('stock-zero');
+
+    setup(product);
+    expect(fixture.nativeElement.querySelector('.product-stock').classList).not.toContain('stock-zero');
+  });
+
+  // Verifica que la imagen use src y alt del producto.
+  it('usa imagen y alt del producto', () => {
+    setup(product);
+
+    const img = fixture.nativeElement.querySelector('img.product-img') as HTMLImageElement;
+    expect(img.getAttribute('src')).toBe('assets/images/Refaccionaria.webp');
+    expect(img.getAttribute('alt')).toBe('Filtro de aceite');
+  });
+
+  // Verifica que sin imagen se muestre el placeholder en lugar de <img>.
+  it('sin imagen muestra el placeholder', () => {
+    setup({ ...product, imagen: '' });
+
+    expect(fixture.nativeElement.querySelector('img.product-img')).toBeNull();
+    expect(fixture.nativeElement.querySelector('.product-img-placeholder')).not.toBeNull();
   });
 });

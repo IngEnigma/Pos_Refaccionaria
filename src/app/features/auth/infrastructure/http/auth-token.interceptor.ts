@@ -6,7 +6,7 @@ import { LOGGER_PORT } from '@core/logging/logger.port';
 import {
   isRefreshRequest,
   isUnauthorizedError,
-} from './auth-token-http.utils';
+} from '@features/auth/application/services/auth-token-http.utils';
 import { AuthTokenRefreshOrchestrator } from '@features/auth/application/services/auth-token-refresh-orchestrator.service';
 
 export const authTokenInterceptor: HttpInterceptorFn = (req, next) => {
@@ -22,6 +22,12 @@ export const authTokenInterceptor: HttpInterceptorFn = (req, next) => {
 
       if (isRefreshRequest(authRequest)) {
         logger.warn('Refresh endpoint returned 401, aborting refresh flow');
+        return throwError(() => error);
+      }
+
+      // Sin token adjunto (sin sesión, login incorrecto, host externo) no hay nada que renovar:
+      // el 401 original llega intacto al llamador (H-22).
+      if (!authRequest.headers.has('Authorization')) {
         return throwError(() => error);
       }
 

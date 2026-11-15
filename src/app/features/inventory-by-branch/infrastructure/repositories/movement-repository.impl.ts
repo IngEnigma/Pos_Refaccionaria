@@ -4,7 +4,7 @@ import { map, Observable } from 'rxjs';
 
 import { APP_ENV } from '@core/tokens/app-env.token';
 import { Environment } from '@env/environment.model';
-import { MovementResponseDto, RegisterMovementRequestDto } from '../../application/dtos/movement-response.dto';
+import { MovementResponseDto } from '../../application/dtos/movement-response.dto';
 import { InventoryMovement, RegisterMovementPayload } from '../../domain/entities/inventory-movement.entity';
 import { InventoryMovementRepository } from '../../domain/repository/movement-repository';
 import { MovementMapper } from '../mappers/movement.mapper';

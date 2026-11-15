@@ -70,7 +70,7 @@ export const DEFAULT_SIDEBAR_NAV_ITEMS: readonly SidebarNavItem[] = [
     label: 'Administración',
     icon: 'settings',
     route: '/admin',
-    roles: ['admin', 'seller', 'manager'],
+    roles: ['admin'],
   },
   {
     id: 'notifications',
@@ -84,6 +84,6 @@ export const DEFAULT_SIDEBAR_NAV_ITEMS: readonly SidebarNavItem[] = [
     label: 'Cajeros',
     icon: 'users',
     route: '/manager/cashiers',
-    roles: ['admin', 'seller', 'manager'],
+    roles: ['admin', 'manager'],
   },
 ];

@@ -6,6 +6,7 @@ import { provideRouter } from '@angular/router';
 import { BanknoteIcon, CreditCard, ArrowLeftRightIcon, LucideAngularModule, Package, Trash2 } from 'lucide-angular';
 
 import { environment } from '@env/environment';
+import { DESKTOP_PORT } from '@core/ports/desktop.port';
 import { APP_ENV } from '@core/tokens/app-env.token';
 import { LOGGER_PORT } from '@core/logging/logger.port';
 import { LoggerService } from '@core/logging/logger.service';
@@ -74,12 +75,12 @@ describe('SalesPageComponent (funcional)', () => {
   const VENTAS = `${API}/ventas/`;
   const METODOS = `${API}/metodopago/`;
   const TIPOS = `${API}/tipos/`;
-  const DETALLE = `${API}/detalleventa/`;
 
   let httpMock: HttpTestingController;
   let fixture: ComponentFixture<SalesPageComponent>;
   let page: SalesPageComponent;
   let toasts: ToastService;
+  const desktop = { generateTicket: jest.fn() };
 
   const itemDto = {
     id: 1,
@@ -125,6 +126,7 @@ describe('SalesPageComponent (funcional)', () => {
   });
 
   beforeEach(() => {
+    desktop.generateTicket.mockReset().mockResolvedValue({ success: true });
     TestBed.configureTestingModule({
       providers: [
         provideHttpClient(withInterceptors([httpErrorInterceptor, authTokenInterceptor, trailingSlashInterceptor])),
@@ -132,6 +134,7 @@ describe('SalesPageComponent (funcional)', () => {
         provideRouter([]),
         importProvidersFrom(LucideAngularModule.pick({ BanknoteIcon, CreditCard, ArrowLeftRightIcon, Package, Trash2 })),
         { provide: APP_ENV, useValue: environment },
+        { provide: DESKTOP_PORT, useValue: desktop },
         { provide: LOGGER_PORT, useClass: LoggerService },
         { provide: LOGGING_LEVEL_TOKEN, useValue: LogLevel.FATAL },
         { provide: STORAGE_PORT, useClass: InMemoryStorageService },
@@ -195,21 +198,20 @@ describe('SalesPageComponent (funcional)', () => {
 
   function processButton(): HTMLButtonElement {
     const buttons = fixture.nativeElement.querySelectorAll('button') as NodeListOf<HTMLButtonElement>;
-    const found = Array.from(buttons).find((b) => b.textContent.includes('Procesar transacción') || b.textContent.includes('Procesando'));
+    const found = Array.from(buttons).find((b) => !!b.textContent?.includes('Procesar transacción') || !!b.textContent?.includes('Procesando'));
     if (!found) throw new Error('Botón de procesar no encontrado en el DOM');
     return found;
   }
 
   function summaryRow(label: string): string {
     const rows = fixture.nativeElement.querySelectorAll('.summary-row') as NodeListOf<HTMLElement>;
-    const row = Array.from(rows).find((r) => r.textContent.includes(label));
+    const row = Array.from(rows).find((r) => r.textContent?.includes(label));
     if (!row) throw new Error(`Fila de resumen no encontrada: ${label}`);
-    return row.textContent;
+    return row.textContent ?? '';
   }
 
-  function flushSuccessfulSale(id: number, cantidad: number) {
-    httpMock.expectOne(VENTAS).flush({ id, id_usuario: 1, id_inventario: 7, id_metodoPago: 1, total: '120.00', fecha: '2024-01-01' });
-    httpMock.expectOne(DETALLE).flush({ id: id + 100, id_producto: 101, id_venta: id, subtotal: '120.00', cantidad });
+  function flushSuccessfulSale(id: number) {
+    httpMock.expectOne(VENTAS).flush({ id, id_usuario: 1, id_inventario: 7, id_metodo_pago: 1, total: '120.00', fecha: '2024-01-01' });
     httpMock.expectOne(`${API}/ventas/${id}/ticket/`).flush({ ...ticketDto, folio: id });
     httpMock.match(VENTAS).forEach((r) => r.flush([]));
     httpMock.match(INV).forEach((r) => r.flush(inventoryDto));
@@ -272,20 +274,19 @@ describe('SalesPageComponent (funcional)', () => {
     expect(page.submitDisabled()).toBe(true);
     expect(processButton().disabled).toBe(true);
 
-    flushSuccessfulSale(50, 1);
+    flushSuccessfulSale(50);
     fixture.detectChanges();
     expect(page.lastTicket()?.folio).toBe(50);
   });
 
-  // F6: verifica que el resumen renderice subtotal, descuento, IVA y total exactos para $120.
-  it('F6: el resumen muestra subtotal, descuento, IVA y total exactos', () => {
+  // F6: verifica que el resumen renderice subtotal, IVA y total exactos para $120.
+  it('F6: el resumen muestra subtotal, IVA y total exactos', () => {
     page.onAddToCart(page.productos()[0]);
     fixture.detectChanges();
 
-    expect(summaryRow('Subtotal')).toContain('$120');
-    expect(summaryRow('Descuento')).toContain('$0');
-    expect(summaryRow('IVA')).toContain('$19.2');
-    expect((fixture.nativeElement.querySelector('.total-amount') as HTMLElement).textContent).toContain('$139.2');
+    expect(summaryRow('Subtotal')).toContain('$120.00');
+    expect(summaryRow('IVA')).toContain('$19.20');
+    expect((fixture.nativeElement.querySelector('.total-amount') as HTMLElement).textContent).toContain('$139.20');
   });
 
   // F7: verifica que la UI muestre $120 y el payload conserve el contrato (sin precios calculados por frontend).
@@ -298,13 +299,9 @@ describe('SalesPageComponent (funcional)', () => {
 
     page.processTransaction();
     const saleReq = httpMock.expectOne(VENTAS);
-    expect(saleReq.request.body).toEqual({ id_metodoPago: 1 });
-    saleReq.flush({ id: 50, id_usuario: 1, id_inventario: 7, id_metodoPago: 1, total: '120.00', fecha: '2024-01-01' });
-
-    const detailReq = httpMock.expectOne(DETALLE);
-    expect(detailReq.request.body).toEqual({ id_producto: 101, id_venta: 50, cantidad: 1 });
-    expect(detailReq.request.body).not.toHaveProperty('precio');
-    detailReq.flush({ id: 11, id_producto: 101, id_venta: 50, subtotal: '120.00', cantidad: 1 });
+    expect(saleReq.request.body).toEqual({ id_metodo_pago: 1, detalles: [{ id_producto: 101, cantidad: 1 }] });
+    expect(saleReq.request.body.detalles[0]).not.toHaveProperty('precio');
+    saleReq.flush({ id: 50, id_usuario: 1, id_metodo_pago: 1, total: '120.00', fecha: '2024-01-01' });
 
     httpMock.expectOne(`${API}/ventas/50/ticket/`).flush(ticketDto);
     httpMock.match(VENTAS).forEach((r) => r.flush([]));
@@ -342,7 +339,7 @@ describe('SalesPageComponent (funcional)', () => {
     expect(page.cartItems()).toHaveLength(1);
 
     page.processTransaction();
-    flushSuccessfulSale(50, 1);
+    flushSuccessfulSale(50);
     fixture.detectChanges();
 
     expect(page.lastTicket()?.folio).toBe(50);
@@ -356,7 +353,7 @@ describe('SalesPageComponent (funcional)', () => {
     page.onSelectPayment(PAGO);
 
     page.processTransaction();
-    flushSuccessfulSale(50, 1);
+    flushSuccessfulSale(50);
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelector('.modal-content')).toBeTruthy();
     expect(fixture.nativeElement.textContent).toContain('Ticket #50');
@@ -380,8 +377,7 @@ describe('SalesPageComponent (funcional)', () => {
 
     const sales = httpMock.match((req) => req.method === 'POST' && req.url === VENTAS);
     expect(sales).toHaveLength(1);
-    sales[0].flush({ id: 50, id_usuario: 1, id_inventario: 7, id_metodoPago: 1, total: '120.00', fecha: '2024-01-01' });
-    httpMock.expectOne(DETALLE).flush({ id: 11, id_producto: 101, id_venta: 50, subtotal: '120.00', cantidad: 1 });
+    sales[0].flush({ id: 50, id_usuario: 1, id_inventario: 7, id_metodo_pago: 1, total: '120.00', fecha: '2024-01-01' });
     httpMock.expectOne(`${API}/ventas/50/ticket/`).flush(ticketDto);
     httpMock.match(VENTAS).forEach((r) => r.flush([]));
     httpMock.match(INV).forEach((r) => r.flush(inventoryDto));
@@ -534,10 +530,12 @@ describe('SalesPageComponent (funcional)', () => {
 
     page.processTransaction();
     const saleReq = httpMock.expectOne(VENTAS);
-    expect(saleReq.request.body).toEqual({ id_metodoPago: 1, id_cliente: 25 });
-    saleReq.flush({ id: 50, id_usuario: 1, id_inventario: 7, id_metodoPago: 1, total: '120.00', fecha: '2024-01-01' });
-
-    httpMock.expectOne(DETALLE).flush({ id: 11, id_producto: 101, id_venta: 50, subtotal: '120.00', cantidad: 1 });
+    expect(saleReq.request.body).toEqual({
+      id_metodo_pago: 1,
+      id_cliente: 25,
+      detalles: [{ id_producto: 101, cantidad: 1 }],
+    });
+    saleReq.flush({ id: 50, id_usuario: 1, id_inventario: 7, id_metodo_pago: 1, total: '120.00', fecha: '2024-01-01' });
     httpMock.expectOne(`${API}/ventas/50/ticket/`).flush(ticketDto);
     httpMock.match(VENTAS).forEach((r) => r.flush([]));
     httpMock.match(INV).forEach((r) => r.flush(inventoryDto));
@@ -564,5 +562,187 @@ describe('SalesPageComponent (funcional)', () => {
     expect(page.cartItems()).toHaveLength(1);
     expect(clienteLabel()).toBe('Juan Pérez López');
     expect(page.isCreatingSale()).toBe(false);
+  });
+
+  // D1: verifica que tras la venta se mande el ticket al puerto de escritorio en snake_case.
+  it('D1: venta exitosa envía el ticket en snake_case al puerto de escritorio', () => {
+    page.onAddToCart(page.productos()[0]);
+    page.onSelectPayment(PAGO);
+
+    page.processTransaction();
+    flushSuccessfulSale(50);
+
+    expect(desktop.generateTicket).toHaveBeenCalledTimes(1);
+    expect(desktop.generateTicket).toHaveBeenCalledWith({
+      folio: 50,
+      fecha: '2024-01-01T00:00:00Z',
+      vendedor: 'vendedora',
+      metodo_pago: 'EFECTIVO',
+      sucursal: 'Central',
+      productos: [{ nombre: 'Filtro de aceite', cantidad: 1, subtotal: '120.00', precio_unitario: '120.00' }],
+      total: '139.20',
+    });
+  });
+
+  // D2: verifica que si el puerto reporta fallo de impresión se muestre su mensaje.
+  it('D2: fallo de impresión muestra el mensaje del puerto', async () => {
+    desktop.generateTicket.mockResolvedValue({ success: false, message: 'Sin papel' });
+    page.onAddToCart(page.productos()[0]);
+    page.onSelectPayment(PAGO);
+
+    page.processTransaction();
+    flushSuccessfulSale(50);
+    await Promise.resolve();
+
+    expect(lastToast().type).toBe('error');
+    expect(lastToast().message).toBe('Sin papel');
+  });
+
+  // H-11: si el IPC rechaza la promesa, el cajero ve un aviso y no queda un rechazo sin manejar.
+  it('H-11: si generateTicket rechaza se avisa al cajero', async () => {
+    desktop.generateTicket.mockRejectedValue(new Error('IPC caído'));
+    page.onAddToCart(page.productos()[0]);
+    page.onSelectPayment(PAGO);
+
+    page.processTransaction();
+    flushSuccessfulSale(50);
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(lastToast().type).toBe('error');
+    expect(lastToast().message).toBe('No fue posible generar el ticket.');
+  });
+
+  // D3: verifica que sin ticket (falló getSaleTicket) no se intente imprimir.
+  it('D3: sin ticket no se llama al puerto de escritorio', () => {
+    page.onAddToCart(page.productos()[0]);
+    page.onSelectPayment(PAGO);
+
+    page.processTransaction();
+    httpMock.expectOne(VENTAS).flush({ id: 50, id_usuario: 1, id_inventario: 7, id_metodo_pago: 1, total: '120.00', fecha: '2024-01-01' });
+    httpMock.expectOne(`${API}/ventas/50/ticket/`).flush({}, { status: 500, statusText: 'Server Error' });
+    httpMock.match(VENTAS).forEach((r) => r.flush([]));
+    httpMock.match(INV).forEach((r) => r.flush(inventoryDto));
+
+    expect(desktop.generateTicket).not.toHaveBeenCalled();
+    expect(page.lastTicket()).toBeNull();
+  });
+
+  // G1: verifica que cobrar sin método de pago no haga POST, avise y conserve el carrito.
+  it('G1: cobrar sin método de pago no hace POST y avisa', () => {
+    page.onAddToCart(page.productos()[0]);
+
+    page.processTransaction();
+    httpMock.expectNone(VENTAS);
+
+    expect(lastToast()).toMatchObject({ type: 'error', message: 'Selecciona un método de pago.' });
+    expect(page.cartItems()).toHaveLength(1);
+    expect(page.isCreatingSale()).toBe(false);
+  });
+
+  // G2: verifica que cobrar con el carrito vacío no haga POST y avise.
+  it('G2: cobrar con carrito vacío no hace POST y avisa', () => {
+    page.onSelectPayment(PAGO);
+
+    page.processTransaction();
+    httpMock.expectNone(VENTAS);
+
+    expect(lastToast()).toMatchObject({ type: 'error', message: 'El carrito está vacío.' });
+  });
+
+  // G3: verifica que una tecla distinta de Enter no dispare la búsqueda por código de barras.
+  it('G3: una tecla distinta de Enter no busca ni limpia el código', () => {
+    page.barcodeInput.set('7501234567890');
+
+    page.onBarcodeKeyDown(new KeyboardEvent('keydown', { key: 'a' }));
+
+    expect(page.cartItems()).toHaveLength(0);
+    expect(page.barcodeInput()).toBe('7501234567890');
+  });
+
+  // G4: verifica que Enter con código vacío o solo espacios no haga nada.
+  it('G4: Enter con código vacío no avisa ni agrega', () => {
+    const before = toasts.toasts().length;
+    page.barcodeInput.set('   ');
+
+    page.onBarcodeKeyDown(new KeyboardEvent('keydown', { key: 'Enter' }));
+
+    expect(toasts.toasts()).toHaveLength(before);
+    expect(page.cartItems()).toHaveLength(0);
+  });
+
+  // G5: verifica que el código con espacios y distinta capitalización agregue el producto y limpie el campo.
+  it('G5: Enter con código con espacios agrega el producto y limpia el campo', () => {
+    page.barcodeInput.set('  7501234567890 ');
+
+    page.onBarcodeKeyDown(new KeyboardEvent('keydown', { key: 'Enter' }));
+
+    expect(page.cartItems()).toHaveLength(1);
+    expect(page.cartItems()[0].productId).toBe(101);
+    expect(page.barcodeInput()).toBe('');
+    expect(lastToast()).toMatchObject({ type: 'success', message: 'Filtro de aceite agregado al carrito' });
+  });
+
+  // G6: verifica que el filtro en vivo por código acote el catálogo y se restaure al limpiar.
+  it('G6: el campo de código filtra el catálogo en vivo', () => {
+    expect(page.productos()).toHaveLength(1);
+
+    page.barcodeInput.set('no-existe');
+    expect(page.productos()).toHaveLength(0);
+
+    page.barcodeInput.set('flt-12');
+    expect(page.productos()).toHaveLength(1);
+
+    page.barcodeInput.set('');
+    expect(page.productos()).toHaveLength(1);
+  });
+
+  // G7: verifica que cargar más no haga peticiones (el inventario viene completo).
+  it('G7: cargar más no dispara peticiones', () => {
+    page.onLoadMore();
+
+    httpMock.expectNone(INV);
+    httpMock.expectNone(VENTAS);
+  });
+
+  // G8: verifica que elegir categoría solo guarde el id y no filtre el catálogo.
+  it('G8: seleccionar categoría guarda el id sin filtrar productos', () => {
+    page.onSelectCategory({ id: 5, nombre: 'Filtros' });
+
+    expect(page.selectedCategoryId()).toBe(5);
+    expect(page.productos()).toHaveLength(1);
+  });
+
+  // G9: verifica la etiqueta de cliente sin apellido materno (sin espacios sobrantes).
+  it('G9: etiqueta de cliente sin apellido materno no deja espacios sobrantes', () => {
+    page.onSelectClient({
+      id: 30, idSucursal: 3, nombre: 'María', apellidoPaterno: 'Gómez', apellidoMaterno: null,
+      telefono: '5598765432', correo: null, direccion: null, rfc: null,
+    });
+
+    expect(page.clienteLabel()).toBe('María Gómez');
+    expect(page.clientSelectorOpen()).toBe(false);
+  });
+
+  // G10: verifica que el selector de cliente se abra y cierre por sus manejadores.
+  it('G10: abrir y cerrar el selector de cliente', () => {
+    page.onOpenClientSelector();
+    expect(page.clientSelectorOpen()).toBe(true);
+
+    page.onCloseClientSelector();
+    expect(page.clientSelectorOpen()).toBe(false);
+  });
+
+  // G11: verifica que cerrar el modal limpie el último ticket.
+  it('G11: cerrar el modal del ticket lo limpia', () => {
+    page.onAddToCart(page.productos()[0]);
+    page.onSelectPayment(PAGO);
+    page.processTransaction();
+    flushSuccessfulSale(50);
+    expect(page.lastTicket()).not.toBeNull();
+
+    page.onTicketModalClose();
+
+    expect(page.lastTicket()).toBeNull();
   });
 });

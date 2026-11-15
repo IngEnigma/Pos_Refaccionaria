@@ -35,7 +35,8 @@ export class LoginPageComponent {
       if (errorMsg) {
         this.toastService.error(errorMsg);
       }
-    });
+      // H-43: el toast escribe una señal; sin esto Angular lanza NG0600 y el error no se mostraba.
+    }, { allowSignalWrites: true });
   }
 
   readonly loginForm = this.fb.nonNullable.group({
@@ -43,24 +44,30 @@ export class LoginPageComponent {
     password: ['', Validators.required],
   });
 
+  /** Desmarcada por defecto: la sesión solo se persiste en localStorage si el usuario lo pide (H-04, H-19). */
+  readonly rememberCtrl = this.fb.nonNullable.control(false);
+
   get submitDisabled(): boolean {
     return this.loading() || this.loginForm.invalid;
   }
 
   onSubmit(): void {
+    if (this.loading()) return;
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
       return;
     }
 
-    const credentials = this.loginForm.getRawValue();
+    const credentials = { ...this.loginForm.getRawValue(), remember: this.rememberCtrl.value };
     this.authFacade
       .login(credentials)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((isSuccess) => {
         if (isSuccess) {
           const redirectTo = this.route.snapshot.queryParams['redirectTo'];
-          this.router.navigateByUrl(redirectTo ?? `/${AppRoutes.sales}`);
+          // H-18: solo rutas internas ("/x"); "//host", "/\\host" o un esquema quedan fuera.
+          const isInternal = typeof redirectTo === 'string' && /^\/(?![/\\])/.test(redirectTo);
+          this.router.navigateByUrl(isInternal ? redirectTo : `/${AppRoutes.sales}`);
         }
       });
   }

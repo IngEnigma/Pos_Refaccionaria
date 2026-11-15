@@ -14,6 +14,8 @@ export class UserMapper {
       username: dto.username,
       email: dto.email,
       isActive: dto.is_active,
+      branchId: dto.id_sucursal,
+      role: dto.rol,
     };
   }
 
@@ -23,6 +25,8 @@ export class UserMapper {
       password: payload.password,
       email: payload.email,
       is_active: payload.isActive,
+      id_sucursal: payload.branchId,
+      rol: payload.role,
     };
   }
 
@@ -32,6 +36,8 @@ export class UserMapper {
       password: payload.password,
       email: payload.email,
       is_active: payload.isActive,
+      id_sucursal: payload.branchId,
+      rol: payload.role,
     };
   }
 }
