@@ -47,6 +47,12 @@ describe('CartItemComponent', () => {
     expect(img.getAttribute('alt')).toBe('Filtro de aceite');
   });
 
+  // H-50: el botón de quitar es solo un icono; necesita nombre accesible con el producto.
+  it('H-50: el botón de quitar tiene aria-label con el nombre del producto', () => {
+    const btn = fixture.nativeElement.querySelector('.remove-btn') as HTMLButtonElement;
+    expect(btn.getAttribute('aria-label')).toBe('Quitar Filtro de aceite del carrito');
+  });
+
   // Verifica que eliminar emita el item completo.
   it('emite remove con el item al pulsar eliminar', () => {
     const spy = jest.fn();

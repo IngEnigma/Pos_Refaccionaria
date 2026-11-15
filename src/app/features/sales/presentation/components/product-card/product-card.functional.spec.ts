@@ -44,6 +44,14 @@ describe('ProductCardComponent (funcional)', () => {
     expect(text).toContain('5');
   });
 
+  // H-52: el precio se imprime siempre con 2 decimales.
+  it('H-52: muestra el precio con 2 decimales', () => {
+    setup({ ...product, precio: 50.5 });
+    expect(fixture.nativeElement.querySelector('.product-price').textContent).toContain('$50.50');
+    setup(product);
+    expect(fixture.nativeElement.querySelector('.product-price').textContent).toContain('$120.00');
+  });
+
   // Verifica que pulsar "Añadir" emita el producto para agregarlo al carrito.
   it('pulsar Añadir emite el producto', () => {
     setup(product);

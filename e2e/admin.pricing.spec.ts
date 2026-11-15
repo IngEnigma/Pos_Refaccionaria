@@ -107,11 +107,11 @@ test.describe('Precios por sucursal — SIS-023', () => {
     await page.goto('/sales');
 
     const balata = page.getByRole('article').filter({ has: page.getByRole('heading', { name: 'Balata delantera' }) });
-    // La tarjeta imprime el número crudo ("$110", no "$110.00"): H-52 🟡.
-    await expect(balata).toContainText('$110 ');
+    // H-52: la tarjeta imprime el precio con 2 decimales.
+    await expect(balata).toContainText('$110.00');
     await expect(balata).toContainText('Sucursal');
     const filtro = page.getByRole('article').filter({ has: page.getByRole('heading', { name: 'Filtro de aceite' }) });
-    await expect(filtro).toContainText('$50 ');
+    await expect(filtro).toContainText('$50.00');
     await expect(filtro).not.toContainText('Sucursal');
   });
 });
