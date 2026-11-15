@@ -37,7 +37,7 @@
     </div>
   </div>
 
-  <main class="page-content animate-slide-up">
+  <div class="page-content animate-slide-up">
     @if (error()) {
       <div class="error-state">
         <p>{{ error() }}</p>
@@ -50,7 +50,7 @@
         (viewDetail)="handleViewDetail($event)">
       </app-sales-history-table>
     }
-  </main>
+  </div>
 
   @if (selectedSale()) {
     <app-sale-detail-modal 

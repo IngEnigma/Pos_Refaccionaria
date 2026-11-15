@@ -85,7 +85,7 @@
   font-size: 0.65rem;
   font-family: var(--font-text-family);
   font-weight: var(--font-text-weight);
-  background: var(--color-success, #10b981);
+  background: #047857; /* H-55: contraste 5.5:1 con blanco */
   color: white;
   padding: 1px 5px;
   border-radius: var(--radius-sm);

@@ -1,5 +1,5 @@
 <div class="sales-root">
-  <main class="sales-main animate-slide-up">
+  <div class="sales-main animate-slide-up">
     <section class="catalog-section">
       @if (!authFacade.sucursalId()) {
         <div class="empty-state">
@@ -43,7 +43,7 @@
         }
       }
     </section>
-  </main>
+  </div>
 
   <app-cart-panel class="animate-fade-in"
     [cartItems]="cartItems()"

@@ -10,7 +10,7 @@ import { animate, style, transition, trigger } from '@angular/animations';
   imports: [LucideAngularModule],
   selector: 'app-toast-container',
   template: `
-    <div class="toast-container" aria-live="polite" aria-label="Notificaciones">
+    <div class="toast-container" role="region" aria-live="polite" aria-label="Notificaciones">
       @for (toast of toastService.toasts(); track toast.id) {
         <div class="toast toast--{{ toast.type }}" role="status" @toastAnimation>
           <div class="toast-content">
