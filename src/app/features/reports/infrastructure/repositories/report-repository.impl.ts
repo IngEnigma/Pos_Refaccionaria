@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { catchError, map, Observable, switchMap, throwError, from } from 'rxjs';
+import { catchError, Observable, switchMap, throwError, from } from 'rxjs';
 
 import { APP_ENV } from '@core/tokens/app-env.token';
 import { Environment } from '@env/environment.model';

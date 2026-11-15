@@ -8,6 +8,10 @@ describe('SaleMapper', () => {
     id_usuario: 3,
     id_sucursal: 7,
     id_metodo_pago: 2,
+    id_cliente: null,
+    estado: 'completada',
+    subtotal: '120.00',
+    iva: '19.20',
     total: '139.20',
     fecha: '2025-01-15T10:00:00Z',
   };

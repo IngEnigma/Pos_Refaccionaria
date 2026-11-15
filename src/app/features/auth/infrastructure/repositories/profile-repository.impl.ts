@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { Observable, map, catchError, throwError } from 'rxjs';
+import { Observable, map } from 'rxjs';
 
 import { ProfileRepository } from '@features/auth/domain/repository/profile-repository';
 import { UserProfile } from '@features/auth/domain/entities/user-profile.entity';

@@ -7,7 +7,6 @@ import {
   effect,
   inject,
   signal,
-  untracked,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -146,7 +145,6 @@ export class SalesPageComponent implements OnInit {
     // Filtro local por búsqueda y categoría (sin consulta adicional a /productos)
     const query = this.searchQuery().trim().toLowerCase();
     const barcodeQuery = this.barcodeInput().trim().toLowerCase();
-    const selectedCategoryId = this.selectedCategoryId();
     // Nota: InventoryItem no expone id_tipo; filtro categoría deshabilitado si no hay mapeo
     // Se mantiene el slider pero el filtrado se hace por nombre/clave si hay query
     let filtered = items;

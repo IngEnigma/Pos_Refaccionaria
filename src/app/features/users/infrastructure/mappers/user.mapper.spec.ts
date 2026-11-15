@@ -8,18 +8,20 @@ import { UserMapper } from './user.mapper';
 describe('UserMapper', () => {
   describe('fromResponseDto', () => {
     it('convierte is_active del backend a isActive de la entidad', () => {
-      const dto: UserResponseDto = { id: 1, username: 'ana', email: 'ana@trt.com', is_active: true };
+      const dto: UserResponseDto = { id: 1, username: 'ana', email: 'ana@trt.com', is_active: true, id_sucursal: 2, rol: 'encargado' };
 
       expect(UserMapper.fromResponseDto(dto)).toEqual({
         id: 1,
         username: 'ana',
         email: 'ana@trt.com',
         isActive: true,
+        branchId: 2,
+        role: 'encargado',
       });
     });
 
     it('conserva isActive en false para un usuario inactivo', () => {
-      const dto: UserResponseDto = { id: 2, username: 'beto', email: 'beto@trt.com', is_active: false };
+      const dto: UserResponseDto = { id: 2, username: 'beto', email: 'beto@trt.com', is_active: false, id_sucursal: null, rol: 'cajero' };
 
       expect(UserMapper.fromResponseDto(dto).isActive).toBe(false);
     });
@@ -30,6 +32,8 @@ describe('UserMapper', () => {
         username: 'caro',
         email: 'caro@trt.com',
         is_active: true,
+        id_sucursal: 1,
+        rol: 'cajero',
         password: 'hash',
       } as UserResponseDto;
 
@@ -96,16 +100,18 @@ describe('UserMapper', () => {
   });
 
   it('ida y vuelta: respuesta -> entidad -> payload de creación conserva los datos', () => {
-    const dto: UserResponseDto = { id: 9, username: 'dani', email: 'dani@trt.com', is_active: true };
+    const dto: UserResponseDto = { id: 9, username: 'dani', email: 'dani@trt.com', is_active: true, id_sucursal: 3, rol: 'cajero' };
     const user = UserMapper.fromResponseDto(dto);
 
-    const request = UserMapper.toCreateRequestDto({ ...user, password: 'x' });
+    const request = UserMapper.toCreateRequestDto({ ...user, branchId: 3, password: 'x' });
 
     expect(request).toEqual({
       username: dto.username,
       password: 'x',
       email: dto.email,
       is_active: dto.is_active,
+      id_sucursal: dto.id_sucursal,
+      rol: dto.rol,
     });
   });
 });

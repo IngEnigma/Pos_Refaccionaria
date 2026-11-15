@@ -71,7 +71,6 @@ describe('SalesPageComponent (integración)', () => {
   const VENTAS = `${API}/ventas/`;
   const METODOS = `${API}/metodopago/`;
   const TIPOS = `${API}/tipos/`;
-  const DETALLE = `${API}/detalleventa/`;
 
   let httpMock: HttpTestingController;
   let fixture: ComponentFixture<SalesPageComponent>;

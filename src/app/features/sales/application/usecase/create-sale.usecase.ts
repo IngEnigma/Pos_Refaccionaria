@@ -5,7 +5,6 @@ import {
   CreateSalePayload,
   SaleRepository,
 } from '@features/sales/domain/repository/sale-repository';
-import { Quantity } from '@features/sales/domain/value-objects/quantity.value';
 import { Sale } from '@features/sales/domain/entities/sale.entity';
 
 @Injectable({ providedIn: 'root' })

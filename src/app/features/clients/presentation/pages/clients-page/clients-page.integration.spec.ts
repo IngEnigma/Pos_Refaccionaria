@@ -148,12 +148,6 @@ describe('ClientsPageComponent (integración)', () => {
     render();
   }
 
-  function optionButtons(): HTMLButtonElement[] {
-    return Array.from(
-      fixture.nativeElement.querySelectorAll('.client-option') as NodeListOf<HTMLButtonElement>,
-    );
-  }
-
   function toastTypes(): string[] {
     return toastService.toasts().map((t) => t.type);
   }

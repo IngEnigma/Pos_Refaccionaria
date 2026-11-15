@@ -17,8 +17,8 @@ const envStub: Environment = {
 describe('UserRepositoryImpl', () => {
   // El backend define `users` y `users/<id>` sin slash final.
   const endpoint = `${envStub.apiUrl}/users`;
-  const dto: UserResponseDto = { id: 5, username: 'ana', email: 'ana@trt.com', is_active: true };
-  const expectedUser = { id: 5, username: 'ana', email: 'ana@trt.com', isActive: true };
+  const dto: UserResponseDto = { id: 5, username: 'ana', email: 'ana@trt.com', is_active: true, id_sucursal: 1, rol: 'cajero' };
+  const expectedUser = { id: 5, username: 'ana', email: 'ana@trt.com', isActive: true, branchId: 1, role: 'cajero' };
   let repository: UserRepositoryImpl;
   let httpMock: HttpTestingController;
 

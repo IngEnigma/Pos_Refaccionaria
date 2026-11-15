@@ -307,6 +307,7 @@ describe('BranchPricingFacade', () => {
       expect(failed).toBe(true);
       expect(facade.errorMessage()).toBe('sin permiso');
       expect(facade.loading()).toBe(false);
+    });
   });
 
   describe('resolución del mensaje de error', () => {

@@ -17,7 +17,7 @@ describe('CreateUserUseCase', () => {
     branchId: 4,
     role: 'cajero',
   };
-  const created: User = { id: 1, username: 'ana', email: 'ana@trt.com', isActive: true };
+  const created: User = { id: 1, username: 'ana', email: 'ana@trt.com', isActive: true, branchId: 1, role: 'cajero' };
   let repository: { createUser: jest.Mock };
   let useCase: CreateUserUseCase;
 

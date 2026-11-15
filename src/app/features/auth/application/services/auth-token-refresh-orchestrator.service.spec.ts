@@ -4,7 +4,7 @@ import { SessionStateService } from '@features/auth/application/services/session
 import { RefreshTokenUseCase } from '@features/auth/application/usecase/refresh.usecase';
 import { LOGGER_PORT } from '@core/logging/logger.port';
 import { APP_ENV } from '@core/tokens/app-env.token';
-import { HttpRequest, HttpHandlerFn, HttpEvent, HttpResponse } from '@angular/common/http';
+import { HttpRequest, HttpHandlerFn, HttpResponse } from '@angular/common/http';
 import { of, throwError, delay } from 'rxjs';
 
 describe('AuthTokenRefreshOrchestrator', () => {

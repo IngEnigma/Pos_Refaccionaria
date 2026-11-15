@@ -17,7 +17,7 @@ describe('AdminManagementPageComponent', () => {
     id: 7, nombreSucursal: 'Sucursal Real', codigoSucursal: 'SUC-007', ubicacion: 'Calle 1',
     codigoPostal: '12345', numeroTelefono: '5512345678', correoElectronico: 'real@trt.com',
   };
-  const user: User = { id: 3, username: 'usuario.real', email: 'u@trt.com', isActive: true };
+  const user: User = { id: 3, username: 'usuario.real', email: 'u@trt.com', isActive: true, branchId: 1, role: 'cajero' };
 
   const branches = signal<readonly Branch[]>([]);
   const users = signal<readonly User[]>([]);
@@ -205,7 +205,7 @@ describe('AdminManagementPageComponent', () => {
 
   describe('resumen y tablas', () => {
     const extraBranch: Branch = { ...branch, id: 8, nombreSucursal: 'Sucursal Norte', codigoSucursal: 'SUC-008' };
-    const inactive: User = { id: 4, username: 'baja.usuario', email: 'b@trt.com', isActive: false };
+    const inactive: User = { id: 4, username: 'baja.usuario', email: 'b@trt.com', isActive: false, branchId: 1, role: 'cajero' };
 
     // Los tres contadores del resumen en orden: sucursales, usuarios, usuarios activos.
     const summary = () =>

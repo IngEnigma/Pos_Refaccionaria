@@ -12,7 +12,7 @@ describe('UpdateSaleUseCase', () => {
   const sale = SaleFactory.fromPrimitives({
     id: 7,
     idUsuario: 1,
-    idInventario: 2,
+    idSucursal: 2,
     idMetodoPago: 3,
     total: 150,
     fecha: '2024-01-01',

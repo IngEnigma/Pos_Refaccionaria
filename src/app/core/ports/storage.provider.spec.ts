@@ -84,7 +84,6 @@ describe('storage.provider', () => {
           useFactory: () => {
             const platformId = 'browser';
             const localStorage = null; // simulate failure
-            const logger = loggerMock;
             
             // Replicating logic directly for focus test if needed, 
             // but provideStorage should handle it if correctly configured.

@@ -75,7 +75,6 @@ describe('SalesPageComponent (funcional)', () => {
   const VENTAS = `${API}/ventas/`;
   const METODOS = `${API}/metodopago/`;
   const TIPOS = `${API}/tipos/`;
-  const DETALLE = `${API}/detalleventa/`;
 
   let httpMock: HttpTestingController;
   let fixture: ComponentFixture<SalesPageComponent>;
@@ -211,7 +210,7 @@ describe('SalesPageComponent (funcional)', () => {
     return row.textContent;
   }
 
-  function flushSuccessfulSale(id: number, cantidad: number) {
+  function flushSuccessfulSale(id: number) {
     httpMock.expectOne(VENTAS).flush({ id, id_usuario: 1, id_inventario: 7, id_metodo_pago: 1, total: '120.00', fecha: '2024-01-01' });
     httpMock.expectOne(`${API}/ventas/${id}/ticket/`).flush({ ...ticketDto, folio: id });
     httpMock.match(VENTAS).forEach((r) => r.flush([]));
@@ -275,7 +274,7 @@ describe('SalesPageComponent (funcional)', () => {
     expect(page.submitDisabled()).toBe(true);
     expect(processButton().disabled).toBe(true);
 
-    flushSuccessfulSale(50, 1);
+    flushSuccessfulSale(50);
     fixture.detectChanges();
     expect(page.lastTicket()?.folio).toBe(50);
   });
@@ -340,7 +339,7 @@ describe('SalesPageComponent (funcional)', () => {
     expect(page.cartItems()).toHaveLength(1);
 
     page.processTransaction();
-    flushSuccessfulSale(50, 1);
+    flushSuccessfulSale(50);
     fixture.detectChanges();
 
     expect(page.lastTicket()?.folio).toBe(50);
@@ -354,7 +353,7 @@ describe('SalesPageComponent (funcional)', () => {
     page.onSelectPayment(PAGO);
 
     page.processTransaction();
-    flushSuccessfulSale(50, 1);
+    flushSuccessfulSale(50);
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelector('.modal-content')).toBeTruthy();
     expect(fixture.nativeElement.textContent).toContain('Ticket #50');
@@ -571,7 +570,7 @@ describe('SalesPageComponent (funcional)', () => {
     page.onSelectPayment(PAGO);
 
     page.processTransaction();
-    flushSuccessfulSale(50, 1);
+    flushSuccessfulSale(50);
 
     expect(desktop.generateTicket).toHaveBeenCalledTimes(1);
     expect(desktop.generateTicket).toHaveBeenCalledWith({
@@ -592,7 +591,7 @@ describe('SalesPageComponent (funcional)', () => {
     page.onSelectPayment(PAGO);
 
     page.processTransaction();
-    flushSuccessfulSale(50, 1);
+    flushSuccessfulSale(50);
     await Promise.resolve();
 
     expect(lastToast().type).toBe('error');
@@ -606,7 +605,7 @@ describe('SalesPageComponent (funcional)', () => {
     page.onSelectPayment(PAGO);
 
     page.processTransaction();
-    flushSuccessfulSale(50, 1);
+    flushSuccessfulSale(50);
     await Promise.resolve();
     await Promise.resolve();
 
@@ -739,7 +738,7 @@ describe('SalesPageComponent (funcional)', () => {
     page.onAddToCart(page.productos()[0]);
     page.onSelectPayment(PAGO);
     page.processTransaction();
-    flushSuccessfulSale(50, 1);
+    flushSuccessfulSale(50);
     expect(page.lastTicket()).not.toBeNull();
 
     page.onTicketModalClose();

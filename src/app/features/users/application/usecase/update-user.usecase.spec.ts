@@ -10,7 +10,7 @@ import { UpdateUserUseCase } from './update-user.usecase';
 
 describe('UpdateUserUseCase', () => {
   const payload: UpdateUserPayload = { email: 'nuevo@trt.com', isActive: false };
-  const updated: User = { id: 3, username: 'ana', email: 'nuevo@trt.com', isActive: false };
+  const updated: User = { id: 3, username: 'ana', email: 'nuevo@trt.com', isActive: false, branchId: 1, role: 'cajero' };
   let repository: { updateUser: jest.Mock };
   let useCase: UpdateUserUseCase;
 

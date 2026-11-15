@@ -6,7 +6,7 @@ import { UserRepository } from '@features/users/domain/repository/user-repositor
 import { GetUsersUseCase } from './get-users.usecase';
 
 describe('GetUsersUseCase', () => {
-  const users: User[] = [{ id: 1, username: 'ana', email: 'ana@trt.com', isActive: true }];
+  const users: User[] = [{ id: 1, username: 'ana', email: 'ana@trt.com', isActive: true, branchId: 1, role: 'cajero' }];
   let repository: { getUsers: jest.Mock };
   let useCase: GetUsersUseCase;
 

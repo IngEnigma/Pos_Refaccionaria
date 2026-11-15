@@ -387,7 +387,7 @@ describe('SalesCartService', () => {
   });
 
   describe('confirmSale - validaciones y estado', () => {
-    const prod = (id: number, cantidadVeces = 1, precio = 100): SalesProduct => ({
+    const prod = (id: number, precio = 100): SalesProduct => ({
       id,
       nombre: `P${id}`,
       descripcion: '',

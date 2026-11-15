@@ -1,4 +1,4 @@
-import { TestBed, fakeAsync, tick, discardPeriodicTasks, flush } from '@angular/core/testing';
+import { TestBed, fakeAsync, tick, flush } from '@angular/core/testing';
 import { GlobalSearchService } from './global-search.service';
 import { SEARCH_STRATEGY } from './search.strategy';
 import { DefaultSearchStrategy } from './default-search.strategy';

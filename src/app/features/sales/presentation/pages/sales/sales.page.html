@@ -19,6 +19,7 @@
         />
 
         <div class="barcode-input-wrapper">
+          <!-- eslint-disable @angular-eslint/template/no-autofocus -- el lector de códigos escribe aquí al abrir el POS -->
           <input
             type="text"
             class="barcode-input"
@@ -28,6 +29,7 @@
             (keydown)="onBarcodeKeyDown($event)"
             autofocus
           />
+          <!-- eslint-enable @angular-eslint/template/no-autofocus -->
         </div>
         
         <h2 class="section-title">Productos</h2>

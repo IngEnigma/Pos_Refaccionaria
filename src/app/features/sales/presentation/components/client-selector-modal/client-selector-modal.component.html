@@ -1,5 +1,5 @@
-<div class="modal-backdrop" (click)="onBackdropClick($event)">
-  <div class="modal-content" (click)="$event.stopPropagation()" role="dialog" aria-label="Seleccionar cliente">
+<div class="modal-backdrop" tabindex="-1" (click)="onBackdropClick($event)" (keydown.escape)="close.emit()">
+  <div class="modal-content" role="dialog" aria-label="Seleccionar cliente">
     <header class="modal-header">
       <div class="header-left">
         <h2 class="modal-title">Seleccionar cliente</h2>

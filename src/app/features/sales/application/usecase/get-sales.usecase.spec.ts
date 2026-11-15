@@ -13,7 +13,7 @@ describe('GetSalesUseCase', () => {
     SaleFactory.fromPrimitives({
       id,
       idUsuario: 1,
-      idInventario: 2,
+      idSucursal: 2,
       idMetodoPago: 3,
       total: 10 * id,
       fecha: '2024-01-01',

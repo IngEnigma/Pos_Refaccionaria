@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { InputComponent } from './input.component';
 import { LucideAngularModule, Eye, EyeOff } from 'lucide-angular';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 
 describe('InputComponent', () => {
   let component: InputComponent;

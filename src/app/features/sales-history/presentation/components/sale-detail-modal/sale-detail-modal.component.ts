@@ -7,8 +7,8 @@ import { DetailedSale } from '../../../../sales/domain/entities/detailed-sale.en
   standalone: true,
   imports: [CommonModule, CurrencyPipe, DatePipe],
   template: `
-    <div class="modal-backdrop" (click)="close.emit()">
-      <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-backdrop" tabindex="-1" (click)="$event.target === $event.currentTarget && close.emit()" (keydown.escape)="close.emit()">
+      <div class="modal-content">
         <header class="modal-header">
           <div class="header-main">
             <span class="modal-badge">Venta</span>

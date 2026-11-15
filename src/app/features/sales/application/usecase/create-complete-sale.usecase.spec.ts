@@ -17,7 +17,7 @@ describe('CreateCompleteSaleUseCase', () => {
   const sale = SaleFactory.fromPrimitives({
     id: 50,
     idUsuario: 1,
-    idInventario: 5,
+    idSucursal: 5,
     idMetodoPago: 1,
     total: 200,
     fecha: '2024-01-01',

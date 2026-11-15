@@ -3,7 +3,7 @@ import { HttpErrorHandlerService } from './http-error.handler';
 import { LOGGER_PORT, LoggerPort } from '@core/logging/logger.port';
 import { UrlSanitizerService } from '@core/utils/url-sanitizer.service';
 import { HttpErrorResponse, HttpRequest } from '@angular/common/http';
-import { firstValueFrom, of } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 import { Router } from '@angular/router';
 import { SessionStateService } from '@features/auth/application/services/session-state.service';
 

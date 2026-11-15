@@ -1,7 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { BehaviorSubject } from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
 import { SEARCH_STRATEGY } from './search.strategy';
 
 @Injectable({ providedIn: 'root' })

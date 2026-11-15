@@ -1,5 +1,5 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { Observable, map, tap, throwError } from 'rxjs';
+import { Observable, tap, throwError } from 'rxjs';
 import { CompleteSaleResult } from '@features/sales/application/usecase/create-complete-sale.usecase';
 
 import { SalesFacade } from '@features/sales/application/facades/sales.facade';

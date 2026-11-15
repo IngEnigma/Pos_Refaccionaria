@@ -14,7 +14,6 @@ import { DeleteSaleDetailUseCase } from '@features/sales/application/usecase/del
 import { GetSaleTicketUseCase } from '@features/sales/application/usecase/get-sale-ticket.usecase';
 import { PaymentMethod } from '@features/sales/domain/entities/payment-method.entity';
 import { Sale } from '@features/sales/domain/entities/sale.entity';
-import { DetailedSale } from '@features/sales/domain/entities/detailed-sale.entity';
 import { SaleDetail } from '@features/sales/domain/entities/sale-detail.entity';
 import { SalesDomainError } from '@features/sales/domain/errors/sales.errors';
 import { CreateSalePayload, CreateCompleteSalePayload } from '@features/sales/domain/repository/sale-repository';

@@ -1,6 +1,6 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-import { catchError, finalize, Observable, of, tap } from 'rxjs';
+import { catchError, finalize, Observable, of } from 'rxjs';
 
 import { LoggerService } from '@core/logging/logger.service';
 import { GetMyBranchInventoryUseCase } from '../usecase/get-my-branch-inventory.usecase';

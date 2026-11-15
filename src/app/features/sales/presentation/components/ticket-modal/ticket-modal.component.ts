@@ -18,8 +18,8 @@ import { ToastService } from '@app/shared/ui/components/toast/toast.service';
   standalone: true,
   imports: [CurrencyPipe, DatePipe],
   template: `
-    <div class="modal-backdrop" (click)="onBackdropClick($event)">
-      <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-backdrop" tabindex="-1" (click)="onBackdropClick($event)" (keydown.escape)="close.emit()">
+      <div class="modal-content">
         <header class="modal-header">
           <div class="header-left">
             <span class="modal-badge">Venta exitosa</span>
