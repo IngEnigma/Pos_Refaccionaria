@@ -62,7 +62,7 @@ describe('UserRepositoryImpl', () => {
     let result: unknown;
 
     repository
-      .createUser({ username: 'ana', password: 'secreta123', email: 'ana@trt.com', isActive: true })
+      .createUser({ username: 'ana', password: 'secreta123', email: 'ana@trt.com', isActive: true, branchId: 4, role: 'cajero' })
       .subscribe((user) => (result = user));
 
     const req = httpMock.expectOne(endpoint);
@@ -73,6 +73,8 @@ describe('UserRepositoryImpl', () => {
       password: 'secreta123',
       email: 'ana@trt.com',
       is_active: true,
+      id_sucursal: 4,
+      rol: 'cajero',
     });
     req.flush(dto);
     expect(result).toEqual(expectedUser);
@@ -107,7 +109,7 @@ describe('UserRepositoryImpl', () => {
     let error: HttpErrorResponse | undefined;
 
     repository
-      .createUser({ username: 'ana', password: 'x', email: 'ana@trt.com', isActive: true })
+      .createUser({ username: 'ana', password: 'x', email: 'ana@trt.com', isActive: true, branchId: 4, role: 'cajero' })
       .subscribe({ error: (err) => (error = err) });
 
     httpMock.expectOne(endpoint).flush({ username: ['Ya existe.'] }, { status: 400, statusText: 'Bad Request' });

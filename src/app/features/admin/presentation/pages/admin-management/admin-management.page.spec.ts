@@ -104,7 +104,7 @@ describe('AdminManagementPageComponent', () => {
   });
 
   it('crea el usuario con los valores del formulario, avisa y recarga la lista', () => {
-    const values = { username: 'nuevo', email: 'n@trt.com', password: 'secreta', isActive: true };
+    const values = { username: 'nuevo', email: 'n@trt.com', password: 'secreta', isActive: true, branchId: 7, role: 'cajero' };
     usersFacade.createUser.mockReturnValue(of(user));
     page.userForm.setValue(values);
 
@@ -116,7 +116,7 @@ describe('AdminManagementPageComponent', () => {
   });
 
   it('muestra un error y conserva el formulario si falla la creación del usuario', () => {
-    const values = { username: 'nuevo', email: 'n@trt.com', password: 'secreta', isActive: true };
+    const values = { username: 'nuevo', email: 'n@trt.com', password: 'secreta', isActive: true, branchId: 7, role: 'cajero' };
     usersFacade.createUser.mockReturnValue(throwError(() => new Error('duplicado')));
     page.userForm.setValue(values);
 
@@ -156,7 +156,7 @@ describe('AdminManagementPageComponent', () => {
 
     it('usa el mensaje genérico del toast si el Error viene sin mensaje', () => {
       usersFacade.createUser.mockReturnValue(throwError(() => new Error('')));
-      page.userForm.setValue({ username: 'a', email: 'a@trt.com', password: 'x', isActive: true });
+      page.userForm.setValue({ username: 'a', email: 'a@trt.com', password: 'x', isActive: true, branchId: 7, role: 'cajero' });
 
       submit('user-form');
 
@@ -165,7 +165,7 @@ describe('AdminManagementPageComponent', () => {
 
     it('muestra el mensaje exacto del error al fallar la creación del usuario', () => {
       usersFacade.createUser.mockReturnValue(throwError(() => new Error('usuario duplicado')));
-      page.userForm.setValue({ username: 'a', email: 'a@trt.com', password: 'x', isActive: true });
+      page.userForm.setValue({ username: 'a', email: 'a@trt.com', password: 'x', isActive: true, branchId: 7, role: 'cajero' });
 
       submit('user-form');
 
@@ -191,8 +191,10 @@ describe('AdminManagementPageComponent', () => {
       ['nombre de usuario vacío', { username: '' }],
       ['correo inválido', { email: 'x' }],
       ['contraseña vacía', { password: '' }],
+      ['sin sucursal', { branchId: null }],
+      ['sin rol', { role: '' }],
     ])('no crea el usuario con %s', (_caso, override) => {
-      page.userForm.setValue({ username: 'a', email: 'a@trt.com', password: 'x', isActive: true, ...override });
+      page.userForm.setValue({ username: 'a', email: 'a@trt.com', password: 'x', isActive: true, branchId: 7, role: 'cajero', ...override });
 
       submit('user-form');
 
@@ -357,6 +359,16 @@ describe('AdminManagementPageComponent', () => {
       expect(text()).toContain('El usuario es requerido');
       expect(text()).toContain('Ingrese un correo electrónico válido');
       expect(text()).toContain('La contraseña es requerida');
+      expect(fixture.nativeElement.querySelector('#user-branch-error')?.textContent).toContain('Seleccione una sucursal');
+      expect(fixture.nativeElement.querySelector('#user-role-error')?.textContent).toContain('Seleccione un rol');
+    });
+
+    it('el select de sucursal lista las sucursales cargadas y el de rol ofrece cajero, encargado y admin', () => {
+      const options = (id: string) =>
+        Array.from(fixture.nativeElement.querySelectorAll(`#${id} option`)).map((o) => (o as HTMLElement).textContent?.trim());
+
+      expect(options('user-branch')).toContain('Sucursal Real');
+      expect(options('user-role')).toEqual(expect.arrayContaining(['Cajero', 'Encargado', 'Admin']));
     });
 
     it('el campo inválido queda marcado con aria-invalid', () => {

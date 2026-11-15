@@ -45,6 +45,12 @@ describe('INT-09 Usuarios (página admin + facade + repositorio + http)', () => 
   const text = () => fixture.nativeElement.textContent as string;
   const lastToast = (type: 'success' | 'error') => toasts.toasts().filter((t) => t.type === type).at(-1)?.message;
 
+  const selectOption = (id: string, index: number | string) => {
+    const select = fixture.nativeElement.querySelector(`#${id}`) as HTMLSelectElement;
+    select.selectedIndex = typeof index === 'number' ? index : Array.from(select.options).findIndex((o) => o.text.toLowerCase().includes(index));
+    select.dispatchEvent(new Event('change'));
+  };
+
   const fillAndSubmitUser = (username = 'nuevo', email = 'nuevo@trt.com', password = 'Secreta123') => {
     const set = (id: string, value: string) => {
       const input = fixture.nativeElement.querySelector(`#${id}`) as HTMLInputElement;
@@ -54,6 +60,8 @@ describe('INT-09 Usuarios (página admin + facade + repositorio + http)', () => 
     set('user-name', username);
     set('user-email', email);
     set('user-password', password);
+    selectOption('user-branch', 1);
+    selectOption('user-role', 'encargado');
     fixture.nativeElement.querySelector('#user-form').dispatchEvent(new Event('submit'));
     fixture.detectChanges();
   };
@@ -75,7 +83,17 @@ describe('INT-09 Usuarios (página admin + facade + repositorio + http)', () => 
     toasts = TestBed.inject(ToastService);
     fixture = TestBed.createComponent(AdminManagementPageComponent);
     fixture.detectChanges(); // ngOnInit
-    httpMock.expectOne(SUCURSALES).flush([]);
+    httpMock.expectOne(SUCURSALES).flush([
+      {
+        id: 5,
+        nombre_sucursal: 'Centro',
+        codigo_sucursal: 'SUC-005',
+        ubicacion: 'Calle 1',
+        codigo_postal: '06000',
+        numero_telefono: '5512345678',
+        correo_electronico: 'c@trt.com',
+      },
+    ]);
     httpMock.expectOne(USERS).flush([userDto(1, 'admin'), userDto(2, 'cajero1', false)]);
     fixture.detectChanges();
   });
@@ -98,6 +116,8 @@ describe('INT-09 Usuarios (página admin + facade + repositorio + http)', () => 
       password: 'Secreta123',
       email: 'nuevo@trt.com',
       is_active: true,
+      id_sucursal: 5,
+      rol: 'encargado',
     });
     post.flush(userDto(3, 'nuevo'));
     httpMock.expectOne(USERS).flush([userDto(1, 'admin'), userDto(2, 'cajero1', false), userDto(3, 'nuevo')]);
@@ -171,6 +191,4 @@ describe('INT-09 Usuarios (página admin + facade + repositorio + http)', () => 
       expect((await done).status).toBe(403);
     });
   });
-
-  it.todo('H-47: el alta de usuario no envía id_sucursal ni rol; el backend crea el usuario sin perfil y no puede operar (sin sucursal)');
 });

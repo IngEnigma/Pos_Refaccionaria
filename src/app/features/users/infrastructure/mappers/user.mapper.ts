@@ -23,6 +23,8 @@ export class UserMapper {
       password: payload.password,
       email: payload.email,
       is_active: payload.isActive,
+      id_sucursal: payload.branchId,
+      rol: payload.role,
     };
   }
 

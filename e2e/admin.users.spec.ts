@@ -1,9 +1,8 @@
 /**
  * SISTEMA E2E — Usuarios y sucursales desde /admin (SIS-050). Con mocks, sin Render.
  * La página usa users.facade / branches.facade (H-03). El caso original "quitarle permiso de
- * reportes" no existe en la UI: el alta no envía rol ni sucursal (H-47), así que aquí se cubre
- * el alta/listado de usuarios y la alta de sucursal. Los formularios no muestran mensajes de
- * validación (H-53), solo no envían.
+ * reportes" no existe en la UI. El alta envía sucursal y rol (H-47); aquí se cubre el
+ * alta/listado de usuarios y la alta de sucursal.
  */
 import { test, expect, Page } from '@playwright/test';
 
@@ -69,6 +68,8 @@ test.describe('Administración — SIS-050', () => {
     await page.getByLabel('Usuario', { exact: true }).fill('vendedor.nuevo');
     await page.getByLabel('Correo', { exact: true }).nth(1).fill('nuevo@trt.com');
     await page.getByLabel('Contraseña').fill('Secreta123');
+    await page.getByLabel('Sucursal', { exact: true }).selectOption({ label: 'Norte' });
+    await page.getByLabel('Rol').selectOption({ label: 'Cajero' });
     await page.getByLabel('Estado').selectOption({ label: 'Activo' });
     await page.getByRole('button', { name: 'Crear usuario' }).click();
 
@@ -79,6 +80,8 @@ test.describe('Administración — SIS-050', () => {
       password: 'Secreta123',
       email: 'nuevo@trt.com',
       is_active: true,
+      id_sucursal: 2,
+      rol: 'cajero',
     });
     await expect(usersTable(page).getByRole('row', { name: /vendedor\.nuevo/ })).toContainText('nuevo@trt.com');
     await expect(page.getByLabel('Usuario', { exact: true })).toHaveValue('');
@@ -92,6 +95,8 @@ test.describe('Administración — SIS-050', () => {
     await page.getByRole('button', { name: 'Crear usuario' }).click();
 
     await expect(page.getByLabel('Contraseña')).toHaveClass(/ng-invalid/);
+    await expect(page.locator('#user-branch-error')).toBeVisible();
+    await expect(page.locator('#user-role-error')).toBeVisible();
     expect(userPosts).toHaveLength(0);
   });
 
@@ -103,6 +108,8 @@ test.describe('Administración — SIS-050', () => {
     await page.getByLabel('Usuario', { exact: true }).fill('admin');
     await page.getByLabel('Correo', { exact: true }).nth(1).fill('otro@trt.com');
     await page.getByLabel('Contraseña').fill('Secreta123');
+    await page.getByLabel('Sucursal', { exact: true }).selectOption({ label: 'Norte' });
+    await page.getByLabel('Rol').selectOption({ label: 'Cajero' });
     await page.getByRole('button', { name: 'Crear usuario' }).click();
 
     await expect(toast(page, 'El nombre de usuario ya existe')).toBeVisible();

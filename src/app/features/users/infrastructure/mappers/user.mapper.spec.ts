@@ -44,6 +44,8 @@ describe('UserMapper', () => {
         password: 'secreta123',
         email: 'ana@trt.com',
         isActive: false,
+        branchId: 4,
+        role: 'encargado',
       };
 
       expect(UserMapper.toCreateRequestDto(payload)).toEqual({
@@ -51,6 +53,8 @@ describe('UserMapper', () => {
         password: 'secreta123',
         email: 'ana@trt.com',
         is_active: false,
+        id_sucursal: 4,
+        rol: 'encargado',
       });
     });
   });

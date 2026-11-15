@@ -10,6 +10,7 @@ import { BranchesFacade } from '@features/branches/application/facades/branches.
 import { ConfirmDialogComponent } from '@app/shared/ui/components/confirm-dialog/confirm-dialog.component';
 import { User } from '@features/users/domain/entities/user.entity';
 import { branchFieldValidators } from '@features/branches/presentation/validators/branch-form.validators';
+import { CreateUserPayload } from '@features/users/domain/repository/user-repository';
 import { UsersFacade } from '@features/users/application/facades/users.facade';
 
 @Component({
@@ -47,6 +48,8 @@ export class AdminManagementPageComponent implements OnInit {
     email: ['', [Validators.required, Validators.email]],
     password: ['', Validators.required],
     isActive: [true],
+    branchId: [null as number | null, Validators.required],
+    role: ['', Validators.required],
   });
 
   ngOnInit(): void {
@@ -78,7 +81,7 @@ export class AdminManagementPageComponent implements OnInit {
       return;
     }
     this.usersFacade
-      .createUser(this.userForm.getRawValue())
+      .createUser(this.userForm.getRawValue() as CreateUserPayload)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {

@@ -14,6 +14,8 @@ describe('CreateUserUseCase', () => {
     password: 'secreta123',
     email: 'ana@trt.com',
     isActive: true,
+    branchId: 4,
+    role: 'cajero',
   };
   const created: User = { id: 1, username: 'ana', email: 'ana@trt.com', isActive: true };
   let repository: { createUser: jest.Mock };

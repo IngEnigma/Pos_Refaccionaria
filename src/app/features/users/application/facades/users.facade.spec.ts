@@ -11,7 +11,7 @@ import { UsersFacade } from './users.facade';
 
 describe('UsersFacade', () => {
   const user: User = { id: 1, username: 'ana', email: 'ana@trt.com', isActive: true };
-  const payload = { username: 'ana', password: 'x', email: 'ana@trt.com', isActive: true };
+  const payload = { username: 'ana', password: 'x', email: 'ana@trt.com', isActive: true, branchId: 4, role: 'cajero' as const };
   let getUsers: jest.Mock;
   let createUser: jest.Mock;
   let updateUser: jest.Mock;

@@ -108,6 +108,26 @@
             @if (invalid(userForm, 'password')) { <span class="error-text" id="user-password-error">La contraseña es requerida</span> }
           </div>
           <div class="field">
+            <label for="user-branch">Sucursal</label>
+            <select id="user-branch" formControlName="branchId" [attr.aria-invalid]="invalid(userForm, 'branchId')" [attr.aria-describedby]="invalid(userForm, 'branchId') ? 'user-branch-error' : null">
+              <option [ngValue]="null" disabled>Seleccione una sucursal</option>
+              @for (branch of branches(); track branch.id) {
+                <option [ngValue]="branch.id">{{ branch.nombreSucursal }}</option>
+              }
+            </select>
+            @if (invalid(userForm, 'branchId')) { <span class="error-text" id="user-branch-error">Seleccione una sucursal</span> }
+          </div>
+          <div class="field">
+            <label for="user-role">Rol</label>
+            <select id="user-role" formControlName="role" [attr.aria-invalid]="invalid(userForm, 'role')" [attr.aria-describedby]="invalid(userForm, 'role') ? 'user-role-error' : null">
+              <option value="" disabled>Seleccione un rol</option>
+              <option value="cajero">Cajero</option>
+              <option value="encargado">Encargado</option>
+              <option value="admin">Admin</option>
+            </select>
+            @if (invalid(userForm, 'role')) { <span class="error-text" id="user-role-error">Seleccione un rol</span> }
+          </div>
+          <div class="field">
             <label for="user-active">Estado</label>
             <select id="user-active" formControlName="isActive">
               <option [ngValue]="true">Activo</option>
