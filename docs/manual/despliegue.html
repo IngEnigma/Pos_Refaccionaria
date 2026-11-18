@@ -8,6 +8,8 @@
   @page { @bottom-left { content: "TRT · Manual de despliegue"; } }
   .portada__panel { left: 16mm; width: 178mm; }
   ul.check { list-style: none; padding: 0; }
+  table.larga { break-inside: auto; }
+  table.larga tr { break-inside: avoid; }
   ul.check > li { position: relative; padding-left: 7mm; break-inside: avoid; }
   ul.check > li::before { content: ""; position: absolute; left: 0; top: 1mm; width: 3.2mm; height: 3.2mm; border: .9pt solid var(--azul); border-radius: .6mm; }
 </style>
@@ -96,8 +98,20 @@
     <li><a href="#c7"><span class="n">7</span><span>Verificar la instalación</span><span class="l"></span><span class="pg"></span></a></li>
     <li><a href="#c8"><span class="n">8</span><span>Actualizar y revertir</span><span class="l"></span><span class="pg"></span></a></li>
     <li><a href="#c9"><span class="n">9</span><span>Publicar como sitio web</span><span class="l"></span><span class="pg"></span></a></li>
-    <li><a href="#c10"><span class="n">10</span><span>Solución de problemas</span><span class="l"></span><span class="pg"></span></a></li>
-    <li><a href="#c11"><span class="n">11</span><span>Lista de liberación</span><span class="l"></span><span class="pg"></span></a></li>
+    <li><a href="#c10"><span class="n">10</span><span>Desplegar el backend</span><span class="l"></span><span class="pg"></span></a>
+      <ol>
+        <li><a href="#c10-1"><span></span><span>10.1 Flujo de publicación</span><span class="l"></span><span class="pg"></span></a></li>
+        <li><a href="#c10-2"><span></span><span>10.2 Configuración en Render</span><span class="l"></span><span class="pg"></span></a></li>
+        <li><a href="#c10-3"><span></span><span>10.3 Migraciones en producción</span><span class="l"></span><span class="pg"></span></a></li>
+      </ol></li>
+    <li><a href="#c11"><span class="n">11</span><span>Preparar una sucursal</span><span class="l"></span><span class="pg"></span></a>
+      <ol>
+        <li><a href="#c11-1"><span></span><span>11.1 Primer administrador</span><span class="l"></span><span class="pg"></span></a></li>
+        <li><a href="#c11-2"><span></span><span>11.2 Sucursal y usuarios</span><span class="l"></span><span class="pg"></span></a></li>
+        <li><a href="#c11-3"><span></span><span>11.3 Catálogos e inventario inicial</span><span class="l"></span><span class="pg"></span></a></li>
+      </ol></li>
+    <li><a href="#c12"><span class="n">12</span><span>Solución de problemas</span><span class="l"></span><span class="pg"></span></a></li>
+    <li><a href="#c13"><span class="n">13</span><span>Lista de liberación</span><span class="l"></span><span class="pg"></span></a></li>
   </ol>
 </section>
 
@@ -105,15 +119,15 @@
 <section class="cap" id="c1">
   <h1><span class="num">1</span> Qué se despliega</h1>
   <p class="para">Responsable de sistemas</p>
-  <p>Este manual explica cómo convertir el repositorio FrontTRT en instaladores y cómo dejarlos funcionando en las computadoras de cada sucursal. Los comandos se ejecutan en una terminal abierta en la raíz del repositorio, salvo que el paso diga otra cosa.</p>
+  <p>Este manual explica cómo convertir el repositorio FrontTRT en instaladores y cómo dejarlos funcionando en las computadoras de cada sucursal. También cubre la publicación del backend y la preparación de una sucursal nueva (capítulos 10 y 11). Los comandos se ejecutan en una terminal abierta en la raíz del repositorio del que trata el capítulo.</p>
 
   <h2 id="c1-1"><span class="num">1.1</span> Piezas del sistema</h2>
   <table class="ancha">
     <thead><tr><th style="width:24%">Pieza</th><th style="width:30%">Dónde corre</th><th>Quién la despliega</th></tr></thead>
     <tbody>
       <tr><td><b>Aplicación de escritorio</b></td><td>En cada caja, como programa instalado (Electron).</td><td>Este manual.</td></tr>
-      <tr><td><b>API REST</b></td><td>Render, en <code>https://refaccionariaback.onrender.com/api</code>.</td><td>Repositorio RefaccionariaBack. Fuera de este manual.</td></tr>
-      <tr><td><b>Base de datos</b></td><td>Junto al backend.</td><td>Repositorio RefaccionariaBack.</td></tr>
+      <tr><td><b>API REST</b></td><td>Render, en <code>https://refaccionariaback.onrender.com/api</code>.</td><td>Repositorio RefaccionariaBack. GitHub Actions lo publica (capítulo 10).</td></tr>
+      <tr><td><b>Base de datos</b></td><td>PostgreSQL en Neon.</td><td>Migraciones del backend (sección 10.3).</td></tr>
     </tbody>
   </table>
   <p>La aplicación de escritorio no guarda datos del negocio. Todo lo que muestra lo pide a la API, así que cada caja necesita internet para trabajar.</p>
@@ -157,7 +171,7 @@
     <li>Conexión a internet estable hacia <code>refaccionariaback.onrender.com</code>.</li>
     <li>Pantalla de 1280 × 800 o mayor. La ventana abre en 1200 × 800.</li>
     <li>Lector de código de barras USB que funcione como teclado y mande Enter al final. No necesita controlador.</li>
-    <li>Un usuario creado en el backend, con rol y sucursal asignados. Sin sucursal, el usuario no puede vender.</li>
+    <li>La sucursal dada de alta, con usuarios, métodos de pago y existencias (capítulo 11). Sin sucursal, el usuario no puede vender.</li>
   </ul>
   <div class="caja importante"><b class="t">Impresora</b><div><p>La versión 1.0 arma el ticket en formato ESC/POS pero todavía no lo envía a la impresora térmica. El ticket se ve en pantalla y se consulta en Historial. No es necesario conectar la impresora para esta versión.</p></div></div>
 </section>
@@ -328,7 +342,7 @@
   <ol class="pasos" start="2" style="counter-reset: paso 1">
     <li>Sube el contenido de <code>dist/front-trt/browser/</code> a cualquier servidor de archivos estáticos.</li>
     <li>Configura el servidor para que responda <code>index.html</code> a cualquier ruta que no sea un archivo. Sin eso, recargar en <code>/sales</code> da 404.</li>
-    <li>En el backend, agrega el dominio del sitio a <code>CORS_ALLOWED_ORIGINS</code>. Sin ese permiso, el navegador bloquea las peticiones a la API.</li>
+    <li>En Render, agrega el dominio del sitio a <code>CORS_ALLOWED_ORIGINS</code> (sección 10.2). Sin ese permiso, el navegador bloquea las peticiones a la API.</li>
   </ol>
   <p>Ejemplo de regla de respaldo en nginx:</p>
 <pre><code>location / {
@@ -337,11 +351,95 @@
   <div class="caja aviso"><b class="t">No usar ng serve</b><div><p><code>npm start</code> y <code>npm run web</code> levantan el servidor de desarrollo, sin optimizar y con el entorno de desarrollo. No sirven para publicar.</p></div></div>
 </section>
 
-<!-- ═════════════ 10. PROBLEMAS ═════════════ -->
+<!-- ═════════════ 10. BACKEND ═════════════ -->
 <section class="cap" id="c10">
-  <h1><span class="num">10</span> Solución de problemas</h1>
+  <h1><span class="num">10</span> Desplegar el backend</h1>
   <p class="para">Responsable de sistemas</p>
+  <p>El backend, repositorio RefaccionariaBack, no se compila a mano: GitHub lo prueba y lo publica en Render. La base de datos de producción es PostgreSQL en Neon. El detalle técnico está en el capítulo 14 del <b>Manual técnico</b>.</p>
+
+  <h2 id="c10-1"><span class="num">10.1</span> Flujo de publicación</h2>
+  <ol class="pasos">
+    <li>Sube los cambios a la rama <code>test</code>, con push o con un pull request.</li>
+    <li>GitHub Actions corre el flujo <i>Tests</i>: análisis con ruff y la suite completa de pytest sobre PostgreSQL 17. Síguelo en la pestaña <span class="ui">Actions</span> del repositorio.</li>
+    <li>Si todo pasa, el mismo flujo hace merge de <code>test</code> en <code>Develop</code> y lanza <i>Deploy to Render</i>.</li>
+    <li>Render construye y arranca la versión nueva. Revisa en su panel que el despliegue termine en verde.</li>
+  </ol>
+  <p>Si las pruebas fallan, no se hace merge ni se publica nada. Un push directo a <code>Develop</code> también despliega, pero se salta las pruebas; evítalo.</p>
+  <div class="caja importante"><b class="t">Secreto de GitHub</b><div><p>El despliegue usa el secreto <code>RENDER_API_KEY</code>, guardado en la configuración del repositorio en GitHub. Si la llave de Render cambia, actualízala ahí o el paso de despliegue fallará.</p></div></div>
+
+  <h2 id="c10-2"><span class="num">10.2</span> Configuración en Render</h2>
+  <p>Estas variables se definen en el panel del servicio en Render, en la sección de variables de entorno:</p>
   <table class="ancha">
+    <thead><tr><th style="width:36%">Variable</th><th>Valor en producción</th></tr></thead>
+    <tbody>
+      <tr><td><code>SECRET_KEY</code></td><td>Una cadena larga, secreta y fija. Si cambia, los tokens emitidos dejan de valer y todos tienen que volver a iniciar sesión.</td></tr>
+      <tr><td><code>DEBUG</code></td><td>No definirla, o <code>False</code>.</td></tr>
+      <tr><td><code>DATABASE_URL</code></td><td>Cadena de conexión de Neon.</td></tr>
+      <tr><td><code>CORS_ALLOWED_ORIGINS</code></td><td>El dominio de la versión web, si la publicas (capítulo 9).</td></tr>
+      <tr><td><code>NOTIFICATIONS_LOW_STOCK_THRESHOLD</code></td><td>Opcional. Piezas por debajo de las cuales se avisa stock bajo; 10 si no se define.</td></tr>
+    </tbody>
+  </table>
+  <div class="caja aviso"><b class="t">Datos fuera del repositorio</b><div><p>Los comandos de compilación y de arranque del servicio solo existen en el panel de Render. Anótalos junto con este manual; si el servicio se pierde, no hay otra copia. El dominio <code>refaccionariaback.onrender.com</code> está escrito en <code>ALLOWED_HOSTS</code> de <code>RTR/settings.py</code>: cambiar de dominio requiere un cambio de código.</p></div></div>
+
+  <h2 id="c10-3"><span class="num">10.3</span> Migraciones en producción</h2>
+  <p>Una versión que cambia modelos trae migraciones. Antes de aplicarlas, sigue <code>docs/RUNBOOK_migracion.md</code> del backend:</p>
+  <ol class="pasos">
+    <li>Saca un respaldo (snapshot) de la base en Neon.</li>
+    <li>Publica la versión nueva con el flujo de la sección 10.1.</li>
+    <li>Revisa si el comando de arranque de Render ya ejecuta <code>migrate</code>. Si no, ejecútalo desde una terminal con el entorno del backend y la <code>DATABASE_URL</code> de producción:</li>
+  </ol>
+<pre class="term"><code><span class="k">python manage.py showmigrations</span>   <span class="c"># pendientes marcadas con [ ]</span>
+<span class="k">python manage.py migrate</span></code></pre>
+  <ol class="pasos" start="4" style="counter-reset: paso 3">
+    <li>Verifica con un usuario de cada rol: inicio de sesión, una venta, un reporte con el encargado y el alta de un usuario con el admin.</li>
+  </ol>
+  <p>Si algo falla, restaura el snapshot de Neon y vuelve a desplegar la versión anterior.</p>
+  <div class="caja importante"><b class="t">Migración rota</b><div><p>En la copia local de RefaccionariaBack hay un archivo sin seguimiento, <code>producto/migrations/0003_rename_codigosat_producto_codigo_sat.py</code>, que hace fallar <code>migrate</code> con <code>NodeNotFoundError</code>. No lo subas al repositorio y no ejecutes <code>migrate</code> contra producción desde una copia que lo tenga.</p></div></div>
+</section>
+
+<!-- ═════════════ 11. ALTA DE SUCURSAL ═════════════ -->
+<section class="cap" id="c11">
+  <h1><span class="num">11</span> Preparar una sucursal</h1>
+  <p class="para">Responsable de sistemas</p>
+  <p>Antes de instalar la aplicación en una caja, la sucursal tiene que existir en el backend con sus usuarios, métodos de pago e inventario. Sin eso, la caja abre pero no puede vender.</p>
+
+  <h2 id="c11-1"><span class="num">11.1</span> Primer administrador</h2>
+  <p>Solo hace falta una vez, cuando la base está vacía o no hay ningún admin.</p>
+  <ol class="pasos">
+    <li>Crea un superusuario desde una terminal con el entorno del backend apuntando a producción: <code>python manage.py createsuperuser</code>.</li>
+    <li>Entra a <code>https://refaccionariaback.onrender.com/admin/</code> con ese usuario.</li>
+    <li>En <span class="ui">Perfils</span>, agrega uno para ese usuario con rol <code>admin</code> y una sucursal.</li>
+  </ol>
+  <div class="caja aviso"><b class="t">Sin Perfil</b><div><p>Un superusuario sin Perfil entra a la aplicación como cajero y no ve Administración. El paso 3 no es opcional.</p></div></div>
+
+  <h2 id="c11-2"><span class="num">11.2</span> Sucursal y usuarios</h2>
+  <p>Con el usuario admin, desde la aplicación:</p>
+  <ol class="pasos">
+    <li>Registra la sucursal en <span class="ui">Sucursales</span> con <span class="ui">Registrar Sucursal</span>, o desde el formulario de sucursal de <span class="ui">Administración</span>.</li>
+    <li>En <span class="ui">Administración</span>, llena el formulario de usuario: <span class="ui">Usuario</span>, <span class="ui">Correo</span>, <span class="ui">Contraseña</span>, <span class="ui">Sucursal</span>, <span class="ui">Rol</span> y <span class="ui">Estado</span>. Pulsa <span class="ui">Crear usuario</span>.</li>
+    <li>Crea al menos un encargado y los cajeros de esa sucursal.</li>
+  </ol>
+  <p>La pantalla Cajeros del encargado todavía no guarda datos, así que en la versión 1.0 todas las altas las hace el admin.</p>
+
+  <h2 id="c11-3"><span class="num">11.3</span> Catálogos e inventario inicial</h2>
+  <table class="ancha">
+    <thead><tr><th style="width:26%">Dato</th><th style="width:30%">Dónde se captura</th><th>Notas</th></tr></thead>
+    <tbody>
+      <tr><td><b>Métodos de pago</b></td><td>Panel <code>/admin/</code>, <span class="ui">Metodo pagos</span></td><td>Son globales. Basta con crearlos una vez (por ejemplo Efectivo y Tarjeta).</td></tr>
+      <tr><td><b>Categorías</b></td><td>Panel <code>/admin/</code>, <span class="ui">Tipos</span></td><td>Globales. Son las categorías del punto de venta.</td></tr>
+      <tr><td><b>Productos</b></td><td>Aplicación, <span class="ui">Inventario</span></td><td>El catálogo es común a todas las sucursales.</td></tr>
+      <tr><td><b>Existencias</b></td><td>Aplicación, <span class="ui">Inventario Sucursal</span>, movimiento de <b>Entrada</b></td><td>Lo hace el encargado de la sucursal. Sin existencias, el punto de venta sale vacío.</td></tr>
+      <tr><td><b>Precio de sucursal</b></td><td>Aplicación, <span class="ui">Precios por Sucursal</span></td><td>Opcional. Sin él, la sucursal vende al precio general.</td></tr>
+    </tbody>
+  </table>
+  <div class="caja importante"><b class="t">No editar Stock en /admin/</b><div><p>El panel de Django permite cambiar la tabla Stock directamente, pero así no queda movimiento ni se evalúan las alertas. Las existencias se cargan siempre con movimientos de entrada desde la aplicación.</p></div></div>
+</section>
+
+<!-- ═════════════ 12. PROBLEMAS ═════════════ -->
+<section class="cap" id="c12">
+  <h1><span class="num">12</span> Solución de problemas</h1>
+  <p class="para">Responsable de sistemas</p>
+  <table class="ancha larga">
     <thead><tr><th style="width:42%">Qué pasa</th><th>Qué hacer</th></tr></thead>
     <tbody>
       <tr><td><code>EACCES: permission denied</code> al compilar.</td><td>Hay archivos de root que dejó Docker. Corre el <code>chown</code> del capítulo 4.</td></tr>
@@ -353,17 +451,24 @@
       <tr><td>Windows borra o bloquea el instalador.</td><td>Es SmartScreen o el antivirus, porque el instalador no está firmado (sección 6.3).</td></tr>
       <tr><td>El inicio de sesión tarda o falla la primera vez del día.</td><td>Render apaga el backend gratuito cuando no hay uso y tarda hasta un minuto en despertar. Espera e intenta otra vez.</td></tr>
       <tr><td>Error de red al iniciar sesión en todas las cajas.</td><td>Revisa que <code>https://refaccionariaback.onrender.com/api</code> responda desde un navegador. Si no responde, el problema está en el backend.</td></tr>
-      <tr><td>Inicia sesión pero dice <span class="msg">Tu usuario no tiene sucursal asignada.</span></td><td>El administrador debe asignar sucursal al usuario en el backend.</td></tr>
-      <tr><td>Un administrador entra y no ve Administración.</td><td>Le falta un registro de Perfil con <code>rol=admin</code> en el backend.</td></tr>
+      <tr><td>Inicia sesión pero dice <span class="msg">Tu usuario no tiene sucursal asignada.</span></td><td>El admin debe asignarle sucursal en Administración (sección 11.2).</td></tr>
+      <tr><td>Un administrador entra y no ve Administración.</td><td>Le falta un Perfil con rol <code>admin</code> (sección 11.1).</td></tr>
+      <tr><td>El punto de venta no muestra productos.</td><td>La sucursal no tiene existencias. El encargado debe registrar entradas (sección 11.3).</td></tr>
+      <tr><td>No aparecen las formas de pago al cobrar.</td><td>Faltan métodos de pago en el panel <code>/admin/</code> (sección 11.3).</td></tr>
+      <tr><td>El flujo <i>Tests</i> falla en GitHub.</td><td>No se publica nada. Revisa el registro en <span class="ui">Actions</span>, corrige en <code>test</code> y vuelve a subir.</td></tr>
+      <tr><td>El paso <i>Deploy to Render</i> falla.</td><td>Revisa el secreto <code>RENDER_API_KEY</code> en GitHub (sección 10.1).</td></tr>
+      <tr><td>La API responde 400 a todo después de cambiar de dominio.</td><td>El dominio nuevo no está en <code>ALLOWED_HOSTS</code> (sección 10.2).</td></tr>
+      <tr><td><code>migrate</code> falla con <code>NodeNotFoundError</code>.</td><td>Hay una migración rota en la copia del backend (sección 10.3). Apártala y repite.</td></tr>
+      <tr><td>Todos tienen que iniciar sesión otra vez tras un despliegue.</td><td>Cambió <code>SECRET_KEY</code> en Render. Déjala fija (sección 10.2).</td></tr>
       <tr><td>No sale el ticket impreso.</td><td>La versión 1.0 no envía el ticket a la impresora (sección 2.2). Consulta la venta en Historial.</td></tr>
       <tr><td>El reporte no abre en la app de escritorio.</td><td>Falla conocida probable (capítulo 7). Genera el reporte desde la versión web (capítulo 9).</td></tr>
     </tbody>
   </table>
 </section>
 
-<!-- ═════════════ 11. LISTA ═════════════ -->
-<section class="cap" id="c11">
-  <h1><span class="num">11</span> Lista de liberación</h1>
+<!-- ═════════════ 13. LISTA ═════════════ -->
+<section class="cap" id="c13">
+  <h1><span class="num">13</span> Lista de liberación</h1>
   <p class="para">Responsable de sistemas</p>
   <p>Imprime esta página y márcala en cada liberación.</p>
   <h3>Antes de compilar</h3>
@@ -371,6 +476,7 @@
     <li>Rama y commit a liberar anotados.</li>
     <li><code>"version"</code> de <code>package.json</code> aumentada.</li>
     <li><code>apiUrl</code> de <code>environment.prod.ts</code> revisada.</li>
+    <li>Si la versión necesita cambios del backend: flujo <i>Tests</i> en verde, despliegue en Render terminado y migraciones aplicadas.</li>
     <li><code>npm ci</code> sin errores.</li>
     <li><code>npm run lint</code>, <code>npm run test:coverage</code> y <code>npm run e2e</code> en verde.</li>
     <li>Sin archivos de root en <code>dist/</code> ni <code>dist_electron/</code>.</li>
