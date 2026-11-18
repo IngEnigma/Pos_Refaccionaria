@@ -3170,23 +3170,23 @@
     "semantic_hash": ""
   },
   "docs/manual/tecnico.html": {
-    "mtime": 1794768464.2338781,
-    "ast_hash": "6a3a157f1a32e1be65e30ed574be2d76",
+    "mtime": 1794973203.0147345,
+    "ast_hash": "5981a882f695123167b85eabc1929562",
     "semantic_hash": ""
   },
   "docs/manual/despliegue.html": {
-    "mtime": 1794768464.1898797,
-    "ast_hash": "d2a818e6ff20afa9d4f6e9b9ab6dd89d",
+    "mtime": 1794977459.6871169,
+    "ast_hash": "1c2bd1a8b9b8f53d9076b645865b157f",
     "semantic_hash": ""
   },
   "docs/manual/Manual-Despliegue-TRT.pdf": {
-    "mtime": 1794768464.1458812,
-    "ast_hash": "cbc64495c24f553d063a8dd2e31f4467",
+    "mtime": 1794977461.883223,
+    "ast_hash": "626126ceb267e351bc0c7b39f13c2fac",
     "semantic_hash": ""
   },
   "docs/manual/Manual-Tecnico-TRT.pdf": {
-    "mtime": 1794768464.1458812,
-    "ast_hash": "e3fcd78485e697cabdf9aedf67faae81",
+    "mtime": 1794973204.6227872,
+    "ast_hash": "45434c9c23e0eeb9f38ef9d3553a590b",
     "semantic_hash": ""
   }
 }
