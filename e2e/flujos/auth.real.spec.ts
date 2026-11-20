@@ -3,7 +3,7 @@
  *
  *   npm run e2e:back   (otra terminal)  +  npm run e2e:flujos
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from '../helpers/test';
 
 import { TEST_USERS, TestUser } from '../fixtures/test-users';
 import { loginAsReal } from '../helpers/api';

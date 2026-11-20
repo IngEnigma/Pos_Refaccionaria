@@ -9,7 +9,7 @@
  * `GET /api/notifications/` lista también las alertas ya resueltas (no expone `resuelta_en`): la resolución se verifica en BD (H-F4-4).
  * Cada prueba borra las notificaciones de E2E-LOW, las ventas que creó y restaura el stock de ese producto.
  */
-import { expect, Page, test } from '@playwright/test';
+import { expect, Page, test } from '../helpers/test';
 
 import { TEST_USERS, TestUser } from '../fixtures/test-users';
 import { apiFetch, crearVentaApi, DB, fijarStock, loginAsReal, metodosPago, productoId, sql, stockDe } from '../helpers/api';

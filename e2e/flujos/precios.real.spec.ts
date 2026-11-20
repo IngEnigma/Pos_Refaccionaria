@@ -7,7 +7,7 @@
  * precios de ese producto (se limpian sus filas en BD antes y después) para no afectar a otras suites.
  * La pantalla `/branch-pricing` no tiene vista de historial: FLU-PRE-003 lo verifica por API y BD (ver caso).
  */
-import { expect, Page, test } from '@playwright/test';
+import { expect, Page, test } from '../helpers/test';
 
 import { TEST_USERS } from '../fixtures/test-users';
 import { apiFetch, DB, loginAsReal, productoId, sql } from '../helpers/api';
@@ -148,16 +148,16 @@ test.describe('Precios por sucursal flujos REAL (backend local)', () => {
     expect(Number(sql(`select total from ventas_venta where id=${venta.id}`))).toBeCloseTo(110 * 1.16, 2);
   });
 
-  test('FLU-PRE-006 manager y cajero no entran a la ruta; admin sí', async ({ page }) => {
+  test('FLU-PRE-006 manager y cajero no entran a la ruta; admin sí', async ({ page, browser }) => {
     test.skip(!(await wakeBackend(page)), 'Backend no disponible');
 
     for (const user of [TEST_USERS.gerenteGeneral, TEST_USERS.anaCentro]) {
-      const p = await page.context().newPage();
+      const p = await browser.newContext().then((c) => c.newPage());
       await loginAsReal(p, user);
       await p.goto('/branch-pricing');
       await expect(p).toHaveURL(/\/sales$/, { timeout: 30_000 });
       await expect(p.getByRole('heading', { name: 'Precios por Sucursal' })).toHaveCount(0);
-      await p.close();
+      await p.context().close();
     }
 
     await loginAsReal(page, TEST_USERS.adminE2e);

@@ -6,7 +6,7 @@
  * Cada prueba crea sus propias ventas por API y las ubica por folio; nada asume el contenido previo.
  * La UI filtra por texto (folio / cajero) y método de pago; no tiene filtro de fecha ni de sucursal.
  */
-import { expect, Page, test } from '@playwright/test';
+import { expect, Page, test } from '../helpers/test';
 
 import { TEST_USERS } from '../fixtures/test-users';
 import { crearVentaApi, DB, loginAsReal, metodosPago, sql } from '../helpers/api';

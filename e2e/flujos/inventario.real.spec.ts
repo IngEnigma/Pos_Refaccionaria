@@ -15,7 +15,7 @@
  *   H-F6-7  BACK   productos: acepta precio negativo, nombre vacío y id_tipo inexistente (queda null)
  *   H-F6-8  BACK   productos: acepta código de barras duplicado
  */
-import { expect, Locator, Page, test } from '@playwright/test';
+import { expect, Locator, Page, test } from '../helpers/test';
 
 import { TEST_USERS, TestUser } from '../fixtures/test-users';
 import { apiFetch, DB, loginAsReal, sql } from '../helpers/api';

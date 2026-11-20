@@ -11,7 +11,7 @@
  */
 import { execFileSync } from 'node:child_process';
 
-import { expect, Page, request, test } from '@playwright/test';
+import { expect, Page, request, test } from '../helpers/test';
 
 import { TEST_USERS } from '../fixtures/test-users';
 import { apiLogin, crearVentaApi, DB, fijarStock, loginAsReal, metodosPago, sql, stockDe } from '../helpers/api';

@@ -8,7 +8,7 @@
  * La UI no tiene búsqueda ni paginación (CLI-005 no aplica) y el back no rechaza duplicados (CLI-004 usa otro rechazo real).
  * Cada prueba crea clientes `E2E Cliente <timestamp>` y los borra de la BD al terminar.
  */
-import { expect, Page, test } from '@playwright/test';
+import { expect, Page, test } from '../helpers/test';
 
 import { TEST_USERS, TestUser } from '../fixtures/test-users';
 import { apiFetch, DB, loginAsReal, sql } from '../helpers/api';

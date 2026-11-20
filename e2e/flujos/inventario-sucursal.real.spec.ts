@@ -7,7 +7,7 @@
  * Cada prueba mide el stock en BD antes/después y lo restaura al terminar (producto compartido E2E-003).
  * La lista de movimientos no muestra usuario (solo tipo, cantidad, razón y fecha): el usuario se verifica en BD.
  */
-import { expect, Page, test } from '@playwright/test';
+import { expect, Page, test } from '../helpers/test';
 
 import { TEST_USERS, TestUser } from '../fixtures/test-users';
 import { DB, fijarStock, loginAsReal, sql, stockDe } from '../helpers/api';

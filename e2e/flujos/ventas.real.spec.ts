@@ -6,7 +6,7 @@
  * Verifica en dos niveles: UI (carrito, ticket) y BD (`E2E_DB` + `sqlite3`: venta, método, sucursal, stock).
  * Cada prueba mide el stock antes/después; solo E2E-ZERO y E2E-ULT están dedicados a un caso.
  */
-import { expect, Locator, Page, test } from '@playwright/test';
+import { expect, Locator, Page, test } from '../helpers/test';
 
 import { TEST_USERS, TestUser } from '../fixtures/test-users';
 import { apiFetch, DB, fijarStock, loginAsReal, MetodoPago, metodosPago, productoId, sql, stockDe } from '../helpers/api';

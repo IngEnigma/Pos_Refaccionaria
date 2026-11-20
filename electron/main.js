@@ -5,7 +5,11 @@ const fs = require('fs');
 const { registerWindowIpc } = require('./ipc/window.ipc');
 const { registerPrinterIpc } = require('./ipc/printer.ipc');
 
-const DEV_SERVER_URL = 'http://localhost:4200';
+// E2E (e2e/helpers/test.ts): ELECTRON_START_URL apunta al ng serve del flujo y E2E_USER_DATA aísla la sesión por prueba.
+const DEV_SERVER_URL = process.env.ELECTRON_START_URL ?? 'http://localhost:4200';
+if (process.env.E2E_USER_DATA) {
+  app.setPath('userData', process.env.E2E_USER_DATA);
+}
 const PROJECT_ROOT = path.resolve(__dirname, '..');
 const DIST_ROOT = path.join(PROJECT_ROOT, 'dist');
 const NPM_LIFECYCLE_EVENT = process.env.npm_lifecycle_event ?? '';
@@ -76,7 +80,10 @@ function createMainWindow() {
     },
   });
 
-  mainWindow.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
+  // Solo se permiten ventanas blob: (PDF de reportes generado por la propia app); el resto se bloquea.
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => ({
+    action: url.startsWith('blob:') ? 'allow' : 'deny',
+  }));
   mainWindow.webContents.on('will-navigate', (event, urlToCheck) => {
     if (!isTrustedNavigation(urlToCheck)) {
       event.preventDefault();

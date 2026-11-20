@@ -11,7 +11,7 @@
  *   H-F6-9   POST /api/sucursales/ acepta un nombre repetido (201): `nombre_sucursal` no es único
  *   H-F6-10  POST /api/sucursales/ acepta nombre vacío o ausente y un correo inválido: solo exige `ubicacion`
  */
-import { expect, Page, test } from '@playwright/test';
+import { expect, Page, test } from '../helpers/test';
 
 import { TEST_USERS } from '../fixtures/test-users';
 import { apiFetch, DB, loginAsReal, sql } from '../helpers/api';

@@ -8,7 +8,7 @@
  * FLU-PRO-004 usa el rechazo real alcanzable (404 al editar un proveedor ya borrado).
  * Cada prueba crea proveedores `E2E Proveedor <timestamp>` y los borra de la BD al terminar.
  */
-import { expect, Page, test } from '@playwright/test';
+import { expect, Page, test } from '../helpers/test';
 
 import { TEST_USERS, TestUser } from '../fixtures/test-users';
 import { apiFetch, DB, loginAsReal, sql } from '../helpers/api';

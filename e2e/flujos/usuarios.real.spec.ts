@@ -7,7 +7,7 @@
  * por la API de admin, como lo haría otro cliente, y verifica lo que ve el usuario al volver a entrar).
  * Cada prueba crea usuarios `e2e.usr.<timestamp>` y limpia de la BD usuario, perfil y las ventas que haya hecho.
  */
-import { expect, Page, test } from '@playwright/test';
+import { expect, Page, test } from '../helpers/test';
 
 import { TEST_USERS } from '../fixtures/test-users';
 import { apiFetch, DB, fijarStock, loginAsReal, metodosPago, sql, stockDe } from '../helpers/api';

@@ -17,7 +17,7 @@
  */
 import { execFileSync } from 'node:child_process';
 
-import { expect, Page, request, test } from '@playwright/test';
+import { expect, Page, request, test } from '../helpers/test';
 
 import { TEST_USERS } from '../fixtures/test-users';
 import { apiFetch, apiLogin, DB, loginAsReal, metodosPago, sql } from '../helpers/api';
@@ -246,7 +246,7 @@ test.describe.serial('FLU-DIA @smoke día completo: sucursal, productos, cajero,
     expect(stock(idB)).toBe(B.stock - 2);
   });
 
-  test('FLU-DIA-07 stock, historial y reporte del día reflejan las dos ventas', async ({ page }) => {
+  test('FLU-DIA-07 stock, historial y reporte del día reflejan las dos ventas', async ({ page, browser }) => {
     expect(ventas).toHaveLength(2);
     expect([stock(idA), stock(idB)]).toEqual([A.stock - 2, B.stock - 2]);
 
@@ -264,7 +264,7 @@ test.describe.serial('FLU-DIA @smoke día completo: sucursal, productos, cajero,
     }
 
     // Reporte del día (admin, por la UI): +2 ventas y el monto sube exactamente por la suma
-    const adminPage = await page.context().browser()!.newContext().then((c) => c.newPage());
+    const adminPage = await browser.newContext().then((c) => c.newPage());
     await loginAsReal(adminPage, ADMIN);
     await adminPage.goto('/reports');
     await expect(adminPage.getByRole('heading', { name: 'Centro de Reportes', level: 1 })).toBeVisible();

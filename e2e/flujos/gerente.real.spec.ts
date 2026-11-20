@@ -7,7 +7,7 @@
  * `gerente.general` es encargado NO staff (seed): rige su permiso por rol y su alcance por sucursal.
  * Cada prueba crea usuarios `e2e.ger.<timestamp>` y limpia de la BD usuario, perfil y ventas.
  */
-import { expect, Page, test } from '@playwright/test';
+import { expect, Page, test } from '../helpers/test';
 
 import { TEST_USERS } from '../fixtures/test-users';
 import { apiFetch, DB, fijarStock, loginAsReal, metodosPago, sql, stockDe } from '../helpers/api';

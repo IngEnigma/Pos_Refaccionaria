@@ -7,7 +7,7 @@
  * coincide con lo que espera el front y que ninguna pantalla permitida recibe 403 en su carga inicial.
  * La fuente de verdad de los permisos es `repository/permissions.py` del back.
  */
-import { expect, Page, test } from '@playwright/test';
+import { expect, Page, test } from '../helpers/test';
 
 import { TEST_USERS, TestUser } from '../fixtures/test-users';
 import { DB, loginAsReal } from '../helpers/api';
