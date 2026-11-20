@@ -1,16 +1,16 @@
 # Graph Report - FrontTRT  (2026-11-20)
 
 ## Corpus Check
-- 595 files · ~234,355 words
+- 595 files · ~234,567 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 2541 nodes · 6984 edges · 127 communities (112 shown, 15 thin omitted)
+- 2541 nodes · 6997 edges · 127 communities (112 shown, 15 thin omitted)
 - Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 117 edges (avg confidence: 0.78)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `c6144242`
+- Built from commit: `cce94d2f`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -182,24 +182,24 @@ Cohesion: 0.07
 Nodes (21): BranchInventoryDto, InventoryItemDto, InventoryByBranchFacade, Injectable, GetMyBranchInventoryUseCase, Injectable, BranchInventory, InventoryItem (+13 more)
 
 ### Community 3 - "Community 3"
-Cohesion: 0.06
+Cohesion: 0.05
 Nodes (36): GlobalSearchService, Injectable, GetReportUseCase, Injectable, ReportParams, ReportType, ReportRepository, ReportRepositoryImpl (+28 more)
 
 ### Community 4 - "Community 4"
-Cohesion: 0.13
-Nodes (11): SaleDetail, SaleDetailFactory, CreateSaleDetailPayload, SaleDetailRepository, UpdateSaleDetailPayload, SaleDetailCreateRequestDto, SaleDetailResponseDto, SaleDetailUpdateRequestDto (+3 more)
+Cohesion: 0.12
+Nodes (10): SaleDetailFactory, CreateSaleDetailPayload, UpdateSaleDetailPayload, SaleDetailCreateRequestDto, SaleDetailResponseDto, SaleDetailUpdateRequestDto, SaleDetailMapper, SaleDetailRepositoryImpl (+2 more)
 
 ### Community 5 - "Community 5"
-Cohesion: 0.16
-Nodes (8): CreateSalePayload, UpdateSalePayload, SaleCreateRequestDto, SaleResponseDto, SaleUpdateRequestDto, SaleMapper, SaleRepositoryImpl, Injectable
+Cohesion: 0.10
+Nodes (20): CompleteSaleResult, DeleteSaleUseCase, Injectable, Injectable, UpdateSaleUseCase, Sale, SaleFactory, SaleCreationError (+12 more)
 
 ### Community 6 - "Community 6"
 Cohesion: 0.14
 Nodes (12): HttpErrorHandlerService, Injectable, buildHttpErrorLog(), normalizePayload(), RETRY_COUNT, RetryStrategyService, RETRY_STRATEGY, Injectable (+4 more)
 
 ### Community 7 - "Community 7"
-Cohesion: 0.08
-Nodes (24): DefaultSearchStrategy, Injectable, SEARCH_STRATEGY, CreateInventarioRequestDto, InventarioRefDto, MovementResponseDto, RegisterMovementRequestDto, GetInventariosUseCase (+16 more)
+Cohesion: 0.09
+Nodes (25): DefaultSearchStrategy, Injectable, SEARCH_STRATEGY, APP_ENV, CreateInventarioRequestDto, InventarioRefDto, MovementResponseDto, RegisterMovementRequestDto (+17 more)
 
 ### Community 8 - "inventory-by-branch.facade.ts"
 Cohesion: 0.14
@@ -293,8 +293,8 @@ Cohesion: 0.08
 Nodes (21): CategorySliderComponent, Component, setup(), CreateProductTypeUseCase, Injectable, DeleteProductTypeUseCase, Injectable, GetProductTypesUseCase (+13 more)
 
 ### Community 31 - "plan-pruebas.md"
-Cohesion: 0.11
-Nodes (29): CompleteSaleResult, CreateCompleteSaleUseCase, Injectable, CreateSaleDetailUseCase, Injectable, CreateSaleUseCase, Injectable, DeleteSaleDetailUseCase (+21 more)
+Cohesion: 0.14
+Nodes (22): CreateCompleteSaleUseCase, Injectable, CreateSaleDetailUseCase, Injectable, CreateSaleUseCase, Injectable, DeleteSaleDetailUseCase, Injectable (+14 more)
 
 ### Community 32 - "Community 32"
 Cohesion: 0.15
@@ -361,8 +361,8 @@ Cohesion: 0.22
 Nodes (3): DropdownComponent, Component, HostListener
 
 ### Community 49 - "Community 49"
-Cohesion: 0.12
-Nodes (14): PaymentMethod, CreatePaymentMethodPayload, PaymentMethodRepository, UpdatePaymentMethodPayload, PaymentMethodCreateRequestDto, PaymentMethodResponseDto, PaymentMethodUpdateRequestDto, PaymentMethodMapper (+6 more)
+Cohesion: 0.14
+Nodes (13): PaymentMethod, CreatePaymentMethodPayload, PaymentMethodRepository, UpdatePaymentMethodPayload, PaymentMethodCreateRequestDto, PaymentMethodResponseDto, PaymentMethodUpdateRequestDto, PaymentMethodMapper (+5 more)
 
 ### Community 50 - "InventoryFacade"
 Cohesion: 0.17
@@ -397,8 +397,8 @@ Cohesion: 0.15
 Nodes (6): ClientsFacade, Injectable, ClientSelectorModalComponent, optionButtons(), optionByText(), Component
 
 ### Community 58 - "payment-method.mapper.ts"
-Cohesion: 0.12
-Nodes (18): APP_ENV, SALE_ENDPOINTS, PaymentMethodFetchError, PaymentMethodMutationError, SaleCreationError, SaleDeleteError, SaleDetailFetchError, SaleDetailMutationError (+10 more)
+Cohesion: 0.11
+Nodes (14): SALE_ENDPOINTS, PaymentMethodFetchError, PaymentMethodMutationError, SaleDeleteError, SaleDetailFetchError, SaleDetailMutationError, SaleFetchError, SalesDomainError (+6 more)
 
 ### Community 60 - "branch-form-dialog.component.ts"
 Cohesion: 0.19
@@ -617,11 +617,11 @@ Nodes (3): NoopStorage, sanitizeUrlParams(), SENSITIVE_QUERY_PARAMS
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `AuthFacade` connect `InventoryFacade` to `Community 2`, `Community 3`, `Community 7`, `inventory-by-branch.facade.ts`, `Community 13`, `login.page.ts`, `sales-page.functional.spec.ts`, `client.entity.ts`, `app.config.ts`, `SessionStateService`, `suppliers.facade.ts`, `branch-form-dialog.component.ts`, `plan-pruebas.md`?**
-  _High betweenness centrality (0.046) - this node is a cross-community bridge._
-- **Why does `LoggerService` connect `plan-pruebas.md` to `Community 33`, `Community 1`, `Community 2`, `Community 6`, `Community 7`, `inventory-by-branch.facade.ts`, `Community 39`, `notifications.facade.ts`, `Community 12`, `sales-page.functional.spec.ts`, `client.entity.ts`, `resolveHttpErrorMessage`, `payment-method.mapper.ts`, `plan-pruebas.md`?**
+  _High betweenness centrality (0.044) - this node is a cross-community bridge._
+- **Why does `LoggerService` connect `plan-pruebas.md` to `Community 33`, `Community 1`, `Community 2`, `Community 5`, `Community 6`, `Community 7`, `inventory-by-branch.facade.ts`, `Community 39`, `notifications.facade.ts`, `Community 12`, `sales-page.functional.spec.ts`, `client.entity.ts`, `resolveHttpErrorMessage`, `plan-pruebas.md`?**
   _High betweenness centrality (0.031) - this node is a cross-community bridge._
 - **Why does `ToastService` connect `Community 12` to `Community 33`, `Community 1`, `Community 2`, `plan-pruebas.md`, `inventory-by-branch.facade.ts`, `Community 7`, `login.page.ts`, `sales-page.functional.spec.ts`, `client.entity.ts`, `app.config.ts`, `InventoryFacade`, `suppliers.facade.ts`, `branch-form-dialog.component.ts`, `plan-pruebas.md`?**
-  _High betweenness centrality (0.026) - this node is a cross-community bridge._
+  _High betweenness centrality (0.025) - this node is a cross-community bridge._
 - **Are the 2 inferred relationships involving `LoggerService` (e.g. with `configure()` and `setup()`) actually correct?**
   _`LoggerService` has 2 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 5 inferred relationships involving `SessionStateService` (e.g. with `configureTestingModule()` and `setup()`) actually correct?**

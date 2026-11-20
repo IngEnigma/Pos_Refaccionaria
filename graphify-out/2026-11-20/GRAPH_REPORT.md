@@ -1,16 +1,16 @@
 # Graph Report - FrontTRT  (2026-11-20)
 
 ## Corpus Check
-- 599 files · ~235,004 words
+- 595 files · ~234,355 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 2545 nodes · 6983 edges · 139 communities (122 shown, 17 thin omitted)
+- 2541 nodes · 6984 edges · 127 communities (112 shown, 15 thin omitted)
 - Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 117 edges (avg confidence: 0.78)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `ebc0478e`
+- Built from commit: `c6144242`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -95,8 +95,6 @@
 - Protocolo de Usabilidad — FrontTRT
 - sale-detail.mapper.ts
 - skeleton.component.ts
-- InventoryMovement
-- AdminManagementPageComponent
 - Plan de Implementación — Sincronización Frontend con Backend (Develop)
 - api.ts
 - resolveHttpErrorMessage
@@ -120,8 +118,6 @@
 - Consideraciones de Arquitectura
 - Fase 0 — Hotfixes de contrato (desbloqueo inmediato)
 - Fase 2 — Re-alineación de Sucursales
-- ProductRepositoryImpl
-- ContextualLogger
 - Fase 5 — Ventas: integración con inventario y precios por sucursal
 - development
 - 3. Casos por módulo
@@ -131,26 +127,18 @@
 - cart-item.component.ts
 - CLAUDE.md
 - local
-- inventory-product-grid.component.spec.ts
 - production
 - NotificationsBadgeComponent
-- SaleTicketDto
-- ProductGridComponent
 - inventario.real.spec.ts
 - plan-pruebas-admin-auth-ventas.md
 - ContextualLogger
 - UpdateSupplierUseCase
 - ContextualLogger
 - sales.pos.spec.ts
-- Branch
 - plan-pruebas.md
 - clients.routes.ts
 - back-e2e.sh
-- AdminManagementPageComponent
-- branches.page.integration.spec.ts
-- app-env.token.ts
 - ADMIN / NOTIFICACIONES / SHELL (P3)
-- UsersFacade
 
 ## God Nodes (most connected - your core abstractions)
 1. `LOGGER_PORT` - 56 edges
@@ -170,39 +158,39 @@
 - `setup()` --references--> `testBed`  [EXTRACTED]
   src/app/features/auth/application/services/session-state.service.spec.ts → setup-jest.ts
 - `setup()` --references--> `testBed`  [EXTRACTED]
-  src/app/features/branch-pricing/infrastructure/repositories/branch-price-repository.impl.spec.ts → setup-jest.ts
-- `setup()` --references--> `testBed`  [EXTRACTED]
   src/app/features/branch-pricing/presentation/components/branch-pricing-table/branch-pricing-table.component.spec.ts → setup-jest.ts
 - `configure()` --references--> `testBed`  [EXTRACTED]
   src/app/features/branches/presentation/pages/branches-page/branches.page.integration.spec.ts → setup-jest.ts
+- `setup()` --references--> `testBed`  [EXTRACTED]
+  src/app/features/clients/presentation/components/client-form-dialog/client-form-dialog.component.spec.ts → setup-jest.ts
 
 ## Import Cycles
 - 1-file cycle: `src/app/app.routes.ts -> src/app/app.routes.ts`
 
-## Communities (139 total, 17 thin omitted)
+## Communities (127 total, 15 thin omitted)
 
 ### Community 0 - "clients.facade.ts"
 Cohesion: 0.20
 Nodes (12): A, addToCart(), B, CAJEROS, cantidad(), card(), lineaCarrito(), panel() (+4 more)
 
 ### Community 1 - "Community 1"
-Cohesion: 0.23
-Nodes (10): CreateBranchUseCase, Injectable, DeleteBranchUseCase, Injectable, GetBranchesUseCase, Injectable, Injectable, UpdateBranchUseCase (+2 more)
+Cohesion: 0.05
+Nodes (40): BranchCreateRequestDto, BranchResponseDto, BranchUpdateRequestDto, BranchesFacade, Injectable, CreateBranchUseCase, Injectable, DeleteBranchUseCase (+32 more)
 
 ### Community 2 - "Community 2"
-Cohesion: 0.05
-Nodes (38): CreateInventarioRequestDto, InventarioRefDto, BranchInventoryDto, InventoryItemDto, MovementResponseDto, RegisterMovementRequestDto, InventoryByBranchFacade, Injectable (+30 more)
+Cohesion: 0.07
+Nodes (21): BranchInventoryDto, InventoryItemDto, InventoryByBranchFacade, Injectable, GetMyBranchInventoryUseCase, Injectable, BranchInventory, InventoryItem (+13 more)
 
 ### Community 3 - "Community 3"
 Cohesion: 0.06
 Nodes (36): GlobalSearchService, Injectable, GetReportUseCase, Injectable, ReportParams, ReportType, ReportRepository, ReportRepositoryImpl (+28 more)
 
 ### Community 4 - "Community 4"
-Cohesion: 0.17
-Nodes (9): SaleDetailFactory, UpdateSaleDetailPayload, SaleDetailCreateRequestDto, SaleDetailResponseDto, SaleDetailUpdateRequestDto, SaleDetailMapper, SaleDetailRepositoryImpl, Injectable (+1 more)
+Cohesion: 0.13
+Nodes (11): SaleDetail, SaleDetailFactory, CreateSaleDetailPayload, SaleDetailRepository, UpdateSaleDetailPayload, SaleDetailCreateRequestDto, SaleDetailResponseDto, SaleDetailUpdateRequestDto (+3 more)
 
 ### Community 5 - "Community 5"
-Cohesion: 0.15
+Cohesion: 0.16
 Nodes (8): CreateSalePayload, UpdateSalePayload, SaleCreateRequestDto, SaleResponseDto, SaleUpdateRequestDto, SaleMapper, SaleRepositoryImpl, Injectable
 
 ### Community 6 - "Community 6"
@@ -210,36 +198,32 @@ Cohesion: 0.14
 Nodes (12): HttpErrorHandlerService, Injectable, buildHttpErrorLog(), normalizePayload(), RETRY_COUNT, RetryStrategyService, RETRY_STRATEGY, Injectable (+4 more)
 
 ### Community 7 - "Community 7"
-Cohesion: 0.14
-Nodes (11): CompleteSaleResult, DeleteSaleUseCase, Injectable, Injectable, UpdateSaleUseCase, Sale, SaleFactory, SaleProps (+3 more)
+Cohesion: 0.08
+Nodes (24): DefaultSearchStrategy, Injectable, SEARCH_STRATEGY, CreateInventarioRequestDto, InventarioRefDto, MovementResponseDto, RegisterMovementRequestDto, GetInventariosUseCase (+16 more)
 
 ### Community 8 - "inventory-by-branch.facade.ts"
 Cohesion: 0.14
 Nodes (19): abrir(), abrirHistorial(), abrirInventario(), abrir(), abrir(), abrirPrecios(), fijar(), row() (+11 more)
 
 ### Community 9 - "Community 9"
-Cohesion: 0.16
-Nodes (8): AppComponent, Component, appConfig, ToastContainerComponent, Component, Toast, ToastService, Injectable
+Cohesion: 0.23
+Nodes (3): BranchPricingTableComponent, setup(), Component
 
 ### Community 10 - "Community 10"
 Cohesion: 0.13
 Nodes (15): extract-i18n, lint, test, builder, architect, prefix, projectType, root (+7 more)
 
-### Community 11 - "Community 11"
-Cohesion: 0.18
-Nodes (3): SalesFacade, Injectable, CreateCompleteSalePayload
-
 ### Community 12 - "Community 12"
-Cohesion: 0.20
-Nodes (11): CreateUserUseCase, Injectable, DeleteUserUseCase, Injectable, GetUsersUseCase, Injectable, Injectable, UpdateUserUseCase (+3 more)
+Cohesion: 0.05
+Nodes (35): AppComponent, Component, appConfig, withoutTrailingSlash(), AdminManagementPageComponent, Component, CashiersManagementPageComponent, Component (+27 more)
 
 ### Community 13 - "Community 13"
-Cohesion: 0.13
-Nodes (16): LoginCommand, LoginUseCase, Injectable, AuthError, InvalidCredentialsError, NetworkAuthError, UnknownAuthError, AuthRepository (+8 more)
+Cohesion: 0.15
+Nodes (12): AuthError, InvalidCredentialsError, NetworkAuthError, UnknownAuthError, LoginCredentials, LoginRequestDto, RefreshTokenRequestDto, RefreshTokenResponseDto (+4 more)
 
 ### Community 14 - "sales-page.functional.spec.ts"
-Cohesion: 0.19
-Nodes (11): GetMyProfileUseCase, Injectable, Injectable, UpdateMySucursalUseCase, UserProfile, ProfileRepository, ProfileResponseDto, UpdateSucursalRequestDto (+3 more)
+Cohesion: 0.11
+Nodes (13): GetMyProfileUseCase, Injectable, Injectable, UpdateMySucursalUseCase, UserProfile, ProfileRepository, ProfileResponseDto, UpdateSucursalRequestDto (+5 more)
 
 ### Community 15 - "Community 15"
 Cohesion: 0.10
@@ -253,12 +237,12 @@ Cohesion: 0.06
 Nodes (32): NotificationsFacade, Injectable, REPORTS_ROUTES, SupplierCreateRequestDto, SupplierResponseDto, SupplierUpdateRequestDto, setup(), SuppliersFacade (+24 more)
 
 ### Community 17 - "app.config.ts"
-Cohesion: 0.12
+Cohesion: 0.10
 Nodes (9): Product, ProductFormDialogComponent, ProductFormDialogData, setup(), Component, InventoryPageComponent, Component, ProductTypesFacade (+1 more)
 
 ### Community 18 - "Branch"
 Cohesion: 0.26
-Nodes (5): isRefreshRequest(), withBearerToken(), AuthTokenRefreshOrchestrator, Injectable, AUTH_ENDPOINTS
+Nodes (7): isRefreshRequest(), isUnauthorizedError(), withBearerToken(), AuthTokenRefreshOrchestrator, Injectable, AUTH_ENDPOINTS, authTokenInterceptor()
 
 ### Community 19 - "Community 19"
 Cohesion: 0.06
@@ -266,7 +250,7 @@ Nodes (31): scripts, a11y, build, build:installer, build:installer:win, build:pr
 
 ### Community 20 - "sale-repository.ts"
 Cohesion: 0.22
-Nodes (9): withoutTrailingSlash(), UserCreateRequestDto, UserResponseDto, UserUpdateRequestDto, CreateUserPayload, UpdateUserPayload, UserMapper, Injectable (+1 more)
+Nodes (4): NavbarComponent, MockNotificationsBadgeComponent, Component, Component
 
 ### Community 21 - "suppliers.facade.ts"
 Cohesion: 0.19
@@ -278,7 +262,7 @@ Nodes (23): A, idEnBd(), perfilEnBd(), UsuarioApi, dePuntoBajo(), enBd(), entrad
 
 ### Community 23 - "Community 23"
 Cohesion: 0.17
-Nodes (10): ClientCreateRequestDto, ClientResponseDto, ClientUpdateRequestDto, Client, CreateClientPayload, UpdateClientPayload, ClientMapper, texto() (+2 more)
+Nodes (9): ClientCreateRequestDto, ClientResponseDto, ClientUpdateRequestDto, CreateClientPayload, UpdateClientPayload, ClientMapper, texto(), ClientRepositoryImpl (+1 more)
 
 ### Community 24 - "Community 24"
 Cohesion: 0.11
@@ -289,16 +273,16 @@ Cohesion: 0.08
 Nodes (24): devDependencies, allure-playwright, @angular-builders/jest, @angular/compiler-cli, @angular-devkit/build-angular, angular-eslint, @axe-core/playwright, concurrently (+16 more)
 
 ### Community 26 - "Community 26"
-Cohesion: 0.23
-Nodes (8): ProductCreateRequestDto, PaginatedProductResponseDto, ProductResponseDto, ProductStockResponseDto, ProductUpdateRequestDto, CreateProductPayload, UpdateProductPayload, ProductMapper
+Cohesion: 0.22
+Nodes (9): ProductCreateRequestDto, PaginatedProductResponseDto, ProductResponseDto, ProductStockResponseDto, ProductUpdateRequestDto, ProductStock, CreateProductPayload, UpdateProductPayload (+1 more)
 
 ### Community 27 - "permisos.real.spec.ts"
 Cohesion: 0.08
 Nodes (13): TestUser, crearCliente(), dialogo(), enBd(), idEnBd(), llenar(), ADMIN, ADMIN_MANAGER (+5 more)
 
 ### Community 28 - "sale-repository.impl.ts"
-Cohesion: 0.16
-Nodes (7): DetailedSaleItem, DetailedSaleProps, Order, OrderItem, OrderItemProps, Money, Quantity
+Cohesion: 0.06
+Nodes (25): DetailedSale, DetailedSaleItem, DetailedSaleProps, Order, OrderItem, OrderItemProps, SaleProps, Money (+17 more)
 
 ### Community 29 - "Community 29"
 Cohesion: 0.22
@@ -306,19 +290,19 @@ Nodes (8): DropdownHostComponent, Component, DropdownItemComponent, Component, D
 
 ### Community 30 - "Community 30"
 Cohesion: 0.08
-Nodes (24): CategorySliderComponent, Component, setup(), CreateProductTypeUseCase, Injectable, DeleteProductTypeUseCase, Injectable, GetProductTypesUseCase (+16 more)
+Nodes (21): CategorySliderComponent, Component, setup(), CreateProductTypeUseCase, Injectable, DeleteProductTypeUseCase, Injectable, GetProductTypesUseCase (+13 more)
 
 ### Community 31 - "plan-pruebas.md"
-Cohesion: 0.08
-Nodes (32): DefaultSearchStrategy, Injectable, SEARCH_STRATEGY, GetMovementsUseCase, Injectable, RegisterMovementUseCase, Injectable, CreateCompleteSaleUseCase (+24 more)
+Cohesion: 0.11
+Nodes (29): CompleteSaleResult, CreateCompleteSaleUseCase, Injectable, CreateSaleDetailUseCase, Injectable, CreateSaleUseCase, Injectable, DeleteSaleDetailUseCase (+21 more)
 
 ### Community 32 - "Community 32"
-Cohesion: 0.18
+Cohesion: 0.15
 Nodes (8): provideControlValueAccessor(), BaseFormField, Directive, InputComponent, Component, SearchInputComponent, Component, resolveAriaLabel()
 
 ### Community 33 - "Community 33"
-Cohesion: 0.06
-Nodes (36): BranchPriceCreateRequestDto, BranchPriceResponseDto, PriceHistoryResponseDto, BranchPricingFacade, Injectable, DeactivatePriceUseCase, Injectable, GetActivePriceUseCase (+28 more)
+Cohesion: 0.07
+Nodes (33): BranchPriceCreateRequestDto, BranchPriceResponseDto, PriceHistoryResponseDto, BranchPricingFacade, Injectable, DeactivatePriceUseCase, Injectable, GetActivePriceUseCase (+25 more)
 
 ### Community 34 - "payment-method.mapper.ts"
 Cohesion: 0.25
@@ -341,20 +325,20 @@ Cohesion: 0.14
 Nodes (3): BaseControlValueAccessor, MockControlValueAccessor, Component
 
 ### Community 39 - "Community 39"
-Cohesion: 0.14
-Nodes (21): setup(), ProductFilter, CreateProductUseCase, Injectable, DeleteProductUseCase, Injectable, GetProductByBarcodeUseCase, Injectable (+13 more)
+Cohesion: 0.20
+Nodes (18): ProductFilter, CreateProductUseCase, Injectable, DeleteProductUseCase, Injectable, GetProductByBarcodeUseCase, Injectable, GetProductByIdUseCase (+10 more)
 
 ### Community 40 - "inventory-by-branch.facade.ts"
-Cohesion: 0.28
+Cohesion: 0.29
 Nodes (11): CreateClientUseCase, Injectable, DeleteClientUseCase, Injectable, GetClientsUseCase, Injectable, Injectable, UpdateClientUseCase (+3 more)
 
 ### Community 41 - "admin.real.spec.ts"
-Cohesion: 0.21
-Nodes (6): JwtUtils, RefreshTokenUseCase, buildSession(), now(), Injectable, LegacySessionPrimitives
+Cohesion: 0.25
+Nodes (5): JwtUtils, RefreshTokenUseCase, Injectable, LoginResponseDto, SessionMapper
 
 ### Community 43 - "notifications.facade.ts"
-Cohesion: 0.09
-Nodes (16): NotificationResponseDto, DeleteNotificationUseCase, Injectable, GetNotificationsUseCase, Injectable, MarkAllNotificationsReadUseCase, Injectable, MarkNotificationReadUseCase (+8 more)
+Cohesion: 0.07
+Nodes (18): NotificationResponseDto, DeleteNotificationUseCase, Injectable, GetNotificationsUseCase, Injectable, MarkAllNotificationsReadUseCase, Injectable, MarkNotificationReadUseCase (+10 more)
 
 ### Community 44 - "Community 44"
 Cohesion: 0.13
@@ -369,7 +353,7 @@ Cohesion: 0.20
 Nodes (4): LoginPageComponent, fillAndSubmit(), submitButton(), Component
 
 ### Community 47 - "MovementListComponent"
-Cohesion: 0.11
+Cohesion: 0.10
 Nodes (10): CardProduct, InventoryProductCardComponent, setup(), Component, GridProduct, InventoryProductGridComponent, FakeIntersectionObserver, ObserverCallback (+2 more)
 
 ### Community 48 - "Community 48"
@@ -377,36 +361,36 @@ Cohesion: 0.22
 Nodes (3): DropdownComponent, Component, HostListener
 
 ### Community 49 - "Community 49"
-Cohesion: 0.11
-Nodes (15): SALE_ENDPOINTS, PaymentMethod, PaymentMethodFetchError, CreatePaymentMethodPayload, PaymentMethodRepository, UpdatePaymentMethodPayload, PaymentMethodCreateRequestDto, PaymentMethodResponseDto (+7 more)
+Cohesion: 0.12
+Nodes (14): PaymentMethod, CreatePaymentMethodPayload, PaymentMethodRepository, UpdatePaymentMethodPayload, PaymentMethodCreateRequestDto, PaymentMethodResponseDto, PaymentMethodUpdateRequestDto, PaymentMethodMapper (+6 more)
 
 ### Community 50 - "InventoryFacade"
 Cohesion: 0.17
 Nodes (4): AuthFacade, Injectable, ClientsPageComponent, Component
 
 ### Community 51 - "SessionStateService"
-Cohesion: 0.14
-Nodes (8): AUTH_ROUTES, Session, SessionPrimitives, UserRole, LoginResponseDto, mapAuthUserRole(), ROLE_BY_BACKEND_ROL, SessionMapper
+Cohesion: 0.11
+Nodes (15): LoginCommand, loginAs(), loginDto(), LoginUseCase, Injectable, buildSession(), now(), AUTH_ROUTES (+7 more)
 
 ### Community 52 - "sales-history.page.ts"
-Cohesion: 0.20
-Nodes (8): SearchStrategy, SalesSearchStrategy, Injectable, ProductCardComponent, Component, setup(), IoCallback, SalesProduct
+Cohesion: 0.23
+Nodes (6): SearchStrategy, SalesSearchStrategy, Injectable, SalesPaymentMethod, SalesProduct, StockIssue
 
 ### Community 53 - "Branch"
 Cohesion: 0.25
-Nodes (5): PaginatedResponse, PaginationParams, ProductSearchParams, ProductRepositoryImpl, Injectable
+Nodes (6): PaginatedResponse, PaginationParams, ProductSearchParams, ProductRepositoryImpl, Injectable, INVENTORY_ROUTES
 
 ### Community 54 - "Community 54"
 Cohesion: 0.25
 Nodes (7): author, description, homepage, main, name, private, version
 
 ### Community 55 - "ButtonComponent"
-Cohesion: 0.17
-Nodes (7): CartPanelComponent, Component, PaymentMethodSelectorComponent, Component, setup(), SalesSummaryComponent, Component
+Cohesion: 0.31
+Nodes (4): CartPanelComponent, Component, SalesSummaryComponent, Component
 
 ### Community 56 - "branch-form-dialog.component.ts"
-Cohesion: 0.13
-Nodes (3): SalesPaymentMethod, SalesPageComponent, Component
+Cohesion: 0.14
+Nodes (4): isNotFoundError(), SalesPageComponent, toSalesProduct(), Component
 
 ### Community 57 - "MovementFormDialogComponent"
 Cohesion: 0.15
@@ -414,15 +398,11 @@ Nodes (6): ClientsFacade, Injectable, ClientSelectorModalComponent, optionButton
 
 ### Community 58 - "payment-method.mapper.ts"
 Cohesion: 0.12
-Nodes (13): DetailedSale, PaymentMethodMutationError, SaleCreationError, SaleDeleteError, SaleDetailFetchError, SaleDetailMutationError, SaleFetchError, SalesDomainError (+5 more)
-
-### Community 59 - "AdminManagementPageComponent"
-Cohesion: 0.29
-Nodes (4): ClientsTableComponent, setup(), Component, StockIssue
+Nodes (18): APP_ENV, SALE_ENDPOINTS, PaymentMethodFetchError, PaymentMethodMutationError, SaleCreationError, SaleDeleteError, SaleDetailFetchError, SaleDetailMutationError (+10 more)
 
 ### Community 60 - "branch-form-dialog.component.ts"
-Cohesion: 0.16
-Nodes (11): DESKTOP_PORT, DesktopPort, DesktopPrintResult, toTicketPrintPayload(), SaleTicket, SaleTicketProductProps, SaleTicketProps, TicketModalComponent (+3 more)
+Cohesion: 0.19
+Nodes (9): DESKTOP_PORT, DesktopPort, DesktopPrintResult, toTicketPrintPayload(), SaleTicket, SaleTicketProductProps, SaleTicketProps, TicketModalComponent (+1 more)
 
 ### Community 61 - "Community 61"
 Cohesion: 0.11
@@ -441,8 +421,8 @@ Cohesion: 0.38
 Nodes (5): IMG, ir(), paso(), settle(), shot()
 
 ### Community 76 - "inventory-repository.impl.ts"
-Cohesion: 0.22
-Nodes (8): testBed, facadeLoading(), render(), startAndFlushInitial(), flushError(), flush(), changeSearch(), flush()
+Cohesion: 0.20
+Nodes (9): testBed, setup(), facadeLoading(), render(), startAndFlushInitial(), flushError(), flush(), changeSearch() (+1 more)
 
 ### Community 77 - "clients.facade.ts"
 Cohesion: 0.12
@@ -464,10 +444,6 @@ Nodes (9): HTTP_RETRY_CONFIG, RETRYABLE_CODES_STATUSES, ExponentialBackoffStrate
 Cohesion: 0.29
 Nodes (10): options, assets, browser, index, outputPath, polyfills, scripts, styles (+2 more)
 
-### Community 82 - "InventoryMovement"
-Cohesion: 0.60
-Nodes (3): BranchCardComponent, renderCard(), Component
-
 ### Community 84 - "Plan de Implementación — Sincronización Frontend con Backend (Develop)"
 Cohesion: 0.17
 Nodes (11): 2. Estado actual del Frontend vs Backend (GAPS), 3. Índice de Fases, 4. Tabla de archivos por fase (resumen), 5. Consideraciones de Arquitectura (recordatorio), 6. Riesgos y decisiones, 7. Peticiones sugeridas al Backend (NOTIFICAR al dev backend — NO las hace el frontend), Checklist Fase 6, Fase 6 — Feature Clientes (real) (+3 more)
@@ -477,8 +453,8 @@ Cohesion: 0.29
 Nodes (7): ADMIN_OR_MANAGER, ALL_ROLES_MENU, enter(), link(), nav(), ONLY_ADMIN, E2eRole
 
 ### Community 86 - "resolveHttpErrorMessage"
-Cohesion: 0.10
-Nodes (18): stubbed, StubPage, Component, LOGGER_PORT, PERSISTENT_STORAGE_PORT, STORAGE_PORT, StoragePort, provideStorage() (+10 more)
+Cohesion: 0.15
+Nodes (12): stubbed, StubPage, Component, LOGGER_PORT, PERSISTENT_STORAGE_PORT, STORAGE_PORT, StoragePort, provideStorage() (+4 more)
 
 ### Community 88 - "Fase 3 — Feature de Notificaciones"
 Cohesion: 0.20
@@ -556,10 +532,6 @@ Nodes (5): 0.1 Auth — endpoint de refresh, 0.2 Sales — endpoint de detalle, 
 Cohesion: 0.40
 Nodes (5): 2.1 Domain, 2.2 Application / Infrastructure, 2.3 Presentation, Checklist Fase 2, Fase 2 — Re-alineación de Sucursales
 
-### Community 107 - "ProductRepositoryImpl"
-Cohesion: 0.30
-Nodes (7): BranchCreateRequestDto, BranchResponseDto, BranchUpdateRequestDto, CreateBranchPayload, UpdateBranchPayload, BranchMapper, envStub
-
 ### Community 109 - "Fase 5 — Ventas: integración con inventario y precios por sucursal"
 Cohesion: 0.50
 Nodes (4): 5.1 Application / Infrastructure, 5.2 Presentation, Checklist Fase 5, Fase 5 — Ventas: integración con inventario y precios por sucursal
@@ -573,8 +545,8 @@ Cohesion: 0.13
 Nodes (15): 3.10 Usuarios / Admin — `FLU-USR`, 3.11 Gerente — `FLU-GER`, 3.12 Reportes — `FLU-REP`, 3.13 Notificaciones — `FLU-NOT`, 3.14 Permisos — `FLU-PER`, 3.1 Auth — `FLU-AUT`, 3.2 Ventas (POS) — `FLU-VEN`, 3.3 Historial de ventas — `FLU-HIS` (+7 more)
 
 ### Community 112 - "CashiersManagementPageComponent"
-Cohesion: 0.21
-Nodes (4): ClientFormDialogComponent, ClientFormDialogData, setup(), Component
+Cohesion: 0.15
+Nodes (8): Client, ClientFormDialogComponent, ClientFormDialogData, setup(), Component, ClientsTableComponent, setup(), Component
 
 ### Community 113 - "ProductGridComponent"
 Cohesion: 0.13
@@ -592,25 +564,13 @@ Nodes (4): CartItemComponent, Component, QuantityControlComponent, Component
 Cohesion: 0.33
 Nodes (6): local, buildTarget, extractLicenses, fileReplacements, optimization, sourceMap
 
-### Community 118 - "inventory-product-grid.component.spec.ts"
-Cohesion: 0.11
-Nodes (13): GetSalesHistoryUseCase, Injectable, SaleHistory, SaleDetailModalComponent, Component, SalesHistoryTableComponent, Component, SalesHistoryPageComponent (+5 more)
-
 ### Community 119 - "production"
 Cohesion: 0.20
 Nodes (10): serve, production, baseHref, budgets, buildTarget, fileReplacements, outputHashing, builder (+2 more)
 
 ### Community 121 - "NotificationsBadgeComponent"
-Cohesion: 0.12
-Nodes (7): NOTIFICATIONS_ROUTES, NotificationsBadgeComponent, Component, NavbarComponent, MockNotificationsBadgeComponent, Component, Component
-
-### Community 124 - "SaleTicketDto"
-Cohesion: 0.12
-Nodes (7): BranchFormDialogData, setup(), branchFieldValidators, NotificationsPageComponent, Component, ButtonComponent, Component
-
-### Community 125 - "ProductGridComponent"
-Cohesion: 0.40
-Nodes (3): ProductGridComponent, Component, ViewChild
+Cohesion: 0.22
+Nodes (3): NOTIFICATIONS_ROUTES, NotificationsBadgeComponent, Component
 
 ### Community 126 - "inventario.real.spec.ts"
 Cohesion: 0.14
@@ -636,49 +596,37 @@ Nodes (4): HostBinding, DropdownTriggerDirective, Directive, HostListener
 Cohesion: 0.07
 Nodes (35): P0_ROUTES, PRIVATE_ROUTES, PUBLIC_ROUTES, setup(), row(), setPriceBtn(), setup(), setup() (+27 more)
 
-### Community 133 - "Branch"
-Cohesion: 0.20
-Nodes (5): GetBranchByIdUseCase, Injectable, Branch, BranchRepositoryImpl, Injectable
-
 ### Community 135 - "plan-pruebas.md"
-Cohesion: 0.17
-Nodes (11): ConsoleLoggerAdapter, Injectable, LogLevel, LogEntry, LoggerAdapter, LOGGER_ADAPTERS, LoggerService, Injectable (+3 more)
+Cohesion: 0.10
+Nodes (16): AppSettingsService, Injectable, SKIP_TRAILING_SLASH, trailingSlashInterceptor(), ConsoleLoggerAdapter, Injectable, ContextualLogger, LogLevel (+8 more)
 
 ### Community 137 - "back-e2e.sh"
 Cohesion: 0.40
 Nodes (4): DATABASE_URL, DEBUG, SECRET_KEY, back-e2e.sh script
-
-### Community 140 - "branches.page.integration.spec.ts"
-Cohesion: 0.13
-Nodes (8): BranchFormDialogComponent, Component, BranchesPageComponent, setup(), Component, ConfirmDialogComponent, ConfirmDialogData, Component
-
-### Community 141 - "app-env.token.ts"
-Cohesion: 0.32
-Nodes (6): AppSettingsService, Injectable, SKIP_TRAILING_SLASH, trailingSlashInterceptor(), APP_ENV, envStub
 
 ### Community 143 - "ADMIN / NOTIFICACIONES / SHELL (P3)"
 Cohesion: 0.24
 Nodes (3): NoopStorage, sanitizeUrlParams(), SENSITIVE_QUERY_PARAMS
 
 ## Knowledge Gaps
-- **437 isolated node(s):** `$schema`, `version`, `newProjectRoot`, `projectType`, `schematics` (+432 more)
+- **436 isolated node(s):** `$schema`, `version`, `newProjectRoot`, `projectType`, `schematics` (+431 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **17 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **15 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `AuthFacade` connect `InventoryFacade` to `Community 2`, `Community 3`, `inventory-by-branch.facade.ts`, `Community 13`, `login.page.ts`, `client.entity.ts`, `app.config.ts`, `SessionStateService`, `suppliers.facade.ts`, `resolveHttpErrorMessage`, `branch-form-dialog.component.ts`, `plan-pruebas.md`?**
-  _High betweenness centrality (0.042) - this node is a cross-community bridge._
-- **Why does `LoggerService` connect `plan-pruebas.md` to `Community 33`, `Community 1`, `Community 2`, `Community 6`, `Community 39`, `inventory-by-branch.facade.ts`, `notifications.facade.ts`, `Community 12`, `app-env.token.ts`, `client.entity.ts`, `resolveHttpErrorMessage`, `plan-pruebas.md`?**
-  _High betweenness centrality (0.036) - this node is a cross-community bridge._
-- **Why does `ToastService` connect `Community 9` to `Community 33`, `Community 2`, `plan-pruebas.md`, `inventory-by-branch.facade.ts`, `AdminManagementPageComponent`, `Community 12`, `app-env.token.ts`, `login.page.ts`, `branches.page.integration.spec.ts`, `client.entity.ts`, `app.config.ts`, `InventoryFacade`, `suppliers.facade.ts`, `branch-form-dialog.component.ts`, `plan-pruebas.md`?**
-  _High betweenness centrality (0.028) - this node is a cross-community bridge._
+- **Why does `AuthFacade` connect `InventoryFacade` to `Community 2`, `Community 3`, `Community 7`, `inventory-by-branch.facade.ts`, `Community 13`, `login.page.ts`, `sales-page.functional.spec.ts`, `client.entity.ts`, `app.config.ts`, `SessionStateService`, `suppliers.facade.ts`, `branch-form-dialog.component.ts`, `plan-pruebas.md`?**
+  _High betweenness centrality (0.046) - this node is a cross-community bridge._
+- **Why does `LoggerService` connect `plan-pruebas.md` to `Community 33`, `Community 1`, `Community 2`, `Community 6`, `Community 7`, `inventory-by-branch.facade.ts`, `Community 39`, `notifications.facade.ts`, `Community 12`, `sales-page.functional.spec.ts`, `client.entity.ts`, `resolveHttpErrorMessage`, `payment-method.mapper.ts`, `plan-pruebas.md`?**
+  _High betweenness centrality (0.031) - this node is a cross-community bridge._
+- **Why does `ToastService` connect `Community 12` to `Community 33`, `Community 1`, `Community 2`, `plan-pruebas.md`, `inventory-by-branch.facade.ts`, `Community 7`, `login.page.ts`, `sales-page.functional.spec.ts`, `client.entity.ts`, `app.config.ts`, `InventoryFacade`, `suppliers.facade.ts`, `branch-form-dialog.component.ts`, `plan-pruebas.md`?**
+  _High betweenness centrality (0.026) - this node is a cross-community bridge._
 - **Are the 2 inferred relationships involving `LoggerService` (e.g. with `configure()` and `setup()`) actually correct?**
   _`LoggerService` has 2 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 5 inferred relationships involving `SessionStateService` (e.g. with `configureTestingModule()` and `setup()`) actually correct?**
   _`SessionStateService` has 5 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `$schema`, `version`, `newProjectRoot` to the rest of the system?**
-  _439 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `Community 2` be split into smaller, more focused modules?**
-  _Cohesion score 0.05041075429424944 - nodes in this community are weakly interconnected._
+  _437 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Should `Community 1` be split into smaller, more focused modules?**
+  _Cohesion score 0.05157493942540672 - nodes in this community are weakly interconnected._
