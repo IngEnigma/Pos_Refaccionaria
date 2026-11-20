@@ -12,8 +12,9 @@ import { API_PREFIX, wakeBackend } from '../helpers/backend';
 test.describe('Auth flujos REAL (backend local)', () => {
   test.skip(process.env['E2E_REAL'] !== '1', 'Solo con E2E_REAL=1 (backend real)');
 
-  const OPCIONES_COMUNES = ['Menú', 'Inventario', 'Reportes', 'Historial', 'Proveedores', 'Clientes', 'Notificaciones'];
-  const SOLO_MANAGER_ADMIN = ['Inventario Sucursal', 'Cajeros'];
+  const OPCIONES_COMUNES = ['Menú', 'Inventario', 'Historial', 'Proveedores', 'Clientes', 'Notificaciones'];
+  // Reportes: el back exige `reporte.ver` (encargado y admin); el cajero recibe 403 (H-F4-3)
+  const SOLO_MANAGER_ADMIN = ['Inventario Sucursal', 'Cajeros', 'Reportes'];
   const SOLO_ADMIN = ['Administración', 'Sucursales', 'Precios por Sucursal'];
 
   const casos: { rol: string; user: TestUser; ve: string[]; noVe: string[] }[] = [

@@ -4,7 +4,7 @@
  *   npm run e2e:back   (otra terminal)  +  npm run e2e:flujos
  *
  * Permisos del back: el cajero solo crea/lista; editar y eliminar exigen encargado o admin (403 al cajero).
- * El back filtra por sucursal: un cajero solo ve/crea clientes de la suya; admin y gerente (is_staff) ven todos.
+ * El back filtra por sucursal: un cajero solo ve/crea clientes de la suya; admin ve todos; el gerente (encargado) solo los de su sucursal.
  * La UI no tiene búsqueda ni paginación (CLI-005 no aplica) y el back no rechaza duplicados (CLI-004 usa otro rechazo real).
  * Cada prueba crea clientes `E2E Cliente <timestamp>` y los borra de la BD al terminar.
  */
@@ -165,7 +165,7 @@ test.describe('Clientes flujos REAL (backend local)', () => {
     await expect(page.getByRole('row').filter({ hasText: /Prueba/ })).toHaveCount(0);
     await expect(fila(page, nombre)).toHaveCount(0);
 
-    // Cajero de Centro y gerente (is_staff, ve todas las sucursales): sí
+    // Cajero de Centro y gerente (misma sucursal): sí
     for (const user of [TEST_USERS.anaCentro, TEST_USERS.gerenteGeneral]) {
       const ctx = await browser.newContext();
       const p = await ctx.newPage();

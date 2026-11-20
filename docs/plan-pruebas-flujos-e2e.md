@@ -70,6 +70,7 @@ es grande, se registra y se decide antes de tocar código.
 | Variables | `E2E_REAL=1`, `API_BASE=http://127.0.0.1:8000`, `BASE_URL=http://localhost:5173`, `E2E_DB=<ruta a db.e2e.sqlite3>` |
 | Helpers existentes | `e2e/helpers/backend.ts` (`API_BASE`, `IS_LOCAL_API`, `wakeBackend`), `e2e/fixtures/test-users.ts` |
 | Spec de referencia | `e2e/sales.real.spec.ts` (estilo, verificación en BD con `sqlite3`) |
+| Herramientas del sistema | `sqlite3` (verificación en BD) y `pdftotext` de `poppler-utils` (los reportes son PDF) |
 
 ### 1.2 Datos semilla
 
@@ -121,8 +122,8 @@ Rutas con `roleGuard` (ver `src/app/app.routes.ts`):
 | Ruta | Roles |
 |---|---|
 | `branches`, `admin`, `branchPricing` | admin |
-| `manager`, `inventoryByBranch` | admin, manager |
-| `sales`, `inventory`, `reports`, `history`, `suppliers`, `clients`, `notifications` | cualquier usuario autenticado |
+| `manager`, `inventoryByBranch`, `reports` | admin, manager (reportes: el back da 403 al cajero, H-F4-3) |
+| `sales`, `inventory`, `history`, `suppliers`, `clients`, `notifications` | cualquier usuario autenticado |
 
 Cada flujo se prueba con **los roles que deben poder hacerlo** y con **uno que no debe**.
 
@@ -396,6 +397,10 @@ con el formato de [plan-pruebas-admin-auth-ventas.md](plan-pruebas-admin-auth-ve
 | H-F3-3 | F3 | FLU-PRO-003 | Front / proveedores | Media | Los errores del back se mostraban como `Http failure response…` | `resolveErrorMessage` no leía `{"error": …}` | Lo lee (TDD: jest) | Corregido |
 | H-F3-4 | F3 | FLU-USR-003b | **Back** / usuarios | Alta | Un usuario desactivado (`is_active=false`) puede hacer login: `POST /api/login` → 200 con tokens | `UserService.login` no revisa `is_active` (`usuario/services/usuario_service.py`) | Esperado 401. Prueba en `test.fixme` | **Reportado al back** |
 | H-F3-5 | F3 | FLU-USR-005b | **Back** / usuarios | Media | Se acepta un correo duplicado: `POST /api/users` → 201 | `User.email` no es único y `create_user` no lo valida (`usuario/services/usuario_service.py`) | Esperado 400. Prueba en `test.fixme` | **Reportado al back** |
+| H-F4-1 | F4 | FLU-GER-001b, FLU-GER-002b | Front / gerente | Alta | `/manager` (gestión de cajeros) es una maqueta: 3 cajeros fijos y un formulario que no guarda nada | Pantalla sin conectar a facade/repositorio | Funcionalidad sin construir, no un bug puntual. Cubierto por API (GER-001/002); UI en `test.fixme`. **Decisión: se construye como tarea aparte al terminar F6** | Abierto (planeado) |
+| H-F4-2 | F4 | FLU-REP-006 | **Back** / reportes | Media | El reporte del gerente de Centro incluye ventas de Norte (`GET /api/reporte/?tipo=day`) | `ReporteVentaService` / `VentaRepository.get_ventas_por_rango` no filtran por sucursal del usuario (`ventas/services/reporte_venta_service.py`, `ventas/repositories/venta_repository.py`, `ventas/views/reporte_venta_view.py`) | Confirmar regla con negocio; el resto de módulos limita al encargado a su sucursal. Prueba en `test.fixme` | **Reportado al back** |
+| H-F4-3 | F4 | FLU-REP-005 | Front / reportes | Media | El cajero ve "Reportes" en el menú y entra a `/reports`, pero el back responde 403 | Ruta y sidebar sin restricción de rol | Ruta y menú solo para admin/manager (TDD: E2E + jest) | Corregido |
+| H-F4-4 | F4 | FLU-NOT-003b | **Back** / notificaciones | Media | Las alertas ya resueltas siguen listadas: tras reponer stock el usuario sigue viendo "quedan 9 unidades", y al llegar a 0 ve juntas la de stock bajo (resuelta) y la de agotado | `NotificationRepository.list_for_user` no filtra `resuelta_en` y `NotificationService._to_dict` no lo expone (`notifications/repositories/notification_repository.py`, `notifications/services/notification_service.py`) | Prueba en `test.fixme` | **Reportado al back** |
 
 ---
 
@@ -407,6 +412,7 @@ con el formato de [plan-pruebas-admin-auth-ventas.md](plan-pruebas-admin-auth-ve
 | D-2 | Tarjeta: ¿solo es un método de pago o hay pasarela? | Confirmar en el POS; si hay pasarela, usar su modo de prueba |
 | D-3 | Campos exactos de clientes y proveedores (RFC, teléfono) | Confirmar con los formularios al implementar F3 |
 | D-4 | Umbral de stock bajo usado en `FLU-NOT` | Leerlo de `notifications/services/thresholds.py` en la semilla |
+| D-5 | `/manager` es maqueta (H-F4-1) | **Resuelta**: construir la gestión de cajeros del gerente como tarea aparte al terminar F6 y quitar el `fixme` de FLU-GER-001b/002b |
 
 ---
 
@@ -418,6 +424,6 @@ con el formato de [plan-pruebas-admin-auth-ventas.md](plan-pruebas-admin-auth-ve
 | F1 | 2026-11-19 | 25 | 25 | 0 | H-F1-1, H-F1-2 | Matriz 3 cajeros × Efectivo/Tarjeta verificada en BD; 3 corridas sin reset + 1 con reset; `--retries=0` en verde. Historial sin filtro de fecha/sucursal en la UI → FLU-HIS-002 cubre folio/cajero/método |
 | F2 | 2026-11-19 | 14 | 14 | 0 | H-F2-1, H-F2-2 | F1+F2 juntas 39/39 con BD recién reseteada y `--retries=0`. Sin UI: usuario en movimientos (IXS-005) y historial de precios (PRE-003) → verificados por API/BD |
 | F3 | 2026-11-19 | 19 | 17 | 2 (fixme back) | H-F3-1..5 | F1–F3 juntas 56 ok / 2 fixme con BD reseteada y `--retries=0`; jest 1590/1590; E2E con mocks 61 ok. F2 sigue verde con el fix del back `e952c4a`. Sin UI: búsqueda/paginación de clientes, edición de rol/sucursal en `/admin` (USR-002 por API). Back sin regla de duplicados en clientes/proveedores |
-| F4 | | | | | | |
+| F4 | 2026-11-19 | 15 | 11 | 4 (2 back, 2 UI sin construir) | H-F4-1..4 | F1–F4 juntas 71 ok / 6 fixme con BD reseteada y `--retries=0`; jest 1592/1592; E2E con mocks 64 ok. Seed: `gerente.general` sin `is_staff` (con staff el back lo trata como admin). Reportes solo en PDF: se leen con `pdftotext` |
 | F5 | | | | | | |
 | F6 | | | | | | |
