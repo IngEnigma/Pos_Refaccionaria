@@ -63,6 +63,7 @@ describe('InventoryMovementRepositoryImpl', () => {
   it('registerEntryExit envía POST al bulk con body snake_case', () => {
     const payload: RegisterMovementPayload = {
       idInventario: 3,
+      idSucursal: 1,
       tipoMovimiento: 'SALIDA',
       razon: 'Merma',
       observaciones: 'Dañado',
@@ -75,6 +76,7 @@ describe('InventoryMovementRepositoryImpl', () => {
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toEqual({
       id_inventario: 3,
+      id_sucursal: 1,
       tipo_movimiento: 'SALIDA',
       razon: 'Merma',
       observaciones: 'Dañado',

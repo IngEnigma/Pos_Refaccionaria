@@ -44,6 +44,7 @@
     }
   </div>
 
+  @if (canManage()) {
   <div class="inv-card__actions">
     <button type="button" class="inv-card__btn inv-card__btn--primary" (click)="onModify()" aria-label="Modificar producto">
       <lucide-icon name="Pencil" [size]="14"></lucide-icon>
@@ -57,4 +58,5 @@
       <lucide-icon name="Trash2" [size]="16"></lucide-icon>
     </button>
   </div>
+  }
 </article>

@@ -27,7 +27,8 @@ export const routes: Routes = [
   },
   {
     path: AppRoutes.reports,
-    canActivate: [authGuard],
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['admin', 'manager'] },
     component: MainLayoutComponent,
     loadChildren: () =>
       import('@features/reports/reports.routes').then((m) => m.REPORTS_ROUTES),

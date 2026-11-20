@@ -7,7 +7,7 @@
         <th>Teléfono</th>
         <th>Correo</th>
         <th>RFC</th>
-        <th class="actions-column">Acciones</th>
+        <th class="actions-column" *ngIf="canManage()">Acciones</th>
       </tr>
     </thead>
     <tbody>
@@ -50,7 +50,7 @@
               <span class="text-muted">—</span>
             </ng-template>
           </td>
-          <td class="actions-cell">
+          <td class="actions-cell" *ngIf="canManage()">
             <div class="action-buttons">
               <button class="btn-action edit" (click)="edit.emit(client)" title="Editar">
                 <lucide-icon name="Pencil" [size]="16"></lucide-icon>

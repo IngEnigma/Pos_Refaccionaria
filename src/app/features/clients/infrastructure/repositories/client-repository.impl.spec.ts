@@ -78,11 +78,11 @@ describe('ClientRepositoryImpl', () => {
       id_sucursal: 1,
       nombre: 'Juan',
       apellido_paterno: 'Pérez',
-      apellido_materno: null,
+      apellido_materno: '',
       telefono: '2711234567',
       correo: null,
-      direccion: null,
-      rfc: null,
+      direccion: '',
+      rfc: '',
     });
     req.flush(dto);
 

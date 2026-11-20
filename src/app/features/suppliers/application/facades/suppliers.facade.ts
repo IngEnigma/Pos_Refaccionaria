@@ -104,7 +104,8 @@ export class SuppliersFacade {
 
   private resolveErrorMessage(error: unknown): string {
     if (error instanceof HttpErrorResponse) {
-      return error.error?.message || error.message || 'No fue posible completar la operación.';
+      // H-F3-3: el back responde {"error": ...}; sin esto se mostraba "Http failure response...".
+      return error.error?.message || error.error?.error || error.message || 'No fue posible completar la operación.';
     }
 
     if (error instanceof Error && error.message) {

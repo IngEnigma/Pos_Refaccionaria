@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, effect, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, OnInit } from '@angular/core';
 import { LucideAngularModule } from 'lucide-angular';
 import { Dialog, DialogModule } from '@angular/cdk/dialog';
 
 import { ToastService } from '@shared/ui/components/toast/toast.service';
 import { ConfirmDialogComponent } from '@shared/ui/components/confirm-dialog/confirm-dialog.component';
+import { AuthFacade } from '@features/auth/application/facades/auth.facade';
 import { SuppliersFacade } from '../../../application/facades/suppliers.facade';
 import { SupplierListComponent } from '../../components/supplier-list/supplier-list.component';
 import { SupplierFormDialogComponent } from '../../components/supplier-form-dialog/supplier-form-dialog.component';
@@ -27,6 +28,10 @@ export class SuppliersPageComponent implements OnInit {
   readonly suppliersFacade = inject(SuppliersFacade);
   private readonly toastService = inject(ToastService);
   private readonly dialog = inject(Dialog);
+  private readonly authFacade = inject(AuthFacade);
+
+  /** H-F3-2: editar/eliminar exigen encargado o admin en el back; el cajero solo crea y consulta. */
+  readonly canManage = computed(() => this.authFacade.role() !== 'seller');
 
   constructor() {
     effect(() => {

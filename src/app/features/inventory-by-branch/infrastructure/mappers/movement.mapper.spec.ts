@@ -29,6 +29,7 @@ describe('MovementMapper', () => {
   it('toRegisterRequestDto convierte el payload y sus items a snake_case', () => {
     const payload: RegisterMovementPayload = {
       idInventario: 3,
+      idSucursal: 1,
       tipoMovimiento: 'SALIDA',
       razon: 'Merma',
       observaciones: 'Producto dañado',
@@ -41,6 +42,7 @@ describe('MovementMapper', () => {
 
     expect(MovementMapper.toRegisterRequestDto(payload)).toEqual({
       id_inventario: 3,
+      id_sucursal: 1,
       tipo_movimiento: 'SALIDA',
       razon: 'Merma',
       observaciones: 'Producto dañado',
@@ -56,6 +58,7 @@ describe('MovementMapper', () => {
   it('toRegisterRequestDto deja opcionales ausentes como undefined', () => {
     const payload: RegisterMovementPayload = {
       idInventario: 3,
+      idSucursal: 1,
       tipoMovimiento: 'ENTRADA',
       razon: 'Compra',
       items: [{ idProducto: 1, cantidad: 1 }],

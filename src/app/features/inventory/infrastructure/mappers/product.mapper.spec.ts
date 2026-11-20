@@ -184,4 +184,15 @@ describe('ProductMapper', () => {
       codigoSAT: undefined,
     });
   });
+
+  // H-F6-1: el back responde 400 NOT NULL con null en descripción/SAT; deben viajar como ''.
+  it('create y update mandan "" en lugar de null en descripción y SAT', () => {
+    const base: CreateProductPayload = {
+      idTipo: 3, idProveedor: 11, clave: 'K', nombre: 'N', descripcion: null,
+      codigoBarras: '1', precioVenta: 1, marca: 'M', costo: 1, codigoSat: null,
+    };
+
+    expect(ProductMapper.toCreateRequestDto(base)).toMatchObject({ descripcion: '', codigoSAT: '' });
+    expect(ProductMapper.toUpdateRequestDto(base)).toMatchObject({ descripcion: '', codigoSAT: '' });
+  });
 });

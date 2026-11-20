@@ -33,6 +33,12 @@ describe('filterSidebarItems', () => {
       expect(idsFor('seller')).not.toContain('manager-cashiers');
     });
 
+    it('seller no ve Reportes (el back exige reporte.ver) y manager y admin sí', () => {
+      expect(idsFor('seller')).not.toContain('reports');
+      expect(idsFor('manager')).toContain('reports');
+      expect(idsFor('admin')).toContain('reports');
+    });
+
     it('manager ve Cajeros pero no Administración', () => {
       expect(idsFor('manager')).toContain('manager-cashiers');
       expect(idsFor('manager')).not.toContain('admin');

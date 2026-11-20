@@ -149,6 +149,19 @@ describe('InventoryByBranchPageComponent', () => {
     );
   });
 
+  // H-F2-1: al recargar la página la sucursal llega después (perfil asíncrono): debe cargar cuando aparece.
+  it('si la sucursal llega después de iniciar, carga inventario y movimientos una sola vez', () => {
+    sucursalId.set(null);
+    flush();
+    expect(loadMyBranchInventory).not.toHaveBeenCalled();
+
+    sucursalId.set(1);
+    flush();
+
+    expect(loadMyBranchInventory).toHaveBeenCalledTimes(1);
+    expect(loadMovements).toHaveBeenCalledTimes(1);
+  });
+
   // Comprueba que registrar movimiento sin inventario seleccionado falle con toast y sin diálogo.
   it('registrar movimiento sin inventario muestra error', () => {
     flush();
@@ -195,8 +208,10 @@ describe('InventoryByBranchPageComponent', () => {
 
     component.onRegisterMovement(item);
 
+    // H-F2-2: el back identifica el movimiento por sucursal (id_sucursal); el inventario del front ya no trae id propio.
     expect(registerMovement).toHaveBeenCalledWith({
       idInventario: 3,
+      idSucursal: 1,
       tipoMovimiento: 'SALIDA',
       razon: 'Merma',
       observaciones: 'Dañado',
@@ -256,6 +271,7 @@ describe('InventoryByBranchPageComponent', () => {
 
     expect(registerMovement).toHaveBeenCalledWith({
       idInventario: 3,
+      idSucursal: 1,
       tipoMovimiento: 'ENTRADA',
       razon: 'Compra',
       observaciones: undefined,

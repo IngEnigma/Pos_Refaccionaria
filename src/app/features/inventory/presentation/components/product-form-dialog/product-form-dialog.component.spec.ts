@@ -17,10 +17,12 @@ import {
   ShieldCheck,
   Check,
   Save,
+  Truck,
 } from 'lucide-angular';
 
 import { ProductFormDialogComponent, ProductFormDialogData } from './product-form-dialog.component';
 import { ProductTypesFacade } from '@features/sales';
+import { SuppliersFacade } from '@features/suppliers/application/facades/suppliers.facade';
 import { Product } from '@features/inventory/domain/entities/product.entity';
 
 // Unitario: validaciones y normalización del formulario de producto con DialogRef/DIALOG_DATA simulados.
@@ -28,6 +30,7 @@ describe('ProductFormDialogComponent', () => {
   let fixture: ComponentFixture<ProductFormDialogComponent>;
   let component: ProductFormDialogComponent;
   let dialogRef: { close: jest.Mock };
+  let suppliersStub: { loadSuppliers: jest.Mock; suppliers: () => readonly unknown[] };
   let productTypesStub: { loadProductTypes: jest.Mock; productTypes: () => readonly unknown[] };
 
   const product: Product = {
@@ -50,6 +53,7 @@ describe('ProductFormDialogComponent', () => {
         { provide: DIALOG_DATA, useValue: data },
         { provide: DialogRef, useValue: dialogRef },
         { provide: ProductTypesFacade, useValue: productTypesStub },
+        { provide: SuppliersFacade, useValue: suppliersStub },
         // Iconos lucide del template del formulario; sin ellos el render lanza error.
         importProvidersFrom(
           LucideAngularModule.pick({
@@ -66,6 +70,7 @@ describe('ProductFormDialogComponent', () => {
             ShieldCheck,
             Check,
             Save,
+            Truck,
           }),
         ),
       ],
@@ -76,6 +81,7 @@ describe('ProductFormDialogComponent', () => {
   }
 
   beforeEach(() => {
+    suppliersStub = { loadSuppliers: jest.fn(), suppliers: signal([{ id: 11, nombre: 'Proveedor 11' }]).asReadonly() };
     dialogRef = { close: jest.fn() };
     productTypesStub = {
       loadProductTypes: jest.fn(),
@@ -92,6 +98,7 @@ describe('ProductFormDialogComponent', () => {
     expect(component.productForm.get('nombre')?.value).toBe('');
     expect(component.productForm.get('precioVenta')?.value).toBe(0);
     expect(productTypesStub.loadProductTypes).toHaveBeenCalled();
+    expect(suppliersStub.loadSuppliers).toHaveBeenCalled();
     expect((fixture.nativeElement as HTMLElement).textContent).toContain('Nuevo Producto');
   });
 
@@ -144,6 +151,18 @@ describe('ProductFormDialogComponent', () => {
 
     component.productForm.get('idTipo')?.setValue(3);
     expect(component.productForm.get('idTipo')?.valid).toBe(true);
+  });
+
+  // H-F6-1: el back exige id_proveedor; el formulario lo pide como obligatorio.
+  it('proveedor requerido: null inválido, número válido', () => {
+    setup({});
+
+    component.productForm.get('idProveedor')?.setValue(null);
+    expect(component.productForm.get('idProveedor')?.invalid).toBe(true);
+
+    component.productForm.get('idProveedor')?.setValue(11);
+    expect(component.productForm.get('idProveedor')?.valid).toBe(true);
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain('Proveedor 11');
   });
 
   // Comprueba que precio y costo acepten cero pero rechacen valores negativos.
@@ -208,7 +227,7 @@ describe('ProductFormDialogComponent', () => {
       marca: 'Fram',
       descripcion: '   ',
       codigoSat: '',
-      idProveedor: null,
+      idProveedor: 11,
     });
 
     component.onSubmit();
@@ -221,9 +240,9 @@ describe('ProductFormDialogComponent', () => {
       precioVenta: 120.5,
       costo: 80,
       marca: 'Fram',
-      descripcion: null,
-      codigoSat: null,
-      idProveedor: null,
+      descripcion: '',
+      codigoSat: '',
+      idProveedor: 11,
     });
   });
 
@@ -282,7 +301,7 @@ describe('ProductFormDialogComponent', () => {
       marca: 'M',
       descripcion: null,
       codigoSat: null,
-      idProveedor: null,
+      idProveedor: 11,
     });
     fixture.detectChanges();
     expect(button.disabled).toBe(false);

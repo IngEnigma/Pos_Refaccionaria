@@ -43,6 +43,7 @@ export abstract class ProductRepository {
   abstract getProducts(params?: PaginationParams, searchParams?: ProductSearchParams): Observable<PaginatedResponse<Product>>;
   abstract getProductsByCategoria(categoria: string, params?: PaginationParams): Observable<PaginatedResponse<Product>>;
   abstract searchProducts(query: string, params?: PaginationParams, searchParams?: ProductSearchParams): Observable<PaginatedResponse<Product>>;
+  abstract getById(id: number): Observable<Product>;
   abstract getByBarcode(codigoBarras: string): Observable<Product | null>;
   abstract createProduct(payload: CreateProductPayload): Observable<Product>;
   abstract updateProduct(id: number, payload: UpdateProductPayload): Observable<Product>;

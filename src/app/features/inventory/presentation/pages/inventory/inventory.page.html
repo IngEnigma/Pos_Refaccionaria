@@ -26,6 +26,7 @@
         <app-inventory-product-grid
           [products]="paginatedProducts()"
           [loadingProducts]="loadingProducts()"
+          [canManage]="canManage()"
           (modifyProduct)="onModifyProduct($event)"
           (deleteProduct)="onDeleteProduct($event)"
           (changePrice)="onChangePrice($event)"

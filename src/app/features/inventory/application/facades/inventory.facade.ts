@@ -7,6 +7,7 @@ import { PaginationParams } from '@core/models/pagination.model';
 import { GetProductsUseCase } from '../usecase/get-products.usecase';
 import { GetProductsByCategoryUseCase } from '../usecase/get-products-by-category.usecase';
 import { SearchProductsUseCase } from '../usecase/search-products.usecase';
+import { GetProductByIdUseCase } from '../usecase/get-product-by-id.usecase';
 import { GetProductByBarcodeUseCase } from '../usecase/get-product-by-barcode.usecase';
 import { CreateProductUseCase } from '../usecase/create-product.usecase';
 import { UpdateProductUseCase } from '../usecase/update-product.usecase';
@@ -25,6 +26,7 @@ export class InventoryFacade {
   private readonly getProductsByCategoryUseCase = inject(GetProductsByCategoryUseCase);
   private readonly searchProductsUseCase = inject(SearchProductsUseCase);
   private readonly getProductByBarcodeUseCase = inject(GetProductByBarcodeUseCase);
+  private readonly getProductByIdUseCase = inject(GetProductByIdUseCase);
   private readonly deleteProductUseCase = inject(DeleteProductUseCase);
   private readonly createProductUseCase = inject(CreateProductUseCase);
   private readonly updateProductUseCase = inject(UpdateProductUseCase);
@@ -71,6 +73,10 @@ export class InventoryFacade {
 
   getProductByBarcode(codigoBarras: string): Observable<Product | null> {
     return this.getProductByBarcodeUseCase.execute(codigoBarras);
+  }
+
+  getProductById(id: number): Observable<Product> {
+    return this.getProductByIdUseCase.execute(id);
   }
 
   private fetchProducts(filter: ProductFilter, pageIndex: number, append: boolean, searchParams?: ProductSearchParams): void {
@@ -189,7 +195,8 @@ export class InventoryFacade {
 
   private resolveErrorMessage(error: unknown): string {
     if (error instanceof HttpErrorResponse) {
-      return error.message || 'No fue posible cargar los productos.';
+      // H-F6-12: el back responde {"error": ...}; sin esto se mostraba "Http failure response...".
+      return error.error?.message || error.error?.error || error.message || 'No fue posible cargar los productos.';
     }
 
     if (error instanceof Error && error.message) {

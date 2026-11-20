@@ -19,8 +19,9 @@ const ONLY_ADMIN = [
 const ADMIN_OR_MANAGER = [
   { ruta: '/inventory-by-branch', menu: 'Inventario Sucursal' },
   { ruta: '/manager/cashiers', menu: 'Cajeros' },
+  { ruta: '/reports', menu: 'Reportes' }, // H-F4-3: el back da 403 al cajero (reporte.ver)
 ];
-const ALL_ROLES_MENU = ['Menú', 'Inventario', 'Reportes', 'Historial', 'Proveedores', 'Clientes', 'Notificaciones'];
+const ALL_ROLES_MENU = ['Menú', 'Inventario', 'Historial', 'Proveedores', 'Clientes', 'Notificaciones'];
 
 async function enter(page: Page, role: E2eRole, ruta: string) {
   await loginAs(page, role);

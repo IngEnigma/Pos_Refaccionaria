@@ -18,6 +18,7 @@ type GridProduct = Product | InventoryItem;
 export class InventoryProductGridComponent implements AfterViewInit, OnDestroy {
   readonly products = input<readonly GridProduct[]>([]);
   readonly loadingProducts = input(false);
+  readonly canManage = input(true);
 
   readonly modifyProduct = output<GridProduct>();
   readonly deleteProduct = output<GridProduct>();

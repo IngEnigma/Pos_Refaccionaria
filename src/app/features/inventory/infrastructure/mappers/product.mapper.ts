@@ -85,12 +85,13 @@ export class ProductMapper {
       id_proveedor: payload.idProveedor,
       clave: payload.clave,
       nombre: payload.nombre,
-      descripcion: payload.descripcion,
+      // H-F6-1: el back no acepta null en estos dos opcionales; '' sí.
+      descripcion: payload.descripcion ?? '',
       codigo_barras: payload.codigoBarras,
       precio_venta: payload.precioVenta,
       marca: payload.marca,
       costo: payload.costo,
-      codigoSAT: payload.codigoSat,
+      codigoSAT: payload.codigoSat ?? '',
     };
   }
 
@@ -100,12 +101,12 @@ export class ProductMapper {
       id_proveedor: payload.idProveedor,
       clave: payload.clave,
       nombre: payload.nombre,
-      descripcion: payload.descripcion,
+      descripcion: payload.descripcion === null ? '' : payload.descripcion,
       codigo_barras: payload.codigoBarras,
       precio_venta: payload.precioVenta,
       marca: payload.marca,
       costo: payload.costo,
-      codigoSAT: payload.codigoSat,
+      codigoSAT: payload.codigoSat === null ? '' : payload.codigoSat,
     };
   }
 }

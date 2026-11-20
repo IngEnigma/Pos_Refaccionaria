@@ -4,9 +4,9 @@
       <div>
         <p class="eyebrow">Gerente</p>
         <h1 class="page-title">Cajeros de mi sucursal</h1>
-        <p class="page-subtitle">Alta visual de cajeros asignados a la sucursal del gerente.</p>
+        <p class="page-subtitle">Alta, edición y baja de los cajeros de tu sucursal.</p>
       </div>
-      <button class="btn-primary" type="button">
+      <button class="btn-primary" type="button" (click)="clear()">
         <lucide-icon name="Plus" [size]="18" aria-hidden="true"></lucide-icon>
         Nuevo cajero
       </button>
@@ -16,44 +16,30 @@
       <article class="panel">
         <div class="panel-header">
           <div>
-            <h2>Crear cajero</h2>
+            <h2>{{ editing() ? 'Editar cajero' : 'Crear cajero' }}</h2>
             <p>El gerente solo puede registrar usuarios con rol cajero.</p>
           </div>
         </div>
 
-        <form class="form-grid">
+        <form class="form-grid" [formGroup]="form" (ngSubmit)="save()">
           <div class="field full">
-            <label for="cashier-name">Nombre completo</label>
-            <input id="cashier-name" type="text" placeholder="Nombre y apellidos" />
+            <label for="cashier-username">Usuario</label>
+            <input id="cashier-username" type="text" formControlName="username" placeholder="usuario.cajero" />
           </div>
           <div class="field">
             <label for="cashier-email">Correo</label>
-            <input id="cashier-email" type="email" placeholder="cajero@trt.com" />
+            <input id="cashier-email" type="email" formControlName="email" placeholder="cajero@trt.com" />
           </div>
           <div class="field">
-            <label for="cashier-phone">Teléfono</label>
-            <input id="cashier-phone" type="tel" placeholder="55 1234 5678" />
-          </div>
-          <div class="field">
-            <label for="cashier-shift">Turno</label>
-            <select id="cashier-shift">
-              <option>Matutino</option>
-              <option>Vespertino</option>
-              <option>Mixto</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="cashier-status">Estado</label>
-            <select id="cashier-status">
-              <option>Activo</option>
-              <option>Invitado</option>
-            </select>
+            <label for="cashier-password">Contraseña</label>
+            <input id="cashier-password" type="password" formControlName="password" autocomplete="new-password"
+              [placeholder]="editing() ? 'Vacía = sin cambios' : ''" />
           </div>
           <div class="form-actions full">
-            <button class="btn-secondary" type="button">Limpiar</button>
-            <button class="btn-primary" type="button">
+            <button class="btn-secondary" type="button" (click)="clear()">Limpiar</button>
+            <button class="btn-primary" type="submit">
               <lucide-icon name="Save" [size]="17" aria-hidden="true"></lucide-icon>
-              Crear cajero
+              {{ editing() ? 'Guardar cambios' : 'Crear cajero' }}
             </button>
           </div>
         </form>
@@ -65,17 +51,8 @@
             <lucide-icon name="Users" [size]="20" aria-hidden="true"></lucide-icon>
           </span>
           <div>
-            <strong>3</strong>
+            <strong>{{ cashiers().length }}</strong>
             <span>Cajeros registrados</span>
-          </div>
-        </div>
-        <div class="summary-card">
-          <span class="summary-icon">
-            <lucide-icon name="ShieldCheck" [size]="20" aria-hidden="true"></lucide-icon>
-          </span>
-          <div>
-            <strong>Matriz Centro</strong>
-            <span>Sucursal asignada</span>
           </div>
         </div>
       </aside>
@@ -84,29 +61,34 @@
     <section class="table-panel">
       <div class="panel-header">
         <div>
-          <h2>Cajeros recientes</h2>
-          <p>Vista de usuarios creados por el gerente.</p>
+          <h2>Cajeros</h2>
+          <p>Cajeros de tu sucursal.</p>
         </div>
       </div>
 
       <div class="table-scroll">
         <table>
-          <caption class="sr-only">Cajeros recientes con correo, turno y estado</caption>
+          <caption class="sr-only">Cajeros con correo y estado</caption>
           <thead>
             <tr>
               <th>Cajero</th>
               <th>Correo</th>
-              <th>Turno</th>
               <th>Estado</th>
+              <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
-            @for (cashier of cashiers; track cashier.email) {
+            @for (cashier of cashiers(); track cashier.id) {
               <tr>
-                <td><strong>{{ cashier.name }}</strong></td>
+                <td><strong>{{ cashier.username }}</strong></td>
                 <td>{{ cashier.email }}</td>
-                <td>{{ cashier.shift }}</td>
-                <td><span class="status" [class.pending]="cashier.status === 'Invitado'">{{ cashier.status }}</span></td>
+                <td><span class="status" [class.pending]="!cashier.isActive">{{ cashier.isActive ? 'Activo' : 'Inactivo' }}</span></td>
+                <td>
+                  <button class="btn-secondary" type="button" (click)="edit(cashier)">Editar</button>
+                  @if (cashier.isActive) {
+                    <button class="btn-secondary" type="button" (click)="deactivate(cashier)">Dar de baja</button>
+                  }
+                </td>
               </tr>
             }
           </tbody>

@@ -66,10 +66,21 @@ describe('ClientMapper', () => {
       telefono: '2711234567',
     });
 
-    expect(request.apellido_materno).toBeNull();
+    // H-F3-1: el backend no admite null en apellido_materno/direccion/rfc (CharField): se envía cadena vacía. correo sí admite null.
+    expect(request.apellido_materno).toBe('');
+    expect(request.direccion).toBe('');
+    expect(request.rfc).toBe('');
     expect(request.correo).toBeNull();
-    expect(request.direccion).toBeNull();
-    expect(request.rfc).toBeNull();
+  });
+
+  // H-F3-1: el formulario manda null en los opcionales vacíos; al editar, el backend responde 400 (NOT NULL) si llegan como null.
+  it('toUpdateRequestDto envía cadena vacía en los textos opcionales en null', () => {
+    const request = ClientMapper.toUpdateRequestDto({ apellidoMaterno: null, direccion: null, rfc: null, correo: null } as never);
+
+    expect(request.apellido_materno).toBe('');
+    expect(request.direccion).toBe('');
+    expect(request.rfc).toBe('');
+    expect(request.correo).toBeNull();
   });
 
   // Comprueba que la actualización parcial conserve los valores tal cual, sin forzar null.

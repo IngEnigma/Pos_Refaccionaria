@@ -6,6 +6,7 @@ import { InventoryFacade } from './inventory.facade';
 import { GetProductsUseCase } from '../usecase/get-products.usecase';
 import { GetProductsByCategoryUseCase } from '../usecase/get-products-by-category.usecase';
 import { SearchProductsUseCase } from '../usecase/search-products.usecase';
+import { GetProductByIdUseCase } from '../usecase/get-product-by-id.usecase';
 import { GetProductByBarcodeUseCase } from '../usecase/get-product-by-barcode.usecase';
 import { CreateProductUseCase } from '../usecase/create-product.usecase';
 import { UpdateProductUseCase } from '../usecase/update-product.usecase';
@@ -22,6 +23,7 @@ describe('InventoryFacade', () => {
   let getProductsByCategoryUseCase: { execute: jest.Mock };
   let searchProductsUseCase: { execute: jest.Mock };
   let getProductByBarcodeUseCase: { execute: jest.Mock };
+  let getProductByIdUseCase: { execute: jest.Mock };
   let createProductUseCase: { execute: jest.Mock };
   let updateProductUseCase: { execute: jest.Mock };
   let deleteProductUseCase: { execute: jest.Mock };
@@ -52,6 +54,7 @@ describe('InventoryFacade', () => {
     getProductsByCategoryUseCase = { execute: jest.fn() };
     searchProductsUseCase = { execute: jest.fn() };
     getProductByBarcodeUseCase = { execute: jest.fn() };
+    getProductByIdUseCase = { execute: jest.fn() };
     createProductUseCase = { execute: jest.fn() };
     updateProductUseCase = { execute: jest.fn() };
     deleteProductUseCase = { execute: jest.fn() };
@@ -63,6 +66,7 @@ describe('InventoryFacade', () => {
         { provide: GetProductsByCategoryUseCase, useValue: getProductsByCategoryUseCase },
         { provide: SearchProductsUseCase, useValue: searchProductsUseCase },
         { provide: GetProductByBarcodeUseCase, useValue: getProductByBarcodeUseCase },
+        { provide: GetProductByIdUseCase, useValue: getProductByIdUseCase },
         { provide: CreateProductUseCase, useValue: createProductUseCase },
         { provide: UpdateProductUseCase, useValue: updateProductUseCase },
         { provide: DeleteProductUseCase, useValue: deleteProductUseCase },
@@ -307,6 +311,25 @@ describe('InventoryFacade', () => {
     expect(created?.id).toBe(77);
     expect(facade.errorMessage()).toBeNull();
     expect(facade.loading()).toBe(false);
+  });
+
+  // H-F6-12: el back responde {"error": ...}; el mensaje debe llegar tal cual a la UI.
+  it('createProduct con {"error": ...} del back expone ese texto', () => {
+    const error = new HttpErrorResponse({ status: 400, error: { error: 'UNIQUE constraint failed: producto_producto.clave' } });
+    createProductUseCase.execute.mockReturnValue(throwError(() => error));
+
+    facade.createProduct({} as CreateProductPayload).subscribe({ error: () => undefined });
+
+    expect(facade.errorMessage()).toBe('UNIQUE constraint failed: producto_producto.clave');
+  });
+
+  // H-F6-3: getProductById delega el id al caso de uso.
+  it('getProductById delega el id', () => {
+    getProductByIdUseCase.execute.mockReturnValue(of(makeProduct(9)));
+
+    facade.getProductById(9).subscribe();
+
+    expect(getProductByIdUseCase.execute).toHaveBeenCalledWith(9);
   });
 
   // Comprueba que updateProduct delegue id y payload sin transformaciones.

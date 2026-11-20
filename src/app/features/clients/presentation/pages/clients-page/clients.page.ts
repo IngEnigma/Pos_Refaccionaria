@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, effect, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, OnInit } from '@angular/core';
 import { LucideAngularModule } from 'lucide-angular';
 import { Dialog, DialogModule } from '@angular/cdk/dialog';
 
@@ -31,6 +31,8 @@ export class ClientsPageComponent implements OnInit {
   private readonly dialog = inject(Dialog);
 
   readonly sucursalId = this.authFacade.sucursalId;
+  /** H-F3-2: editar/eliminar exigen encargado o admin en el back; el cajero solo crea y consulta. */
+  readonly canManage = computed(() => this.authFacade.role() !== 'seller');
 
   constructor() {
     effect(() => {

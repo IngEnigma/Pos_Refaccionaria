@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, effect, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, untracked } from '@angular/core';
 import { LucideAngularModule } from 'lucide-angular';
 import { Dialog, DialogModule } from '@angular/cdk/dialog';
 
@@ -25,7 +25,7 @@ import { MovementFormDialogComponent } from '../../components/movement-form-dial
   styleUrls: ['./inventory.page.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class InventoryByBranchPageComponent implements OnInit {
+export class InventoryByBranchPageComponent {
   readonly authFacade = inject(AuthFacade);
   readonly inventoryFacade = inject(InventoryByBranchFacade);
   private readonly toastService = inject(ToastService);
@@ -39,14 +39,15 @@ export class InventoryByBranchPageComponent implements OnInit {
       }
       // H-43: el toast escribe una señal; sin esto Angular lanza NG0600 y el error no se mostraba.
     }, { allowSignalWrites: true });
-  }
 
-  ngOnInit(): void {
-    const sucursalId = this.authFacade.sucursalId();
-    if (sucursalId) {
-      this.inventoryFacade.loadMyBranchInventory();
-      this.inventoryFacade.loadMovements();
-    }
+    // H-F2-1: tras recargar, la sucursal llega con el perfil (asíncrono); se carga cuando aparece, no solo al iniciar.
+    effect(() => {
+      if (!this.authFacade.sucursalId()) return;
+      untracked(() => {
+        this.inventoryFacade.loadMyBranchInventory();
+        this.inventoryFacade.loadMovements();
+      });
+    }, { allowSignalWrites: true });
   }
 
   onRegisterMovement(item: InventoryItem): void {
@@ -71,6 +72,7 @@ export class InventoryByBranchPageComponent implements OnInit {
 
       this.inventoryFacade.registerMovement({
         idInventario: formValue.idInventario,
+        idSucursal: inventario.idSucursal,
         tipoMovimiento: formValue.tipoMovimiento,
         razon: formValue.razon,
         observaciones: formValue.observaciones,
@@ -105,6 +107,7 @@ export class InventoryByBranchPageComponent implements OnInit {
 
       this.inventoryFacade.registerMovement({
         idInventario: formValue.idInventario,
+        idSucursal: inventario.idSucursal,
         tipoMovimiento: formValue.tipoMovimiento,
         razon: formValue.razon,
         observaciones: formValue.observaciones,

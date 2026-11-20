@@ -11,6 +11,7 @@ export interface InventoryMovement {
 
 export interface RegisterMovementPayload {
   idInventario: number;
+  idSucursal: number;
   tipoMovimiento: MovementType;
   razon: string;
   observaciones?: string;

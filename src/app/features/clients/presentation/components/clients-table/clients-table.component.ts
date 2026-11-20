@@ -15,6 +15,8 @@ import { SkeletonComponent } from '@shared/ui/components/skeleton/skeleton.compo
 export class ClientsTableComponent {
   readonly clients = input<readonly Client[]>([]);
   readonly loading = input(false);
+  /** H-F3-2: el back solo deja editar/eliminar a encargado y admin (403 al cajero). */
+  readonly canManage = input(true);
 
   readonly edit = output<Client>();
   readonly delete = output<Client>();

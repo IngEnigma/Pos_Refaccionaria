@@ -15,6 +15,8 @@ import { SkeletonComponent } from '@shared/ui/components/skeleton/skeleton.compo
 export class SupplierListComponent {
   readonly suppliers = input<readonly Supplier[]>([]);
   readonly loading = input(false);
+  /** H-F3-2: el back solo deja editar/eliminar a encargado y admin (403 al cajero). */
+  readonly canManage = input(true);
   
   readonly edit = output<Supplier>();
   readonly delete = output<Supplier>();

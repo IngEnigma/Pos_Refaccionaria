@@ -38,8 +38,9 @@ export default defineConfig({
     // { name: 'webkit', use: { ...devices['Desktop Safari'] } },
     // { name: 'mobile-chrome', use: { ...devices['Pixel 7'] } },
   ],
-  // Levanta Angular automáticamente al correr `npm run e2e`
-  webServer: {
+  // Levanta Angular automáticamente al correr `npm run e2e`; con BASE_URL (e2e:local, e2e:flujos)
+  // el servidor ya lo levanta el script npm y no se arranca otro en 4200.
+  webServer: process.env['BASE_URL'] ? undefined : {
     command: 'npx ng serve --port 4200',
     url: 'http://localhost:4200',
     reuseExistingServer: !process.env['CI'],

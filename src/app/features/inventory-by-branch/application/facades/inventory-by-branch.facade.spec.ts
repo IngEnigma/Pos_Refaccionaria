@@ -181,6 +181,7 @@ describe('InventoryByBranchFacade', () => {
   it('registerMovement gestiona loading y limpia errores previos', () => {
     const payload: RegisterMovementPayload = {
       idInventario: 1,
+      idSucursal: 1,
       tipoMovimiento: 'ENTRADA',
       razon: 'Compra',
       items: [{ idProducto: 5, cantidad: 2 }],
@@ -206,6 +207,7 @@ describe('InventoryByBranchFacade', () => {
     facade
       .registerMovement({
         idInventario: 1,
+        idSucursal: 1,
         tipoMovimiento: 'SALIDA',
         razon: 'Merma',
         items: [{ idProducto: 5, cantidad: 999 }],
@@ -248,6 +250,7 @@ describe('InventoryByBranchFacade', () => {
     facade
       .registerMovement({
         idInventario: 1,
+        idSucursal: 1,
         tipoMovimiento: 'ENTRADA',
         razon: 'Compra',
         items: [{ idProducto: 1, cantidad: 1 }],
@@ -264,6 +267,7 @@ describe('InventoryByBranchFacade', () => {
     facade
       .registerMovement({
         idInventario: 1,
+        idSucursal: 1,
         tipoMovimiento: 'ENTRADA',
         razon: 'Compra',
         items: [{ idProducto: 1, cantidad: 1 }],
