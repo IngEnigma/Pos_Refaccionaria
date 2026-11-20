@@ -1100,9 +1100,9 @@
     "semantic_hash": "719aa4bb623782c9ece9ab838878de3d"
   },
   "src/app/features/manager/presentation/pages/cashiers-management/cashiers-management.page.ts": {
-    "mtime": 1780946611.1017854,
-    "ast_hash": "c4df7778f4590e876d5c70024992f995",
-    "semantic_hash": "c4df7778f4590e876d5c70024992f995"
+    "mtime": 1795187729.6586223,
+    "ast_hash": "251f0ab56a0f3f1f934478f77f52f5b9",
+    "semantic_hash": ""
   },
   "src/app/features/notifications/application/dtos/notification-create-request.dto.ts": {
     "mtime": 1787199671.8575237,
@@ -2265,8 +2265,8 @@
     "semantic_hash": ""
   },
   "src/app/features/manager/presentation/pages/cashiers-management/cashiers-management.page.html": {
-    "mtime": 1794768464.2378778,
-    "ast_hash": "ae40cdafdf0a5c52b92ef4d9b76b11cd",
+    "mtime": 1795187729.6786227,
+    "ast_hash": "56cdbb3e24872a85666d4000c2f65efd",
     "semantic_hash": ""
   },
   "src/app/features/notifications/presentation/components/notification-item/notification-item.component.html": {
@@ -3070,8 +3070,8 @@
     "semantic_hash": ""
   },
   "playwright-report/index.html": {
-    "mtime": 1795147757.6411595,
-    "ast_hash": "0d1cc43f1d87d4721e5db72cccc88b88",
+    "mtime": 1795152924.2268693,
+    "ast_hash": "4a9131e49a0ecb00c4cbacb74692e7d0",
     "semantic_hash": ""
   },
   "src/electron-ticket-escpos.spec.ts": {
@@ -3190,8 +3190,8 @@
     "semantic_hash": ""
   },
   "docs/plan-pruebas-flujos-e2e.md": {
-    "mtime": 1795147776.5495732,
-    "ast_hash": "b2d72f368ca0695abf24042f1a0d9235",
+    "mtime": 1795189012.5745835,
+    "ast_hash": "3b838da476e1a44d00cae7b1d91844f3",
     "semantic_hash": ""
   },
   "e2e/back-e2e.sh": {
@@ -3255,8 +3255,8 @@
     "semantic_hash": ""
   },
   "e2e/flujos/gerente.real.spec.ts": {
-    "mtime": 1795140763.910091,
-    "ast_hash": "40d4c6090951d7a946a4182039add503",
+    "mtime": 1795187620.0273235,
+    "ast_hash": "44a1087f08a4c4c494672227142808b4",
     "semantic_hash": ""
   },
   "e2e/flujos/reportes.real.spec.ts": {
@@ -3292,6 +3292,11 @@
   "src/app/features/inventory/application/usecase/get-product-by-id.usecase.ts": {
     "mtime": 1795151050.8248112,
     "ast_hash": "eb97bc12361371ccb1769d6c0b58e9f7",
+    "semantic_hash": ""
+  },
+  "src/app/features/manager/presentation/pages/cashiers-management/cashiers-management.page.spec.ts": {
+    "mtime": 1795187631.6396923,
+    "ast_hash": "1ef1a74b9ba03dc932f60580ea22597b",
     "semantic_hash": ""
   }
 }
