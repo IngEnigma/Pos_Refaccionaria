@@ -9,6 +9,7 @@ import { ClientsFacade } from '../../../application/facades/clients.facade';
 import { AuthFacade } from '@features/auth/application/facades/auth.facade';
 import { ToastService } from '@shared/ui/components/toast/toast.service';
 import { Client } from '../../../domain/entities/client.entity';
+import { GlobalSearchService } from '@core/search/global-search.service';
 
 // Unitario: lógica propia de la página de clientes (carga inicial, alta, edición,
 // eliminación y toast de error) con fachadas sustituidas por stubs.
@@ -89,6 +90,14 @@ describe('ClientsPageComponent', () => {
     errorSignal.set(message);
     TestBed.flushEffects();
   }
+
+  // El buscador del navbar filtra la tabla de clientes.
+  it('filtra los clientes con el texto del buscador global', () => {
+    clientsSignal.set([makeClient(1), { ...makeClient(2), nombre: 'Ana' }]);
+    TestBed.inject(GlobalSearchService).setSearchQuery('ana');
+
+    expect(component.clients().map((c) => c.id)).toEqual([2]);
+  });
 
   // Comprueba que al iniciar la página se solicite el catálogo de clientes.
   it('ngOnInit carga el catálogo de clientes', () => {

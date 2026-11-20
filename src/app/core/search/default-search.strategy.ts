@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { SearchStrategy } from './search.strategy';
+import type { SearchStrategy } from './search.strategy';
 
 @Injectable({ providedIn: 'root' })
 export class DefaultSearchStrategy<T> implements SearchStrategy<T> {

@@ -12,7 +12,7 @@
       </div>
 
       <app-clients-table
-        [clients]="clientsFacade.clients()"
+        [clients]="clients()"
         [loading]="clientsFacade.loading()"
         [canManage]="canManage()"
         (edit)="onEditClient($event)"

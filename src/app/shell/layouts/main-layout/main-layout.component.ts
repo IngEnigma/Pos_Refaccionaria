@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, effect, inject, OnInit, viewChild } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { interval, map, startWith } from 'rxjs';
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { filter, interval, map, startWith } from 'rxjs';
 import { NavbarComponent } from '../../components/navbar/navbar.component';
 import { SidebarComponent } from '../../components/sidebar/sidebar.component';
 import { ShellFacade } from '../../application/facades/shell.facade';
@@ -38,6 +38,12 @@ export class MainLayoutComponent implements OnInit {
     // POS: el lector de códigos escribe en el buscador del navbar, así que recibe el foco al entrar.
     effect(() => {
       if (this.shellFacade.searchSubmitActive()) this.navbar()?.focusSearch();
+    });
+
+    // El buscador es global: al cambiar de página se vacía para no filtrar la nueva con el texto anterior.
+    inject(Router).events.pipe(filter((e) => e instanceof NavigationEnd), takeUntilDestroyed()).subscribe(() => {
+      this.navbar()?.clearSearch();
+      this.shellFacade.setSearchQuery('');
     });
   }
 
