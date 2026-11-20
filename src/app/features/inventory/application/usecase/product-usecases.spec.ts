@@ -6,6 +6,7 @@ import { GetProductsUseCase } from './get-products.usecase';
 import { GetProductsByCategoryUseCase } from './get-products-by-category.usecase';
 import { SearchProductsUseCase } from './search-products.usecase';
 import { GetProductByBarcodeUseCase } from './get-product-by-barcode.usecase';
+import { GetProductByIdUseCase } from './get-product-by-id.usecase';
 import { CreateProductUseCase } from './create-product.usecase';
 import { UpdateProductUseCase } from './update-product.usecase';
 import { DeleteProductUseCase } from './delete-product.usecase';
@@ -20,6 +21,7 @@ describe('Casos de uso del catálogo de productos', () => {
     getProducts: jest.Mock;
     getProductsByCategoria: jest.Mock;
     searchProducts: jest.Mock;
+    getById: jest.Mock;
     getByBarcode: jest.Mock;
     createProduct: jest.Mock;
     updateProduct: jest.Mock;
@@ -47,6 +49,7 @@ describe('Casos de uso del catálogo de productos', () => {
       getProducts: jest.fn(),
       getProductsByCategoria: jest.fn(),
       searchProducts: jest.fn(),
+      getById: jest.fn(),
       getByBarcode: jest.fn(),
       createProduct: jest.fn(),
       updateProduct: jest.fn(),
@@ -59,6 +62,7 @@ describe('Casos de uso del catálogo de productos', () => {
         GetProductsByCategoryUseCase,
         SearchProductsUseCase,
         GetProductByBarcodeUseCase,
+        GetProductByIdUseCase,
         CreateProductUseCase,
         UpdateProductUseCase,
         DeleteProductUseCase,
@@ -139,6 +143,17 @@ describe('Casos de uso del catálogo de productos', () => {
     TestBed.inject(DeleteProductUseCase).execute(4).subscribe();
 
     expect(repository.deleteProduct).toHaveBeenCalledWith(4);
+  });
+
+  // Comprueba que GetProductByIdUseCase delegue el id al repositorio (H-F6-3).
+  it('GetProductByIdUseCase delega el id', () => {
+    repository.getById.mockReturnValue(of(product));
+
+    let result: Product | undefined;
+    TestBed.inject(GetProductByIdUseCase).execute(1).subscribe((p) => (result = p));
+
+    expect(repository.getById).toHaveBeenCalledWith(1);
+    expect(result).toBe(product);
   });
 
   // Comprueba que la búsqueda por código de barras devuelva el producto cuando existe.

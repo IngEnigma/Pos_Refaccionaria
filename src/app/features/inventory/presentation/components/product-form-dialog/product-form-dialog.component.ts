@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 import { Product } from '@features/inventory/domain/entities/product.entity';
 import { ProductTypesFacade } from '@features/sales';
+import { SuppliersFacade } from '@features/suppliers/application/facades/suppliers.facade';
 import { ButtonComponent } from '@shared/ui/components/button/button.component';
 import { CreateProductPayload, UpdateProductPayload } from '@features/inventory/domain/repository/product-repository';
 
@@ -30,6 +31,7 @@ export class ProductFormDialogComponent implements OnInit {
   private readonly dialogRef = inject(DialogRef<CreateProductPayload | UpdateProductPayload | null>);
   private readonly data = inject<ProductFormDialogData>(DIALOG_DATA);
   readonly productTypesFacade = inject(ProductTypesFacade);
+  readonly suppliersFacade = inject(SuppliersFacade);
 
   productForm!: FormGroup;
   isEditMode = false;
@@ -38,6 +40,7 @@ export class ProductFormDialogComponent implements OnInit {
     this.isEditMode = !!this.data?.product;
     this.initForm();
     this.productTypesFacade.loadProductTypes();
+    this.suppliersFacade.loadSuppliers();
   }
 
   private initForm(): void {
@@ -52,7 +55,7 @@ export class ProductFormDialogComponent implements OnInit {
       marca: [p?.marca || '', [Validators.required]],
       descripcion: [p?.descripcion ?? ''],
       codigoSat: [p?.codigoSat ?? '', [Validators.maxLength(8)]],
-      idProveedor: [p?.idProveedor ?? null],
+      idProveedor: [p?.idProveedor ?? null, [Validators.required]],
     });
   }
 
@@ -72,9 +75,9 @@ export class ProductFormDialogComponent implements OnInit {
     this.dialogRef.close(payload);
   }
 
-  private normalizeOptionalString(value: string | null | undefined): string | null {
-    const trimmed = value?.trim();
-    return trimmed || null;
+  // H-F6-1: el back no acepta null en descripción ni SAT; vacío viaja como ''.
+  private normalizeOptionalString(value: string | null | undefined): string {
+    return value?.trim() ?? '';
   }
 
   onCancel(): void {

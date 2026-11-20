@@ -21,6 +21,8 @@ function isInventoryItem(p: CardProduct): p is InventoryItem {
 })
 export class InventoryProductCardComponent {
   readonly product = input.required<CardProduct>();
+  // H-F6-4: editar, precio y eliminar son solo de encargado/admin (el back responde 403 al cajero).
+  readonly canManage = input(true);
 
   readonly modifyProduct = output<CardProduct>();
   readonly deleteProduct = output<CardProduct>();

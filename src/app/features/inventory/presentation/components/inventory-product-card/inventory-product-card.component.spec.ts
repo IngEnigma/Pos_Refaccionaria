@@ -119,6 +119,23 @@ describe('InventoryProductCardComponent', () => {
     expect(deleted).toBe(item);
   });
 
+  // H-F6-4: sin canManage (cajero) no se ofrecen Editar, Precio ni Eliminar.
+  it('sin canManage oculta las acciones', () => {
+    fixture = TestBed.createComponent(InventoryProductCardComponent);
+    fixture.componentRef.setInput('product', item);
+    fixture.componentRef.setInput('canManage', false);
+    fixture.detectChanges();
+
+    expect((fixture.nativeElement as HTMLElement).querySelectorAll('button')).toHaveLength(0);
+  });
+
+  // Comprueba que con canManage (por defecto) se muestren las tres acciones.
+  it('con canManage muestra las tres acciones', () => {
+    setup(item);
+
+    expect((fixture.nativeElement as HTMLElement).querySelectorAll('button')).toHaveLength(3);
+  });
+
   // Comprueba que la tarjeta muestre nombre, marca y precio observables en el DOM.
   it('muestra nombre, marca y precio en el template', () => {
     setup(item);

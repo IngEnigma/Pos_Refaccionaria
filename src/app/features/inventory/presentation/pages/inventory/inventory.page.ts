@@ -17,6 +17,7 @@ import { ProductFormDialogComponent } from '../../components/product-form-dialog
 import { SetPriceDialogComponent } from '@features/branch-pricing/presentation/components/set-price-dialog/set-price-dialog.component';
 import { InventoryItem } from '@features/inventory-by-branch/domain/entities/inventory-item.entity';
 import { Product } from '../../../domain/entities/product.entity';
+import { UserRole } from '@features/auth/domain/value-objects/auth-user-role.enum';
 
 @Component({
   selector: 'app-inventory-page',
@@ -41,6 +42,9 @@ export class InventoryPageComponent implements OnInit {
   readonly branchPricingFacade = inject(BranchPricingFacade);
   readonly toastService = inject(ToastService);
   private readonly dialog = inject(Dialog);
+
+  // H-F6-4: editar, precio y eliminar solo para encargado/admin.
+  readonly canManage = computed(() => [UserRole.Manager, UserRole.Admin].includes(this.authFacade.role() as UserRole));
 
   readonly loadingCategories = computed(() => this.productTypesFacade.loading());
   // mi-sucursal como fuente (reemplaza /productos)
@@ -77,8 +81,11 @@ export class InventoryPageComponent implements OnInit {
           it.marca.toLowerCase().includes(query)
       );
     }
-    // Nota: filtro por categoría no aplica a InventoryItem (sin id_tipo), se mantiene slider pero no filtra
-    void catId;
+    // H-F6-5: mi-sucursal no trae id_tipo; se cruza con GET /productos/?tipo_id= (inventoryFacade.products).
+    if (catId) {
+      const ids = new Set(this.inventoryFacade.products().map((p) => p.id));
+      filtered = filtered.filter((it) => ids.has(it.idProducto));
+    }
     return filtered;
   });
 
@@ -96,22 +103,22 @@ export class InventoryPageComponent implements OnInit {
     effect(() => {
       const errorMsg = this.inventoryByBranchFacade.errorMessage();
       if (errorMsg) this.toastService.error(errorMsg);
-    });
+    }, { allowSignalWrites: true }); // H-F6-12: el toast escribe señales (NG0600)
 
     effect(() => {
       const errorMsg = this.inventoryFacade.errorMessage();
       if (errorMsg) this.toastService.error(errorMsg);
-    });
+    }, { allowSignalWrites: true }); // H-F6-12: el toast escribe señales (NG0600)
 
     effect(() => {
       const errorMsg = this.productTypesFacade.errorMessage();
       if (errorMsg) this.toastService.error(errorMsg);
-    });
+    }, { allowSignalWrites: true }); // H-F6-12: el toast escribe señales (NG0600)
 
     effect(() => {
       const errorMsg = this.branchPricingFacade.errorMessage();
       if (errorMsg) this.toastService.error(errorMsg);
-    });
+    }, { allowSignalWrites: true }); // H-F6-12: el toast escribe señales (NG0600)
 
     // Reset paginación al cambiar búsqueda
     effect(() => {
@@ -150,7 +157,7 @@ export class InventoryPageComponent implements OnInit {
   onSelectCategory(category: ProductType): void {
     this.selectedCategoryId.set(category.id);
     this.currentPage.set(1);
-    // Filtrado local; mi-sucursal no tiene id_tipo, solo reset paginación
+    if (category.id) this.inventoryFacade.loadProducts(1, false, { tipoId: category.id });
   }
 
   onLoadMore(): void {
@@ -175,26 +182,24 @@ export class InventoryPageComponent implements OnInit {
   }
 
   onModifyProduct(product: Product | InventoryItem): void {
-    // Producto proveniente de mi-sucursal (InventoryItem) -> mapear a Product para diálogo
-    const asProduct: Product = this.toProduct(product);
-    const dialogRef = this.dialog.open(ProductFormDialogComponent, { data: { product: asProduct } });
-    dialogRef.closed.subscribe((result) => {
-      if (result) {
-        // TODO(inventario): Revisar el identificador utilizado para la operación de
-        // actualización. Los elementos InventoryItem traen "id" = fila del detalle de
-        // inventario y "idProducto" = producto; con la prioridad actual (id ?? idProducto)
-        // la petición PUT podría dirigirse al id del detalle en lugar del id del producto.
-        // Validar con el encargado del frontend qué identificador corresponde antes de
-        // modificar esta lógica. Hallazgo pendiente de revisión, no confirmado como bug definitivo.
-        const id = (product as any).id ?? (product as InventoryItem).idProducto;
-        this.inventoryFacade.updateProduct(id, result as any).subscribe({
-          next: () => {
-            this.toastService.success('Producto actualizado correctamente');
-            this.inventoryByBranchFacade.loadMyBranchInventory();
-          },
-          error: () => {},
+    const id = this.productId(product);
+    // H-F6-3: la lista (mi-sucursal) no trae categoría, proveedor, descripción ni SAT; se carga el producto real.
+    this.inventoryFacade.getProductById(id).subscribe({
+      next: (full) => {
+        const dialogRef = this.dialog.open(ProductFormDialogComponent, { data: { product: full } });
+        dialogRef.closed.subscribe((result) => {
+          if (result) {
+            this.inventoryFacade.updateProduct(id, result as any).subscribe({
+              next: () => {
+                this.toastService.success('Producto actualizado correctamente');
+                this.inventoryByBranchFacade.loadMyBranchInventory();
+              },
+              error: () => {},
+            });
+          }
         });
-      }
+      },
+      error: () => this.toastService.error('No fue posible cargar el producto.'),
     });
   }
 
@@ -204,12 +209,7 @@ export class InventoryPageComponent implements OnInit {
       this.toastService.error('No hay sucursal asignada para cambiar precio');
       return;
     }
-    // TODO(inventario): Revisar el identificador enviado al diálogo de precios de sucursal.
-    // El mismo patrón (id ?? idProducto) puede pasar el id del detalle de inventario en
-    // lugar del id del producto, y el backend recibiría un idProducto incorrecto.
-    // Validar con el encargado del frontend qué identificador corresponde antes de
-    // modificar esta lógica. Hallazgo pendiente de revisión, no confirmado como bug definitivo.
-    const idProducto = (product as any).id ?? (product as InventoryItem).idProducto;
+    const idProducto = this.productId(product);
     const dialogRef = this.dialog.open(SetPriceDialogComponent, {
       data: { idProducto, idSucursal: sucursalId },
     });
@@ -229,12 +229,7 @@ export class InventoryPageComponent implements OnInit {
 
   onDeleteProduct(product: Product | InventoryItem): void {
     const nombre = (product as any).nombre;
-    // TODO(inventario): Revisar el identificador utilizado para la operación de
-    // eliminación. Con InventoryItem, "id" es la fila del detalle de inventario y no el
-    // producto; DELETE /productos/{id} podría borrarse contra un registro equivocado.
-    // Validar con el encargado del frontend qué identificador corresponde antes de
-    // modificar esta lógica. Hallazgo pendiente de revisión, no confirmado como bug definitivo.
-    const id = (product as any).id ?? (product as InventoryItem).idProducto;
+    const id = this.productId(product);
     const dialogRef = this.dialog.open<boolean>(ConfirmDialogComponent, {
       data: {
         title: 'Eliminar Producto',
@@ -257,24 +252,8 @@ export class InventoryPageComponent implements OnInit {
     });
   }
 
-  private toProduct(p: Product | InventoryItem): Product {
-    if ('cantidad' in p) {
-      // InventoryItem -> Product (para reutilizar ProductFormDialog)
-      const it = p as InventoryItem;
-      return {
-        id: it.idProducto,
-        idTipo: null,
-        idProveedor: null,
-        clave: it.clave,
-        nombre: it.nombre,
-        descripcion: null,
-        codigoBarras: it.codigoBarras,
-        precioVenta: it.precioBase,
-        marca: it.marca,
-        costo: it.costo,
-        codigoSat: null,
-      };
-    }
-    return p as Product;
+  // `id` de InventoryItem es la fila de stock; el producto es `idProducto` (H-F6-2).
+  private productId(p: Product | InventoryItem): number {
+    return 'idProducto' in p ? p.idProducto : p.id;
   }
 }

@@ -21,6 +21,10 @@ describe('InventoryPageComponent (catálogo)', () => {
   let fixture: ComponentFixture<InventoryPageComponent>;
   let component: InventoryPageComponent;
 
+  let role: ReturnType<typeof signal<string | null>>;
+  let facadeProducts: ReturnType<typeof signal<readonly Product[]>>;
+  let loadProducts: jest.Mock;
+  let getProductById: jest.Mock;
   let sucursalId: ReturnType<typeof signal<number | null>>;
   let searchQuery: ReturnType<typeof signal<string>>;
   let branchLoading: ReturnType<typeof signal<boolean>>;
@@ -61,6 +65,10 @@ describe('InventoryPageComponent (catálogo)', () => {
 
   beforeEach(() => {
     sucursalId = signal<number | null>(1);
+    role = signal<string | null>('manager');
+    facadeProducts = signal<readonly Product[]>([]);
+    loadProducts = jest.fn();
+    getProductById = jest.fn((id: number) => of({ id, idTipo: 1, idProveedor: 2, nombre: 'Completo' } as Product));
     searchQuery = signal('');
     branchLoading = signal(false);
     branchError = signal<string | null>(null);
@@ -82,7 +90,7 @@ describe('InventoryPageComponent (catálogo)', () => {
       providers: [
         // Iconos lucide del template (tarjetas y botón Añadir); sin ellos el render lanza error.
         importProvidersFrom(LucideAngularModule.pick({ Package, Pencil, Tag, Trash2, Plus })),
-        { provide: AuthFacade, useValue: { sucursalId: sucursalId.asReadonly() } },
+        { provide: AuthFacade, useValue: { sucursalId: sucursalId.asReadonly(), role: role.asReadonly() } },
         {
           provide: ProductTypesFacade,
           useValue: {
@@ -96,6 +104,9 @@ describe('InventoryPageComponent (catálogo)', () => {
           provide: InventoryFacade,
           useValue: {
             errorMessage: branchError.asReadonly(),
+            products: facadeProducts.asReadonly(),
+            loadProducts,
+            getProductById,
             createProduct,
             updateProduct,
             deleteProduct,
@@ -296,24 +307,20 @@ describe('InventoryPageComponent (catálogo)', () => {
     expect(deleteProduct).not.toHaveBeenCalled();
   });
 
-  // EVIDENCIA BUG: el producto del grid es InventoryItem, cuyo "id" es la fila de detalle de
-  // inventario y NO el idProducto; la página usa "id ?? idProducto" y por eso envía el id del
-  // detalle a DELETE /productos/{id}. Debería enviarse idProducto (7), no el id de detalle (70).
-  it('BUG: eliminar usa el id del detalle en lugar del idProducto', () => {
-    const item = makeItem(7); // id detalle = 70, idProducto = 7
+  // H-F6-2: el id de InventoryItem es la fila de stock; DELETE debe ir al idProducto (7), no a 70.
+  it('eliminar usa el idProducto y no el id de la fila de stock', () => {
+    const item = makeItem(7); // id fila = 70, idProducto = 7
     branchItems.set([item]);
     flush();
     dialogOpen.mockReturnValue({ closed: of(true) } as never);
 
     component.onDeleteProduct(item);
 
-    expect(deleteProduct).toHaveBeenCalledWith(70);
-    // Comportamiento correcto esperado (hoy fallaría): expect(deleteProduct).toHaveBeenCalledWith(7);
+    expect(deleteProduct).toHaveBeenCalledWith(7);
   });
 
-  // EVIDENCIA BUG: al editar, el diálogo recibe el producto mapeado con id=idProducto, pero la
-  // petición de actualización usa el id del detalle de inventario (70) en lugar de idProducto (7).
-  it('BUG: actualizar usa el id del detalle en lugar del idProducto', () => {
+  // H-F6-2 y H-F6-3: se carga el producto real por idProducto, el diálogo lo recibe y el PUT va al idProducto.
+  it('editar carga el producto por idProducto y actualiza con ese id', () => {
     const item = makeItem(7);
     branchItems.set([item]);
     flush();
@@ -321,11 +328,58 @@ describe('InventoryPageComponent (catálogo)', () => {
 
     component.onModifyProduct(item);
 
-    // El diálogo sí recibe el producto correcto (idProducto)...
+    expect(getProductById).toHaveBeenCalledWith(7);
     const dialogData = dialogOpen.mock.calls[0][1] as { data: { product: Product } };
-    expect(dialogData.data.product.id).toBe(7);
-    // ...pero la actualización se dispara con el id del detalle (comportamiento bug).
-    expect(updateProduct).toHaveBeenCalledWith(70, { nombre: 'X' });
+    expect(dialogData.data.product).toMatchObject({ id: 7, idTipo: 1, idProveedor: 2 });
+    expect(updateProduct).toHaveBeenCalledWith(7, { nombre: 'X' });
+  });
+
+  // H-F6-2: el diálogo de precio recibe el idProducto.
+  it('cambiar precio manda el idProducto al diálogo', () => {
+    flush();
+    dialogOpen.mockReturnValue({ closed: of(null) } as never);
+
+    component.onChangePrice(makeItem(7));
+
+    expect((dialogOpen.mock.calls[0][1] as { data: { idProducto: number } }).data.idProducto).toBe(7);
+  });
+
+  // H-F6-5: seleccionar categoría pide GET /productos/?tipo_id= y deja solo esos productos.
+  it('filtrar por categoría cruza con los productos del tipo', () => {
+    branchItems.set([makeItem(1), makeItem(2), makeItem(3)]);
+    flush();
+
+    component.onSelectCategory({ id: 5, nombre: 'Frenos' });
+    facadeProducts.set([{ id: 2 } as Product]);
+
+    expect(loadProducts).toHaveBeenCalledWith(1, false, { tipoId: 5 });
+    expect(component.filteredItems().map((i) => i.idProducto)).toEqual([2]);
+
+    component.onSelectCategory({ id: 0, nombre: 'Todos' });
+    expect(component.filteredItems()).toHaveLength(3);
+  });
+
+  // H-F6-4: solo encargado y admin gestionan productos.
+  it('canManage: manager y admin sí, seller no', () => {
+    role.set('manager');
+    expect(component.canManage()).toBe(true);
+    role.set('admin');
+    expect(component.canManage()).toBe(true);
+    role.set('seller');
+    expect(component.canManage()).toBe(false);
+  });
+
+  // H-F6-12: el toast escribe señales; sin allowSignalWrites el effect lanza NG0600 y no se muestra.
+  it('el toast de error del back se muestra aunque escriba señales (NG0600)', () => {
+    const toastOpen = signal(false);
+    toastError.mockImplementation(() => toastOpen.set(true));
+    flush();
+
+    branchError.set('UNIQUE constraint failed: producto_producto.clave');
+    expect(() => TestBed.flushEffects()).not.toThrow();
+
+    expect(toastError).toHaveBeenCalledWith('UNIQUE constraint failed: producto_producto.clave');
+    expect(toastOpen()).toBe(true);
   });
 
   // Comprueba que sin sucursal asignada el cambio de precio se rechace con toast de error.

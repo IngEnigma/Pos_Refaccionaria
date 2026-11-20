@@ -2,6 +2,7 @@
   @for (producto of products(); track $any(producto).id || $any(producto).idProducto) {
     <app-inventory-product-card
       [product]="$any(producto)"
+      [canManage]="canManage()"
       (modifyProduct)="modifyProduct.emit($event)"
       (deleteProduct)="deleteProduct.emit($event)"
       (changePrice)="changePrice.emit($event)"

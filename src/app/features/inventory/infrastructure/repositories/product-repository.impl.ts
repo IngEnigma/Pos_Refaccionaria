@@ -68,6 +68,12 @@ export class ProductRepositoryImpl implements ProductRepository {
       );
   }
 
+  getById(id: number): Observable<Product> {
+    return this.http
+      .get<ProductResponseDto>(`${this.endpoint}/${id}/`)
+      .pipe(map((dto) => ProductMapper.fromResponseDto(dto)));
+  }
+
   getByBarcode(codigoBarras: string): Observable<Product | null> {
     const url = `${this.endpoint}/codigo-barras/`;
     const params = new HttpParams().set('codigo_barras', codigoBarras);

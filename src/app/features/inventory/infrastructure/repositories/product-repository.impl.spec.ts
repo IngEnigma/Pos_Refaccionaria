@@ -144,6 +144,17 @@ describe('ProductRepositoryImpl', () => {
     req.flush({ results: [], total: 0, page: 1, page_size: 15 });
   });
 
+  // H-F6-3: el diálogo de edición carga el producto completo por id (GET /productos/{id}/).
+  it('getById consulta el recurso del id', () => {
+    let got: Product | undefined;
+    repository.getById(7).subscribe((p) => (got = p));
+
+    const req = httpMock.expectOne(`${endpoint}/7/`);
+    expect(req.request.method).toBe('GET');
+    req.flush(dto);
+    expect(got?.id).toBe(7);
+  });
+
   // Comprueba que la consulta por código de barras use el endpoint dedicado con el parámetro esperado.
   it('getByBarcode consulta el endpoint dedicado con codigo_barras', () => {
     repository.getByBarcode('75010000000007').subscribe();
@@ -180,12 +191,12 @@ describe('ProductRepositoryImpl', () => {
       id_proveedor: null,
       clave: 'SKU-7',
       nombre: 'Rótula',
-      descripcion: null,
+      descripcion: '',
       codigo_barras: '750',
       precio_venta: 494.36,
       marca: 'Moog',
       costo: 300.5,
-      codigoSAT: null,
+      codigoSAT: '',
     });
     req.flush(dto);
 

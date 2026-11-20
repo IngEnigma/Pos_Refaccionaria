@@ -1,7 +1,9 @@
 :host {
   max-width: 700px;
   width: 95vw;
-  /* Eliminamos el max-height fijo para evitar el scroll si hay espacio */
+  /* H-F6-11: sin tope el diálogo se sale de pantallas bajas y deja Crear/Cancelar fuera de vista */
+  max-height: 90vh;
+  overflow-y: auto;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
   border-radius: 1.5rem;
