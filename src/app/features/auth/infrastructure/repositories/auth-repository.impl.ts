@@ -1,7 +1,8 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Observable, catchError, map, tap, throwError } from 'rxjs';
+import { Observable, catchError, map, retry, tap, throwError, timer } from 'rxjs';
 
+import { RETRYABLE_CODES_STATUSES } from '@core/config/http-retry.config';
 import { AUTH_ENDPOINTS } from '@features/auth/config/auth-endpoints';
 import { withoutTrailingSlash } from '@core/interceptors/trailing-slash.interceptor';
 import { APP_ENV } from '@core/tokens/app-env.token';
@@ -23,6 +24,16 @@ import {
   UnknownAuthError,
 } from '@features/auth/domain/errors/auth.errors';
 
+/**
+ * Render (plan gratis) duerme el back: al despertar corta la conexión o responde 502/503/504 sin CORS (status 0).
+ * El retry global solo cubre GET, así que el login (POST, idempotente) reintenta aquí ~30 s antes de dar "Error de red".
+ */
+export const LOGIN_WAKE_RETRIES = 6;
+export const LOGIN_WAKE_RETRY_DELAY_MS = 5000;
+
+const isServerWakingUp = (error: unknown): boolean =>
+  error instanceof HttpErrorResponse && (RETRYABLE_CODES_STATUSES as readonly number[]).includes(error.status);
+
 @Injectable()
 export class AuthRepositoryImpl implements AuthRepository {
   private readonly http = inject(HttpClient);
@@ -39,6 +50,10 @@ export class AuthRepositoryImpl implements AuthRepository {
     // El backend define `login` sin slash final: sin el bypass, el interceptor
     // lo convierte en `/api/login/` y Django responde 404.
     return this.http.post<LoginResponseDto>(url, payload, { context: withoutTrailingSlash() }).pipe(
+      retry({
+        count: LOGIN_WAKE_RETRIES,
+        delay: (error: unknown) => (isServerWakingUp(error) ? timer(LOGIN_WAKE_RETRY_DELAY_MS) : throwError(() => error)),
+      }),
       map((dto) => SessionMapper.fromLoginResponse(dto)),
       tap((session) => {
         this.logger.debug('Login request succeeded', { url, userId: session.userId });

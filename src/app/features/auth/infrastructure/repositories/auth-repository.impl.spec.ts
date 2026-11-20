@@ -1,4 +1,4 @@
-import { TestBed } from '@angular/core/testing';
+import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { HttpClient, provideHttpClient } from '@angular/common/http';
 import { throwError } from 'rxjs';
 import {
@@ -6,7 +6,7 @@ import {
   provideHttpClientTesting,
 } from '@angular/common/http/testing';
 
-import { AuthRepositoryImpl } from './auth-repository.impl';
+import { AuthRepositoryImpl, LOGIN_WAKE_RETRIES, LOGIN_WAKE_RETRY_DELAY_MS } from './auth-repository.impl';
 import { APP_ENV } from '@core/tokens/app-env.token';
 import { Environment } from '@env/environment.model';
 import { LOGGER_PORT, LoggerPort } from '@core/logging/logger.port';
@@ -113,11 +113,31 @@ describe('AuthRepositoryImpl', () => {
       expect((error as Error).message).toBe('Credenciales inválidas');
     });
 
-    it('status 0 (sin red) → NetworkAuthError', () => {
-      const error = loginError((req) => req.error(new ProgressEvent('error')));
+    it('status 0 (sin red) → NetworkAuthError tras agotar los reintentos', fakeAsync(() => {
+      let error: unknown;
+      repository.login(credentials).subscribe({ error: (e) => (error = e) });
+      for (let i = 0; i <= LOGIN_WAKE_RETRIES; i++) {
+        tick(i ? LOGIN_WAKE_RETRY_DELAY_MS : 0);
+        httpMock.expectOne('http://api.test/login').error(new ProgressEvent('error'));
+      }
 
       expect(error).toBeInstanceOf(NetworkAuthError);
-    });
+    }));
+
+    it.each([0, 502, 503, 504])('status %i (servidor despertando) → reintenta y entra cuando responde', fakeAsync((status: number) => {
+      let userId: string | undefined;
+      repository.login(credentials).subscribe((s) => (userId = s.userId));
+      const req = httpMock.expectOne('http://api.test/login');
+      if (status) req.flush(null, { status, statusText: 'Waking' });
+      else req.error(new ProgressEvent('error'));
+
+      tick(LOGIN_WAKE_RETRY_DELAY_MS);
+      httpMock.expectOne('http://api.test/login').flush({
+        accessToken: 'a', refreshToken: 'r', user: { id: 7, username: 'admin', isAdmin: true, isStaff: false },
+      });
+
+      expect(userId).toBe('7');
+    }));
 
     it('500 con { detail } → UnknownAuthError con ese texto', () => {
       const error = loginError((req) =>
@@ -130,7 +150,7 @@ describe('AuthRepositoryImpl', () => {
 
     it('500 con { message } → UnknownAuthError con ese texto', () => {
       const error = loginError((req) =>
-        req.flush({ message: 'Mantenimiento' }, { status: 503, statusText: 'Unavailable' }),
+        req.flush({ message: 'Mantenimiento' }, { status: 500, statusText: 'Server Error' }),
       );
 
       expect(error).toBeInstanceOf(UnknownAuthError);
