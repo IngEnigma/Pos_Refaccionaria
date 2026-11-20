@@ -3070,8 +3070,8 @@
     "semantic_hash": ""
   },
   "playwright-report/index.html": {
-    "mtime": 1795142448.8433247,
-    "ast_hash": "0d09fc462c3939a14b69768636606db0",
+    "mtime": 1795144172.5114384,
+    "ast_hash": "364af3262a05ca5fcadca6621da3a236",
     "semantic_hash": ""
   },
   "src/electron-ticket-escpos.spec.ts": {
@@ -3190,8 +3190,8 @@
     "semantic_hash": ""
   },
   "docs/plan-pruebas-flujos-e2e.md": {
-    "mtime": 1795142495.3587184,
-    "ast_hash": "b87a57ab9a2b875c0fae8cff28a2f765",
+    "mtime": 1795144179.4557424,
+    "ast_hash": "14920896b0aec49ce46d677dff9597cc",
     "semantic_hash": ""
   },
   "e2e/back-e2e.sh": {
@@ -3245,8 +3245,8 @@
     "semantic_hash": ""
   },
   "e2e/flujos/usuarios.real.spec.ts": {
-    "mtime": 1795139747.4252095,
-    "ast_hash": "a5895e78410fd5f748ca99290017f02c",
+    "mtime": 1795142977.7116547,
+    "ast_hash": "3db430275236b8ea3f3b91c1cd05211d",
     "semantic_hash": ""
   },
   "src/app/features/suppliers/application/facades/suppliers.facade.spec.ts": {
@@ -3267,6 +3267,11 @@
   "e2e/flujos/notificaciones.real.spec.ts": {
     "mtime": 1795141703.8159473,
     "ast_hash": "e31a5b76d34f7a26c48eac9cf57107eb",
+    "semantic_hash": ""
+  },
+  "e2e/flujos/permisos.real.spec.ts": {
+    "mtime": 1795142999.2516139,
+    "ast_hash": "4ffcc68e9d4b885172b9f135d6572168",
     "semantic_hash": ""
   }
 }
