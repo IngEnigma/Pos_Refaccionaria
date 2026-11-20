@@ -80,14 +80,14 @@
     "semantic_hash": ""
   },
   "package.json": {
-    "mtime": 1794766387.045289,
-    "ast_hash": "fb953c6dfe301684a138ebbbd3a34a20",
+    "mtime": 1795137216.8999066,
+    "ast_hash": "a7b913828a0d2f23c1a281b2b208da19",
     "semantic_hash": ""
   },
   "playwright.config.ts": {
-    "mtime": 1789361941.6198313,
-    "ast_hash": "9b7d5a9f16a829831e576285281ecf5a",
-    "semantic_hash": "9b7d5a9f16a829831e576285281ecf5a"
+    "mtime": 1795135236.9303122,
+    "ast_hash": "d51290dc56153aa5a8b7fe7f17466a62",
+    "semantic_hash": ""
   },
   "setup-jest.ts": {
     "mtime": 1794768464.2378778,
@@ -880,9 +880,9 @@
     "semantic_hash": "ea3098422101055d6d93c91e5a6e7ccd"
   },
   "src/app/features/inventory-by-branch/application/dtos/movement-response.dto.ts": {
-    "mtime": 1788402347.250419,
-    "ast_hash": "eb2cb2404e8f5498a227761fccd22812",
-    "semantic_hash": "eb2cb2404e8f5498a227761fccd22812"
+    "mtime": 1795138145.9492948,
+    "ast_hash": "4af3e0e43b7e6daa45d33af182dea313",
+    "semantic_hash": ""
   },
   "src/app/features/inventory-by-branch/application/facades/inventory-by-branch.facade.ts": {
     "mtime": 1794766545.6013658,
@@ -920,9 +920,9 @@
     "semantic_hash": "2e456366b1c06fe2f85550160bd351ed"
   },
   "src/app/features/inventory-by-branch/domain/entities/inventory-movement.entity.ts": {
-    "mtime": 1788402330.402598,
-    "ast_hash": "7e64989aa09a1bf2f0488f0bd1a1b971",
-    "semantic_hash": "7e64989aa09a1bf2f0488f0bd1a1b971"
+    "mtime": 1795138145.9452946,
+    "ast_hash": "776a98a5f6f6f251eb5791e4398ac726",
+    "semantic_hash": ""
   },
   "src/app/features/inventory-by-branch/domain/entities/inventory.entity.ts": {
     "mtime": 1788402327.1946318,
@@ -950,9 +950,9 @@
     "semantic_hash": "1787143ba323d12cf2cd520510f041f9"
   },
   "src/app/features/inventory-by-branch/infrastructure/mappers/movement.mapper.ts": {
-    "mtime": 1788402537.312359,
-    "ast_hash": "262654d098fa12d763c29137437e861d",
-    "semantic_hash": "262654d098fa12d763c29137437e861d"
+    "mtime": 1795138145.9492948,
+    "ast_hash": "43bf76b26b520755a71dd2867849ebe0",
+    "semantic_hash": ""
   },
   "src/app/features/inventory-by-branch/infrastructure/repositories/inventory-repository.impl.ts": {
     "mtime": 1790912898.2082167,
@@ -985,8 +985,8 @@
     "semantic_hash": "90e99a7b93fc7dc5c06353f67547bd50"
   },
   "src/app/features/inventory-by-branch/presentation/pages/inventory-page/inventory.page.ts": {
-    "mtime": 1794721779.7466567,
-    "ast_hash": "57abfbc090cdaef450a3eb0679fb5953",
+    "mtime": 1795138145.9492948,
+    "ast_hash": "f1d39b8aed1d14216db8c590fea78fa6",
     "semantic_hash": ""
   },
   "src/app/features/inventory/application/dtos/product-create-request.dto.ts": {
@@ -1220,9 +1220,9 @@
     "semantic_hash": "d1efe6c48ee8d0768b66f76a23b0cce1"
   },
   "src/app/features/sales-history/application/usecase/get-sales-history.usecase.ts": {
-    "mtime": 1776471952.5976744,
-    "ast_hash": "93a9a19ee0539d858367310cabb926cd",
-    "semantic_hash": "93a9a19ee0539d858367310cabb926cd"
+    "mtime": 1795136849.0955486,
+    "ast_hash": "a93f4b1e1aedf04dd535d629d4dff524",
+    "semantic_hash": ""
   },
   "src/app/features/sales-history/domain/entities/sale-history.entity.ts": {
     "mtime": 1776468496.054748,
@@ -1375,7 +1375,7 @@
     "semantic_hash": ""
   },
   "src/app/features/sales/domain/entities/sale.entity.ts": {
-    "mtime": 1794765190.0040073,
+    "mtime": 1795136829.8433206,
     "ast_hash": "0857e0d119aa29fae3a38dc8b53bade1",
     "semantic_hash": ""
   },
@@ -1465,7 +1465,7 @@
     "semantic_hash": "6a54e6601f305ea102d019b1ebf96f8a"
   },
   "src/app/features/sales/infrastructure/dtos/sale-response.dto.ts": {
-    "mtime": 1794765190.0000067,
+    "mtime": 1795136829.8433206,
     "ast_hash": "7a5de6c24d8a87b14ee8aec6b1d77963",
     "semantic_hash": ""
   },
@@ -1500,7 +1500,7 @@
     "semantic_hash": ""
   },
   "src/app/features/sales/infrastructure/mappers/sale.mapper.ts": {
-    "mtime": 1794765190.0080082,
+    "mtime": 1795136829.8433206,
     "ast_hash": "00b820b7184327cdcd1c99bbc8b81e9c",
     "semantic_hash": ""
   },
@@ -2145,8 +2145,8 @@
     "semantic_hash": ""
   },
   "docs/plan-pruebas.md": {
-    "mtime": 1794635109.2440395,
-    "ast_hash": "e8d1a4cd6369a74d689534ee9f85f966",
+    "mtime": 1795134400.002921,
+    "ast_hash": "7800c4fff5ea0acbd53d757d2994e616",
     "semantic_hash": ""
   },
   "docs/plan-sync-backend-2026-09.md": {
@@ -2475,8 +2475,8 @@
     "semantic_hash": ""
   },
   "src/app/features/inventory-by-branch/application/facades/inventory-by-branch.facade.spec.ts": {
-    "mtime": 1794767053.1487823,
-    "ast_hash": "f96da44a089abe1cb325684b8314eb7e",
+    "mtime": 1795138188.6831956,
+    "ast_hash": "f751ed8ae19d01ca3cc70421713a3ab8",
     "semantic_hash": ""
   },
   "src/app/features/inventory-by-branch/infrastructure/mappers/inventory.mapper.spec.ts": {
@@ -2485,8 +2485,8 @@
     "semantic_hash": ""
   },
   "src/app/features/inventory-by-branch/infrastructure/mappers/movement.mapper.spec.ts": {
-    "mtime": 1794628409.917886,
-    "ast_hash": "bb34dadb8855820a8603045f32fb1023",
+    "mtime": 1795138130.2245724,
+    "ast_hash": "3ca8a97590d51749b319e5e3e6ec1674",
     "semantic_hash": ""
   },
   "src/app/features/inventory-by-branch/infrastructure/repositories/inventory-repository.impl.spec.ts": {
@@ -2495,8 +2495,8 @@
     "semantic_hash": ""
   },
   "src/app/features/inventory-by-branch/infrastructure/repositories/movement-repository.impl.spec.ts": {
-    "mtime": 1794628409.917886,
-    "ast_hash": "5f118048acceccf92629660639fdca8d",
+    "mtime": 1795138133.9567451,
+    "ast_hash": "e44e683124f8fc7afe58594abc14c478",
     "semantic_hash": ""
   },
   "src/app/features/inventory-by-branch/presentation/components/inventory-table/inventory-table.component.spec.ts": {
@@ -2515,8 +2515,8 @@
     "semantic_hash": ""
   },
   "src/app/features/inventory-by-branch/presentation/pages/inventory-page/inventory.page.spec.ts": {
-    "mtime": 1794628409.917886,
-    "ast_hash": "6c6ef39d8530c04aa9a7f28a20a58b4d",
+    "mtime": 1795138133.9567451,
+    "ast_hash": "d3fcd1c2c226546cf80e41b7f9152d7b",
     "semantic_hash": ""
   },
   "src/app/features/inventory/application/facades/inventory.facade.spec.ts": {
@@ -2840,7 +2840,7 @@
     "semantic_hash": ""
   },
   "src/app/features/sales/infrastructure/mappers/sale.mapper.spec.ts": {
-    "mtime": 1794766763.034243,
+    "mtime": 1795136829.8433206,
     "ast_hash": "7dae6f4c02e6a3416e63b45d94e83d39",
     "semantic_hash": ""
   },
@@ -3070,8 +3070,8 @@
     "semantic_hash": ""
   },
   "playwright-report/index.html": {
-    "mtime": 1794766209.1068215,
-    "ast_hash": "0091e0261024f9a9d929bc4ab319b7a2",
+    "mtime": 1795138816.3841462,
+    "ast_hash": "cc359666949f6782f14e8c3865bda800",
     "semantic_hash": ""
   },
   "src/electron-ticket-escpos.spec.ts": {
@@ -3187,6 +3187,51 @@
   "docs/manual/Manual-Tecnico-TRT.pdf": {
     "mtime": 1794973204.6227872,
     "ast_hash": "45434c9c23e0eeb9f38ef9d3553a590b",
+    "semantic_hash": ""
+  },
+  "docs/plan-pruebas-flujos-e2e.md": {
+    "mtime": 1795138831.288542,
+    "ast_hash": "fa4c3859bd3edd8bcf6d9c267dd8ee84",
+    "semantic_hash": ""
+  },
+  "e2e/back-e2e.sh": {
+    "mtime": 1795135220.8462706,
+    "ast_hash": "ef32ef6567cfbf332c51e754a3454d2d",
+    "semantic_hash": ""
+  },
+  "e2e/flujos/auth.real.spec.ts": {
+    "mtime": 1795136002.0815275,
+    "ast_hash": "66682439dda35ad1aeaf8be832d4bc38",
+    "semantic_hash": ""
+  },
+  "e2e/helpers/api.ts": {
+    "mtime": 1795138463.7296672,
+    "ast_hash": "d792655d48150ecd60dedb1ab0269bee",
+    "semantic_hash": ""
+  },
+  "e2e/flujos/ventas.real.spec.ts": {
+    "mtime": 1795136625.548901,
+    "ast_hash": "e6d069d01812dd42c8ab49a81f7bec69",
+    "semantic_hash": ""
+  },
+  "e2e/flujos/historial.real.spec.ts": {
+    "mtime": 1795136864.2917287,
+    "ast_hash": "90234312081ed80c3e78c00daaa1d1d7",
+    "semantic_hash": ""
+  },
+  "src/app/features/sales-history/application/usecase/get-sales-history.usecase.spec.ts": {
+    "mtime": 1795136840.187443,
+    "ast_hash": "35229399edd97b4739f90686e3c84fbb",
+    "semantic_hash": ""
+  },
+  "e2e/flujos/inventario-sucursal.real.spec.ts": {
+    "mtime": 1795137657.4971285,
+    "ast_hash": "5578a2f6b916f80eb487278bff89466d",
+    "semantic_hash": ""
+  },
+  "e2e/flujos/precios.real.spec.ts": {
+    "mtime": 1795137701.7902687,
+    "ast_hash": "4a08483eeecd0dd46f3368c617fcbfe6",
     "semantic_hash": ""
   }
 }
