@@ -192,9 +192,8 @@ test.describe('Usuarios flujos REAL (backend local)', () => {
     await ctx.close();
   });
 
-  // H-F3-4 (BACK, no se corrige aquí): UserService.login (usuario/services/usuario_service.py) no revisa is_active:
-  // un usuario desactivado recibe tokens 200 en /api/login. Esperado: 401 y la UI se queda en /login.
-  test.fixme('FLU-USR-003b usuario desactivado no puede hacer login (H-F3-4)', async ({ page }) => {
+  // H-F3-4 (corregido en back 09e1fe7): usuario desactivado → 401 y la UI se queda en /login.
+  test('FLU-USR-003b usuario desactivado no puede hacer login (H-F3-4)', async ({ page }) => {
     const username = unico();
     const { id } = await crearUsuarioApi(username, 'cajero', NORTE);
     await apiFetch(TEST_USERS.adminE2e, 'PUT', `users/${id}`, { is_active: false });
@@ -236,9 +235,8 @@ test.describe('Usuarios flujos REAL (backend local)', () => {
     expect(sql(`select count(*) from auth_user`)).toBe(antes);
   });
 
-  // H-F3-5 (BACK, no se corrige aquí): User.email no es único y create_user (usuario_service.py) no lo valida:
-  // un correo repetido se acepta (201). Esperado: 400 con mensaje y la UI lo muestra.
-  test.fixme('FLU-USR-005b correo duplicado muestra el mensaje del back (H-F3-5)', async ({ page }) => {
+  // H-F3-5 (corregido en back 09e1fe7): correo repetido → 400 con mensaje y la UI lo muestra.
+  test('FLU-USR-005b correo duplicado muestra el mensaje del back (H-F3-5)', async ({ page }) => {
     const username = unico();
     await crearUsuarioApi(username, 'cajero', NORTE);
     await abrirAdmin(page);

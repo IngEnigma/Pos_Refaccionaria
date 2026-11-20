@@ -296,6 +296,7 @@ stock se recupera.
 |---|---|---|
 | FLU-PER-001 | Cada ruta × cada rol con backend real: entra o vuelve a `/sales` según la tabla de la sección 2 | permiso |
 | FLU-PER-002 | Sin sesión, cualquier ruta privada manda a `/login` con `redirectTo` | permiso |
+| FLU-PER-003 | El menú de cada rol coincide exactamente con las rutas a las que puede entrar | permiso |
 
 `e2e/admin.access.spec.ts` ya cubre esto con mocks; aquí se repite con login real para confirmar
 que el rol que deduce el backend coincide con lo que espera el front.
@@ -395,8 +396,8 @@ con el formato de [plan-pruebas-admin-auth-ventas.md](plan-pruebas-admin-auth-ve
 | H-F3-1 | F3 | FLU-CLI-001 | Front / clientes | Alta | Crear o editar un cliente sin apellido materno, dirección o RFC → 400 `NOT NULL constraint failed: clientes_cliente.apellido_materno` | El front mandaba `null` en campos que el back define como texto obligatorio | `ClientMapper` manda `''` en esos 3 campos (TDD: E2E + jest) | Corregido |
 | H-F3-2 | F3 | FLU-CLI-004b, FLU-PRO-004b | Front / clientes y proveedores | Alta | El cajero ve Editar/Eliminar; al usarlos el back da 403 y la app lo saca a `/login` | La UI no ocultaba acciones que el back reserva a encargado/admin | Input `canManage` en tablas; el cajero solo crea y consulta (TDD: E2E + jest) | Corregido |
 | H-F3-3 | F3 | FLU-PRO-003 | Front / proveedores | Media | Los errores del back se mostraban como `Http failure response…` | `resolveErrorMessage` no leía `{"error": …}` | Lo lee (TDD: jest) | Corregido |
-| H-F3-4 | F3 | FLU-USR-003b | **Back** / usuarios | Alta | Un usuario desactivado (`is_active=false`) puede hacer login: `POST /api/login` → 200 con tokens | `UserService.login` no revisa `is_active` (`usuario/services/usuario_service.py`) | Esperado 401. Prueba en `test.fixme` | **Reportado al back** |
-| H-F3-5 | F3 | FLU-USR-005b | **Back** / usuarios | Media | Se acepta un correo duplicado: `POST /api/users` → 201 | `User.email` no es único y `create_user` no lo valida (`usuario/services/usuario_service.py`) | Esperado 400. Prueba en `test.fixme` | **Reportado al back** |
+| H-F3-4 | F3 | FLU-USR-003b | **Back** / usuarios | Alta | Un usuario desactivado (`is_active=false`) puede hacer login: `POST /api/login` → 200 con tokens | `UserService.login` no revisa `is_active` (`usuario/services/usuario_service.py`) | Esperado 401 | Corregido por el back (`09e1fe7`); prueba activa |
+| H-F3-5 | F3 | FLU-USR-005b | **Back** / usuarios | Media | Se acepta un correo duplicado: `POST /api/users` → 201 | `User.email` no es único y `create_user` no lo valida (`usuario/services/usuario_service.py`) | Esperado 400 | Corregido por el back (`09e1fe7`); prueba activa |
 | H-F4-1 | F4 | FLU-GER-001b, FLU-GER-002b | Front / gerente | Alta | `/manager` (gestión de cajeros) es una maqueta: 3 cajeros fijos y un formulario que no guarda nada | Pantalla sin conectar a facade/repositorio | Funcionalidad sin construir, no un bug puntual. Cubierto por API (GER-001/002); UI en `test.fixme`. **Decisión: se construye como tarea aparte al terminar F6** | Abierto (planeado) |
 | H-F4-2 | F4 | FLU-REP-006 | **Back** / reportes | Media | El reporte del gerente de Centro incluye ventas de Norte (`GET /api/reporte/?tipo=day`) | `ReporteVentaService` / `VentaRepository.get_ventas_por_rango` no filtran por sucursal del usuario (`ventas/services/reporte_venta_service.py`, `ventas/repositories/venta_repository.py`, `ventas/views/reporte_venta_view.py`) | Confirmar regla con negocio; el resto de módulos limita al encargado a su sucursal. Prueba en `test.fixme` | **Reportado al back** |
 | H-F4-3 | F4 | FLU-REP-005 | Front / reportes | Media | El cajero ve "Reportes" en el menú y entra a `/reports`, pero el back responde 403 | Ruta y sidebar sin restricción de rol | Ruta y menú solo para admin/manager (TDD: E2E + jest) | Corregido |
@@ -425,5 +426,5 @@ con el formato de [plan-pruebas-admin-auth-ventas.md](plan-pruebas-admin-auth-ve
 | F2 | 2026-11-19 | 14 | 14 | 0 | H-F2-1, H-F2-2 | F1+F2 juntas 39/39 con BD recién reseteada y `--retries=0`. Sin UI: usuario en movimientos (IXS-005) y historial de precios (PRE-003) → verificados por API/BD |
 | F3 | 2026-11-19 | 19 | 17 | 2 (fixme back) | H-F3-1..5 | F1–F3 juntas 56 ok / 2 fixme con BD reseteada y `--retries=0`; jest 1590/1590; E2E con mocks 61 ok. F2 sigue verde con el fix del back `e952c4a`. Sin UI: búsqueda/paginación de clientes, edición de rol/sucursal en `/admin` (USR-002 por API). Back sin regla de duplicados en clientes/proveedores |
 | F4 | 2026-11-19 | 15 | 11 | 4 (2 back, 2 UI sin construir) | H-F4-1..4 | F1–F4 juntas 71 ok / 6 fixme con BD reseteada y `--retries=0`; jest 1592/1592; E2E con mocks 64 ok. Seed: `gerente.general` sin `is_staff` (con staff el back lo trata como admin). Reportes solo en PDF: se leen con `pdftotext` |
-| F5 | | | | | | |
+| F5 | 2026-11-19 | 64 | 64 | 0 | — | 12 rutas × 4 roles sin 403 del back en la carga; F1–F5 juntas 137 ok / 4 fixme con BD reseteada y `--retries=0`. Back `09e1fe7` cerró H-F3-4 y H-F3-5 (USR-003b/005b activos) |
 | F6 | | | | | | |
