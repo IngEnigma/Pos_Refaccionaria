@@ -14,6 +14,7 @@
       <app-clients-table
         [clients]="clientsFacade.clients()"
         [loading]="clientsFacade.loading()"
+        [canManage]="canManage()"
         (edit)="onEditClient($event)"
         (delete)="onDeleteClient($event)"
       />

@@ -99,7 +99,7 @@ describe('ClientsPageComponent (integración)', () => {
         DeleteClientUseCase,
         { provide: ClientRepository, useClass: ClientRepositoryImpl },
         // Fronteras simuladas: sucursal del usuario y diálogos de CDK.
-        { provide: AuthFacade, useValue: { sucursalId: signal<number | null>(1).asReadonly() } },
+        { provide: AuthFacade, useValue: { sucursalId: signal<number | null>(1).asReadonly(), role: signal('admin') } },
         { provide: DIALOG_DATA, useValue: dialogData },
         { provide: DialogRef, useValue: { close: dialogRefClose } },
         // Iconos lucide de página, tabla y formulario; sin ellos el render lanza error.
@@ -243,11 +243,11 @@ describe('ClientsPageComponent (integración)', () => {
       id_sucursal: 1,
       nombre: 'María',
       apellido_paterno: 'Gómez',
-      apellido_materno: null,
+      apellido_materno: '',
       telefono: '2719876543',
       correo: null,
-      direccion: null,
-      rfc: null,
+      direccion: '',
+      rfc: '',
     });
     post.flush(dto({ id: 40, nombre: 'María', apellido_paterno: 'Gómez', apellido_materno: null }));
 

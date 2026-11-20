@@ -59,7 +59,7 @@ describe('ClientsPageComponent', () => {
       providers: [
         // Iconos lucide del template (botón Registrar y acciones de la tabla).
         importProvidersFrom(LucideAngularModule.pick({ Plus, Pencil, Trash2, Users })),
-        { provide: AuthFacade, useValue: { sucursalId: sucursalSignal.asReadonly() } },
+        { provide: AuthFacade, useValue: { sucursalId: sucursalSignal.asReadonly(), role: signal('admin') } },
         {
           provide: ClientsFacade,
           useValue: {

@@ -7,6 +7,9 @@ import {
   UpdateClientPayload,
 } from '@features/clients/domain/repository/client-repository';
 
+/** H-F3-1: apellido_materno, direccion y rfc son CharField sin null en el backend: null → ''. */
+const texto = <T>(v: T | null): T | '' => (v === null ? '' : v);
+
 export class ClientMapper {
   static fromResponseDto(dto: ClientResponseDto): Client {
     return {
@@ -27,11 +30,11 @@ export class ClientMapper {
       id_sucursal: payload.idSucursal,
       nombre: payload.nombre,
       apellido_paterno: payload.apellidoPaterno,
-      apellido_materno: payload.apellidoMaterno ?? null,
+      apellido_materno: payload.apellidoMaterno ?? '',
       telefono: payload.telefono,
       correo: payload.correo ?? null,
-      direccion: payload.direccion ?? null,
-      rfc: payload.rfc ?? null,
+      direccion: payload.direccion ?? '',
+      rfc: payload.rfc ?? '',
     };
   }
 
@@ -40,11 +43,11 @@ export class ClientMapper {
       id_sucursal: payload.idSucursal,
       nombre: payload.nombre,
       apellido_paterno: payload.apellidoPaterno,
-      apellido_materno: payload.apellidoMaterno,
+      apellido_materno: texto(payload.apellidoMaterno),
       telefono: payload.telefono,
       correo: payload.correo,
-      direccion: payload.direccion,
-      rfc: payload.rfc,
+      direccion: texto(payload.direccion),
+      rfc: texto(payload.rfc),
     };
   }
 }

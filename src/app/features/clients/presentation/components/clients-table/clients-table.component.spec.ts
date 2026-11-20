@@ -50,6 +50,17 @@ describe('ClientsTableComponent', () => {
     expect(component.getFullName(makeClient({ apellidoMaterno: '' }))).toBe('Juan Pérez');
   });
 
+  // H-F3-2: sin permiso de gestión (cajero) la tabla no ofrece editar ni eliminar.
+  it('con canManage=false oculta la columna y los botones de acciones', () => {
+    fixture = TestBed.createComponent(ClientsTableComponent);
+    fixture.componentRef.setInput('clients', [makeClient()]);
+    fixture.componentRef.setInput('canManage', false);
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('.btn-action')).toBeNull();
+    expect(fixture.nativeElement.querySelector('.actions-column')).toBeNull();
+  });
+
   // Comprueba que en estado de carga se muestren los skeletons y no las filas de datos.
   it('con loading muestra skeletons y sin filas de datos', () => {
     setup([], true);

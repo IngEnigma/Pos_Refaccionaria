@@ -125,11 +125,11 @@ describe('ClientsFacade (integración)', () => {
       id_sucursal: 1,
       nombre: 'María',
       apellido_paterno: 'Gómez',
-      apellido_materno: null,
+      apellido_materno: '',
       telefono: '2719876543',
       correo: null,
-      direccion: null,
-      rfc: null,
+      direccion: '',
+      rfc: '',
     });
     req.flush(dto({ id: 40, nombre: 'María', apellido_paterno: 'Gómez', apellido_materno: null }));
 
