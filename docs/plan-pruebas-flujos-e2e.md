@@ -391,6 +391,11 @@ con el formato de [plan-pruebas-admin-auth-ventas.md](plan-pruebas-admin-auth-ve
 | H-F1-2 | F1 | FLU-HIS-001 | **Back** / ventas | Media | El cajero ve a los demás cajeros de su sucursal como "Usuario Desconocido" en el historial | `venta_to_dict` (`ventas/services/venta_query.py`) no incluye el nombre del cajero y `/users` es 403 para cajeros | Propuesta para el equipo del back: agregar `usuario_nombre` a la respuesta de ventas | **Reportado al back** |
 | H-F2-1 | F2 | FLU-IXS-001..005 | Front / inventario por sucursal | Alta | `/inventory-by-branch` queda vacío al recargar o entrar directo por URL | `ngOnInit` leía `sucursalId()` antes de que llegara el perfil (asíncrono) y no volvía a cargar | `effect` que carga inventario y movimientos cuando aparece la sucursal (TDD: E2E + jest) | Corregido |
 | H-F2-2 | F2 | FLU-IXS-002..005 | Front / inventario por sucursal | Alta | Registrar entrada o salida responde 400 `Faltan campos obligatorios: id_sucursal`: no se podía mover inventario | El front solo mandaba `id_inventario`; el back trabaja por sucursal | Se envía `id_sucursal` (entidad, DTO, mapper y página) (TDD: E2E + jest) | Corregido |
+| H-F3-1 | F3 | FLU-CLI-001 | Front / clientes | Alta | Crear o editar un cliente sin apellido materno, dirección o RFC → 400 `NOT NULL constraint failed: clientes_cliente.apellido_materno` | El front mandaba `null` en campos que el back define como texto obligatorio | `ClientMapper` manda `''` en esos 3 campos (TDD: E2E + jest) | Corregido |
+| H-F3-2 | F3 | FLU-CLI-004b, FLU-PRO-004b | Front / clientes y proveedores | Alta | El cajero ve Editar/Eliminar; al usarlos el back da 403 y la app lo saca a `/login` | La UI no ocultaba acciones que el back reserva a encargado/admin | Input `canManage` en tablas; el cajero solo crea y consulta (TDD: E2E + jest) | Corregido |
+| H-F3-3 | F3 | FLU-PRO-003 | Front / proveedores | Media | Los errores del back se mostraban como `Http failure response…` | `resolveErrorMessage` no leía `{"error": …}` | Lo lee (TDD: jest) | Corregido |
+| H-F3-4 | F3 | FLU-USR-003b | **Back** / usuarios | Alta | Un usuario desactivado (`is_active=false`) puede hacer login: `POST /api/login` → 200 con tokens | `UserService.login` no revisa `is_active` (`usuario/services/usuario_service.py`) | Esperado 401. Prueba en `test.fixme` | **Reportado al back** |
+| H-F3-5 | F3 | FLU-USR-005b | **Back** / usuarios | Media | Se acepta un correo duplicado: `POST /api/users` → 201 | `User.email` no es único y `create_user` no lo valida (`usuario/services/usuario_service.py`) | Esperado 400. Prueba en `test.fixme` | **Reportado al back** |
 
 ---
 
@@ -412,7 +417,7 @@ con el formato de [plan-pruebas-admin-auth-ventas.md](plan-pruebas-admin-auth-ve
 | F0 | 2026-11-19 | 3 | 3 | 0 | H-F0-1, H-F0-2, H-F0-3 | `seed_e2e` + `e2e:back` + `e2e:flujos`; `FLU-AUT-001` x3 en verde; suite con mocks 61 ok / 7 skip; back 675 ok |
 | F1 | 2026-11-19 | 25 | 25 | 0 | H-F1-1, H-F1-2 | Matriz 3 cajeros × Efectivo/Tarjeta verificada en BD; 3 corridas sin reset + 1 con reset; `--retries=0` en verde. Historial sin filtro de fecha/sucursal en la UI → FLU-HIS-002 cubre folio/cajero/método |
 | F2 | 2026-11-19 | 14 | 14 | 0 | H-F2-1, H-F2-2 | F1+F2 juntas 39/39 con BD recién reseteada y `--retries=0`. Sin UI: usuario en movimientos (IXS-005) y historial de precios (PRE-003) → verificados por API/BD |
-| F3 | | | | | | |
+| F3 | 2026-11-19 | 19 | 17 | 2 (fixme back) | H-F3-1..5 | F1–F3 juntas 56 ok / 2 fixme con BD reseteada y `--retries=0`; jest 1590/1590; E2E con mocks 61 ok. F2 sigue verde con el fix del back `e952c4a`. Sin UI: búsqueda/paginación de clientes, edición de rol/sucursal en `/admin` (USR-002 por API). Back sin regla de duplicados en clientes/proveedores |
 | F4 | | | | | | |
 | F5 | | | | | | |
 | F6 | | | | | | |

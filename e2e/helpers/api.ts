@@ -72,7 +72,7 @@ export const fijarStock = (clave: string, sucursalId: number, cantidad: number):
 export const productoId = (clave: string): number => Number(sql(`select id from producto_producto where clave='${clave}'`));
 
 /** Petición autenticada a la API (ruta con "/" final donde el back lo exige, ej. `ventas/`). */
-export async function apiFetch(user: Pick<TestUser, 'username' | 'password'>, method: 'GET' | 'POST', ruta: string, data?: unknown) {
+export async function apiFetch(user: Pick<TestUser, 'username' | 'password'>, method: 'GET' | 'POST' | 'PUT' | 'DELETE', ruta: string, data?: unknown) {
   const { access } = await apiLogin(user);
   const ctx = await request.newContext({ extraHTTPHeaders: { Authorization: `Bearer ${access}` } });
   try {
