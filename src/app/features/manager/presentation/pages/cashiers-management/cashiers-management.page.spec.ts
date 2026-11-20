@@ -65,6 +65,19 @@ describe('CashiersManagementPageComponent', () => {
     expect(usersFacade.createUser).not.toHaveBeenCalled();
   });
 
+  it('formulario inválido: dice qué campo falta en vez de no hacer nada', () => {
+    type('cashier-username', 'nuevo');
+    type('cashier-password', 'Secreta123');
+    submit();
+    expect(usersFacade.createUser).not.toHaveBeenCalled();
+    expect(el().textContent).toContain('El correo es requerido');
+    expect(el().textContent).not.toContain('El usuario es requerido');
+
+    type('cashier-email', 'nuevo');
+    fixture.detectChanges();
+    expect(el().textContent).toContain('Correo inválido');
+  });
+
   it('crea cajero con la sucursal de la lista, avisa y recarga', () => {
     usersFacade.createUser.mockReturnValue(of(user(9, 'nuevo', 'cajero')));
     type('cashier-username', 'nuevo');

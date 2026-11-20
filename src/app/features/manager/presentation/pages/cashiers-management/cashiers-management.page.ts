@@ -33,6 +33,11 @@ export class CashiersManagementPageComponent implements OnInit {
     password: ['', Validators.required],
   });
 
+  invalid(name: 'username' | 'email' | 'password'): boolean {
+    const control = this.form.controls[name];
+    return control.invalid && control.touched;
+  }
+
   ngOnInit(): void {
     this.usersFacade.loadUsers();
   }

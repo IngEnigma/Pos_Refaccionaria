@@ -25,15 +25,24 @@
           <div class="field full">
             <label for="cashier-username">Usuario</label>
             <input id="cashier-username" type="text" formControlName="username" placeholder="usuario.cajero" />
+            @if (invalid('username')) {
+              <span class="error-text">El usuario es requerido</span>
+            }
           </div>
           <div class="field">
             <label for="cashier-email">Correo</label>
             <input id="cashier-email" type="email" formControlName="email" placeholder="cajero@trt.com" />
+            @if (invalid('email')) {
+              <span class="error-text">{{ form.controls.email.hasError('required') ? 'El correo es requerido' : 'Correo inválido' }}</span>
+            }
           </div>
           <div class="field">
             <label for="cashier-password">Contraseña</label>
             <input id="cashier-password" type="password" formControlName="password" autocomplete="new-password"
               [placeholder]="editing() ? 'Vacía = sin cambios' : ''" />
+            @if (invalid('password')) {
+              <span class="error-text">La contraseña es requerida</span>
+            }
           </div>
           <div class="form-actions full">
             <button class="btn-secondary" type="button" (click)="clear()">Limpiar</button>
