@@ -78,7 +78,7 @@ test.describe('Inventario por sucursal flujos REAL (backend local)', () => {
     await loginAsReal(page, TEST_USERS.anaCentro);
     await page.goto('/sales');
     const tarjeta = page.getByRole('article').filter({ has: page.getByRole('heading', { name: P.nombre }) });
-    await expect(tarjeta.locator('.product-stock')).toHaveText(String(inicial + 7), { timeout: 30_000 });
+    await expect(tarjeta.locator('.inv-card__stock-text')).toHaveText(`${inicial + 7} en stock`, { timeout: 30_000 });
   });
 
   test('FLU-IXS-003 salida: el stock baja', async ({ page }) => {

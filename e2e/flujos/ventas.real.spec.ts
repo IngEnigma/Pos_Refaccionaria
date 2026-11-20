@@ -111,7 +111,7 @@ test.describe('Ventas flujos REAL (backend local)', () => {
 
   test('FLU-VEN-003 código de barras + Enter agrega; uno desconocido avisa', async ({ page }) => {
     await entrar(page, TEST_USERS.anaCentro);
-    const barcode = page.getByPlaceholder('Escanear código de barras...');
+    const barcode = page.getByRole('banner').getByPlaceholder('Buscar...');
 
     await barcode.fill(A.codigoBarras);
     await barcode.press('Enter');
@@ -127,7 +127,7 @@ test.describe('Ventas flujos REAL (backend local)', () => {
   test('FLU-VEN-004 el carrito se topa en el stock disponible', async ({ page }) => {
     await entrar(page, TEST_USERS.anaCentro);
     const nombre = 'Stock Bajo E2E';
-    const stock = Number((await card(page, nombre).locator('.product-stock').innerText()).trim());
+    const stock = parseInt(await card(page, nombre).locator('.inv-card__stock-text').innerText(), 10);
     expect(stock).toBeGreaterThan(0);
 
     for (let i = 0; i < stock + 3; i++) await addToCart(page, nombre);
@@ -146,7 +146,7 @@ test.describe('Ventas flujos REAL (backend local)', () => {
     await card(page, 'Sin Stock E2E').getByRole('button', { name: 'Añadir' }).click({ force: true });
     await expect(panel(page).getByText('No hay productos agregados.')).toBeVisible();
 
-    const barcode = page.getByPlaceholder('Escanear código de barras...');
+    const barcode = page.getByRole('banner').getByPlaceholder('Buscar...');
     await barcode.fill('750E2EZERO');
     await barcode.press('Enter');
     await expect(page.getByText('Producto sin existencias en esta sucursal')).toBeVisible();
@@ -227,7 +227,7 @@ test.describe('Ventas flujos REAL (backend local)', () => {
       await entrar(ana, TEST_USERS.anaCentro);
       await entrar(carlos, TEST_USERS.carlosCentro);
       for (const p of [ana, carlos]) {
-        await expect(card(p, 'Ultima Pieza E2E').locator('.product-stock')).toHaveText('1');
+        await expect(card(p, 'Ultima Pieza E2E').locator('.inv-card__stock-text')).toHaveText('1 en stock');
         await addToCart(p, 'Ultima Pieza E2E');
         await expect(cantidad(p, 'Ultima Pieza E2E')).toHaveText('1');
       }

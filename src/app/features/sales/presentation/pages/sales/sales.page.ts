@@ -10,7 +10,6 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { HttpErrorResponse } from '@angular/common/http';
-import { FormsModule } from '@angular/forms';
 
 import { ToastService } from '@app/shared/ui/components/toast/toast.service';
 import { AuthFacade } from '@features/auth/application/facades/auth.facade';
@@ -18,7 +17,9 @@ import { SalesFacade } from '@features/sales/application/facades/sales.facade';
 import { ProductTypesFacade } from '@features/sales/application/facades/product-types.facade';
 import { CategorySliderComponent } from '@features/sales/presentation/components/category-slider/category-slider.component';
 import { CartPanelComponent } from '@features/sales/presentation/components/cart-panel/cart-panel.component';
-import { ProductGridComponent } from '@features/sales/presentation/components/product-grid/product-grid.component';
+import { InventoryProductGridComponent } from '@features/inventory/presentation/components/inventory-product-grid/inventory-product-grid.component';
+import { InventoryFacade } from '@features/inventory/application/facades/inventory.facade';
+import { InventoryItem } from '@features/inventory-by-branch/domain/entities/inventory-item.entity';
 import { TicketModalComponent } from '@features/sales/presentation/components/ticket-modal/ticket-modal.component';
 import { ClientSelectorModalComponent } from '@features/sales/presentation/components/client-selector-modal/client-selector-modal.component';
 import {
@@ -38,7 +39,7 @@ import { Client } from '@features/clients/domain/entities/client.entity';
 @Component({
   selector: 'app-sales-page',
   standalone: true,
-  imports: [FormsModule, CategorySliderComponent, ProductGridComponent, CartPanelComponent, TicketModalComponent, ClientSelectorModalComponent],
+  imports: [CategorySliderComponent, InventoryProductGridComponent, CartPanelComponent, TicketModalComponent, ClientSelectorModalComponent],
   templateUrl: './sales.page.html',
   styleUrl: './sales.page.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -49,6 +50,7 @@ export class SalesPageComponent implements OnInit {
   readonly salesFacade = inject(SalesFacade);
   readonly productTypesFacade = inject(ProductTypesFacade);
   readonly inventoryByBranchFacade = inject(InventoryByBranchFacade);
+  readonly inventoryFacade = inject(InventoryFacade);
   readonly toastService = inject(ToastService);
   readonly cartService = inject(SalesCartService);
   private readonly destroyRef = inject(DestroyRef);
@@ -61,7 +63,6 @@ export class SalesPageComponent implements OnInit {
     this.isCreatingSale() || this.cartItems().length === 0 || !this.selectedPayment()
   );
 
-  readonly barcodeInput = signal('');
   readonly lastTicket = signal<SaleTicket | null>(null);
   readonly clientSelectorOpen = signal(false);
 
@@ -77,6 +78,16 @@ export class SalesPageComponent implements OnInit {
   });
 
   constructor() {
+    // El lector de códigos escribe en el buscador del navbar; Enter ahí agrega al carrito.
+    const search = inject(GlobalSearchService);
+    search.submitHandler.set((code) => this.onScan(code));
+    this.destroyRef.onDestroy(() => search.submitHandler.set(null));
+
+    effect(() => {
+      const errorMsg = this.inventoryFacade.errorMessage();
+      if (errorMsg) this.toastService.error(errorMsg);
+    }, { allowSignalWrites: true }); // H-43: el toast escribe señales (NG0600)
+
     effect(() => {
       const errorMsg = this.salesFacade.errorMessage();
       if (errorMsg) {
@@ -140,23 +151,10 @@ export class SalesPageComponent implements OnInit {
   readonly searchQuery = inject(GlobalSearchService).searchQuery;
 
   // Productos vienen exclusivamente de mi-sucursal (única fuente de stock/precio)
-  readonly productos = computed<SalesProduct[]>(() => {
-    const items = this.inventoryByBranchFacade.allItems();
-    // Filtro local por búsqueda y categoría (sin consulta adicional a /productos)
+  readonly catalogItems = computed<readonly InventoryItem[]>(() => {
     const query = this.searchQuery().trim().toLowerCase();
-    const barcodeQuery = this.barcodeInput().trim().toLowerCase();
-    // Nota: InventoryItem no expone id_tipo; filtro categoría deshabilitado si no hay mapeo
-    // Se mantiene el slider pero el filtrado se hace por nombre/clave si hay query
-    let filtered = items;
-    // Filtrado en vivo mientras se escribe/escanea el código QR/barras
-    if (barcodeQuery) {
-      filtered = filtered.filter(
-        (it) =>
-          it.codigoBarras.toLowerCase().includes(barcodeQuery) ||
-          it.clave.toLowerCase().includes(barcodeQuery) ||
-          it.nombre.toLowerCase().includes(barcodeQuery)
-      );
-    }
+    const catId = this.selectedCategoryId();
+    let filtered = this.inventoryByBranchFacade.allItems();
     if (query) {
       filtered = filtered.filter(
         (it) =>
@@ -166,19 +164,15 @@ export class SalesPageComponent implements OnInit {
           it.marca.toLowerCase().includes(query)
       );
     }
-    // TODO: si se requiere filtro por tipo, InventoryItem debería incluir id_tipo/nombre_tipo
-
-    return filtered.map((item) => ({
-      id: item.idProducto,
-      nombre: item.nombre,
-      descripcion: item.clave,
-      precio: item.precioSucursal ?? item.precioBase,
-      stock: item.cantidad,
-      codigoBarras: item.codigoBarras,
-      imagen: 'assets/images/Refaccionaria.webp',
-      hasSucursalPrice: item.precioSucursal !== null,
-    }));
+    // Igual que inventario (H-F6-5): mi-sucursal no trae id_tipo; se cruza con GET /productos/?tipo_id=.
+    if (catId) {
+      const ids = new Set(this.inventoryFacade.products().map((p) => p.id));
+      filtered = filtered.filter((it) => ids.has(it.idProducto));
+    }
+    return filtered;
   });
+
+  readonly productos = computed<SalesProduct[]>(() => this.catalogItems().map(toSalesProduct));
 
   readonly cartItems = this.cartService.cart;
   readonly subtotal = this.cartService.subtotal;
@@ -187,30 +181,31 @@ export class SalesPageComponent implements OnInit {
   readonly selectedPayment = this.cartService.selectedPayment;
   readonly paymentMethods = this.salesFacade.paymentMethods;
 
-  onBarcodeKeyDown(event: KeyboardEvent): void {
-    if (event.key !== 'Enter') return;
-
-    const codigo = this.barcodeInput().trim();
-    if (!codigo) return;
+  /** Enter en el buscador del navbar. true = código reconocido, el buscador se limpia. */
+  onScan(raw: string): boolean {
+    const codigo = raw.trim().toLowerCase();
+    if (!codigo) return false;
 
     // Búsqueda local en mi-sucursal (sin llamada a /productos/codigo-barras)
-    const existingProducts = this.productos();
-    const matched = existingProducts.find(
-      (p) => p.codigoBarras.trim().toLowerCase() === codigo.toLowerCase()
-    );
+    const matched = this.inventoryByBranchFacade
+      .allItems()
+      .find((it) => it.codigoBarras.trim().toLowerCase() === codigo);
 
     if (!matched) {
       this.toastService.warning('Producto no encontrado en tu sucursal o sin stock');
-    } else {
-      if (matched.stock <= 0) {
-        this.toastService.error('Producto sin existencias en esta sucursal');
-      } else {
-        this.onAddToCart(matched);
-        this.toastService.success(`${matched.nombre} agregado al carrito`);
-      }
+      return false;
     }
+    if (matched.cantidad <= 0) {
+      this.toastService.error('Producto sin existencias en esta sucursal');
+    } else {
+      this.onAddItem(matched);
+      this.toastService.success(`${matched.nombre} agregado al carrito`);
+    }
+    return true;
+  }
 
-    this.barcodeInput.set('');
+  onAddItem(item: InventoryItem): void {
+    this.onAddToCart(toSalesProduct(item));
   }
 
   onAddToCart(product: SalesProduct): void {
@@ -219,8 +214,7 @@ export class SalesPageComponent implements OnInit {
 
   onSelectCategory(category: ProductType): void {
     this.selectedCategoryId.set(category.id);
-    // Filtrado local sobre mi-sucursal; no se consulta /productos
-    // Si necesitas filtro por categoría real, agregar id_tipo a InventoryItem
+    if (category.id) this.inventoryFacade.loadProducts(1, false, { tipoId: category.id });
   }
 
   onIncreaseQty(item: SalesCartItem): void {
@@ -310,6 +304,19 @@ export class SalesPageComponent implements OnInit {
   onLoadMore(): void {
     // Paginación local no necesaria; mi-sucursal trae todo el inventario
   }
+}
+
+function toSalesProduct(item: InventoryItem): SalesProduct {
+  return {
+    id: item.idProducto,
+    nombre: item.nombre,
+    descripcion: item.clave,
+    precio: item.precioSucursal ?? item.precioBase,
+    stock: item.cantidad,
+    codigoBarras: item.codigoBarras,
+    imagen: 'assets/images/Refaccionaria.webp',
+    hasSucursalPrice: item.precioSucursal !== null,
+  };
 }
 
 /** Recorre la cadena `cause` buscando un 404 (p. ej. ticket no encontrado). */

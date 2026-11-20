@@ -3,7 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideRouter } from '@angular/router';
-import { BanknoteIcon, CreditCard, ArrowLeftRightIcon, LucideAngularModule, Package, Trash2 } from 'lucide-angular';
+import { BanknoteIcon, CreditCard, ArrowLeftRightIcon, LucideAngularModule, Package, Plus, Trash2 } from 'lucide-angular';
 
 import { environment } from '@env/environment';
 import { DESKTOP_PORT } from '@core/ports/desktop.port';
@@ -61,6 +61,8 @@ import { GetMovementsUseCase } from '@features/inventory-by-branch/application/u
 import { RegisterMovementUseCase } from '@features/inventory-by-branch/application/usecase/register-movement.usecase';
 import { InventoryRepository } from '@features/inventory-by-branch/domain/repository/inventory-repository';
 import { InventoryRepositoryImpl } from '@features/inventory-by-branch/infrastructure/repositories/inventory-repository.impl';
+import { ProductRepository } from '@features/inventory/domain/repository/product-repository';
+import { ProductRepositoryImpl } from '@features/inventory/infrastructure/repositories/product-repository.impl';
 import { InventoryMovementRepository } from '@features/inventory-by-branch/domain/repository/movement-repository';
 import { InventoryMovementRepositoryImpl } from '@features/inventory-by-branch/infrastructure/repositories/movement-repository.impl';
 import { ClientRepository } from '@features/clients/domain/repository/client-repository';
@@ -132,7 +134,7 @@ describe('SalesPageComponent (funcional)', () => {
         provideHttpClient(withInterceptors([httpErrorInterceptor, authTokenInterceptor, trailingSlashInterceptor])),
         provideHttpClientTesting(),
         provideRouter([]),
-        importProvidersFrom(LucideAngularModule.pick({ BanknoteIcon, CreditCard, ArrowLeftRightIcon, Package, Trash2 })),
+        importProvidersFrom(LucideAngularModule.pick({ BanknoteIcon, CreditCard, ArrowLeftRightIcon, Package, Plus, Trash2 })),
         { provide: APP_ENV, useValue: environment },
         { provide: DESKTOP_PORT, useValue: desktop },
         { provide: LOGGER_PORT, useClass: LoggerService },
@@ -173,6 +175,7 @@ describe('SalesPageComponent (funcional)', () => {
         GetMovementsUseCase,
         RegisterMovementUseCase,
         { provide: InventoryRepository, useClass: InventoryRepositoryImpl },
+        { provide: ProductRepository, useClass: ProductRepositoryImpl },
         { provide: InventoryMovementRepository, useClass: InventoryMovementRepositoryImpl },
         { provide: ClientRepository, useClass: ClientRepositoryImpl },
       ],
@@ -295,7 +298,7 @@ describe('SalesPageComponent (funcional)', () => {
     page.onSelectPayment(PAGO);
     fixture.detectChanges();
 
-    expect(fixture.nativeElement.querySelector('.product-price').textContent).toContain('$120');
+    expect(fixture.nativeElement.querySelector('.inv-card__price-value').textContent).toContain('120.00');
 
     page.processTransaction();
     const saleReq = httpMock.expectOne(VENTAS);
@@ -650,51 +653,38 @@ describe('SalesPageComponent (funcional)', () => {
     expect(lastToast()).toMatchObject({ type: 'error', message: 'El carrito está vacío.' });
   });
 
-  // G3: verifica que una tecla distinta de Enter no dispare la búsqueda por código de barras.
-  it('G3: una tecla distinta de Enter no busca ni limpia el código', () => {
-    page.barcodeInput.set('7501234567890');
-
-    page.onBarcodeKeyDown(new KeyboardEvent('keydown', { key: 'a' }));
-
-    expect(page.cartItems()).toHaveLength(0);
-    expect(page.barcodeInput()).toBe('7501234567890');
-  });
-
-  // G4: verifica que Enter con código vacío o solo espacios no haga nada.
+  // G4: verifica que Enter en el buscador con texto vacío no haga nada ni limpie.
   it('G4: Enter con código vacío no avisa ni agrega', () => {
     const before = toasts.toasts().length;
-    page.barcodeInput.set('   ');
 
-    page.onBarcodeKeyDown(new KeyboardEvent('keydown', { key: 'Enter' }));
+    expect(TestBed.inject(GlobalSearchService).submit('   ')).toBe(false);
 
     expect(toasts.toasts()).toHaveLength(before);
     expect(page.cartItems()).toHaveLength(0);
   });
 
-  // G5: verifica que el código con espacios y distinta capitalización agregue el producto y limpie el campo.
-  it('G5: Enter con código con espacios agrega el producto y limpia el campo', () => {
-    page.barcodeInput.set('  7501234567890 ');
-
-    page.onBarcodeKeyDown(new KeyboardEvent('keydown', { key: 'Enter' }));
+  // G5: verifica que Enter en el buscador del navbar con un código (espacios/mayúsculas) agregue y pida limpiar.
+  it('G5: Enter en el buscador con un código agrega el producto y limpia el campo', () => {
+    expect(TestBed.inject(GlobalSearchService).submit('  7501234567890 ')).toBe(true);
 
     expect(page.cartItems()).toHaveLength(1);
     expect(page.cartItems()[0].productId).toBe(101);
-    expect(page.barcodeInput()).toBe('');
     expect(lastToast()).toMatchObject({ type: 'success', message: 'Filtro de aceite agregado al carrito' });
   });
 
-  // G6: verifica que el filtro en vivo por código acote el catálogo y se restaure al limpiar.
-  it('G6: el campo de código filtra el catálogo en vivo', () => {
-    expect(page.productos()).toHaveLength(1);
+  // G6: verifica que un texto que no es código avise y no limpie el buscador (puede ser búsqueda por nombre).
+  it('G6: Enter con texto que no es un código avisa y conserva el buscador', () => {
+    expect(TestBed.inject(GlobalSearchService).submit('filtro')).toBe(false);
 
-    page.barcodeInput.set('no-existe');
-    expect(page.productos()).toHaveLength(0);
+    expect(page.cartItems()).toHaveLength(0);
+    expect(lastToast().type).toBe('warning');
+  });
 
-    page.barcodeInput.set('flt-12');
-    expect(page.productos()).toHaveLength(1);
+  // G6b: al salir del POS el Enter del buscador deja de agregar al carrito.
+  it('G6b: al destruir la página se quita el manejador de Enter', () => {
+    fixture.destroy();
 
-    page.barcodeInput.set('');
-    expect(page.productos()).toHaveLength(1);
+    expect(TestBed.inject(GlobalSearchService).submit('7501234567890')).toBe(false);
   });
 
   // G7: verifica que cargar más no haga peticiones (el inventario viene completo).
@@ -705,11 +695,16 @@ describe('SalesPageComponent (funcional)', () => {
     httpMock.expectNone(VENTAS);
   });
 
-  // G8: verifica que elegir categoría solo guarde el id y no filtre el catálogo.
-  it('G8: seleccionar categoría guarda el id sin filtrar productos', () => {
+  // G8: verifica que elegir categoría filtre el catálogo con GET /productos/?tipo_id= (igual que inventario).
+  it('G8: seleccionar categoría filtra el catálogo por tipo', () => {
     page.onSelectCategory({ id: 5, nombre: 'Filtros' });
 
     expect(page.selectedCategoryId()).toBe(5);
+    const req = httpMock.expectOne((r) => r.url.includes('/productos') && r.params.get('tipo_id') === '5');
+    req.flush([]);
+    expect(page.productos()).toHaveLength(0);
+
+    page.onSelectCategory({ id: 0, nombre: 'Todos' });
     expect(page.productos()).toHaveLength(1);
   });
 

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, OnInit, viewChild } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { interval, map, startWith } from 'rxjs';
@@ -32,6 +32,15 @@ export class MainLayoutComponent implements OnInit {
     { initialValue: formatDate(new Date()) },
   );
 
+  private readonly navbar = viewChild(NavbarComponent);
+
+  constructor() {
+    // POS: el lector de códigos escribe en el buscador del navbar, así que recibe el foco al entrar.
+    effect(() => {
+      if (this.shellFacade.searchSubmitActive()) this.navbar()?.focusSearch();
+    });
+  }
+
   ngOnInit(): void {
     this.authFacade.refreshProfile().subscribe();
   }
@@ -42,5 +51,9 @@ export class MainLayoutComponent implements OnInit {
 
   onSearchChange(query: string): void {
     this.shellFacade.setSearchQuery(query);
+  }
+
+  onSearchSubmit(query: string): void {
+    if (this.shellFacade.submitSearch(query)) this.navbar()?.clearSearch();
   }
 }

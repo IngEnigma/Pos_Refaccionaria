@@ -44,7 +44,14 @@
     }
   </div>
 
-  @if (canManage()) {
+  @if (sellable()) {
+  <div class="inv-card__actions inv-card__actions--single">
+    <button type="button" class="inv-card__btn inv-card__btn--primary" [disabled]="stock() === 0" (click)="onAddToCart()">
+      <lucide-icon name="Plus" [size]="14"></lucide-icon>
+      <span>Añadir</span>
+    </button>
+  </div>
+  } @else if (canManage()) {
   <div class="inv-card__actions">
     <button type="button" class="inv-card__btn inv-card__btn--primary" (click)="onModify()" aria-label="Modificar producto">
       <lucide-icon name="Pencil" [size]="14"></lucide-icon>

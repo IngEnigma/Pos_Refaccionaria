@@ -57,4 +57,10 @@ export class ShellFacade {
         this.globalSearchService.setSearchQuery(query);
     }
 
+    submitSearch(query: string): boolean {
+        return this.globalSearchService.submit(query);
+    }
+
+    readonly searchSubmitActive = computed(() => this.globalSearchService.submitHandler() !== null);
+
 }

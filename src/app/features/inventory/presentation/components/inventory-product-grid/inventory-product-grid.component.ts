@@ -19,10 +19,12 @@ export class InventoryProductGridComponent implements AfterViewInit, OnDestroy {
   readonly products = input<readonly GridProduct[]>([]);
   readonly loadingProducts = input(false);
   readonly canManage = input(true);
+  readonly sellable = input(false);
 
   readonly modifyProduct = output<GridProduct>();
   readonly deleteProduct = output<GridProduct>();
   readonly changePrice = output<GridProduct>();
+  readonly addToCart = output<GridProduct>();
   readonly loadMore = output<void>();
 
   @ViewChild('sentinel') sentinelRef?: ElementRef<HTMLElement>;

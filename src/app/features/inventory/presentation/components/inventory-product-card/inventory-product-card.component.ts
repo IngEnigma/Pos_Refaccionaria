@@ -23,10 +23,13 @@ export class InventoryProductCardComponent {
   readonly product = input.required<CardProduct>();
   // H-F6-4: editar, precio y eliminar son solo de encargado/admin (el back responde 403 al cajero).
   readonly canManage = input(true);
+  /** POS: muestra "Añadir" al carrito en lugar de las acciones de gestión. */
+  readonly sellable = input(false);
 
   readonly modifyProduct = output<CardProduct>();
   readonly deleteProduct = output<CardProduct>();
   readonly changePrice = output<CardProduct>();
+  readonly addToCart = output<CardProduct>();
 
   readonly effectivePrice = computed(() => {
     const p = this.product();
@@ -59,5 +62,9 @@ export class InventoryProductCardComponent {
 
   onChangePrice(): void {
     this.changePrice.emit(this.product());
+  }
+
+  onAddToCart(): void {
+    this.addToCart.emit(this.product());
   }
 }

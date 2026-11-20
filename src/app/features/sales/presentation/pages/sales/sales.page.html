@@ -18,29 +18,17 @@
           (selected)="onSelectCategory($event)"
         />
 
-        <div class="barcode-input-wrapper">
-          <!-- eslint-disable @angular-eslint/template/no-autofocus -- el lector de códigos escribe aquí al abrir el POS -->
-          <input
-            type="text"
-            class="barcode-input"
-            placeholder="Escanear código de barras..."
-            [ngModel]="barcodeInput()"
-            (ngModelChange)="barcodeInput.set($event)"
-            (keydown)="onBarcodeKeyDown($event)"
-            autofocus
-          />
-          <!-- eslint-enable @angular-eslint/template/no-autofocus -->
-        </div>
-        
         <h2 class="section-title">Productos</h2>
 
-        <app-product-grid
-          [products]="productos()"
+        <app-inventory-product-grid
+          [products]="catalogItems()"
           [loadingProducts]="loadingProducts()"
-          (addToCart)="onAddToCart($event)"
+          [canManage]="false"
+          [sellable]="true"
+          (addToCart)="onAddItem($any($event))"
           (loadMore)="onLoadMore()"
         />
-        @if (!loadingProducts() && productos().length === 0) {
+        @if (!loadingProducts() && catalogItems().length === 0) {
           <p class="empty-hint">Sin productos con stock en tu sucursal.</p>
         }
       }

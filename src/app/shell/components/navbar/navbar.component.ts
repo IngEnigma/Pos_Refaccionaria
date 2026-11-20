@@ -3,6 +3,7 @@ import {
   Component,
   input,
   output,
+  viewChild,
 } from '@angular/core';
 import { SearchInputComponent } from '@shared/ui/form-controls/search-input/search-input.component';
 import { IconButtonComponent } from '@shared/ui/components/icon-button/icon-button.component';
@@ -38,6 +39,9 @@ export class NavbarComponent {
 
   readonly logoutClick = output<void>();
   readonly searchChange = output<string>();
+  readonly searchSubmit = output<string>();
+
+  private readonly searchInput = viewChild(SearchInputComponent);
 
   onLogout(): void {
     this.logoutClick.emit();
@@ -45,5 +49,13 @@ export class NavbarComponent {
 
   onSearchChange(query: string): void {
     this.searchChange.emit(query);
+  }
+
+  focusSearch(): void {
+    this.searchInput()?.focus();
+  }
+
+  clearSearch(): void {
+    this.searchInput()?.clear();
   }
 }

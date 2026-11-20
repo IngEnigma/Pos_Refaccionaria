@@ -3,10 +3,12 @@ import {
   Component,
   computed,
   DestroyRef,
+  ElementRef,
   inject,
   input,
   OnInit,
-  output
+  output,
+  viewChild
 } from '@angular/core';
 import { LucideAngularModule } from 'lucide-angular';
 import { Subject } from 'rxjs';
@@ -31,6 +33,10 @@ export class SearchInputComponent extends BaseFormField<string> implements OnIni
   readonly disabledInput = input(false);
 
   readonly searchChange = output<string>();
+  /** Enter: emite el texto al instante (sin debounce), p. ej. para el lector de código de barras. */
+  readonly searchSubmit = output<string>();
+
+  private readonly field = viewChild<ElementRef<HTMLInputElement>>('field');
 
   readonly resolvedAriaLabel = computed(() => 
     resolveAriaLabel(
@@ -58,5 +64,20 @@ export class SearchInputComponent extends BaseFormField<string> implements OnIni
   onSearchInput(event: Event): void {
     const target = event.target as HTMLInputElement;
     this.searchSubject.next(target.value);
+  }
+
+  onEnter(): void {
+    this.searchSubmit.emit(this.field()?.nativeElement.value.trim() ?? '');
+  }
+
+  focus(): void {
+    this.field()?.nativeElement.focus();
+  }
+
+  /** Vacía el campo y la búsqueda; el debounce descarta cualquier texto pendiente. */
+  clear(): void {
+    const el = this.field()?.nativeElement;
+    if (el) el.value = '';
+    this.searchSubject.next('');
   }
 }

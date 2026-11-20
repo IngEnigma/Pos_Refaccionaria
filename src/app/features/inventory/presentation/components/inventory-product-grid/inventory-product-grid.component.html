@@ -3,9 +3,11 @@
     <app-inventory-product-card
       [product]="$any(producto)"
       [canManage]="canManage()"
+      [sellable]="sellable()"
       (modifyProduct)="modifyProduct.emit($event)"
       (deleteProduct)="deleteProduct.emit($event)"
       (changePrice)="changePrice.emit($event)"
+      (addToCart)="addToCart.emit($event)"
     />
   }
 

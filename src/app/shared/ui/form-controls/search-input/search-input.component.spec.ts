@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { SearchInputComponent } from './search-input.component';
 import { LucideAngularModule, Search } from 'lucide-angular';
 
@@ -91,4 +91,33 @@ describe('SearchInputComponent', () => {
 
     expect(touchedSpy).toHaveBeenCalledTimes(1);
   });
+
+  // Lector de código de barras: Enter emite al instante, sin esperar el debounce.
+  it('Enter emite searchSubmit con el texto recortado', () => {
+    fixture.detectChanges();
+    const submitted: string[] = [];
+    component.searchSubmit.subscribe((q) => submitted.push(q));
+
+    const input = getInputByAriaLabel('Buscar...');
+    input.value = ' 7501 ';
+    input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
+
+    expect(submitted).toEqual(['7501']);
+  });
+
+  // clear() vacía el campo y descarta el texto pendiente del debounce.
+  it('clear vacía el campo y emite búsqueda vacía', fakeAsync(() => {
+    fixture.detectChanges();
+    const changes: string[] = [];
+    component.searchChange.subscribe((q) => changes.push(q));
+
+    const input = getInputByAriaLabel('Buscar...');
+    input.value = '7501';
+    input.dispatchEvent(new Event('input'));
+    component.clear();
+    tick(300);
+
+    expect(input.value).toBe('');
+    expect(changes).not.toContain('7501');
+  }));
 });

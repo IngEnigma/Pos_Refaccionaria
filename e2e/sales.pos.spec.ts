@@ -176,11 +176,13 @@ test.describe('POS — ventas', () => {
     await setupPos(page);
     await page.goto('/sales');
 
-    const barcode = page.getByPlaceholder('Escanear código de barras...');
+    const barcode = page.getByRole('banner').getByPlaceholder('Buscar...');
+    await expect(barcode).toBeFocused(); // el lector escribe donde está el foco
     await barcode.fill('7501');
     await barcode.press('Enter');
     await expect(page.getByText('Balata delantera agregado al carrito')).toBeVisible();
     await expect(cartPanel(page).getByTitle('Cantidad')).toHaveText('1');
+    await expect(barcode).toHaveValue('');
 
     await barcode.fill('0000');
     await barcode.press('Enter');

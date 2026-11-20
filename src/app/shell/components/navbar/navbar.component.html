@@ -1,5 +1,5 @@
 <header class="navbar" role="banner">
-  <app-search-input (searchChange)="onSearchChange($event)"></app-search-input>
+  <app-search-input (searchChange)="onSearchChange($event)" (searchSubmit)="searchSubmit.emit($event)"></app-search-input>
 
   <div class="user-section">
     <div class="user-info">

@@ -47,39 +47,12 @@ app-category-slider {
   flex-shrink: 0; 
 }
 
-app-product-grid {
+app-inventory-product-grid {
   display: block;
   flex: 1;
   overflow-y: auto;
   min-height: 0;
   padding-bottom: var(--space-5);
-}
-
-.barcode-input-wrapper {
-  flex-shrink: 0;
-  margin-bottom: 4px;
-  max-width: 320px;
-}
-
-.barcode-input {
-  width: 100%;
-  padding: 6px 10px;
-  border: 2px solid var(--color-border, #e2e8f0);
-  border-radius: 8px;
-  font-size: 0.85rem;
-  font-family: var(--font-text-family);
-  background: var(--color-surface, #fff);
-  color: var(--font-text-color);
-  outline: none;
-  transition: border-color 0.2s;
-}
-
-.barcode-input:focus {
-  border-color: var(--color-primary, #3b82f6);
-}
-
-.barcode-input::placeholder {
-  color: var(--color-text-muted, #94a3b8);
 }
 
 .empty-state {

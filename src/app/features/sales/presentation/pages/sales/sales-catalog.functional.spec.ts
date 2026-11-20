@@ -3,7 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideRouter } from '@angular/router';
-import { BanknoteIcon, CreditCard, ArrowLeftRightIcon, LucideAngularModule, Package, Trash2 } from 'lucide-angular';
+import { BanknoteIcon, CreditCard, ArrowLeftRightIcon, LucideAngularModule, Package, Plus, Trash2 } from 'lucide-angular';
 
 import { environment } from '@env/environment';
 import { APP_ENV } from '@core/tokens/app-env.token';
@@ -60,6 +60,8 @@ import { GetMovementsUseCase } from '@features/inventory-by-branch/application/u
 import { RegisterMovementUseCase } from '@features/inventory-by-branch/application/usecase/register-movement.usecase';
 import { InventoryRepository } from '@features/inventory-by-branch/domain/repository/inventory-repository';
 import { InventoryRepositoryImpl } from '@features/inventory-by-branch/infrastructure/repositories/inventory-repository.impl';
+import { ProductRepository } from '@features/inventory/domain/repository/product-repository';
+import { ProductRepositoryImpl } from '@features/inventory/infrastructure/repositories/product-repository.impl';
 import { InventoryMovementRepository } from '@features/inventory-by-branch/domain/repository/movement-repository';
 import { InventoryMovementRepositoryImpl } from '@features/inventory-by-branch/infrastructure/repositories/movement-repository.impl';
 
@@ -112,7 +114,7 @@ describe('Catálogo de ventas (funcional)', () => {
         provideHttpClient(withInterceptors([httpErrorInterceptor, authTokenInterceptor, trailingSlashInterceptor])),
         provideHttpClientTesting(),
         provideRouter([]),
-        importProvidersFrom(LucideAngularModule.pick({ BanknoteIcon, CreditCard, ArrowLeftRightIcon, Package, Trash2 })),
+        importProvidersFrom(LucideAngularModule.pick({ BanknoteIcon, CreditCard, ArrowLeftRightIcon, Package, Plus, Trash2 })),
         { provide: APP_ENV, useValue: environment },
         { provide: LOGGER_PORT, useClass: LoggerService },
         { provide: LOGGING_LEVEL_TOKEN, useValue: LogLevel.FATAL },
@@ -152,6 +154,7 @@ describe('Catálogo de ventas (funcional)', () => {
         GetMovementsUseCase,
         RegisterMovementUseCase,
         { provide: InventoryRepository, useClass: InventoryRepositoryImpl },
+        { provide: ProductRepository, useClass: ProductRepositoryImpl },
         { provide: InventoryMovementRepository, useClass: InventoryMovementRepositoryImpl },
       ],
     });
@@ -175,7 +178,7 @@ describe('Catálogo de ventas (funcional)', () => {
   });
 
   function cardNames(): string[] {
-    return Array.from(fixture.nativeElement.querySelectorAll('.product-name') as NodeListOf<HTMLElement>)
+    return Array.from(fixture.nativeElement.querySelectorAll('.inv-card__name') as NodeListOf<HTMLElement>)
       .map((el) => (el.textContent ?? '').trim());
   }
 
@@ -239,8 +242,7 @@ describe('Catálogo de ventas (funcional)', () => {
     httpMock.expectOne(TIPOS).flush([{ id: 5, nombre: 'Filtros' }]);
     fixture.detectChanges();
 
-    // El slider emite cats[0] (Todos, id 0) y la página lo registra; el filtrado por tipo
-    // está deshabilitado en el código, así que el catálogo sigue completo (conducta real).
+    // El slider emite cats[0] (Todos, id 0): sin tipo elegido el catálogo sigue completo.
     expect(page.selectedCategoryId()).toBe(0);
     expect(cardNames()).toEqual(['Filtro de aceite', 'Bujía NGK']);
   });

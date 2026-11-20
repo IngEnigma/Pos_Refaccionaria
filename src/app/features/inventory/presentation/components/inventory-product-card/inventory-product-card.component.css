@@ -318,6 +318,8 @@
   border-color: var(--color-primary-600);
 }
 .inv-card__btn--primary:hover { background: var(--color-primary-700); border-color: var(--color-primary-700); }
+.inv-card__btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.inv-card__actions--single { grid-template-columns: 1fr; }
 
 .inv-card__btn--ghost {
   background: var(--color-surface);

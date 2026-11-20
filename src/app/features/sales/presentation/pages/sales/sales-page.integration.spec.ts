@@ -58,6 +58,8 @@ import { GetMovementsUseCase } from '@features/inventory-by-branch/application/u
 import { RegisterMovementUseCase } from '@features/inventory-by-branch/application/usecase/register-movement.usecase';
 import { InventoryRepository } from '@features/inventory-by-branch/domain/repository/inventory-repository';
 import { InventoryRepositoryImpl } from '@features/inventory-by-branch/infrastructure/repositories/inventory-repository.impl';
+import { ProductRepository } from '@features/inventory/domain/repository/product-repository';
+import { ProductRepositoryImpl } from '@features/inventory/infrastructure/repositories/product-repository.impl';
 import { InventoryMovementRepository } from '@features/inventory-by-branch/domain/repository/movement-repository';
 import { InventoryMovementRepositoryImpl } from '@features/inventory-by-branch/infrastructure/repositories/movement-repository.impl';
 
@@ -167,6 +169,7 @@ describe('SalesPageComponent (integración)', () => {
         GetMovementsUseCase,
         RegisterMovementUseCase,
         { provide: InventoryRepository, useClass: InventoryRepositoryImpl },
+        { provide: ProductRepository, useClass: ProductRepositoryImpl },
         { provide: InventoryMovementRepository, useClass: InventoryMovementRepositoryImpl },
       ],
     });
@@ -235,8 +238,7 @@ describe('SalesPageComponent (integración)', () => {
   it('código de barras válido agrega el producto al carrito', () => {
     flushStartup(inventoryDto([itemDto()]));
 
-    page.barcodeInput.set('7501234567890');
-    page.onBarcodeKeyDown(new KeyboardEvent('keydown', { key: 'Enter' }));
+    page.onScan('7501234567890');
 
     expect(page.cartItems()).toHaveLength(1);
     expect(page.cartItems()[0]).toEqual({
@@ -255,8 +257,7 @@ describe('SalesPageComponent (integración)', () => {
   it('código de barras inexistente avisa sin agregar nada', () => {
     flushStartup(inventoryDto([itemDto()]));
 
-    page.barcodeInput.set('0000000000000');
-    page.onBarcodeKeyDown(new KeyboardEvent('keydown', { key: 'Enter' }));
+    page.onScan('0000000000000');
 
     expect(page.cartItems()).toHaveLength(0);
     expect(lastToast().type).toBe('warning');
@@ -266,8 +267,7 @@ describe('SalesPageComponent (integración)', () => {
   it('producto sin stock no entra al carrito por código de barras', () => {
     flushStartup(inventoryDto([itemDto({ cantidad: 0 })]));
 
-    page.barcodeInput.set('7501234567890');
-    page.onBarcodeKeyDown(new KeyboardEvent('keydown', { key: 'Enter' }));
+    page.onScan('7501234567890');
 
     expect(page.cartItems()).toHaveLength(0);
     expect(lastToast().type).toBe('error');

@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { importProvidersFrom } from '@angular/core';
-import { LucideAngularModule, Package, Pencil, Tag, Trash2 } from 'lucide-angular';
+import { LucideAngularModule, Package, Pencil, Plus, Tag, Trash2 } from 'lucide-angular';
 
 import { InventoryProductCardComponent } from './inventory-product-card.component';
 import { Product } from '@features/inventory/domain/entities/product.entity';
@@ -15,7 +15,7 @@ describe('InventoryProductCardComponent', () => {
   // Iconos lucide usados por el template (Package, Pencil, Tag, Trash2); sin ellos el render lanza error.
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [importProvidersFrom(LucideAngularModule.pick({ Package, Pencil, Tag, Trash2 }))],
+      providers: [importProvidersFrom(LucideAngularModule.pick({ Package, Pencil, Plus, Tag, Trash2 }))],
     });
   });
 
@@ -155,5 +155,34 @@ describe('InventoryProductCardComponent', () => {
     const text = (fixture.nativeElement as HTMLElement).textContent as string;
     expect(text).not.toContain('en stock');
     expect(text).not.toContain('Sucursal');
+  });
+
+  // POS: en modo venta solo hay "Añadir" (sin acciones de gestión) y emite el producto.
+  it('sellable muestra solo Añadir y emite addToCart', () => {
+    setup(item);
+    fixture.componentRef.setInput('sellable', true);
+    fixture.detectChanges();
+    const emitted: unknown[] = [];
+    component.addToCart.subscribe((p) => emitted.push(p));
+
+    const buttons = Array.from(fixture.nativeElement.querySelectorAll('.inv-card__actions button') as NodeListOf<HTMLButtonElement>);
+    expect(buttons.map((b) => b.textContent?.trim())).toEqual(['Añadir']);
+    buttons[0].click();
+
+    expect(emitted).toEqual([item]);
+  });
+
+  // POS: sin stock el botón Añadir queda deshabilitado y no emite.
+  it('sellable con stock 0 deshabilita Añadir', () => {
+    setup({ ...item, cantidad: 0 });
+    fixture.componentRef.setInput('sellable', true);
+    fixture.detectChanges();
+    const emitted: unknown[] = [];
+    component.addToCart.subscribe((p) => emitted.push(p));
+
+    const btn = fixture.nativeElement.querySelector('.inv-card__actions button') as HTMLButtonElement;
+    expect(btn.disabled).toBe(true);
+    btn.click();
+    expect(emitted).toEqual([]);
   });
 });
