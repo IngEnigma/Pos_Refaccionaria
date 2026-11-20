@@ -3,9 +3,7 @@
  *
  *   npm run e2e:back   (otra terminal)  +  npm run e2e:flujos
  *
- * La pantalla /manager (cashiers-management.page) es hoy una maqueta: lista 3 cajeros fijos y su formulario no
- * envía nada (sin facade ni repositorio). Por eso GER-001/002 se prueban contra la API de usuarios que el gerente
- * ya tiene (`/api/users`) y las versiones por UI quedan en `test.fixme` (H-F4-1). GER-003 y GER-004 sí usan la UI real.
+ * GER-001/002 se prueban por API (`/api/users`) y por UI (001b/002b: /manager/cashiers usa UsersFacade). GER-003/004 usan la UI.
  * `gerente.general` es encargado NO staff (seed): rige su permiso por rol y su alcance por sucursal.
  * Cada prueba crea usuarios `e2e.ger.<timestamp>` y limpia de la BD usuario, perfil y ventas.
  */
@@ -80,13 +78,14 @@ test.describe('Gerente flujos REAL (backend local)', () => {
     expect((await apiFetch(TEST_USERS.anaCentro, 'GET', 'users')).status).toBe(403);
   });
 
-  test.fixme('FLU-GER-001b /manager lista los cajeros reales de Centro y no los de Norte (UI) — H-F4-1', async ({ page }) => {
-    // H-F4-1: la pantalla muestra 3 cajeros fijos (Ana Lira, Roberto Solis, Iris Molina), no llama a la API.
+  test('FLU-GER-001b /manager lista los cajeros reales de Centro y no los de Norte (UI)', async ({ page }) => {
     test.skip(!(await wakeBackend(page)), 'Backend no disponible');
     await loginAsReal(page, GERENTE);
     await page.goto('/manager/cashiers');
     await expect(page.getByRole('row').filter({ hasText: 'ana.centro' })).toHaveCount(1);
+    await expect(page.getByRole('row').filter({ hasText: 'carlos.centro' })).toHaveCount(1);
     await expect(page.getByRole('row').filter({ hasText: 'maria.norte' })).toHaveCount(0);
+    await expect(page.getByRole('row').filter({ hasText: 'Ana Lira' })).toHaveCount(0);
   });
 
   test('FLU-GER-002 el gerente da de alta, edita y da de baja un cajero de su sucursal (API)', async () => {
@@ -115,17 +114,29 @@ test.describe('Gerente flujos REAL (backend local)', () => {
     expect(sql(`select is_active from auth_user where id=${norte}`)).toBe('1');
   });
 
-  test.fixme('FLU-GER-002b el formulario de /manager crea, edita y da de baja un cajero (UI) — H-F4-1', async ({ page }) => {
-    // H-F4-1: "Crear cajero" no tiene (click) ni formulario reactivo: no hay llamada a POST /api/users.
+  test('FLU-GER-002b el formulario de /manager crea, edita y da de baja un cajero (UI)', async ({ page }) => {
     test.skip(!(await wakeBackend(page)), 'Backend no disponible');
     const username = unico();
     await loginAsReal(page, GERENTE);
     await page.goto('/manager/cashiers');
-    await page.getByLabel('Nombre completo').fill(username);
+    const fila = page.getByRole('row').filter({ hasText: username });
+
+    await page.getByLabel('Usuario').fill(username);
     await page.getByLabel('Correo').fill(`${username}@trt.com`);
+    await page.getByLabel('Contraseña').fill(PASSWORD);
     await page.getByRole('button', { name: 'Crear cajero' }).click();
-    await expect(page.getByRole('row').filter({ hasText: username })).toHaveCount(1);
+    await expect(fila).toHaveCount(1);
     expect(perfilEnBd(username)).toBe(`cajero|${CENTRO}|1`);
+
+    await fila.getByRole('button', { name: 'Editar' }).click();
+    await page.getByLabel('Correo').fill(`${username}.nuevo@trt.com`);
+    await page.getByRole('button', { name: 'Guardar cambios' }).click();
+    await expect(fila).toContainText(`${username}.nuevo@trt.com`);
+    expect(sql(`select email from auth_user where username='${username}'`)).toBe(`${username}.nuevo@trt.com`);
+
+    await fila.getByRole('button', { name: 'Dar de baja' }).click();
+    await expect(fila).toContainText('Inactivo');
+    expect(perfilEnBd(username)).toBe(`cajero|${CENTRO}|0`);
   });
 
   test('FLU-GER-003 el cajero creado por el gerente entra por UI y vende en la sucursal del gerente', async ({ page }) => {
