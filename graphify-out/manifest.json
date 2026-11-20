@@ -1005,9 +1005,9 @@
     "semantic_hash": "a51f4308025d0f92fe6c371724e944f4"
   },
   "src/app/features/inventory/application/facades/inventory.facade.ts": {
-    "mtime": 1788404112.8420553,
-    "ast_hash": "b2a48adceea0d20589fcba7b50d42928",
-    "semantic_hash": "b2a48adceea0d20589fcba7b50d42928"
+    "mtime": 1795151050.8248112,
+    "ast_hash": "2d8cadcd4ca703cc420708c30d831c48",
+    "semantic_hash": ""
   },
   "src/app/features/inventory/application/usecase/create-product.usecase.ts": {
     "mtime": 1772728817.0757036,
@@ -1050,8 +1050,8 @@
     "semantic_hash": "2beca1e4e2de67248456551df9424898"
   },
   "src/app/features/inventory/domain/repository/product-repository.ts": {
-    "mtime": 1794766545.6013658,
-    "ast_hash": "8dde311118e91cb98f67222a75d142d6",
+    "mtime": 1795151050.8248112,
+    "ast_hash": "b2be1010c0cd3b13f4107e9b98875505",
     "semantic_hash": ""
   },
   "src/app/features/inventory/index.ts": {
@@ -1060,14 +1060,14 @@
     "semantic_hash": "f1ccf23542fbfe32c343196aea0b1a49"
   },
   "src/app/features/inventory/infrastructure/mappers/product.mapper.ts": {
-    "mtime": 1788401279.0989256,
-    "ast_hash": "58f70aa9bf8a217559204c37e95d878a",
-    "semantic_hash": "58f70aa9bf8a217559204c37e95d878a"
+    "mtime": 1795151078.7122333,
+    "ast_hash": "f7d038405d2437e0e750988aa2010be3",
+    "semantic_hash": ""
   },
   "src/app/features/inventory/infrastructure/repositories/product-repository.impl.ts": {
-    "mtime": 1788404064.718683,
-    "ast_hash": "72dcb4ce3d22c054ee5de953a73e68b7",
-    "semantic_hash": "72dcb4ce3d22c054ee5de953a73e68b7"
+    "mtime": 1795151050.8248112,
+    "ast_hash": "7163ff1909c9948e8692807d67a8de9a",
+    "semantic_hash": ""
   },
   "src/app/features/inventory/inventory.routes.ts": {
     "mtime": 1774040341.9180217,
@@ -1075,23 +1075,23 @@
     "semantic_hash": "3e5fb74f360e0b41498a38ea1ca8052d"
   },
   "src/app/features/inventory/presentation/components/inventory-product-card/inventory-product-card.component.ts": {
-    "mtime": 1790912898.2082167,
-    "ast_hash": "306ffaea66916c9d54a71c226875ce1f",
-    "semantic_hash": "306ffaea66916c9d54a71c226875ce1f"
+    "mtime": 1795151050.8288116,
+    "ast_hash": "c9bd8415312955be6dc22161798493e3",
+    "semantic_hash": ""
   },
   "src/app/features/inventory/presentation/components/inventory-product-grid/inventory-product-grid.component.ts": {
-    "mtime": 1790912898.2082167,
-    "ast_hash": "8df611101a655cfbf2f432d22d85a7be",
-    "semantic_hash": "8df611101a655cfbf2f432d22d85a7be"
+    "mtime": 1795151050.8288116,
+    "ast_hash": "44b4dd5bcda676f2da9120247f9e7490",
+    "semantic_hash": ""
   },
   "src/app/features/inventory/presentation/components/product-form-dialog/product-form-dialog.component.ts": {
-    "mtime": 1788401386.89759,
-    "ast_hash": "7a92f22e28fdf122e39b6f841ad5187c",
-    "semantic_hash": "7a92f22e28fdf122e39b6f841ad5187c"
+    "mtime": 1795151050.8248112,
+    "ast_hash": "151594a91d4a5aee0b773b04d6380cfc",
+    "semantic_hash": ""
   },
   "src/app/features/inventory/presentation/pages/inventory/inventory.page.ts": {
-    "mtime": 1794766622.9221299,
-    "ast_hash": "ab422f2c0a8f1bd9f35a39b0a8401224",
+    "mtime": 1795151060.693994,
+    "ast_hash": "5ea90c02a8128b62f8000da85c9bd52f",
     "semantic_hash": ""
   },
   "src/app/features/manager/manager.routes.ts": {
@@ -2245,23 +2245,23 @@
     "semantic_hash": ""
   },
   "src/app/features/inventory/presentation/components/inventory-product-card/inventory-product-card.component.html": {
-    "mtime": 1790912898.2082167,
-    "ast_hash": "608f00c0033dd9b2e280496d449b4e4c",
+    "mtime": 1795151050.8288116,
+    "ast_hash": "2d7082ff75e6fe579801e163b23a33b7",
     "semantic_hash": ""
   },
   "src/app/features/inventory/presentation/components/inventory-product-grid/inventory-product-grid.component.html": {
-    "mtime": 1790912898.2082167,
-    "ast_hash": "b6ce8907d1e7660dc9be9b9ffc1fbf14",
+    "mtime": 1795151050.8288116,
+    "ast_hash": "30e5fafdc79d1ea0c82c306360bcaede",
     "semantic_hash": ""
   },
   "src/app/features/inventory/presentation/components/product-form-dialog/product-form-dialog.component.html": {
-    "mtime": 1788401396.4134724,
-    "ast_hash": "0b4cee473f41decfdaa738ae530ecbbc",
+    "mtime": 1795151050.8248112,
+    "ast_hash": "f15ae785994525c23647b02f30ca926f",
     "semantic_hash": ""
   },
   "src/app/features/inventory/presentation/pages/inventory/inventory.page.html": {
-    "mtime": 1794720461.5603848,
-    "ast_hash": "e090163947a285c758897d09dc142019",
+    "mtime": 1795151060.693994,
+    "ast_hash": "5c11295ae6f582843ab8cc00f8eafa20",
     "semantic_hash": ""
   },
   "src/app/features/manager/presentation/pages/cashiers-management/cashiers-management.page.html": {
@@ -2520,28 +2520,28 @@
     "semantic_hash": ""
   },
   "src/app/features/inventory/application/facades/inventory.facade.spec.ts": {
-    "mtime": 1794628409.917886,
-    "ast_hash": "289adf0da7db39257b02092876ad0cc4",
+    "mtime": 1795151086.8652744,
+    "ast_hash": "f4411610d5f36f66f80b1a6b762b8522",
     "semantic_hash": ""
   },
   "src/app/features/inventory/application/usecase/product-usecases.spec.ts": {
-    "mtime": 1794628409.921886,
-    "ast_hash": "1c742db2b61a9fb496d84431342ee786",
+    "mtime": 1795151086.8652744,
+    "ast_hash": "f867f3b9a15de9ede7531bc853a17532",
     "semantic_hash": ""
   },
   "src/app/features/inventory/infrastructure/mappers/product.mapper.spec.ts": {
-    "mtime": 1794628409.921886,
-    "ast_hash": "516ca8b91c23568e2c3eb562b23b36cb",
+    "mtime": 1795151078.7122333,
+    "ast_hash": "53a748cadca3724c3643b1c67b37cb68",
     "semantic_hash": ""
   },
   "src/app/features/inventory/infrastructure/repositories/product-repository.impl.spec.ts": {
-    "mtime": 1794628409.921886,
-    "ast_hash": "72c3abe1ceda42d059ca64f1ab43b878",
+    "mtime": 1795151078.7122333,
+    "ast_hash": "dd43fec96008fc0a7737fe4236234099",
     "semantic_hash": ""
   },
   "src/app/features/inventory/presentation/components/inventory-product-card/inventory-product-card.component.spec.ts": {
-    "mtime": 1794628409.921886,
-    "ast_hash": "1bf5d4f70473980c84bbaacf0d8e837b",
+    "mtime": 1795151096.1464775,
+    "ast_hash": "97065f965a34a6d47de5706d2c04d316",
     "semantic_hash": ""
   },
   "src/app/features/inventory/presentation/components/inventory-product-grid/inventory-product-grid.component.spec.ts": {
@@ -2550,13 +2550,13 @@
     "semantic_hash": ""
   },
   "src/app/features/inventory/presentation/components/product-form-dialog/product-form-dialog.component.spec.ts": {
-    "mtime": 1794628409.921886,
-    "ast_hash": "15bf8463bd0dee84ef1569f4917f8fb5",
+    "mtime": 1795151096.1464775,
+    "ast_hash": "502979e8963692d3803641d3405fbcb5",
     "semantic_hash": ""
   },
   "src/app/features/inventory/presentation/pages/inventory/inventory.page.spec.ts": {
-    "mtime": 1794628409.921886,
-    "ast_hash": "4699d3fe78cc2037202f5619e8a4710a",
+    "mtime": 1795151108.0400426,
+    "ast_hash": "261fbd9f99de7b716216a37b09a20940",
     "semantic_hash": ""
   },
   "src/app/features/sales/presentation/components/client-selector-modal/client-selector-modal.component.spec.ts": {
@@ -3275,8 +3275,8 @@
     "semantic_hash": ""
   },
   "e2e/flujos/inventario.real.spec.ts": {
-    "mtime": 1795146449.3707943,
-    "ast_hash": "3957df41763b6872f470e9a742e2be2e",
+    "mtime": 1795151607.762012,
+    "ast_hash": "e2e8e700e9ba4eb31c3b89abbb69c797",
     "semantic_hash": ""
   },
   "e2e/flujos/sucursales.real.spec.ts": {
@@ -3287,6 +3287,11 @@
   "e2e/flujos/dia-completo.real.spec.ts": {
     "mtime": 1795146538.629906,
     "ast_hash": "1e3742ae965278c3f05d072aeb4c513e",
+    "semantic_hash": ""
+  },
+  "src/app/features/inventory/application/usecase/get-product-by-id.usecase.ts": {
+    "mtime": 1795151050.8248112,
+    "ast_hash": "eb97bc12361371ccb1769d6c0b58e9f7",
     "semantic_hash": ""
   }
 }
