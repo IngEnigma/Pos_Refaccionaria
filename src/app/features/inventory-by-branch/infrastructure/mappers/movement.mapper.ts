@@ -16,6 +16,7 @@ export class MovementMapper {
   static toRegisterRequestDto(payload: RegisterMovementPayload): RegisterMovementRequestDto {
     return {
       id_inventario: payload.idInventario,
+      id_sucursal: payload.idSucursal,
       tipo_movimiento: payload.tipoMovimiento,
       razon: payload.razon,
       observaciones: payload.observaciones,

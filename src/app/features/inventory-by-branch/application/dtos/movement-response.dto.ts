@@ -9,6 +9,7 @@ export interface MovementResponseDto {
 
 export interface RegisterMovementRequestDto {
   id_inventario: number;
+  id_sucursal: number;
   tipo_movimiento: 'ENTRADA' | 'SALIDA';
   razon: string;
   observaciones?: string;
