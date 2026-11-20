@@ -10,6 +10,8 @@
 > Las suites contra backend real deben usar `wakeBackend()` + timeouts 60-90s + `retries: 2` en CI.
 
 > Plan detallado de auth, ventas y rol admin (hallazgos, fases y resultado final): [plan-pruebas-admin-auth-ventas.md](plan-pruebas-admin-auth-ventas.md).
+>
+> Plan E2E de todos los flujos, módulo por módulo, contra el backend local: [plan-pruebas-flujos-e2e.md](plan-pruebas-flujos-e2e.md).
 
 ---
 
