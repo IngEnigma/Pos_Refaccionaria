@@ -21,7 +21,7 @@ export const DEFAULT_SIDEBAR_NAV_ITEMS: readonly SidebarNavItem[] = [
     label: 'Reportes',
     icon: 'bar-chart-3',
     route: '/reports',
-    roles: ['admin', 'manager', 'seller'],
+    roles: ['admin', 'manager'],
   },
   {
     id: 'history',

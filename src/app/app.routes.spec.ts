@@ -13,6 +13,7 @@ describe('app.routes — acceso por rol', () => {
     [AppRoutes.branchPricing, ['admin']],
     [AppRoutes.manager, ['admin', 'manager']],
     [AppRoutes.inventoryByBranch, ['admin', 'manager']],
+    [AppRoutes.reports, ['admin', 'manager']], // H-F4-3: el back da 403 al cajero (reporte.ver)
   ])('/%s exige authGuard + roleGuard con roles %j', (path, roles) => {
     const route = find(path);
 
