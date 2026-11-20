@@ -840,9 +840,9 @@
     "semantic_hash": "8289a47eddbc298c676b119a33ca9f05"
   },
   "src/app/features/clients/infrastructure/mappers/client.mapper.ts": {
-    "mtime": 1788484721.198997,
-    "ast_hash": "c58c701a7ffe62682516bf3b938f861b",
-    "semantic_hash": "c58c701a7ffe62682516bf3b938f861b"
+    "mtime": 1795139357.9331326,
+    "ast_hash": "85b8529e538277218ef8b87cb963c09e",
+    "semantic_hash": ""
   },
   "src/app/features/clients/infrastructure/repositories/client-repository.impl.ts": {
     "mtime": 1788484724.7751646,
@@ -855,13 +855,13 @@
     "semantic_hash": "e5c62d654332899ce8896cd38b8d007b"
   },
   "src/app/features/clients/presentation/components/clients-table/clients-table.component.ts": {
-    "mtime": 1788484793.1440852,
-    "ast_hash": "5dd3dee39eef8cbf86f55c72ad106eef",
-    "semantic_hash": "5dd3dee39eef8cbf86f55c72ad106eef"
+    "mtime": 1795139483.4158714,
+    "ast_hash": "e8aebf2b6547964673a2ca72ff9009d7",
+    "semantic_hash": ""
   },
   "src/app/features/clients/presentation/pages/clients-page/clients.page.ts": {
-    "mtime": 1794721779.7466567,
-    "ast_hash": "90a7f428e3718f154a15c21653f3fddd",
+    "mtime": 1795139530.7968895,
+    "ast_hash": "4ed48d4392204b32b88ef6555163d306",
     "semantic_hash": ""
   },
   "src/app/features/index.ts": {
@@ -1725,9 +1725,9 @@
     "semantic_hash": "d50124c7b876bf414e0c66dfe99ff91f"
   },
   "src/app/features/suppliers/application/facades/suppliers.facade.ts": {
-    "mtime": 1776698260.6075575,
-    "ast_hash": "a883790ec89d6458040bf9af5f33144e",
-    "semantic_hash": "a883790ec89d6458040bf9af5f33144e"
+    "mtime": 1795139633.1550639,
+    "ast_hash": "83cb0b00d8acf76e23d1ff7718b3659c",
+    "semantic_hash": ""
   },
   "src/app/features/suppliers/application/usecase/create-supplier.usecase.ts": {
     "mtime": 1772728857.59619,
@@ -1780,13 +1780,13 @@
     "semantic_hash": "8c2d8257b7586240cb0092e2d3e4e528"
   },
   "src/app/features/suppliers/presentation/components/supplier-list/supplier-list.component.ts": {
-    "mtime": 1776698411.433891,
-    "ast_hash": "0c09d3ac5267670b827cb52005f10d4e",
-    "semantic_hash": "0c09d3ac5267670b827cb52005f10d4e"
+    "mtime": 1795139487.387957,
+    "ast_hash": "357644038a52fde23988f578867a3e17",
+    "semantic_hash": ""
   },
   "src/app/features/suppliers/presentation/pages/suppliers/suppliers.page.ts": {
-    "mtime": 1794721779.7466567,
-    "ast_hash": "420eaf5813119434d1fffb3436d6474a",
+    "mtime": 1795139530.7968895,
+    "ast_hash": "0088d8439eaf3df46aeedb6e9e49b96f",
     "semantic_hash": ""
   },
   "src/app/features/suppliers/suppliers.routes.ts": {
@@ -2215,13 +2215,13 @@
     "semantic_hash": ""
   },
   "src/app/features/clients/presentation/components/clients-table/clients-table.component.html": {
-    "mtime": 1794768464.2378778,
-    "ast_hash": "3a600dadf96a475e2e495458d4a97e1f",
+    "mtime": 1795139483.4198713,
+    "ast_hash": "a0d81d9cc851963eb6929dec09956761",
     "semantic_hash": ""
   },
   "src/app/features/clients/presentation/pages/clients-page/clients.page.html": {
-    "mtime": 1794720461.5523844,
-    "ast_hash": "216fef9610bb2bbc89d9f5f0582ac5ac",
+    "mtime": 1795139483.4198713,
+    "ast_hash": "445d470d673ff7397ae0be0c140d97ec",
     "semantic_hash": ""
   },
   "src/app/features/inventory-by-branch/presentation/components/inventory-table/inventory-table.component.html": {
@@ -2355,13 +2355,13 @@
     "semantic_hash": ""
   },
   "src/app/features/suppliers/presentation/components/supplier-list/supplier-list.component.html": {
-    "mtime": 1794768464.2378778,
-    "ast_hash": "5699379247d7533c634fa0210cf1c770",
+    "mtime": 1795139493.0560791,
+    "ast_hash": "20817753fdca045b830ca17b89c0517e",
     "semantic_hash": ""
   },
   "src/app/features/suppliers/presentation/pages/suppliers/suppliers.page.html": {
-    "mtime": 1794720461.580386,
-    "ast_hash": "f8f0864ab7f4b0b403386234722ec4e2",
+    "mtime": 1795139493.060079,
+    "ast_hash": "8493f26c092ef5d4b15bafd243411f17",
     "semantic_hash": ""
   },
   "src/app/shared/ui/components/button/button.component.html": {
@@ -2425,8 +2425,8 @@
     "semantic_hash": ""
   },
   "src/app/features/clients/application/facades/clients-facade.integration.spec.ts": {
-    "mtime": 1794628409.913886,
-    "ast_hash": "53c18aee35ee213672ef9a5dc75a6adb",
+    "mtime": 1795139389.313824,
+    "ast_hash": "d42bab0a55d5c714a4b0c055158fa56c",
     "semantic_hash": ""
   },
   "src/app/features/clients/application/facades/clients.facade.spec.ts": {
@@ -2445,13 +2445,13 @@
     "semantic_hash": ""
   },
   "src/app/features/clients/infrastructure/mappers/client.mapper.spec.ts": {
-    "mtime": 1794628409.917886,
-    "ast_hash": "9c28ba6219c455c45e7e144f7313ceae",
+    "mtime": 1795139357.9331326,
+    "ast_hash": "697f1054c64843ebede8e75453892c54",
     "semantic_hash": ""
   },
   "src/app/features/clients/infrastructure/repositories/client-repository.impl.spec.ts": {
-    "mtime": 1794628409.917886,
-    "ast_hash": "b55703da5ef72e12df54d45208f5d312",
+    "mtime": 1795139367.001333,
+    "ast_hash": "9076a51a9bccfde88764f50c074d93c9",
     "semantic_hash": ""
   },
   "src/app/features/clients/presentation/components/client-form-dialog/client-form-dialog.component.spec.ts": {
@@ -2460,18 +2460,18 @@
     "semantic_hash": ""
   },
   "src/app/features/clients/presentation/components/clients-table/clients-table.component.spec.ts": {
-    "mtime": 1794628409.917886,
-    "ast_hash": "bf3ca42060a42f45e72bf434b36a61e1",
+    "mtime": 1795139503.1082954,
+    "ast_hash": "9ee60c6066e8ea961b5b381b583fbb47",
     "semantic_hash": ""
   },
   "src/app/features/clients/presentation/pages/clients-page/clients-page.integration.spec.ts": {
-    "mtime": 1794767053.1487823,
-    "ast_hash": "cbe2089cbe4077e356a2bbcb4eced59c",
+    "mtime": 1795139530.8008895,
+    "ast_hash": "c57ad01c9f646c53816be342f5677165",
     "semantic_hash": ""
   },
   "src/app/features/clients/presentation/pages/clients-page/clients.page.spec.ts": {
-    "mtime": 1794628409.917886,
-    "ast_hash": "e9466d7de77fbbda53130a15bd5c43ce",
+    "mtime": 1795139530.8008895,
+    "ast_hash": "db7eff34bd2e39b61548d1274c08622e",
     "semantic_hash": ""
   },
   "src/app/features/inventory-by-branch/application/facades/inventory-by-branch.facade.spec.ts": {
@@ -3070,8 +3070,8 @@
     "semantic_hash": ""
   },
   "playwright-report/index.html": {
-    "mtime": 1795138816.3841462,
-    "ast_hash": "cc359666949f6782f14e8c3865bda800",
+    "mtime": 1795140339.3399756,
+    "ast_hash": "c1d3f9e40895e0010285ebe4b2822afc",
     "semantic_hash": ""
   },
   "src/electron-ticket-escpos.spec.ts": {
@@ -3115,8 +3115,8 @@
     "semantic_hash": ""
   },
   "src/app/features/suppliers/presentation/pages/suppliers/suppliers.page.toast.spec.ts": {
-    "mtime": 1794721759.1585047,
-    "ast_hash": "befb3c1dd9d3c7b4ca90bccdc312ae48",
+    "mtime": 1795139530.8008895,
+    "ast_hash": "97e3430992ad323451edfcd0b42589e9",
     "semantic_hash": ""
   },
   "docs/manual/capturar.mjs": {
@@ -3190,8 +3190,8 @@
     "semantic_hash": ""
   },
   "docs/plan-pruebas-flujos-e2e.md": {
-    "mtime": 1795138831.288542,
-    "ast_hash": "fa4c3859bd3edd8bcf6d9c267dd8ee84",
+    "mtime": 1795140435.1041973,
+    "ast_hash": "6c171deaeed069680075d3e11a4c008c",
     "semantic_hash": ""
   },
   "e2e/back-e2e.sh": {
@@ -3205,8 +3205,8 @@
     "semantic_hash": ""
   },
   "e2e/helpers/api.ts": {
-    "mtime": 1795138463.7296672,
-    "ast_hash": "d792655d48150ecd60dedb1ab0269bee",
+    "mtime": 1795139669.6758325,
+    "ast_hash": "8fab7f5642eafe2fb2200d393c1f92d6",
     "semantic_hash": ""
   },
   "e2e/flujos/ventas.real.spec.ts": {
@@ -3232,6 +3232,26 @@
   "e2e/flujos/precios.real.spec.ts": {
     "mtime": 1795137701.7902687,
     "ast_hash": "4a08483eeecd0dd46f3368c617fcbfe6",
+    "semantic_hash": ""
+  },
+  "e2e/flujos/clientes.real.spec.ts": {
+    "mtime": 1795139545.5972059,
+    "ast_hash": "ecac0c5fa166b1e6b9c859dbcce3c771",
+    "semantic_hash": ""
+  },
+  "e2e/flujos/proveedores.real.spec.ts": {
+    "mtime": 1795139595.1222596,
+    "ast_hash": "f0b7015ce892b3c4b49a4af35b850810",
+    "semantic_hash": ""
+  },
+  "e2e/flujos/usuarios.real.spec.ts": {
+    "mtime": 1795139747.4252095,
+    "ast_hash": "a5895e78410fd5f748ca99290017f02c",
+    "semantic_hash": ""
+  },
+  "src/app/features/suppliers/application/facades/suppliers.facade.spec.ts": {
+    "mtime": 1795139503.088295,
+    "ast_hash": "6ca6a54d597fceef51c1ae9d3d775ee7",
     "semantic_hash": ""
   }
 }
