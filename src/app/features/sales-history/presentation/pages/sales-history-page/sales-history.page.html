@@ -15,15 +15,6 @@
 
   <!-- Filter Bar -->
   <div class="filter-bar" *ngIf="!error()">
-    <div class="search-box">
-      <i class="lucide-search"></i>
-      <input 
-        type="text" 
-        placeholder="Buscar por ID o Usuario..." 
-        [ngModel]="searchQuery()"
-        (ngModelChange)="searchQuery.set($event)"
-      >
-    </div>
 
     <div class="filter-actions">
       <select 

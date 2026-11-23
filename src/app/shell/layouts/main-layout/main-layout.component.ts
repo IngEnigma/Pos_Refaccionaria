@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, effect, inject, OnDestroy, OnInit, viewChild } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { interval, map, startWith } from 'rxjs';
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { filter, interval, map, startWith } from 'rxjs';
 import { NavbarComponent } from '../../components/navbar/navbar.component';
 import { SidebarComponent } from '../../components/sidebar/sidebar.component';
 import { ShellFacade } from '../../application/facades/shell.facade';

@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, effect, inject, untracked } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, untracked } from '@angular/core';
 import { LucideAngularModule } from 'lucide-angular';
 import { Dialog, DialogModule } from '@angular/cdk/dialog';
 
+import { GlobalSearchService } from '@core/search/global-search.service';
 import { ToastService } from '@shared/ui/components/toast/toast.service';
 import { AuthFacade } from '@features/auth/application/facades/auth.facade';
 import { InventoryByBranchFacade } from '../../../application/facades/inventory-by-branch.facade';
@@ -30,6 +31,10 @@ export class InventoryByBranchPageComponent {
   readonly inventoryFacade = inject(InventoryByBranchFacade);
   private readonly toastService = inject(ToastService);
   private readonly dialog = inject(Dialog);
+  private readonly globalSearch = inject(GlobalSearchService);
+  /** Filtrado con el buscador del navbar. */
+  readonly items = computed(() => this.globalSearch.search([...this.inventoryFacade.allItems()]));
+  readonly movements = computed(() => this.globalSearch.search([...this.inventoryFacade.movements()]));
 
   constructor() {
     effect(() => {

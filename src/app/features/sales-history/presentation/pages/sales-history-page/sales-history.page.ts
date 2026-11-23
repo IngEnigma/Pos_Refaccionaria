@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GetSalesHistoryUseCase } from '../../../application/usecase/get-sales-history.usecase';
 import { GetSaleDetailUseCase } from '../../../../sales/application/usecase/get-sale-detail.usecase';
+import { GlobalSearchService } from '@core/search/global-search.service';
 import { SaleHistory } from '../../../domain/entities/sale-history.entity';
 import { DetailedSale } from '../../../../sales/domain/entities/detailed-sale.entity';
 import { SalesHistoryTableComponent } from '../../components/sales-history-table/sales-history-table.component';
@@ -29,12 +30,13 @@ export class SalesHistoryPageComponent implements OnInit {
   isDetailLoading = signal<boolean>(false);
 
   // Search and Filters
-  searchQuery = signal<string>('');
+  /** Viene del buscador del navbar. */
+  readonly searchQuery = inject(GlobalSearchService).searchQuery;
   filterPaymentMethod = signal<number | null>(null);
 
   // Computed: Filtered Sales
   filteredSales = computed(() => {
-    const query = this.searchQuery().toLowerCase();
+    const query = this.searchQuery().trim().toLowerCase();
     const method = this.filterPaymentMethod();
     
     return this.salesHistory().filter(sale => {

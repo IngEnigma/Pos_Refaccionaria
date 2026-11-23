@@ -12,7 +12,7 @@
       </div>
 
       <app-supplier-list
-        [suppliers]="suppliersFacade.suppliers()"
+        [suppliers]="suppliers()"
         [loading]="suppliersFacade.loading()"
         [canManage]="canManage()"
         (edit)="onEditSupplier($event)"

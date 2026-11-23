@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal, untracked } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, output, signal, untracked } from '@angular/core';
+import { GlobalSearchService } from '@core/search/global-search.service';
 import { CommonModule } from '@angular/common';
 import { LucideAngularModule } from 'lucide-angular';
 import { catchError, finalize, of } from 'rxjs';
@@ -22,6 +23,9 @@ export class BranchPricingTableComponent {
   readonly deactivatePrice = output<number>();
 
   readonly products = signal<readonly ProductStock[]>([]);
+  private readonly globalSearch = inject(GlobalSearchService);
+  /** Filtrado con el buscador del navbar. */
+  readonly visibleProducts = computed(() => this.globalSearch.search([...this.products()]));
   readonly loading = signal(false);
 
   readonly skeletonRows = Array.from({ length: 5 }, (_, i) => i);

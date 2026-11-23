@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, OnInit } 
 import { LucideAngularModule } from 'lucide-angular';
 import { Dialog, DialogModule } from '@angular/cdk/dialog';
 
+import { GlobalSearchService } from '@core/search/global-search.service';
 import { ToastService } from '@shared/ui/components/toast/toast.service';
 import { ConfirmDialogComponent } from '@shared/ui/components/confirm-dialog/confirm-dialog.component';
 import { ClientsFacade } from '../../../application/facades/clients.facade';
@@ -29,10 +30,13 @@ export class ClientsPageComponent implements OnInit {
   private readonly authFacade = inject(AuthFacade);
   private readonly toastService = inject(ToastService);
   private readonly dialog = inject(Dialog);
+  private readonly globalSearch = inject(GlobalSearchService);
 
   readonly sucursalId = this.authFacade.sucursalId;
   /** H-F3-2: editar/eliminar exigen encargado o admin en el back; el cajero solo crea y consulta. */
   readonly canManage = computed(() => this.authFacade.role() !== 'seller');
+  /** Filtrado con el buscador del navbar. */
+  readonly clients = computed(() => this.globalSearch.search([...this.clientsFacade.clients()]));
 
   constructor() {
     effect(() => {

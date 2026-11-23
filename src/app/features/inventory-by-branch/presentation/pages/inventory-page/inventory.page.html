@@ -33,7 +33,7 @@
             </span>
           </div>
           <app-inventory-table
-            [items]="inventoryFacade.allItems()"
+            [items]="items()"
             [loading]="inventoryFacade.loading()"
             (registerMovement)="onRegisterMovement($event)"
           />
@@ -41,7 +41,7 @@
 
         <div class="movements-panel">
           <app-movement-list
-            [movements]="inventoryFacade.movements()"
+            [movements]="movements()"
             [loading]="inventoryFacade.loading()"
           />
         </div>

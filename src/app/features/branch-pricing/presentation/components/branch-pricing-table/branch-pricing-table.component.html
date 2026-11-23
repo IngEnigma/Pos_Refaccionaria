@@ -30,7 +30,7 @@
 
       <!-- Data State -->
       <ng-container *ngIf="!loading()">
-        <tr *ngFor="let product of products()" class="product-row">
+        <tr *ngFor="let product of visibleProducts()" class="product-row">
           <td>
             <div class="product-name">
               <lucide-icon name="Package" [size]="16" class="product-icon"></lucide-icon>
