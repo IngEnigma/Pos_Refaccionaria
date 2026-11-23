@@ -62,6 +62,19 @@ export class InventoryByBranchFacade {
       });
   }
 
+  /** Reemplaza cantidades desde GET /api/stock/; no agrega ni elimina productos. */
+  applyStockSnapshot(stockByProductId: ReadonlyMap<number, number>): void {
+    let changed = false;
+    const items = this._allItems().map((item) => {
+      const cantidad = stockByProductId.get(item.idProducto);
+      if (cantidad === undefined || cantidad === item.cantidad) return item;
+      changed = true;
+      return { ...item, cantidad };
+    });
+
+    if (changed) this._allItems.set(items);
+  }
+
   selectInventory(inventario: BranchInventory): void {
     this._selectedInventory.set(inventario);
   }

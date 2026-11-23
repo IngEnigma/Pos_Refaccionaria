@@ -147,6 +147,40 @@ describe('InventoryByBranchFacade', () => {
     expect(facade.selectedInventory()?.idInventario).toBe(1);
   });
 
+  // Comprueba que el snapshot reemplace cantidades por idProducto sin sumar ni restar.
+  it('applyStockSnapshot reemplaza cantidades por idProducto', () => {
+    getMyBranchInventoryUseCase.execute.mockReturnValue(
+      of([makeInventory(1, [makeItem(1), makeItem(2)])]),
+    );
+    facade.loadMyBranchInventory();
+
+    facade.applyStockSnapshot(new Map([[1, 3]]));
+
+    expect(facade.allItems()[0].cantidad).toBe(3);
+    expect(facade.allItems()[1].cantidad).toBe(10);
+  });
+
+  // Comprueba que un producto ausente en el snapshot conserve su cantidad.
+  it('applyStockSnapshot ignora productos ausentes', () => {
+    getMyBranchInventoryUseCase.execute.mockReturnValue(of([makeInventory(1, [makeItem(1)])]));
+    facade.loadMyBranchInventory();
+
+    facade.applyStockSnapshot(new Map([[99, 0]]));
+
+    expect(facade.allItems()[0].cantidad).toBe(10);
+  });
+
+  // Comprueba que sin cambios reales no se reemplace la referencia (evita re-renders).
+  it('applyStockSnapshot no cambia la referencia si las cantidades son iguales', () => {
+    getMyBranchInventoryUseCase.execute.mockReturnValue(of([makeInventory(1, [makeItem(1)])]));
+    facade.loadMyBranchInventory();
+    const before = facade.allItems();
+
+    facade.applyStockSnapshot(new Map([[1, 10]]));
+
+    expect(facade.allItems()).toBe(before);
+  });
+
   // Comprueba que selectInventory cambie el inventario elegido.
   it('selectInventory cambia el inventario seleccionado', () => {
     const inv = makeInventory(9, []);

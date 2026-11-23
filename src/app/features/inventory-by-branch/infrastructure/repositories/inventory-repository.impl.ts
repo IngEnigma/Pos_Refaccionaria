@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 
@@ -6,6 +6,7 @@ import { APP_ENV } from '@core/tokens/app-env.token';
 import { Environment } from '@env/environment.model';
 import { BranchInventoryDto, InventoryItemDto } from '../../application/dtos/inventory-response.dto';
 import { InventarioRefDto, CreateInventarioRequestDto } from '../../application/dtos/inventario-ref.dto';
+import { StockResponseDto } from '../../application/dtos/stock-response.dto';
 import { BranchInventory } from '../../domain/entities/inventory.entity';
 import { InventarioRef } from '../../domain/entities/inventory-movement.entity';
 import { InventoryRepository } from '../../domain/repository/inventory-repository';
@@ -16,6 +17,7 @@ export class InventoryRepositoryImpl implements InventoryRepository {
   private readonly http = inject(HttpClient);
   private readonly env = inject<Environment>(APP_ENV);
   private readonly endpoint = `${this.env.apiUrl}/inventarios`;
+  private readonly stockEndpoint = `${this.env.apiUrl}/stock/`;
 
   getMyBranchInventory(): Observable<BranchInventory[]> {
     return this.http
@@ -36,6 +38,14 @@ export class InventoryRepositoryImpl implements InventoryRepository {
           return [];
         }),
       );
+  }
+
+  getStock(sucursalId: number): Observable<ReadonlyMap<number, number>> {
+    const params = new HttpParams().set('sucursal_id', sucursalId.toString());
+
+    return this.http
+      .get<StockResponseDto[]>(this.stockEndpoint, { params })
+      .pipe(map((rows) => new Map(rows.map((row) => [row.id_producto, row.cantidad]))));
   }
 
   getInventarios(): Observable<InventarioRef[]> {

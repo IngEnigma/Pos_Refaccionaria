@@ -4,6 +4,7 @@ import { InventarioRef } from '../entities/inventory-movement.entity';
 
 export abstract class InventoryRepository {
   abstract getMyBranchInventory(): Observable<BranchInventory[]>;
+  abstract getStock(sucursalId: number): Observable<ReadonlyMap<number, number>>;
   abstract getInventarios(): Observable<InventarioRef[]>;
   abstract createInventario(payload: { idSucursal: number; descripcion: string }): Observable<InventarioRef>;
 }
