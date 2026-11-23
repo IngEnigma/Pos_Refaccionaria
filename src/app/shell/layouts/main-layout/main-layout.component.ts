@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, effect, inject, OnInit, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, OnDestroy, OnInit, viewChild } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { interval, map, startWith } from 'rxjs';
@@ -6,6 +6,7 @@ import { NavbarComponent } from '../../components/navbar/navbar.component';
 import { SidebarComponent } from '../../components/sidebar/sidebar.component';
 import { ShellFacade } from '../../application/facades/shell.facade';
 import { AuthFacade } from '@features/auth';
+import { StockSyncService } from '@features/inventory-by-branch/application/services/stock-sync.service';
 import { formatDate } from '@app/shared/utils/date-format.util';
 
 @Component({
@@ -16,10 +17,11 @@ import { formatDate } from '@app/shared/utils/date-format.util';
   styleUrl: './main-layout.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class MainLayoutComponent implements OnInit {
+export class MainLayoutComponent implements OnInit, OnDestroy {
 
   private readonly shellFacade = inject(ShellFacade);
   private readonly authFacade = inject(AuthFacade);
+  private readonly stockSync = inject(StockSyncService);
 
   readonly username = this.shellFacade.user;
   readonly sucursalId = this.authFacade.sucursalId;
@@ -39,10 +41,20 @@ export class MainLayoutComponent implements OnInit {
     effect(() => {
       if (this.shellFacade.searchSubmitActive()) this.navbar()?.focusSearch();
     });
+
+    // La sucursal llega asíncrona con el perfil; el polling arranca cuando ya existe.
+    effect(() => {
+      if (this.authFacade.sucursalId() != null) this.stockSync.start();
+      else this.stockSync.stop();
+    });
   }
 
   ngOnInit(): void {
     this.authFacade.refreshProfile().subscribe();
+  }
+
+  ngOnDestroy(): void {
+    this.stockSync.stop();
   }
 
   onLogout(): void {
