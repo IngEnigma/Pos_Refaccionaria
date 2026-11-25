@@ -65,6 +65,12 @@ export const routes: Routes = [
       import('@features/clients/clients.routes').then((m) => m.CLIENTS_ROUTES),
   },
   {
+    path: AppRoutes.debts,
+    canActivate: [authGuard],
+    component: MainLayoutComponent,
+    loadChildren: () => import('@features/debts/debts.routes').then((m) => m.DEBTS_ROUTES),
+  },
+  {
     path: AppRoutes.admin,
     canActivate: [authGuard, roleGuard],
     data: { roles: ['admin'] },

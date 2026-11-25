@@ -8,6 +8,7 @@ export const AppRoutes = {
   suppliers: 'suppliers',
   branches: 'branches',
   clients: 'clients',
+  debts: 'debts',
   admin: 'admin',
   manager: 'manager',
   notifications: 'notifications',

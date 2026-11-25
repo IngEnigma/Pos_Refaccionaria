@@ -59,6 +59,13 @@ export const DEFAULT_SIDEBAR_NAV_ITEMS: readonly SidebarNavItem[] = [
     roles: ['admin', 'manager', 'seller'],
   },
   {
+    id: 'debts',
+    label: 'Adeudos',
+    icon: 'credit-card',
+    route: '/debts',
+    roles: ['admin', 'manager', 'seller'],
+  },
+  {
     id: 'inventory-by-branch',
     label: 'Inventario Sucursal',
     icon: 'warehouse',

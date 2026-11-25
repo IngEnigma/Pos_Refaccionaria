@@ -54,6 +54,8 @@ import { BranchPriceRepository } from '@features/branch-pricing/domain/repositor
 import { BranchPriceRepositoryImpl } from '@features/branch-pricing/infrastructure/repositories/branch-price-repository.impl';
 import { ClientRepository } from '@features/clients/domain/repository/client-repository';
 import { ClientRepositoryImpl } from '@features/clients/infrastructure/repositories/client-repository.impl';
+import { DebtRepository } from '@features/debts/domain/debt';
+import { DebtRepositoryImpl } from '@features/debts/infrastructure/debt-repository.impl';
 import { SEARCH_STRATEGY } from '@core/search/search.strategy';
 import { DefaultSearchStrategy } from '@core/search/default-search.strategy';
 import { routes } from '@app/app.routes';
@@ -297,6 +299,10 @@ export const appConfig: ApplicationConfig = {
     {
       provide: ClientRepository,
       useClass: ClientRepositoryImpl,
+    },
+    {
+      provide: DebtRepository,
+      useClass: DebtRepositoryImpl,
     },
     {
       provide: SEARCH_STRATEGY,

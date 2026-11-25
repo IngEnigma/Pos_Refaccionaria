@@ -1,0 +1,55 @@
+<div class="debts-root">
+  <div class="header">
+    <div>
+      <h1 class="title">Adeudos</h1>
+      <p class="subtitle">Saldos de clientes y registro de abonos.</p>
+    </div>
+    <button class="btn-primary" (click)="onNew()">
+      <lucide-icon name="Plus" [size]="18"></lucide-icon> Nuevo adeudo
+    </button>
+  </div>
+
+  <div class="toolbar">
+    <label>Estado
+      <select [value]="status()" (change)="setStatus($any($event.target).value)" aria-label="Filtrar por estado">
+        @for (s of statuses; track s.value) { <option [value]="s.value">{{ s.label }}</option> }
+      </select>
+    </label>
+    <span class="total">Por cobrar: <strong>{{ pendingBalance() | currency }}</strong></span>
+  </div>
+
+  <div class="table-container">
+    <table>
+      <caption class="sr-only">Adeudos de clientes con total, saldo y estado</caption>
+      <thead>
+        <tr><th>Cliente</th><th>Concepto</th><th>Fecha</th><th>Total</th><th>Saldo</th><th>Estado</th><th>Acciones</th></tr>
+      </thead>
+      <tbody>
+        @if (loading()) {
+          <tr><td colspan="7" class="empty">Cargando…</td></tr>
+        } @else {
+          @for (d of rows(); track d.id) {
+            <tr>
+              <td>{{ d.clientName }}</td>
+              <td>{{ d.concept || '—' }}</td>
+              <td>{{ d.date | date: 'dd/MM/yyyy' }}</td>
+              <td>{{ d.total | currency }}</td>
+              <td>{{ d.balance | currency }}</td>
+              <td><span class="badge" [class]="d.status">{{ d.status }}</span></td>
+              <td>
+                @if (d.status === 'pendiente') {
+                  <button class="btn-link" (click)="onPay(d)">Abonar</button>
+                  @if (canManage()) {
+                    <button class="btn-link danger" (click)="onCancel(d)">Cancelar</button>
+                  }
+                }
+              </td>
+            </tr>
+          } @empty {
+            <tr><td colspan="7" class="empty">No hay adeudos.</td></tr>
+          }
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
