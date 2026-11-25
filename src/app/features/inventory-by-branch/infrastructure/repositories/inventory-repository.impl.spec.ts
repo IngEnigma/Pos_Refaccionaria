@@ -14,6 +14,7 @@ describe('InventoryRepositoryImpl', () => {
   const envStub: Environment = { apiUrl: 'http://api.test', production: false, loggingLevel: 0 };
   const miSucursalUrl = 'http://api.test/inventarios/mi-sucursal/';
   const inventariosUrl = 'http://api.test/inventarios';
+  const stockUrl = 'http://api.test/stock/';
 
   const itemDto = {
     id: 55,
@@ -94,6 +95,23 @@ describe('InventoryRepositoryImpl', () => {
     });
 
     httpMock.expectOne(miSucursalUrl).flush({ otra: 'forma' });
+  });
+
+  // Comprueba que el snapshot de stock se pida por sucursal y se mapee a idProducto -> cantidad.
+  it('getStock envía sucursal_id y mapea cantidades', () => {
+    repository.getStock(3).subscribe((stock) => {
+      expect(stock.get(7)).toBe(47);
+      expect(stock.get(8)).toBe(0);
+    });
+
+    const req = httpMock.expectOne(
+      (request) => request.url === stockUrl && request.params.get('sucursal_id') === '3',
+    );
+    expect(req.request.method).toBe('GET');
+    req.flush([
+      { id: 1, id_sucursal: 3, id_producto: 7, cantidad: 47 },
+      { id: 2, id_sucursal: 3, id_producto: 8, cantidad: 0 },
+    ]);
   });
 
   // Comprueba que el listado de inventarios mapee id/descripción/sucursal a camelCase.
